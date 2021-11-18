@@ -1,0 +1,16 @@
+introduction
+statistical-learning
+what-is-statistical-learning
+why-estimate-f
+how-do-we-estimate-f
+parametric-methods
+non-parametric-methods
+the-trade-off-between-prediction-accuracy-and-model-interpretability
+supervised-versus-unsupervised-learning
+assessing-model-accuracy
+measuring-the-quality-of-fit
+the-bias-variance-trade-off
+the-classification-setting
+the-bayes-classifier
+k-nearest-neighbors
+lab-introduction-to-r

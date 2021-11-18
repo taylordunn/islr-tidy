@@ -1,0 +1,77 @@
+# Introduction
+
+## An Overview of Statistical Learning {-}
+
+>Broadly speaking, supervised statistical learning involves building a statistical model for predicting, or estimating, an output based on one or more inputs. 
+
+>With unsupervised statistical learning, there are inputs but no supervising output; nevertheless we can learn relationships and structure from such data.
+
+
+### Wage Data {-}
+
+Load the `Wage` data set via the `ISLR2` package:
+
+```{r}
+library(ISLR2)
+wage <- ISLR2::Wage
+
+head(wage)
+```
+
+Load the `tidyverse`, and set my `ggplot2` theme:
+
+```{r message=FALSE}
+library(tidyverse)
+library(dunnr) # My personal R package
+library(patchwork) # For composing plots
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td())
+set_geom_fonts()
+set_palette()
+```
+
+Now attempt to re-create Figure 1.1:
+
+```{r figure1.1, message=FALSE, fig.height=3}
+p1 <- wage %>%
+  ggplot(aes(x = age, y = wage)) +
+  geom_point(color = "lightgrey") +
+  geom_smooth(color = "blue")
+p2 <- wage %>%
+  ggplot(aes(x = year, y = wage)) +
+  geom_point(color = "lightgrey") +
+  geom_smooth(method = "lm", color = "blue")
+p3 <- wage %>%
+  # Need to re-label the factor levels
+  mutate(education = fct_relabel(education, ~str_extract(., "\\d"))) %>%
+  ggplot(aes(x = education, y = wage)) +
+  geom_boxplot(aes(fill = education)) +
+  theme(legend.position = "none")
+p1 + p2 + p3
+```
+
+## A Brief History of Statistical Learning {-}
+
+## This Book {-}
+
+>The Elements of Statistical Learning (ESL) by Hastie, Tibshirani, and
+Friedman was first published in 2001. Since that time, it has become an
+important reference on the fundamentals of statistical machine learning.
+Its success derives from its comprehensive and detailed treatment of many
+important topics in statistical learning, as well as the fact that (relative to
+many upper-level statistics textbooks) it is accessible to a wide audience.
+
+>The purpose of An Introduction to Statistical Learning (ISL) is to facilitate the transition of statistical learning from an academic to a mainstream
+field. ISL is not intended to replace ESL, which is a far more comprehensive text both in terms of the number of approaches considered and the
+depth to which they are explored.
+
+I may also pull from ESL [@Hastie2009] at times for more detailed treatments of complex topics.
+
+>ISL is based on the following four premises
+>1. Many statistical learning methods are relevant and useful in a wide
+range of academic and non-academic disciplines, beyond just the statistical sciences.
+2. Statistical learning should not be viewed as a series of black boxes.
+3. While it is important to know what job is performed by each cog, it
+is not necessary to have the skills to construct the machine inside the
+box!
+4. We presume that the reader is interested in applying statistical learning methods to real-world problems.

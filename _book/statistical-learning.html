@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 Statistical Learning | An Introduction to Statistical with the tidyverse</title>
+  <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 Statistical Learning | An Introduction to Statistical with the tidyverse" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="github-repo" content="taylordunn/islr-tidy" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 Statistical Learning | An Introduction to Statistical with the tidyverse" />
+  
+  <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  
+
+<meta name="author" content="Taylor Dunn" />
+
+
+<meta name="date" content="2021-11-17" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="introduction.html"/>
+
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Who, what, and why?</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#an-overview-of-statistical-learning"><i class="fa fa-check"></i>An Overview of Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#wage-data"><i class="fa fa-check"></i>Wage Data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#a-brief-history-of-statistical-learning"><i class="fa fa-check"></i>A Brief History of Statistical Learning</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#this-book"><i class="fa fa-check"></i>This Book</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="statistical-learning.html"><a href="statistical-learning.html"><i class="fa fa-check"></i><b>2</b> Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#what-is-statistical-learning"><i class="fa fa-check"></i><b>2.1</b> What Is Statistical Learning?</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="statistical-learning.html"><a href="statistical-learning.html#why-estimate-f"><i class="fa fa-check"></i><b>2.1.1</b> Why Estimate <span class="math inline">\(f\)</span>?</a></li>
+<li class="chapter" data-level="2.1.2" data-path="statistical-learning.html"><a href="statistical-learning.html#how-do-we-estimate-f"><i class="fa fa-check"></i><b>2.1.2</b> How Do We Estimate f?</a></li>
+<li class="chapter" data-level="2.1.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-trade-off-between-prediction-accuracy-and-model-interpretability"><i class="fa fa-check"></i><b>2.1.3</b> The Trade-Off Between Prediction Accuracy and Model Interpretability</a></li>
+<li class="chapter" data-level="2.1.4" data-path="statistical-learning.html"><a href="statistical-learning.html#supervised-versus-unsupervised-learning"><i class="fa fa-check"></i><b>2.1.4</b> Supervised Versus Unsupervised Learning</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#assessing-model-accuracy"><i class="fa fa-check"></i><b>2.2</b> Assessing Model Accuracy</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#measuring-the-quality-of-fit"><i class="fa fa-check"></i><b>2.2.1</b> Measuring the Quality of Fit</a></li>
+<li class="chapter" data-level="2.2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#the-bias-variance-trade-off"><i class="fa fa-check"></i><b>2.2.2</b> The Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="2.2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-classification-setting"><i class="fa fa-check"></i><b>2.2.3</b> The Classification Setting</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#lab-introduction-to-r"><i class="fa fa-check"></i><b>2.3</b> Lab: Introduction to R</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical with the tidyverse</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="statistical-learning" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Statistical Learning</h1>
+<div id="what-is-statistical-learning" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> What Is Statistical Learning?</h2>
+<p>For a quantitative response <span class="math inline">\(Y\)</span> and <span class="math inline">\(p\)</span> different predictors <span class="math inline">\(X_1, X_2, \dots, X_p\)</span>, we assume there is some relationship between <span class="math inline">\(Y\)</span> and the predictors <span class="math inline">\(X\)</span>.
+This can be written in the very general form:</p>
+<p><span class="math display">\[
+Y = f(X) + \epsilon
+\]</span></p>
+<p>where <span class="math inline">\(f\)</span> is some fixed but unkown function of <span class="math inline">\(X_1, \dots, X_p\)</span>, and <span class="math inline">\(\epsilon\)</span> is a random error term, which is independent of <span class="math inline">\(X\)</span> and has mean zero.</p>
+<blockquote>
+<p>In essence, statistical learning refers to a set of approaches for estimating
+f. In this chapter we outline some of the key theoretical concepts that arise
+in estimating f, as well as tools for evaluating the estimates obtained</p>
+</blockquote>
+<div id="why-estimate-f" class="section level3" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Why Estimate <span class="math inline">\(f\)</span>?</h3>
+<p>For <em>prediction</em> and <em>inference</em>.</p>
+<div id="prediction" class="section level4 unnumbered">
+<h4>Prediction</h4>
+<p>In cases where inputs <span class="math inline">\(X\)</span> are available, but output <span class="math inline">\(Y\)</span> is not easily obtained, we can predict <span class="math inline">\(Y\)</span> using</p>
+<p><span class="math display">\[
+\hat{Y} = \hat{f}(X)
+\]</span></p>
+<p>where <span class="math inline">\(\hat{f}\)</span> represents our estimate for <span class="math inline">\(f\)</span>, and <span class="math inline">\(\hat{Y}\)</span> represents our prediction for <span class="math inline">\(Y\)</span>.
+We don’t necessarily care about the form of <span class="math inline">\(\hat{f}\)</span> – it can be treated as a block box as long as it gives good predictions.</p>
+</div>
+<div id="inference" class="section level4 unnumbered">
+<h4>Inference</h4>
+<p>When we are interested in understanding the association between <span class="math inline">\(Y\)</span> and <span class="math inline">\(X\)</span>, we wish to estimate <span class="math inline">\(\hat{f}\)</span> and know its exact form (i.e. we don’t treat it as a block box).</p>
+<blockquote>
+<p>Depending on whether our ultimate goal is prediction, inference, or a
+combination of the two, different methods for estimating f may be appropriate. For example, linear models allow for relatively simple and inter- linear model pretable inference, but may not yield as accurate predictions as some other
+approaches. In contrast, some of the highly non-linear approaches that we
+discuss in the later chapters of this book can potentially provide quite accurate predictions for Y , but this comes at the expense of a less interpretable
+model for which inference is more challenging.</p>
+</blockquote>
+</div>
+</div>
+<div id="how-do-we-estimate-f" class="section level3" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> How Do We Estimate f?</h3>
+<blockquote>
+<p>Our goal is to apply a statistical learning method to the training data
+in order to estimate the unknown function <span class="math inline">\(f\)</span>. In other words, we want to
+find a function <span class="math inline">\(\hat{f}\)</span> such that <span class="math inline">\(Y \approx \hat{f}(X)\)</span> for any observation <span class="math inline">\((X, Y)\)</span>. Broadly
+speaking, most statistical learning methods for this task can be characterized as either parametric or non-parametric. We now briefly discuss these two types of approaches.</p>
+</blockquote>
+<div id="parametric-methods" class="section level4" number="2.1.2.1">
+<h4><span class="header-section-number">2.1.2.1</span> Parametric Methods</h4>
+<p>The parametric method involves estimating a set of parameters.
+It is a two-step model-based approach:</p>
+<ol style="list-style-type: decimal">
+<li>Make an assumption about the function form or shape of <span class="math inline">\(f\)</span>.</li>
+<li>Fit or train the model.</li>
+</ol>
+<p>A simple assumption is that <span class="math inline">\(f\)</span> is linear in <span class="math inline">\(X\)</span>:</p>
+<p><span class="math display">\[
+f(X) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p
+\]</span></p>
+<p>In the case of this linear model, we need to estimate the <span class="math inline">\(\beta\)</span> parameters such that <span class="math inline">\(Y \approx \beta_0 + \dots + \beta_p X_p\)</span>.
+The most common approach to fitting a model like this is (ordinary) least squares.</p>
+</div>
+<div id="non-parametric-methods" class="section level4" number="2.1.2.2">
+<h4><span class="header-section-number">2.1.2.2</span> Non-Parametric Methods</h4>
+<blockquote>
+<p>Non-parametric methods do not make explicit assumptions about the functional form of <span class="math inline">\(f\)</span>. Instead they seek an estimate of <span class="math inline">\(f\)</span> that gets as close to the
+data points as possible without being too rough or wiggly. Such approaches
+can have a major advantage over parametric approaches: by avoiding the
+assumption of a particular functional form for <span class="math inline">\(f\)</span>, they have the potential
+to accurately fit a wider range of possible shapes for <span class="math inline">\(f\)</span>.</p>
+</blockquote>
+</div>
+</div>
+<div id="the-trade-off-between-prediction-accuracy-and-model-interpretability" class="section level3" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> The Trade-Off Between Prediction Accuracy and Model Interpretability</h3>
+<blockquote>
+<p>One might reasonably ask the following question: why would we ever
+choose to use a more restrictive method instead of a very flexible approach?
+There are several reasons that we might prefer a more restrictive model.
+If we are mainly interested in inference, then restrictive models are much
+more interpretable.</p>
+</blockquote>
+<blockquote>
+<p>We have established that when inference is the goal, there are clear advantages to using simple and relatively inflexible statistical learning methods. In some settings, however, we are only interested in prediction, and
+the interpretability of the predictive model is simply not of interest. For
+instance, if we seek to develop an algorithm to predict the price of a
+stock, our sole requirement for the algorithm is that it predict accurately—
+interpretability is not a concern. In this setting, we might expect that it
+will be best to use the most flexible model available. Surprisingly, this is
+not always the case! We will often obtain more accurate predictions using
+a less flexible method.</p>
+</blockquote>
+</div>
+<div id="supervised-versus-unsupervised-learning" class="section level3" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> Supervised Versus Unsupervised Learning</h3>
+<ul>
+<li>Supervised
+<ul>
+<li>for each observation, there is an associated response</li>
+<li>we wish to fit a model that relates the response to predictors, with the aim of accurately predicting the response, or for better understanding the relationships</li>
+<li>the focus of the book</li>
+</ul></li>
+<li>Unsupervised
+<ul>
+<li>no associated response</li>
+<li>we can seek to understand relationships between variables or between obervsations</li>
+<li>one example: cluster analysis</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="assessing-model-accuracy" class="section level2" number="2.2">
+<h2><span class="header-section-number">2.2</span> Assessing Model Accuracy</h2>
+<blockquote>
+<p>There
+is no free lunch in statistics: no one method dominates all others over all
+possible data sets. On a particular data set, one specific method may work
+best, but some other method may work better on a similar but different
+data set. Hence it is an important task to decide for any given set of data
+which method produces the best results. Selecting the best approach can
+be one of the most challenging parts of performing statistical learning in
+practice.</p>
+</blockquote>
+<div id="measuring-the-quality-of-fit" class="section level3" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> Measuring the Quality of Fit</h3>
+<p>In the regression setting, the most commonly-used measure is the mean squared error (MSE):</p>
+<p><span class="math display">\[
+\text{MSE} = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{f}(x_i))^2
+\]</span></p>
+<p>We compute MSE with both training and testing data sets, but care much more about the latter.
+The goal is to minimize the testing MSE, but what if we only have training data?
+It is not always the case that we want to take the model that minimizes the training MSE due to overfitting.</p>
+<blockquote>
+<p>In practice, one can usually compute the training MSE with relative
+ease, but estimating test MSE is considerably more difficult because usually
+no test data are available. As the previous three examples illustrate, the
+flexibility level corresponding to the model with the minimal test MSE can
+vary considerably among data sets.</p>
+</blockquote>
+</div>
+<div id="the-bias-variance-trade-off" class="section level3" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> The Bias-Variance Trade-Off</h3>
+<p>The expected test MSE for a given value of <span class="math inline">\(x_0\)</span> can be decomposed into the sum of three quantities:</p>
+<p><span class="math display">\[
+E(y - \hat{f}(x_0))^2 = \text{Var}(\hat{f}(x_0)) + [\text{Bias}(\hat{f}(x_0))]^2 + \text{Var}(\epsilon)
+\]</span></p>
+<p>This tells us that, to minimize MSE, we need to select a statistical learning method that achieves low variance and low bias (because the variance of the error term is irreducible).</p>
+<p>The variance here refers to the amount by which <span class="math inline">\(\hat{f}\)</span> would change if estimated using different training data.
+This is minimized by more rigid models; flexible models tend to have high variance.</p>
+<p>The bias is, conceptually, the error introduced by approximating a complex real-life scenario with a much simpler model.
+A linear regression model tends to introduce much bias due to the very simplified assumption of linear relationships.
+Flexible methods tend to result in less bias.</p>
+</div>
+<div id="the-classification-setting" class="section level3" number="2.2.3">
+<h3><span class="header-section-number">2.2.3</span> The Classification Setting</h3>
+<p>When estimating <span class="math inline">\(f\)</span> with qualitative <span class="math inline">\(y\)</span>, the most common approach for quantifying accuracy is the training error rate.
+This is the proportion of mistakes made by <span class="math inline">\(\hat{f}\)</span> to the training data:</p>
+<p><span class="math display">\[
+\frac{1}{n} \sum_{i=1}^n I(y_i \neq \hat{y}_i)
+\]</span></p>
+<p>As with the regression setting, we seek a classifier for which the test error rate is smallest.</p>
+<div id="the-bayes-classifier" class="section level4" number="2.2.3.1">
+<h4><span class="header-section-number">2.2.3.1</span> The Bayes Classifier</h4>
+<blockquote>
+<p>It is possible to show (though the proof is outside of the scope of this
+book) that the test error rate given in (2.9) is minimized, on average, by a
+very simple classifier that assigns each observation to the most likely class,
+given its predictor values. In other words, we should simply assign a test
+observation with predictor vector <span class="math inline">\(x_0\)</span> to the class <span class="math inline">\(j\)</span> for which</p>
+</blockquote>
+<p><span class="math display">\[
+\text{Pr}(Y = j | X = x_0)
+\]</span></p>
+<blockquote>
+<p>is largest…
+This very simple classifier is called the Bayes classifer.</p>
+</blockquote>
+<p>The Bayes error rate is analogous to the irreducible error in that classes may overlap.</p>
+</div>
+<div id="k-nearest-neighbors" class="section level4" number="2.2.3.2">
+<h4><span class="header-section-number">2.2.3.2</span> <span class="math inline">\(K\)</span>-Nearest Neighbors</h4>
+<p>The Bayes classifier is the gold standard, but unattainable for real data because we do not know the conditional distribution <span class="math inline">\(\text{Pr}(Y|X)\)</span>.</p>
+<p>One method to which to compared is the <span class="math inline">\(K\)</span>-nearest neighbors (KNN) classifier.
+For a test observation <span class="math inline">\(x_0\)</span>, KNN involves identifying the <span class="math inline">\(K\)</span> nearest points in the training data that are closest to <span class="math inline">\(x_0\)</span>, represented by <span class="math inline">\(\mathcal{N}_0\)</span>.
+It then estimates the conditional probability of the classes using the fraction of the poitns:</p>
+<p><span class="math display">\[
+\text{Pr}(Y = j|X = x_0) = \frac{1}{K} \sum_{i \in \mathcal{N}_0} I (y_i = j).
+\]</span>
+KNN classifies the <span class="math inline">\(x_0\)</span> into the class <span class="math inline">\(k\)</span> w</p>
+<p>The choices of <span class="math inline">\(k\)</span> has a drastic effect on the performance of the classifer.
+<span class="math inline">\(K = 1\)</span> is the most flexible, i.e. low bias but high variance.
+A large value of <span class="math inline">\(K\)</span> (which is relative to the density of points) is the least flexible, i.e. high bias but low variance.</p>
+</div>
+</div>
+</div>
+<div id="lab-introduction-to-r" class="section level2" number="2.3">
+<h2><span class="header-section-number">2.3</span> Lab: Introduction to R</h2>
+<p>I’ll be skipping this, as it is just a basic introduction of base R.</p>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
+</div>
+<div class="csl-entry">
+James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em><span class="nocase">An Introduction to Statistical Learning with Applications in R</span></em>. 2nd ed. New York, NY: Springer. <a href="https://doi.org/10.1007/978-1-0716-1418-1_1">https://doi.org/10.1007/978-1-0716-1418-1_1</a>.
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="introduction.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
