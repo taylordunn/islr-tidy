@@ -1,0 +1,86 @@
+# Classification
+
+>But in many situations, the response
+variable is instead qualitative. For example, eye color is qualitative. Often qualitative variables are referred to as categorical; we will use these
+terms interchangeably. In this chapter, we study approaches for predicting
+qualitative responses, a process that is known as classification.
+
+The methods covered in this chapter include logistic regression (and Poisson regression), linear discriminant analysis, quadratic discriminant analysis, naive Bayes, and $K$-nearest neighbors.
+
+## An Overview of Classification
+
+>In this chapter, we will illustrate the concept of classification using the
+simulated `Default` data set. We are interested in predicting whether an
+individual will default on his or her credit card payment, on the basis of
+annual income and monthly credit card balance.
+
+```{r figure4.1}
+default <- ISLR2::Default
+glimpse(default)
+```
+
+Randomly choose a subset of the `r nrow(default)` observations and re-create Figure 4.1:
+
+```{r figure4.1, message=FALSE, fig.width=6, fig.height=3}
+library(tidyverse)
+library(patchwork) # for composing plots
+# Load my R package and set the ggplot theme
+library(dunnr)
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td())
+set_geom_fonts()
+set_palette()
+
+d <- default %>%
+  add_count(default, name = "n_group") %>%
+  slice_sample(
+    n = 1000,
+    # Inversely weight by group size to get more even distribution
+    weight_by = n() - n_group
+  )
+p1 <- d %>%
+  ggplot(aes(x = balance, y = income)) +
+  geom_point(aes(color = default, shape = default),
+             alpha = 0.5, show.legend = FALSE)
+p2 <- d %>%
+  ggplot(aes(x = default, y = balance)) +
+  geom_boxplot(aes(fill = default), show.legend = FALSE)
+p3 <- d %>%
+  ggplot(aes(x = default, y = income)) +
+  geom_boxplot(aes(fill = default), show.legend = FALSE)
+p1 | (p2 | p3)
+```
+
+## Why Not Linear Regression?
+
+Linear regression cannot predict un-ordered qualitative responses with more than two levels.
+
+>Unfortunately, in general there is no natural way to
+convert a qualitative response variable with more than two levels into a
+quantitative response that is ready for linear regression.
+
+It is possible to use linear regression to predict a binary (two level) response.
+For example, if we code stroke and drug overdose as dummy variables:
+
+$$
+Y =
+\begin{cases}
+0 & \text{if stroke;} \\
+1 & \text{if drug overdose}.
+\end{cases}
+$$
+
+Then we predict stroke if $\hat{Y} <= 0.5$ and overdose if $\hat{Y} > 0.5$.
+It turns out that these probability estimates are not unreasonble, but there can be issues:
+
+>However, if we use linear regression, some of our estimates might be outside the [0, 1] interval (see Figure 4.2), making them
+hard to interpret as probabilities! Nevertheless, the predictions provide an ordering and can be interpreted as crude probability estimates.
+
+## Logistic Regression
+
+In logistic regression, we model the probability of $Y$ belonging to a class, rather than the response $Y$ itself.
+The probability of `default` given `balance` can be written:
+
+$$
+\text{Pr}(\text{`default` = `Yes`}|\text{`balance`}) = p(\text{`balance`})
+$$
