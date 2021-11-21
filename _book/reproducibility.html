@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>An Introduction to Statistical with the tidyverse</title>
+  <title>Reproducibility | An Introduction to Statistical with the tidyverse</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="An Introduction to Statistical with the tidyverse" />
+  <meta property="og:title" content="Reproducibility | An Introduction to Statistical with the tidyverse" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="taylordunn/islr-tidy" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="An Introduction to Statistical with the tidyverse" />
+  <meta name="twitter:title" content="Reproducibility | An Introduction to Statistical with the tidyverse" />
   
   <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
   
@@ -24,15 +24,15 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2021-11-21" />
+<meta name="date" content="2021-11-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
+<link rel="prev" href="linear-regression.html"/>
 
-<link rel="next" href="introduction.html"/>
 <script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -216,8 +216,8 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#applied"><i class="fa fa-check"></i>Applied</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#reproducibility"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
+<li class="chapter" data-level="" data-path="reproducibility.html"><a href="reproducibility.html"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul>
 
       </nav>
@@ -235,23 +235,192 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="header">
-<h1 class="title">An Introduction to Statistical with the tidyverse</h1>
-<p class="author"><em>Taylor Dunn</em></p>
-<p class="date"><em>2021-11-21</em></p>
-</div>
-<div id="who-what-and-why" class="section level1 unnumbered">
-<h1>Who, what, and why?</h1>
-<p>I am a data scientist and statistician who is (mostly) self-taught from textbooks and generous people sharing their work online.
-Inspired by projects like <a href="https://bookdown.org/content/3890/">Solomon Kurz’s recoding of Statistical Rethinking</a>, I decided to publicly document my notes and code as I work through <a href="https://www.statlearning.com/">An Introduction to Statistical Learning, 2nd edition</a> by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani <span class="citation">(<a href="#ref-James2021" role="doc-biblioref">James et al. 2021</a>)</span>.</p>
-<p>I prefer to work with the <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> collection of R packages, and will be teaching myself the <a href="https://www.tidymodels.org/"><code>tidymodels</code> framework</a> for machine learning along the way.</p>
-<p>I won’t be doing every exercise or section. My main goal for this project is to improve my statistical programming, so I will focus on the applied exercises rather than the conceptual.</p>
+<div id="reproducibility" class="section level1 unnumbered">
+<h1>Reproducibility</h1>
+<details>
+<summary>
+Reproducibility receipt
+</summary>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="reproducibility.html#cb131-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2021-11-20 22:10:04 AST&quot;</code></pre>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="reproducibility.html#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
+<span id="cb133-2"><a href="reproducibility.html#cb133-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
+<span id="cb133-3"><a href="reproducibility.html#cb133-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
+<span id="cb133-4"><a href="reproducibility.html#cb133-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb133-5"><a href="reproducibility.html#cb133-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
+## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
+## Head:     [47fab9d] 2021-11-18: First commit: chapters 1 and 2</code></pre>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="reproducibility.html#cb135-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
+<pre><code>## - Session info ---------------------------------------------------------------
+##  setting  value                       
+##  version  R version 4.1.1 (2021-08-10)
+##  os       Windows 10 x64              
+##  system   x86_64, mingw32             
+##  ui       RTerm                       
+##  language (EN)                        
+##  collate  English_Canada.1252         
+##  ctype    English_Canada.1252         
+##  tz       America/Curacao             
+##  date     2021-11-20                  
+## 
+## - Packages -------------------------------------------------------------------
+##  package      * version    date       lib source                           
+##  abind          1.4-5      2016-07-21 [1] CRAN (R 4.1.1)                   
+##  assertthat     0.2.1      2019-03-21 [1] CRAN (R 4.1.0)                   
+##  backports      1.2.1      2020-12-09 [1] CRAN (R 4.1.0)                   
+##  bayestestR     0.10.5     2021-07-26 [1] CRAN (R 4.1.0)                   
+##  bookdown       0.24       2021-09-02 [1] CRAN (R 4.1.1)                   
+##  broom        * 0.7.9      2021-07-27 [1] CRAN (R 4.1.1)                   
+##  bslib          0.2.5.1    2021-05-18 [1] CRAN (R 4.1.0)                   
+##  cachem         1.0.6      2021-08-19 [1] CRAN (R 4.1.1)                   
+##  car            3.0-12     2021-11-06 [1] CRAN (R 4.1.2)                   
+##  carData        3.0-4      2020-05-22 [1] CRAN (R 4.1.1)                   
+##  cellranger     1.1.0      2016-07-27 [1] CRAN (R 4.1.0)                   
+##  checkmate      2.0.0      2020-02-06 [1] CRAN (R 4.1.0)                   
+##  class          7.3-19     2021-05-03 [2] CRAN (R 4.1.1)                   
+##  cli            3.1.0      2021-10-27 [1] CRAN (R 4.1.1)                   
+##  codetools      0.2-18     2020-11-04 [2] CRAN (R 4.1.1)                   
+##  colorspace     2.0-2      2021-06-24 [1] CRAN (R 4.1.0)                   
+##  corrr        * 0.4.3      2020-11-24 [1] CRAN (R 4.1.0)                   
+##  crayon         1.4.2      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  datawizard     0.1.0      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  DBI            1.1.1      2021-01-15 [1] CRAN (R 4.1.0)                   
+##  dbplyr         2.1.1      2021-04-06 [1] CRAN (R 4.1.0)                   
+##  DEoptimR       1.0-9      2021-05-24 [1] CRAN (R 4.1.0)                   
+##  dials        * 0.0.10     2021-09-10 [1] CRAN (R 4.1.1)                   
+##  DiceDesign     1.9        2021-02-13 [1] CRAN (R 4.1.0)                   
+##  digest         0.6.28     2021-09-23 [1] CRAN (R 4.1.1)                   
+##  distill        1.3        2021-10-13 [1] CRAN (R 4.1.1)                   
+##  downlit        0.4.0      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  dplyr        * 1.0.7      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  dunnr        * 0.2.4      2021-11-14 [1] Github (taylordunn/dunnr@0039077)
+##  effectsize     0.4.5      2021-05-25 [1] CRAN (R 4.1.0)                   
+##  ellipsis       0.3.2      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  evaluate       0.14       2019-05-28 [1] CRAN (R 4.1.0)                   
+##  extrafont      0.17       2014-12-08 [1] CRAN (R 4.1.0)                   
+##  extrafontdb    1.0        2012-06-11 [1] CRAN (R 4.1.0)                   
+##  fansi          0.5.0      2021-05-25 [1] CRAN (R 4.1.0)                   
+##  farver         2.1.0      2021-02-28 [1] CRAN (R 4.1.0)                   
+##  fastmap        1.1.0      2021-01-25 [1] CRAN (R 4.1.0)                   
+##  forcats      * 0.5.1      2021-01-27 [1] CRAN (R 4.1.0)                   
+##  foreach        1.5.1      2020-10-15 [1] CRAN (R 4.1.0)                   
+##  fs             1.5.0      2020-07-31 [1] CRAN (R 4.1.0)                   
+##  furrr          0.2.3      2021-06-25 [1] CRAN (R 4.1.0)                   
+##  future         1.21.0     2020-12-10 [1] CRAN (R 4.1.0)                   
+##  generics       0.1.1      2021-10-25 [1] CRAN (R 4.1.1)                   
+##  GGally         2.1.2      2021-06-21 [1] CRAN (R 4.1.0)                   
+##  ggplot2      * 3.3.5      2021-06-25 [1] CRAN (R 4.1.0)                   
+##  ggrepel        0.9.1      2021-01-15 [1] CRAN (R 4.1.0)                   
+##  ggridges       0.5.3      2021-01-08 [1] CRAN (R 4.1.0)                   
+##  git2r          0.28.0     2021-01-10 [1] CRAN (R 4.1.0)                   
+##  globals        0.14.0     2020-11-22 [1] CRAN (R 4.1.0)                   
+##  glue           1.5.0      2021-11-07 [1] CRAN (R 4.1.1)                   
+##  gower          0.2.2      2020-06-23 [1] CRAN (R 4.1.0)                   
+##  GPfit          1.0-8      2019-02-08 [1] CRAN (R 4.1.0)                   
+##  gridExtra      2.3        2017-09-09 [1] CRAN (R 4.1.0)                   
+##  gt           * 0.3.0      2021-05-12 [1] CRAN (R 4.1.0)                   
+##  gtable         0.3.0      2019-03-25 [1] CRAN (R 4.1.0)                   
+##  hardhat        0.1.6      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  haven          2.4.1      2021-04-23 [1] CRAN (R 4.1.0)                   
+##  here         * 1.0.1      2020-12-13 [1] CRAN (R 4.1.0)                   
+##  highr          0.9        2021-04-16 [1] CRAN (R 4.1.0)                   
+##  hms            1.1.0      2021-05-17 [1] CRAN (R 4.1.0)                   
+##  htmltools      0.5.2      2021-08-25 [1] CRAN (R 4.1.1)                   
+##  httr           1.4.2      2020-07-20 [1] CRAN (R 4.1.0)                   
+##  infer        * 1.0.0      2021-08-13 [1] CRAN (R 4.1.1)                   
+##  insight        0.14.2     2021-06-22 [1] CRAN (R 4.1.0)                   
+##  ipred          0.9-12     2021-09-15 [1] CRAN (R 4.1.1)                   
+##  ISLR2        * 1.0        2021-07-22 [1] CRAN (R 4.1.0)                   
+##  iterators      1.0.13     2020-10-15 [1] CRAN (R 4.1.0)                   
+##  jquerylib      0.1.4      2021-04-26 [1] CRAN (R 4.1.0)                   
+##  jsonlite       1.7.2      2020-12-09 [1] CRAN (R 4.1.0)                   
+##  knitr          1.36       2021-09-29 [1] CRAN (R 4.1.1)                   
+##  labeling       0.4.2      2020-10-20 [1] CRAN (R 4.1.0)                   
+##  lattice        0.20-44    2021-05-02 [2] CRAN (R 4.1.1)                   
+##  lava           1.6.9      2021-03-11 [1] CRAN (R 4.1.0)                   
+##  lhs            1.1.1      2020-10-05 [1] CRAN (R 4.1.0)                   
+##  lifecycle      1.0.1      2021-09-24 [1] CRAN (R 4.1.1)                   
+##  listenv        0.8.0      2019-12-05 [1] CRAN (R 4.1.0)                   
+##  lubridate      1.8.0      2021-10-07 [1] CRAN (R 4.1.1)                   
+##  magrittr       2.0.1      2020-11-17 [1] CRAN (R 4.1.0)                   
+##  MASS           7.3-54     2021-05-03 [2] CRAN (R 4.1.1)                   
+##  Matrix         1.3-4      2021-06-01 [2] CRAN (R 4.1.1)                   
+##  memoise        2.0.0      2021-01-26 [1] CRAN (R 4.1.0)                   
+##  mgcv           1.8-36     2021-06-01 [2] CRAN (R 4.1.1)                   
+##  modeldata    * 0.1.1      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  modelr         0.1.8      2020-05-19 [1] CRAN (R 4.1.0)                   
+##  munsell        0.5.0      2018-06-12 [1] CRAN (R 4.1.0)                   
+##  nlme           3.1-152    2021-02-04 [2] CRAN (R 4.1.1)                   
+##  nnet           7.3-16     2021-05-03 [2] CRAN (R 4.1.1)                   
+##  parallelly     1.27.0     2021-07-19 [1] CRAN (R 4.1.0)                   
+##  parameters     0.14.0     2021-05-29 [1] CRAN (R 4.1.0)                   
+##  parsnip      * 0.1.7      2021-07-21 [1] CRAN (R 4.1.0)                   
+##  patchwork    * 1.1.1      2020-12-17 [1] CRAN (R 4.1.0)                   
+##  performance    0.7.3      2021-07-21 [1] CRAN (R 4.1.1)                   
+##  pillar         1.6.4      2021-10-18 [1] CRAN (R 4.1.1)                   
+##  pkgconfig      2.0.3      2019-09-22 [1] CRAN (R 4.1.0)                   
+##  plyr           1.8.6      2020-03-03 [1] CRAN (R 4.1.0)                   
+##  pROC           1.17.0.1   2021-01-13 [1] CRAN (R 4.1.0)                   
+##  prodlim        2019.11.13 2019-11-17 [1] CRAN (R 4.1.0)                   
+##  purrr        * 0.3.4      2020-04-17 [1] CRAN (R 4.1.0)                   
+##  qqplotr        0.0.5      2021-04-23 [1] CRAN (R 4.1.0)                   
+##  R6             2.5.1      2021-08-19 [1] CRAN (R 4.1.1)                   
+##  RColorBrewer   1.1-2      2014-12-07 [1] CRAN (R 4.1.0)                   
+##  Rcpp           1.0.7      2021-07-07 [1] CRAN (R 4.1.0)                   
+##  readr        * 1.4.0      2020-10-05 [1] CRAN (R 4.1.0)                   
+##  readxl         1.3.1      2019-03-13 [1] CRAN (R 4.1.0)                   
+##  recipes      * 0.1.17     2021-09-27 [1] CRAN (R 4.1.1)                   
+##  reprex         2.0.0      2021-04-02 [1] CRAN (R 4.1.0)                   
+##  reshape        0.8.8      2018-10-23 [1] CRAN (R 4.1.0)                   
+##  rlang          0.4.12     2021-10-18 [1] CRAN (R 4.1.1)                   
+##  rmarkdown      2.11       2021-09-14 [1] CRAN (R 4.1.1)                   
+##  robustbase     0.93-8     2021-06-02 [1] CRAN (R 4.1.0)                   
+##  rpart          4.1-15     2019-04-12 [2] CRAN (R 4.1.1)                   
+##  rprojroot      2.0.2      2020-11-15 [1] CRAN (R 4.1.0)                   
+##  rsample      * 0.1.0      2021-05-08 [1] CRAN (R 4.1.0)                   
+##  rstudioapi     0.13       2020-11-12 [1] CRAN (R 4.1.0)                   
+##  Rttf2pt1       1.3.8      2020-01-10 [1] CRAN (R 4.1.1)                   
+##  rvest          1.0.0      2021-03-09 [1] CRAN (R 4.1.0)                   
+##  sass           0.4.0      2021-05-12 [1] CRAN (R 4.1.0)                   
+##  scales       * 1.1.1      2020-05-11 [1] CRAN (R 4.1.0)                   
+##  see            0.6.4      2021-05-29 [1] CRAN (R 4.1.0)                   
+##  sessioninfo    1.1.1      2018-11-05 [1] CRAN (R 4.1.0)                   
+##  stringi        1.7.5      2021-10-04 [1] CRAN (R 4.1.1)                   
+##  stringr      * 1.4.0      2019-02-10 [1] CRAN (R 4.1.0)                   
+##  survival       3.2-11     2021-04-26 [2] CRAN (R 4.1.1)                   
+##  tibble       * 3.1.6      2021-11-07 [1] CRAN (R 4.1.1)                   
+##  tidymodels   * 0.1.4      2021-10-01 [1] CRAN (R 4.1.1)                   
+##  tidyr        * 1.1.4      2021-09-27 [1] CRAN (R 4.1.1)                   
+##  tidyselect     1.1.1      2021-04-30 [1] CRAN (R 4.1.0)                   
+##  tidyverse    * 1.3.1      2021-04-15 [1] CRAN (R 4.1.0)                   
+##  timeDate       3043.102   2018-02-21 [1] CRAN (R 4.1.0)                   
+##  tune         * 0.1.6      2021-07-21 [1] CRAN (R 4.1.0)                   
+##  usethis        2.1.3      2021-10-27 [1] CRAN (R 4.1.1)                   
+##  utf8           1.2.2      2021-07-24 [1] CRAN (R 4.1.0)                   
+##  vctrs          0.3.8      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  withr          2.4.2      2021-04-18 [1] CRAN (R 4.1.0)                   
+##  workflows    * 0.2.3      2021-07-16 [1] CRAN (R 4.1.0)                   
+##  workflowsets * 0.1.0      2021-07-22 [1] CRAN (R 4.1.0)                   
+##  xfun           0.28       2021-11-04 [1] CRAN (R 4.1.1)                   
+##  xml2           1.3.2      2020-04-23 [1] CRAN (R 4.1.0)                   
+##  yaml           2.2.1      2020-02-01 [1] CRAN (R 4.1.0)                   
+##  yardstick    * 0.0.8      2021-03-28 [1] CRAN (R 4.1.0)                   
+## 
+## [1] C:/Users/tdunn/Documents/R/win-library/4.1
+## [2] C:/Program Files/R/R-4.1.1/library</code></pre>
+</details>
 
-</div>
-<h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-James2021" class="csl-entry">
+<div class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
+</div>
+<div class="csl-entry">
 James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em><span class="nocase">An Introduction to Statistical Learning with Applications in R</span></em>. 2nd ed. New York, NY: Springer. <a href="https://doi.org/10.1007/978-1-0716-1418-1_1">https://doi.org/10.1007/978-1-0716-1418-1_1</a>.
+</div>
+<div class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
+</div>
 </div>
 </div>
             </section>
@@ -259,8 +428,8 @@ James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em><
           </div>
         </div>
       </div>
+<a href="linear-regression.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
-<a href="introduction.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

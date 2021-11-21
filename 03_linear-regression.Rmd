@@ -1,0 +1,1759 @@
+# Linear Regression
+
+## Simple Linear Regression
+
+A straightforward approach of predicing a quantiative $Y$ from a single predictor $X$, assuming an approximately linear relationship:
+
+$$
+Y \approx \beta_0 + \beta_1 X
+$$
+
+### Estimating the Coefficients
+
+Our goal is to obtain estimates of the coefficients $\hat{\beta}_0$ and $\hat{\beta}_1$ such that the linear model fits the data well.
+There are a number of ways of evaluating fit to data, but by far the most common approach is the least squares criterion.
+We define the residual sum of squares (RSS) as
+
+$$
+\text{RSS} = e_1^2 + e_2^2 + \dots + e_n^2
+$$
+
+where $e_i = y_i - \hat{y}$ is the $i$th (out of $n$) residual.
+The least squares approach chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ to minimize the RSS.
+Using some calculus, one can show that
+
+$$
+\begin{align}
+\hat{\beta}_1 &= \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}\\
+\hat{\beta}_0 &= \bar{y} - \hat{\beta}_1 \bar{x}
+\end{align}
+$$
+
+To re-create Figure 3.1, import the `Advertising` data set:
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(here)
+
+# Load my R package and set the ggplot theme
+library(dunnr)
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td())
+set_geom_fonts()
+set_palette()
+
+advertising <- read_csv(here("data", "Advertising.csv"))
+glimpse(advertising)
+```
+
+Fit the simple linear model and draw the residuals to the line of best fit:
+
+```{r figure3.3}
+lm_sales_tv <- lm(sales ~ TV, data = advertising)
+advertising %>%
+  bind_cols(
+    pred_sales = predict(lm_sales_tv, data = advertising)
+  ) %>%
+  ggplot(aes(x = TV)) +
+  geom_linerange(aes(ymin = sales, ymax = pred_sales)) +
+  geom_point(aes(y = sales), color = "red") +
+  geom_abline(intercept = coef(lm_sales_tv)[1], slope = coef(lm_sales_tv)[2],
+              color = "blue", size = 1)
+```
+
+We recover the same regression coefficients: $\beta_0$ = `r round(coef(lm_sales_tv)[1], 2)` and $\beta_1$ = `r round(coef(lm_sales_tv)[2], 3)`.
+
+### Assessing the Accuracy of the Coefficient Estimates
+
+>The analogy between linear regression and estimation of the mean of a
+random variable is an apt one based on the concept of bias. If we use the bias sample mean $\hat{\mu}$ to estimate $\mu$, this estimate is unbiased, in the sense that unbiased on average, we expect $\hat{\mu}$ to equal $\mu$. What exactly does this mean? It means
+that on the basis of one particular set of observations $y_1,\dots, y_n$, $\hat{\mu}$ might
+overestimate $\mu$, and on the basis of another set of observations, $\hat{\mu}$ might
+underestimate $\mu$. But if we could average a huge number of estimates of
+$\mu$ obtained from a huge number of sets of observations, then this average
+would exactly equal $\mu$. Hence, an unbiased estimator does not systematically
+over- or under-estimate the true parameter.
+
+>A natural question is as follows: how accurate
+is the sample mean $\hat{\mu}$ as an estimate of $\mu$? We have established that the
+average of $\hat{\mu}$’s over many data sets will be very close to $\mu$, but that a
+single estimate $\hat{\mu}$ may be a substantial underestimate or overestimate of $\mu$.
+How far off will that single estimate of $\hat{\mu}$ be? In general, we answer this
+question by computing the standard error of $\hat{\mu}$, written as SE($\hat{\mu}$). 
+
+$$
+\text{Var}(\hat{\mu}) = \text{SE}(\hat{\mu})^2 = \frac{\sigma^2}{n}
+$$
+
+>where $\sigma$ is the standard deviation of each of the realizations $y_i$ of $Y$.
+Roughly speaking, the standard error tells us the average amount that this estimate $\hat{\mu}$ differs from the actual value of $\mu$.
+
+>To compute the standard errors associated with $\hat{\beta}_0$ and $\hat{\beta}_1$, we use the following formulas:
+
+$$
+\begin{align}
+\text{SE}(\hat{\beta}_0)^2 &= \sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{\sum (x_i - \bar{x})^2}\right] \\
+\text{SE}(\hat{\beta}_1)^2 &= \frac{\sigma^2}{\sum (x_i - \bar{x})^2}
+\end{align}
+$$
+
+>where $\sigma^2 = \text{Var}(\epsilon)$.
+
+>In general, $\sigma^2$ is not known, but can be estimated from the data.
+This estimate of $\sigma$ is known as the residual standard error, and is given by the formula $\text{RSE} = \sqrt{\text{RSS}/(n-2)}$.
+
+For linear regression, we get approximate 95% confidence intervals for the coefficients as:
+
+$$
+\begin{align}
+\hat{\beta}_1 \pm 2 \text{SE}(\hat{\beta}_1) \\
+\hat{\beta}_0 \pm 2 \text{SE}(\hat{\beta}_0).
+\end{align}
+$$
+
+These approximations assume that the errors are Gaussian, and the factor of 2 will vary depending on the number of observations $n$.
+The true value of this factor is the 2.5% and 97.5% quantile of a $t$-distribution with $n-2$ degrees of freedom.
+We can show this with the `stats::qt` function:
+
+```{r}
+tibble(
+  n = c(10, 50, 100, 500, 1000)
+) %>%
+  mutate(
+    qt_low = qt(p = 0.025, df = n - 2),
+    qt_high = qt(p = 0.975, df = n - 2)
+  ) %>%
+  gt::gt()
+```
+
+The quickest way to get the 95% confidence intervals for the coefficients is with `stats::confint()`:
+
+```{r}
+confint(lm_sales_tv)
+```
+
+Computing them manually requires the standard errors of the coefficients.
+For this, I prefer `broom::tidy`:
+
+```{r}
+library(broom)
+tidy(lm_sales_tv)
+```
+
+Here is how you would calculate the SEs manually:
+
+```{r}
+n_obs <- nrow(advertising)
+bar_x <- mean(advertising$TV)
+# Residual sum of squares
+lm_sales_tv_rss <- sum(resid(lm_sales_tv)^2)
+# Residual standard error (our estimate of sigma, the variance of errors)
+lm_sales_tv_rse <- sqrt(lm_sales_tv_rss / (n_obs - 2))
+# Intercept SE
+beta0_se <- sqrt(
+  lm_sales_tv_rse^2 *
+    ((1 / n_obs) + bar_x^2 / (sum((advertising$TV - bar_x)^2)))
+)
+# Slope SE
+beta1_se <- sqrt(
+  lm_sales_tv_rse^2 / (sum((advertising$TV - bar_x)^2))
+)
+c(beta0_se, beta1_se)
+```
+
+Then get the 95% confidence intervals:
+
+```{r}
+tidy(lm_sales_tv) %>%
+  transmute(
+    term, estimate, mult_fact = 2.0,
+    ci_lower = estimate - mult_fact * std.error,
+    ci_upper = estimate + mult_fact * std.error
+  )
+```
+
+Note that the intervals don't exactly match those in the text.
+The true multiplication factor of the SEs for this data with `r n_obs` observations is `r qt(0.975, n_obs-2)`:
+
+```{r}
+tidy(lm_sales_tv) %>%
+  transmute(
+    term, estimate, mult_fact = qt(0.975, n_obs-2),
+    ci_lower = estimate - mult_fact * std.error,
+    ci_upper = estimate + mult_fact * std.error
+  )
+```
+
+To test the null hypothesis that there is no relationship between $X$ and $Y$, we copmute a $t$-statistic as:
+
+$$
+t = \frac{\hat{\beta}_1 - 0}{\text{SE}(\hat{\beta}_1)}
+$$
+
+where we have written out the $- 0$ to explicitly indicate the alternative hypothesis that $\beta_1$ is different from 0.
+If the null is true, then we expect that the above formula will have a $t$-distribution with $n-2$ degrees of freedom.
+Then taking the $t$ value returned by our model, we compute the probability of observing a value equal to or greater than that value assuming $\beta_1 = 0$.
+This probability is the $p$-value.
+
+The $t$-statistics are returned by `broom::tidy` as the `statistic` variable.
+It also returns the $p$-values, which we can manually compute as well with `stats::pt`:
+
+```{r}
+tidy(lm_sales_tv) %>%
+  mutate(
+    p.value_manual = 2 * pt(-statistic, df = n_obs - 2)
+  )
+```
+
+### Assessing the Accuracy of the Model
+
+>The quality of a linear regression fit is typically assessed
+using two related quantities: the residual standard error (RSE) and the $R^2$ statistic.
+
+The `broom::glance` function gives summary statistics of a model:
+
+```{r}
+glance(lm_sales_tv)
+```
+
+#### Residual Standard Error {-}
+
+The residual standard error (RSE) is `sigma`, variance explained $R^2$ is `r.squared`, and the $F$-statistic is `statistic`.
+With this, we can re-create Table 3.2:
+
+```{r table3.2}
+library(gt)
+glance(lm_sales_tv) %>%
+  transmute(`Residual standard error` = round(sigma, 2),
+            `R2` = round(r.squared, 3), `F-statistic` = round(statistic, 1)) %>%
+  mutate(across(everything(), as.character)) %>%
+  pivot_longer(everything(), names_to = "Quantity", values_to = "Value") %>%
+  gt()
+```
+
+#### $R^2$ Statistic {-}
+
+>The RSE provides an absolute measure of lack of fit of the model (3.5)
+to the data. But since it is measured in the units of $Y$, it is not always
+clear what constitutes a good RSE. The $R^2$ statistic provides an alternative
+measure of fit. It takes the form of a proportion—the proportion of variance
+explained —- and so it always takes on a value between 0 and 1, and is
+independent of the scale of $Y$.
+
+$$
+R^2 = \frac{\text{TSS} - \text{RSS}}{\text{TSS}} = 1 - \frac{\text{RSS}}{\text{TSS}}
+$$
+
+>where $\text{TSS} = \sum (y_i - \bar{y})^2$ is the total sum of squares.
+
+The easiest way to think of it in linear regression terms, is as a measure of improvement by the sloped line over a horizontal line (the mean of $Y$) through the data.
+
+The correlation between variables:
+
+$$
+\text{Cor}(X, Y) = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2} \sqrt{\sum (y_i - \bar{y})^2}}
+$$
+
+is exactly the same in the linear regression setting, $R^2 = r^2$.
+In multivariable regression (the next section), this is (usually) not the case, in which case we use $R^2$.
+
+## Multiple Linear Regression
+
+>Simple linear regression is a useful approach for predicting a response on the
+basis of a single predictor variable. However, in practice we often have more
+than one predictor.
+
+>One option is to run three separate simple linear regressions, ...
+However, the approach of fitting a separate simple linear regression model
+for each predictor is not entirely satisfactory...
+Instead of fitting a separate simple linear regression model for each predictor, a better approach is to extend the simple linear regression model
+(3.5) so that it can directly accommodate multiple predictors.
+
+The model with $p$ predictors takes the form:
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_p X_p + \epsilon.
+$$
+
+We interpret the slope $\beta_j$ as the average effect on $Y$ by a one unit increase in $X_j$ while holding all other predictors fixed.
+
+### Estimating the Regression Coefficients
+
+The parameters are estimated using the same least squares approach as simple linear regression: choose $\beta_0 \dots \beta_p$ to minimize RSS.
+However, the formula to estimate these parameters have more complicated forms that are harder to interpret than in simple regression.
+
+Re-create Table 3.4 by regressing `sales` on `TV`, `radio`, and `newspaper`:
+
+```{r table3.4}
+lm_sales_mult <- lm(sales ~ TV + radio + newspaper, data = advertising)
+# Since I will be reproducting this table often, write a function
+tidy_custom <- function(mod, coef_round = 3, se_round = 4, t_round = 2) {
+  tidy(mod) %>%
+    transmute(
+      term,
+      coefficient = round(estimate, coef_round),
+      std.error = round(std.error, se_round),
+      `t-statistic` = round(statistic, t_round),
+      `p-value` = scales::pvalue(p.value)
+    )
+}
+tidy_custom(lm_sales_mult) %>%
+  gt()
+```
+
+To understand why there is no relationship between `sales` and `newspaper`, consider the correlation between the variables:
+
+```{r table3.5}
+library(corrr)
+advertising %>%
+  select(TV, radio, newspaper, sales) %>%
+  cor() %>%
+  as_tibble(rownames = "var") %>%
+  mutate(across(-var, round, 4)) %>%
+  gt(rowname_col = "var")
+```
+
+High correlation between `radio` and `newspaper` suggest that the former is driving the relationship with `sales`.
+
+### Some Important Questions
+
+#### One: Is There a Relationship Between the Response and Predictors? {-}
+
+Consider the hypothesis test:
+
+$$
+\begin{align}
+H_0:& \beta_1 = \beta_2 = \dots = \beta_p = 0 \\
+H_a:& \text{at least one of } \beta_j \text{ is non-zero.}
+\end{align}
+$$
+This is performed by computing the $F$-statistic:
+
+$$
+F = \frac{(\text{TSS} - \text{RSS})/p}{\text{RSS}/(n - p - 1)}
+$$
+
+The denominator should be familiar from simple linear regression: it is the RSS divided by the degrees of freedom, so our estimate of $\sigma^2$.
+Likewise, the expected value of the numerator is also $\sigma^2$ provided that $H_0$ is true.
+Hence, when there is no relationship between response and predictors, we expect $F \approx 1$, and $F > 1$ when $H_a$ is true.
+
+Instead of computing manually, use `broom::glance` to re-create Table 3.6:
+
+```{r table3.6}
+glance(lm_sales_mult) %>%
+  transmute(`Residual standard error` = round(sigma, 2),
+            `R2` = round(r.squared, 3), `F-statistic` = round(statistic, 1)) %>%
+  mutate(across(everything(), as.character)) %>%
+  pivot_longer(everything(), names_to = "Quantity", values_to = "Value") %>%
+  gt()
+```
+
+The value of 570 is far larger than 1, which is compelling evidence against the null $H_0$.
+The $F$-statistic follows the $F$-distribution (assuming $H_0$ is true and the errors $\epsilon_i$ are normally distributed), so we can get a $p$-value using the values of $n$ and $p$.
+Or automatically with `glance`:
+
+```{r}
+glance(lm_sales_mult) %>% select(statistic, p.value)
+```
+
+Another way to do this is to explicitly fit the null model (no predictors, intercept only), and perform an analysis of variance with the two models using `anova`:
+
+```{r}
+lm_sales_null <- lm(sales ~ 1, data = advertising)
+anova(lm_sales_null, lm_sales_mult)
+```
+
+This approach can also be used to test that a particular subset of $q$ coefficients are zero:
+
+$$
+H_0: \beta_{p-q+1} = \beta_{p-q+2} = \dots = \beta_p = 0 \\
+$$
+
+In this case, we fit a second model that uses all the variables except those $q$, with a residual sum of squares we call $\text{RSS}_0$.
+Then the appropriate $F$_statistic is:
+
+$$
+F = \frac{(\text{RSS}_0 - \text{RSS})/q}{\text{RSS}/(n-p-1)}
+$$
+
+It turns out the multivariable model already does this for $q = 1$.
+The square of each $t$-statistic is the exact same as the $F$-statistic we would get by removing that variable:
+
+```{r}
+tidy(lm_sales_mult)
+```
+
+For example, the $t$-statistic for `TV` is `r tidy(lm_sales_mult)$statistic[2] %>% round(2)`.
+Use `anova` to compare models with and without `TV:
+
+```{r}
+anova(
+  lm(sales ~ radio + newspaper, data = advertising),
+  lm_sales_mult
+)
+```
+
+The $F$-statistic here is the square of the $t$-statistic: `r (tidy(lm_sales_mult)$statistic[2])^2 %>% round(1)`.
+
+#### Two: Deciding on Important Variables {-}
+
+>The task of determining which predictors are
+associated with the response, in order to fit a single model involving only
+those predictors, is referred to as variable selection.
+
+>Ideally, we would like to perform variable selection by trying out a lot of
+different models, each containing a different subset of the predictors. For
+instance, if $p = 2$, then we can consider four models: (1) a model containing no variables, (2) a model containing $X_1$ only, (3) a model containing
+$X_2$ only, and (4) a model containing both $X_1$ and $X_2$. We can then select the best model out of all of the models that we have considered. How
+do we determine which model is best? Various statistics can be used to
+judge the quality of a model. These include Mallow’s $C_p$, Akaike information criterion (AIC), Bayesian information criterion (BIC), and adjusted $R^2$.
+These are discussed in more detail in Chapter 6. We can also determine which model is best by plotting various model outputs, such as the residuals, in order to search for patterns.
+
+There are a lot of reasons to avoid the stepwise variable selection methods detailed here (forward, backward and mixed).
+See [this article](https://www.stata.com/support/faqs/statistics/stepwise-regression-problems/) and @Smith2018, for example.
+
+
+#### Three: Model Fit {-}
+
+Most commonly, we use RSE and $R^2$ to quantify model fit.
+In simple regression, $R^2$ is the square of the correlation between response and predictor.
+In multiple linear regression, it equals the square of the correlation between response and the fitted linear model: $R^2 = \text{Cor}(Y, \hat{Y})^2$.
+
+>It turns out that $R^2$ will always increase when
+more variables are added to the model, even if those variables are only
+weakly associated with the response. This is due to the fact that adding
+another variable always results in a decrease in the residual sum of squares
+on the training data (though not necessarily the testing data).
+
+#### Four: Predictions {-}
+
+With a fit regression model, it is straightforward to make predictions of the response $Y$.
+There are three sources of uncertainty in these predictions:
+
+1. The coefficient estimates $\hat{\beta}_i$ are estimates of the true $\beta_i$. This inaccuracy is part of the reducible error.
+2. Assuming a linear model of $f(X)$ is almost always an approximation of reality, so it is an additional form of reducible error we call model bias.
+3. The random error term $\epsilon$, which is irreducible. To quantify how much $Y$ will vary from $\hat{Y}$, we use prediction intervals, which are always wider than confidence intervals because they incorporate both reducible error (in our estimate for $f(X)$) and irreducible error.
+
+## Other Considerations in the Regression Model
+
+### Qualitative Predictors
+
+#### Predictors with Only Two Levels {-}
+
+With only two levels in the predictor, we use models that look like this:
+
+$$
+y_i = \beta_0 + \beta_1 x_i + \epsilon_i = 
+\begin{cases}
+\beta_0 + \beta_1 + \epsilon_i, & \text{if } i\text{th person owns a house} \\
+\beta_0 + \epsilon_i, & \text{if } i\text{th person does not}.
+\end{cases}
+$$
+
+Load the `credit` data set and regress credit card balance on home ownership:
+
+```{r table3.7}
+credit <- ISLR2::Credit
+lm_balance_own <- lm(Balance ~ Own, data = credit)
+
+tidy_custom(lm_balance_own, coef_round = 2, se_round = 2, t_round = 3) %>%
+  gt()
+```
+
+#### Qualitative Predictors with More than Two Levels {-}
+
+And with region (three levels):
+
+$$
+y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i = 
+\begin{cases}
+\beta_0 + \beta_1 + \epsilon_i, & \text{if } i\text{th person is from the South} \\
+\beta_0 + \beta_2 + \epsilon_i, & \text{if } i\text{th person is from the West} \\
+\beta_0 + \epsilon_i, & \text{if } i\text{th person is from the East}.
+\end{cases}
+$$
+
+```{r table3.8}
+lm_balance_region <- lm(Balance ~ Region, data = credit)
+tidy_custom(lm_balance_region, coef_round = 2, se_round = 2, t_round = 3) %>%
+  gt()
+```
+
+To run the $F$-test, use `anova()`:
+
+```{r}
+anova(lm_balance_region)
+```
+
+which tells us that we cannot reject the null that there is no relationship between `balance` and `region`.
+
+### Extensions of the Linear Model
+
+>The standard linear regression model (3.19) provides interpretable results
+and works quite well on many real-world problems. However, it makes several highly restrictive assumptions that are often violated in practice. Two
+of the most important assumptions state that the relationship between the
+predictors and response are additive and linear.
+
+#### Removing the Additive Assumption {-}
+
+This assumption is that the association between a predictor $X_j$ and the response $Y$ does not depend on the values of other predictors.
+
+In our advertising example, suppose that spending money on radio actually increases the effectiveness of TV advertising, i.e. the the slope term for `TV` actually increases as `radio` increases.
+In marketing, this is synergy.
+In statistics, this is an interaction effect.
+The models with and without an interaction effect are:
+
+$$
+\begin{align}
+Y &= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \epsilon \\
+Y &= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
+\end{align}
+$$
+
+The effect on `sales`, with an interaction term between `TV` and `radio`:
+
+```{r table3.9}
+lm_sales_inter <- lm(sales ~ radio * TV, data = advertising)
+tidy_custom(lm_sales_inter, coef_round = 4, se_round = 3) %>%
+  gt()
+```
+
+Compare the model with and without the interaction term:
+
+```{r}
+lm_sales_radio_tv <- lm(sales ~ radio + TV, data = advertising)
+
+glance(lm_sales_radio_tv) %>%
+  mutate(model = "additive") %>%
+  bind_rows(
+    glance(lm_sales_inter) %>%
+      mutate(model = "interaction")
+  ) %>%
+  select(model, r.squared, AIC, BIC) %>%
+  gt()
+```
+
+What if the interaction term was highly insignificant, but the associated main effects were not?
+The hierarchical principle states that if we include an interaction in a model, we should also include the main effects, even if the $p$-values of their coefficients are not significant.
+
+The concept of interactions applies just as well to qualitative variables.
+Re-create Figure 3.7, comparing the balance model with and without an interaction term of `Income` and `Student`:
+
+```{r figure3.7, fig.width=6, fig.height=3}
+lm_balance_income_student <-
+  lm(Balance ~ Income + Student, data = credit)
+lm_balance_income_student_inter <-
+  lm(Balance ~ Income * Student, data = credit)
+
+d <- tibble(Income = seq(0, 150, 0.1)) %>%
+  crossing(Student = factor(c("No", "Yes")))
+augment(lm_balance_income_student, newdata = d) %>%
+  mutate(model = "additive") %>%
+  bind_rows(
+    augment(lm_balance_income_student_inter, newdata = d) %>%
+      mutate(model = "interaction")
+  ) %>%
+  ggplot(aes(x = Income, y = .fitted, color = Student)) +
+  geom_line(size = 1.5) +
+  facet_wrap(~model, nrow = 1) +
+  add_facet_borders() +
+  labs(y = "Balance")
+```
+
+This suggests that the positive relationship between `Income` and `Balance` is smaller for students.
+
+#### Non-linear Relationships {-}
+
+This assumption is that there is a linear relationship between response and predictors, but in some cases, the true relationship may be non-linear.
+A simple way to account for non-linearity is to use polynomial regression.
+
+Fit `mpg` to `horsepower` as a linear term, quadratic term, and up to the fifth degree:
+
+```{r figure3.8}
+auto <- ISLR2::Auto
+
+lm_mpg_hp <- lm(mpg ~ horsepower, data = auto)
+lm_mpg_hp2 <- lm(mpg ~ horsepower + I(horsepower^2), data = auto)
+lm_mpg_hp5 <-
+  lm(
+    mpg ~ horsepower + I(horsepower^2) + I(horsepower^3) +
+      I(horsepower^4) + I(horsepower^5),
+    data = auto
+  )
+
+d <- tibble(horsepower = seq(1, 250, 0.1))
+
+bind_rows(
+  augment(lm_mpg_hp, newdata = d) %>% mutate(model = "Linear"),
+  augment(lm_mpg_hp2, newdata = d) %>% mutate(model = "Degree 2"),
+  augment(lm_mpg_hp5, newdata = d) %>% mutate(model = "Degree 5")
+) %>%
+  ggplot(aes(x = horsepower, y = .fitted, color = model)) +
+  geom_point(
+    aes(y = mpg), data = auto, color = "darkgrey", shape = 21, size = 3
+  ) +
+  geom_line(size = 1.5) +
+  coord_cartesian(xlim = c(40, 230), ylim = c(8, 52)) +
+  add_facet_borders() +
+  theme(legend.position = c(0.7, 0.8)) +
+  labs(y = "mpg", color = NULL)
+```
+
+And compare model assessment statistics:
+
+```{r}
+glance(lm_mpg_hp) %>% mutate(model = "Linear") %>%
+  bind_rows(
+    glance(lm_mpg_hp2) %>% mutate(model = "Degree 2")
+  ) %>%
+  bind_rows(
+    glance(lm_mpg_hp5) %>% mutate(model = "Degree 5")
+  ) %>%
+  select(model, r.squared, AIC, BIC) %>%
+  mutate(across(-model, round, 3)) %>%
+  gt()
+```
+
+### Potential Problems
+
+#### 1. Non-linearity of the Data {-}
+
+If the true relationship between response and predictors is far from linear, then we can should be able to see this in residual plots.
+In R, we can call the generic `plot()` function on the model objects to quickly get these plots:
+
+```{r figure3.9, fig.height=3, fig.width=4}
+plot(lm_mpg_hp, 1)
+plot(lm_mpg_hp2, 1)
+```
+
+Ideally these residual plots will show no discernible pattern.
+Above, there is a clear U-shape in the linear model indicating non-linearity in the data.
+This appears to be improved by the quadratic term.
+
+#### 2. Correlation of Error Terms {-}
+
+>An important assumption of the linear regression model is that the error
+terms, $\epsilon$, are uncorrelated. What does this mean? For instance,
+if the errors are uncorrelated, then the fact that $\epsilon_i$ is positive provides
+little or no information about the sign of $\epsilon_{i+1}$. The standard errors that
+are computed for the estimated regression coefficients or the fitted values
+are based on the assumption of uncorrelated error terms. If in fact there is
+correlation among the error terms, then the estimated standard errors will
+tend to underestimate the true standard errors. As a result, confidence and
+prediction intervals will be narrower than they should be. For example,
+a 95% confidence interval may in reality have a much lower probability
+than 0.95 of containing the true value of the parameter. In addition, p-values associated with the model will be lower than they should be; this
+could cause us to erroneously conclude that a parameter is statistically
+significant. In short, if the error terms are correlated, we may have an
+unwarranted sense of confidence in our model.
+
+The extreme example in the text is an accidental doubling of the data, which we can try out with the `advertising` multiple regression model:
+
+```{r}
+lm_sales_mult_double <- lm(sales ~ TV + radio + newspaper,
+                           data = bind_rows(advertising, advertising))
+bind_rows(
+  bind_cols(data = "original", tidy_custom(lm_sales_mult)),
+  bind_cols(data = "double", tidy_custom(lm_sales_mult_double))
+) %>%
+  group_by(data) %>%
+  gt()
+```
+
+
+#### 3. Non-constant Variance of Error Terms {-}
+
+Another important assumption is that the error terms have constant variance, $\text{Var}(\epsilon_i) = \sigma^2$.
+If they do not, we say there is heteroscedasticity, which we can see in the residual plot as a funnel shape.
+For example:
+
+```{r fig.height=3, fig.width=4}
+d <- tibble(
+  x = rnorm(300, mean = 20, sd = 5)
+) %>%
+  rowwise() %>%
+  mutate(
+    y = x * rnorm(1, mean = 1, sd = x / 20)
+  )
+plot(lm(y ~ x, data = d), 1)
+```
+
+#### 4. Outliers {-}
+
+>An outlier is a point for which $y_i$ is far from the value predicted by the model. Outliers can arise for a variety of reasons, such as incorrect recording
+of an observation during data collection.
+
+We can typically see outliers in the residuals plots:
+
+```{r fig.height=3, fig.width=4}
+plot(lm_mpg_hp, 1)
+```
+
+In this case, point numbers 334, 323, and 330 were identified as outliers.
+It is hard to say when a residual is a problem that should be addressed.
+We can also plot the studentized (or standardized) residuals, which are computed by dividing each residual by its estimated standard error:
+
+```{r fig.height=3, fig.width=4}
+plot(lm_mpg_hp, 5)
+```
+
+Here we see a few outliers with standardized residuals above 2.
+
+#### 5. High Leverage Points {-}
+
+Outliers are unusual response values $y_i$, while observations with high leverage have unusual values for $x_i$.
+In the above plot, the points 117 and 94 were identified as high leverage, as well as having fairly high residuals.
+These data would be worth investigating further.
+
+#### 6. Collinearity {-}
+
+Collinearity refers to the situation in which two or more predictor variables are closely related to one another.
+In the `credit` data, we see collinearity between the `limit` and `rating` variables:
+
+```{r figure3.14, fig.width=5, fig.height=3}
+credit %>%
+  select(Limit, Age, Rating) %>%
+  pivot_longer(cols = c(Age, Rating)) %>%
+  ggplot(aes(x = Limit, y = value)) +
+  geom_point() +
+  facet_wrap(~name, nrow = 1, scales = "free_y")
+```
+
+>The presence of collinearity can pose problems in
+the regression context, since it can be difficult to separate out the individual effects of collinear variables on the response. In other words, since
+`limit` and `rating` tend to increase or decrease together, it can be difficult to
+determine how each one separately is associated with the response, `balance`.
+
+```{r figure3.15, include=FALSE, eval=FALSE}
+# Can't seem to get this code working
+
+d <-
+  # Create a grid of possible beta values
+  crossing(
+    beta_age = seq(-5, 0, 0.1),
+    beta_limit = seq(0.155, 0.195, 0.001)
+  ) %>%
+  mutate(
+    # Alter the model to use the provided coefficients
+    mod = map2(
+      beta_age, beta_limit,
+      ~{
+        m <- lm_balance_age_limit
+        m$coefficients[2] <- .x
+        m$coefficients[3] <- .y
+        m
+      }
+    ),
+    rss = map_dbl(
+      mod,
+      ~{
+        # Need to re-calculate residuals
+        r <- credit$Balance - predict(.x, newdata = credit)
+        sum(r^2)
+      }
+    )
+  )
+p1 <- d %>%
+  ggplot(aes(x = beta_limit, y = beta_age)) +
+  geom_tile(aes(fill = rss))
+
+d <-
+  crossing(
+    beta_rating = seq(0, 5, 0.1),
+    beta_limit = seq(-0.15, 0.2, 0.01)
+  ) %>%
+  mutate(
+    mod = map2(
+      beta_rating, beta_limit,
+      ~{
+        m <- lm_balance_rating_limit
+        m$coefficients[2] <- .x
+        m$coefficients[3] <- .y
+        m
+      }
+    ),
+    rss = map_dbl(
+      mod,
+      ~{
+        r <- credit$Balance - predict(.x, newdata = credit)
+        sum(r^2)
+      }
+    )
+  )
+p2 <- d %>%
+  ggplot(aes(x = beta_limit, y = beta_rating)) +
+  geom_tile(aes(fill = rss))
+  geom_density2d(aes(z = rss))
+```
+
+>Since collinearity reduces the accuracy of the estimates of the regression
+coefficients, it causes the standard error for $\hat{\beta}_j$ to grow. Recall that the
+$t$-statistic for each predictor is calculated by dividing $\hat{\beta}_j$ by its standard
+error. Consequently, collinearity results in a decline in the $t$-statistic. As a
+result, in the presence of collinearity, we may fail to reject $H_0: \beta_j = 0$. This
+means that the power of the hypothesis test -- the probability of correctly detecting a non-zero coefficient -- is reduced by collinearity.
+
+Fit the two models and summarize in a table:
+
+```{r}
+lm_balance_age_limit <- lm(Balance ~ Age + Limit, data = credit)
+lm_balance_rating_limit <- lm(Balance ~ Rating + Limit, data = credit)
+
+bind_rows(
+  bind_cols(mod = "Model 1", tidy_custom(lm_balance_age_limit)),
+  bind_cols(mod = "Model 2", tidy_custom(lm_balance_rating_limit))
+) %>%
+  group_by(mod) %>%
+  gt(rowname_col = "term")
+```
+
+A simple way to detect collinearity is to look at the correlation matrix of predictors.
+However, when there is multicollinearity (more than 2 variables correlated), we won't see anything wrong in the pairwise correlation matrix.
+A better way is to compute the variance inflation factor (VIF).
+The VIF of a parameter if the ratio of $\text{Var}(\hat{\beta}_j)$ when fitting the full model divided by the variance when fit on its own.
+VIF values which exceed 5 or 10 indicate a problematic amount of collinearity.
+It can be computed using the formula:
+
+$$
+\text{VIF}(\hat{\beta}_j) = \frac{1}{1 - R^2_{X_j | X_-j}}
+$$
+where $R^2_{X_j | X_-j}$ is the $R^2$ from a regression of $X_j$ onto all other predictors.
+
+Compute it manually with the predictor `rating` regressed on `age` and `limit`:
+
+```{r}
+rating_r2 <-
+  summary(
+    lm(Rating ~ Age + Limit, data = credit)
+  )$r.squared
+round(1 / (1 - rating_r2), 2)
+```
+
+To calculate VIFs, there are R functions such as `car::vif` which can be used, but it is fairly simple to calculate by hand:
+
+```{r}
+lm_rating_age_limit <- lm(Rating ~ Age + Limit, data = credit)
+lm_age_rating_limit <- lm(Age ~ Rating + Limit, data = credit)
+lm_limit_age_rating <- lm(Limit ~ Age + Rating, data = credit)
+tribble(
+  ~Predictor, ~`R^2`,
+  "Age", 1 / (1 - summary(lm_age_rating_limit)$r.squared),
+  "Rating", 1 / (1 - summary(lm_rating_age_limit)$r.squared),
+  "Limit", 1 / (1 - summary(lm_limit_age_rating)$r.squared)
+) %>%
+  mutate(`R^2` = round(`R^2`, 2)) %>%
+  gt()
+```
+
+When dealing with high collinearity, such as with `rating` and `limit` here, the first solution is to drop one of the variables from the regression.
+This should be okay because the dropped variable is likely redundant.
+Another solution would be to combine the collinear variables together into a single predictor, e.g. taking the average of standardized `limit` and `rating`.
+
+## The Marketing Plan
+
+1. Is there a relationship between sales and advertising budget:
+
+From the multiple regression $F$-test (Table 3.6), $F =$ `r glance(lm_sales_mult)$statistic %>% round(2)` ($p$ `r scales::pvalue(glance(lm_sales_mult)$p.value)`).
+There is clear evidence of a relationship.
+
+2. How strong is the relationship?
+
+Calculate the RSE from the model:
+
+```{r}
+# Manually calculated RSE
+sqrt(
+  sum(resid(lm_sales_mult)^2) /
+    # Degrees of freedom: n - p - 1
+    (nrow(advertising) - 3 - 1)
+)
+# The helper functon RSE is easier
+sigma(lm_sales_mult)
+```
+
+On the scale of the response, with a mean (SD) of `r round(mean(advertising$sales), 1)` (`r round(sd(advertising$sales), 1)`), the RSE indicates a percentage error of about:
+
+```{r}
+(sigma(lm_sales_mult) / mean(advertising$sales)) %>%
+  scales::percent()
+```
+
+The $R^2$ value is `r summary(lm_sales_mult)$r.squared`, indicating approximately `r scales::percent(summary(lm_sales_mult)$r.squared)` of the variance in `sales` is explained by the three predictors.
+
+3. Which media are associated with sales?
+
+Though a simplified view of association, we say that `TV` and `radio` are significantly associated with `sales` due to their low $p$-values, and that `newspaper` is not.
+
+4. How large is the association between each medium and sales?
+
+Compute 95% confidence intervals from SEs for each predictor:
+
+```{r}
+tidy(lm_sales_mult, conf.int = 0.95) %>%
+  transmute(
+    term, across(c(estimate, conf.low, conf.high), round, 3)
+  ) %>%
+  gt()
+```
+
+`TV` and `radio` CIs are both narrow and don't include zero.
+The interval for `newspaper` does include zero.
+Look for collinearity:
+
+```{r}
+car::vif(lm_sales_mult)
+```
+
+No evidence from VIF scores.
+
+5. How accurately can we predict future sales?
+
+We can either predict an individual response, $Y = f(X) + \epsilon$ with a prediction interval, or the average response $f(X)$ with a confidence interval.
+This is done with the `predict.lm()` function and by setting the argument `interval`:
+
+```{r}
+# Make up some new data to predict sales
+d <- tibble(TV = 160.0, radio = 15.0, newspaper = 72.0)
+predict(
+  lm_sales_mult, newdata = d,
+  interval = "prediction", level = 0.95
+)
+predict(
+  lm_sales_mult, newdata = d,
+  interval = "confidence", level = 0.95
+)
+```
+
+As expected, the former is wider than the latter due to incorporating the irreducible error.
+
+6. Is the relationship linear?
+
+The residual plot:
+
+```{r fig.height=3, fig.width=4}
+plot(lm_sales_mult, 1)
+```
+
+The shape of these residuals suggests a non-linear relationship.
+
+7. Is there synergy among the advertising media?
+
+To account for the non-linearity, we included an interaction term between `TV` and `radio`.
+The $p$-value of the interaction term:
+
+```{r}
+tidy_custom(lm_sales_inter) %>%
+  gt()
+```
+
+and the increase in $R^2$:
+
+```{r}
+summary(lm_sales_radio_tv)$r.squared
+summary(lm_sales_inter)$r.squared
+```
+
+suggests a substantial improvement over the additive model.
+
+## Comparison of Linear Regression with $K$-Nearest Neighbors
+
+Parametric methods are often easy to fit, and easy to interpret, but the disadvantage is the strong assumption about the form of $f(X)$.
+
+Non-parametric methods do not explicitly assume a form for $f(X)$ and therefore provide an alternative and more flexible approach to regression.
+One of the simplest and best-known methods is $K$-nearest neighbors regression (closely related to the KNN classifier from Chapter 2).
+
+From the $K$ nearest neighbors (represented by the set $\mathcal{N}_0$) to a prediction point $x_0$, it estimates $f(x_0)$ using the average:
+
+$$
+\hat{f}(x_0) = \frac{1}{K} \sum_{x_i \in \mathcal{N}_0} y_i.
+$$
+
+On the choice of $K$:
+
+>In general, the optimal value
+for $K$ will depend on the bias-variance tradeoff, which we introduced in
+Chapter 2. A small value for $K$ provides the most flexible fit, which will
+have low bias but high variance. This variance is due to the fact that the
+prediction in a given region is entirely dependent on just one observation.
+In contrast, larger values of $K$ provide a smoother and less variable fit; the
+prediction in a region is an average of several points, and so changing one
+observation has a smaller effect. However, the smoothing may cause bias by
+masking some of the structure in $f(X)$. In Chapter 5, we introduce several
+approaches for estimating test error rates. These methods can be used to
+identify the optimal value of $K$ in KNN regression.
+
+>In what setting will a parametric approach such as least squares linear regression outperform a non-parametric approach such as KNN regression?
+The answer is simple: the parametric approach will outperform the non-parametric approach if the parametric form that has been selected is close
+to the true form of $f$.
+
+There is another consideration when performing KNN with many predictors $p$:
+
+>However, spreading 50 observations over $p$ = 20 dimensions results in a phenomenon in which a given observation has no
+nearby neighbors —- this is the so-called curse of dimensionality. That is, the $K$ observations that are nearest to a given test observation $x_0$ may be
+very far away from $x_0$ in $p$-dimensional space when $p$ is large, leading to a
+very poor prediction of $f(x_0)$ and hence a poor KNN fit. As a general rule,
+parametric methods will tend to outperform non-parametric approaches
+when there is a small number of observations per predictor.
+
+However:
+
+>Even when the dimension is small, we might prefer linear regression to
+KNN from an interpretability standpoint. If the test MSE of KNN is only
+slightly lower than that of linear regression, we might be willing to forego
+a little bit of prediction accuracy for the sake of a simple model that can
+be described in terms of just a few coefficients, and for which $p$-values are
+available.
+
+## Lab: Linear Regression
+
+### Libraries
+
+Load the `boston` data rather than the full `ISLR2` package:
+
+```{r}
+boston <- ISLR2::Boston
+```
+
+### Simple Linear Regression
+
+Regress median value of owner-occupied homes `medv` on percentage of houses with lower socioeconomic status `lstat`:
+
+```{r}
+lm_medv_lstat <- lm(medv ~ lstat, data = boston)
+summary(lm_medv_lstat)
+```
+
+Compute confidence and prediction intervals at different values of `lstat`:
+
+```{r}
+nd <- tibble(lstat = c(5, 10, 15))
+
+bind_cols(
+  nd,
+  as_tibble(predict(lm_medv_lstat, nd, interval = "confidence"))
+)
+bind_cols(
+  nd,
+  as_tibble(predict(lm_medv_lstat, nd, interval = "prediction"))
+)
+```
+
+The `broom::augment` function is a more convenient method:
+
+```{r}
+broom::augment(
+  lm_medv_lstat, newdata = nd, interval = "confidence"
+)
+```
+Plot the relationship between `medv` and `lstat`:
+
+```{r fig.height=3, fig.width=4}
+boston %>%
+  ggplot(aes(x = lstat, y = medv)) +
+  geom_point(alpha = 0.3) +
+  geom_abline(slope = coef(lm_medv_lstat)["lstat"],
+              intercept = coef(lm_medv_lstat)["(Intercept)"],
+              size = 1.0, color = td_colors$nice$day9_yellow)
+```
+
+To display model diagnostics, we can call `plot()` on the model object as we have before, but I like the `performance` package because it uses `ggplot2`:
+
+```{r warning=FALSE, message=FALSE, fig.width=9, fig.height=9}
+performance::check_model(lm_medv_lstat)
+```
+
+The `stats::hatvalues()` function is a new one to me, for computing leverage:
+
+```{r}
+hatvalues(lm_medv_lstat)[which.max(hatvalues(lm_medv_lstat))]
+```
+
+Unsurprisingly, this point is the one with the largest value of `lstat`:
+
+```{r}
+boston %>%
+  transmute(row = 1:n(), lstat, medv) %>%
+  filter(lstat == max(lstat))
+```
+
+
+### Multiple Linear Regression
+
+Fit to all predictors and check VIF with the `performance` package:
+
+```{r}
+lm_medv_all <- lm(medv ~ ., data = boston)
+performance::check_collinearity(lm_medv_all)
+```
+
+The `rad` (accessibility to radial highways) and `tax` (property tax rate) variables have moderate VIF.
+
+### Interaction Terms
+
+Interaction between `lstat` and `age`:
+
+```{r}
+lm_medv_lstat_age <- lm(medv ~ lstat * age, data = boston)
+tidy_custom(lm_medv_lstat_age) %>%
+  gt()
+```
+
+
+### Non-linear Transformations of the Predictors
+
+Perform a regression of `medv` onto `lstat` and `lstat^2`, and compare fits with `anova`:
+
+```{r}
+lm_medv_lstat2 <- lm(medv ~ lstat + I(lstat^2), data = boston)
+
+anova(lm_medv_lstat, lm_medv_lstat2)
+```
+
+The quadratic model is superior by the $F$-test.
+Check the residuals:
+
+```{r fig.height=3, fig.width=4}
+performance::check_model(lm_medv_lstat2, check = "linearity")
+```
+
+The quadratic term is an obvious improvement, but still some non-linearity at large values of `medv`.
+
+The `poly()` function is a quick way to include higher order terms:
+
+```{r}
+# Orthogonalized predictors by default
+lm_medv_lstat5 <- lm(medv ~ poly(lstat, 5), data = boston)
+tidy_custom(lm_medv_lstat5)
+# Raw polynomials
+lm_medv_lstat5_raw <- lm(medv ~ poly(lstat, 5, raw = TRUE), data = boston)
+tidy_custom(lm_medv_lstat5_raw)
+```
+
+
+### Qualitative Predictors
+
+Load `carseats`:
+
+```{r}
+carseats <- ISLR2::Carseats
+```
+
+The `contrasts()` function shows the dummy coding for the qualitative `ShelveLoc` variable:
+
+```{r}
+contrasts(carseats$ShelveLoc)
+```
+
+Fit the model and print the coefficients related to `ShelveLoc`:
+
+```{r}
+lm_sales <- lm(Sales ~ . + Income:Advertising + Price:Age,
+               data = carseats)
+tidy_custom(lm_sales) %>%
+  filter(str_detect(term, "ShelveLoc|Intercept"))
+```
+
+## Exercises
+
+### Applied {-}
+
+I'll attempt to do these exercises in the `tidymodels` framework.
+
+```{r message=FALSE}
+library(tidymodels)
+```
+
+#### 8. Simple linear regression with `Auto` {-}
+
+This is way overkill for a simple linear regression, but here is a `tidymodels` workflow object for regressing `mpg` on `horsepower`:
+
+```{r}
+lm_mpg_hp_recipe <- recipe(mpg ~ horsepower, data = auto)
+lm_mpg_hp_spec <- linear_reg() %>%
+  set_mode("regression") %>%
+  set_engine("lm")
+lm_mpg_hp_workflow <- workflow() %>%
+  add_recipe(lm_mpg_hp_recipe) %>%
+  add_model(lm_mpg_hp_spec)
+lm_mpg_hp_workflow
+```
+
+Fit the model and print the estimates:
+
+```{r}
+lm_mpg_hp_fit <- lm_mpg_hp_workflow %>%
+  fit(data = auto)
+tidy_custom(lm_mpg_hp_fit) %>%
+  gt()
+```
+
+The `tidymodels` framework uses the same functions as we have seen (the "engine" specifies the `lm` function), but in principled fashion with a standardized interface.
+We can extract the actual `lm` object from `lm_mpg_hp_fit` using `extract_fit_engine()`
+
+```{r}
+lm_mpg_hp_fit_engine <- lm_mpg_hp_fit %>%
+  extract_fit_engine()
+summary(lm_mpg_hp_fit_engine)
+```
+
+(a) Observations on the model:
+
+* There is a relationship between `mpg` and `horsepower`.
+* Is is highly significant ($p$ `r scales::pvalue(tidy(lm_mpg_hp_fit)$p.value[[2]])`) with $R^2 = $ `r summary(lm_mpg_hp_fit_engine)$r.squared %>% round(2)`
+* The relationship is negative. Every unit of horsepower is associated with a `r tidy(lm_mpg_hp_fit)$estimate[[2]] %>% round(2)` reduction in miles per gallon.
+* The confidence and prediction intervals of predicted `mpg` given `horsepower` = 98:
+
+```{r}
+predict(lm_mpg_hp_fit, tibble(horsepower = 98), type = "conf_int",
+        # Don't have to call this, because it is the default value
+        level = 0.95)
+predict(lm_mpg_hp_fit, tibble(horsepower = 98), type = "pred_int")
+```
+
+Note that the `lm_mpg_hp_fit` is a `workflow` object, and so the `parsnip::predict.model_fit()` function takes a different argument (`type`) to specify confidence/prediction intervals.
+Before, we were calling `predict.lm()` which uses the `interval` argument.
+Note that it also doesn't return the point estimate, just the lower and upper values.
+
+(b) Plot with best fit line:
+
+```{r warning=FALSE}
+auto %>%
+  ggplot(aes(x = horsepower)) +
+  geom_point(aes(y = mpg), size = 2, alpha = 0.4) +
+  geom_abline(slope = coef(lm_mpg_hp_fit_engine)["horsepower"],
+              intercept = coef(lm_mpg_hp_fit_engine)["(Intercept)"],
+              size = 2, color = td_colors$nice$emerald)
+```
+
+(c) Diagnostic plots:
+
+```{r fig.height=7, fig.width=6, warning=FALSE}
+lm_mpg_hp_fit_engine %>%
+  performance::check_model()
+```
+
+Two potential problems: non-linearity (top left plot) and homogeneity of variance (top right).
+
+#### 9. Multiple linear regression with `Auto` {-}
+
+(a) Scatterplot of all variables.
+
+For quickly producing these correlation matrices, I like the `GGally::ggpairs()` function:
+
+```{r fig.height=7, fig.width=7}
+GGally::ggpairs(auto %>% select(-name))
+```
+
+(b) Compute the correlations.
+
+The above plot shows the correlation coefficients, but here is the `cor()` output:
+
+```{r}
+cor(auto %>% select(-name))
+```
+
+(c) Fit the multiple linear regression.
+
+```{r}
+lm_mpg_recipe <- recipe(mpg ~ ., data = auto) %>%
+  step_rm(name)
+
+# Skip the spec step, and just put it directly into the workflow
+lm_mpg_workflow <- workflow() %>%
+  add_recipe(lm_mpg_recipe) %>%
+  # By default, linear_reg() will use lm as the engine and regression as mode
+  add_model(linear_reg())
+lm_mpg_workflow
+
+lm_mpg_fit <- lm_mpg_workflow %>%
+  fit(data = auto)
+lm_mpg_fit_engine <- extract_fit_engine(lm_mpg_fit)
+summary(lm_mpg_fit_engine)
+```
+
+* There is a relationship between the predictors and `mpg`: $F$ = `r glance(lm_mpg_fit)$statistic %>% round(1)`
+* The following terms are statistically significant: `r tidy(lm_mpg_fit) %>% filter(p.value < 0.05) %>% pull(term) %>% str_c(collapse = ", ")`
+* The coefficient for `year` suggests that, for every increment in car model year, `mpg` increases by `r tidy(lm_mpg_fit) %>% filter(term == "year") %>% pull(estimate) %>% round(2)`
+
+(d) Diagnostic plots.
+        
+```{r fig.height=7, fig.width=8, warning=FALSE}
+lm_mpg_fit %>%
+  extract_fit_engine() %>%
+  performance::check_model()
+```
+
+Some non-linearity and moderate collinearity.
+There is a point with high leverage, but it has a fairly small standardized residual.
+
+#### 10. Multiple linear regression with `Carseats` {-}
+
+(a) Fit a model to predict `Sales` using `Price`, `Urban`, and `US`.
+
+For demonstration, here I'll use the minimal code possible while still using `tidymodels` (i.e. skip `recipe` and `workflow` steps):
+
+```{r}
+lm_sales_price_urban_us_fit <-
+  linear_reg() %>% # default engine = "lm"
+  fit(Sales ~ Price + Urban + US, data = carseats)
+
+fit_tidy <- tidy(lm_sales_price_urban_us_fit)
+tidy_custom(lm_sales_price_urban_us_fit) %>%
+  gt()
+```
+
+(b) Provide an interpretation of each coefficient.
+
+* There is a significant negative relationship between `Sales` and `Price`:
+    * A difference of `r signif(fit_tidy$estimate[2], 2)` thousand unit sales per dollar of price
+* There is no significant association between `Urban` and `Sales`:
+    * Urban stores sell `r signif(fit_tidy$estimate[3], 2)` thousand units compared to non-urban
+* There is a significant difference between US and non-US stores.
+    * US stores sell `r signif(fit_tidy$estimate[4], 2)` thousand more units on average compared to non-US
+    
+(c) Write out the model formula.
+
+There is a nice package called `equatiomatic` for writing out model formulae:
+
+```{r}
+lm_sales_price_urban_us_fit %>%
+  extract_fit_engine() %>%
+  equatiomatic::extract_eq()
+```
+
+Note that it uses $\alpha$, rather than $\beta_0$, to represent intercepts by default.
+
+(d) For which predictions can you reject the null hypothesis $H_0: \beta_j = 0$?
+
+For $\beta_1$ (`Price`) and $\beta_3$ (`US`).
+
+(e) Fit a smaller model with just the predictors in (d).
+
+```{r}
+lm_sales_price_us_fit <- linear_reg() %>%
+  fit(Sales ~ Price + US, data = carseats)
+tidy_custom(lm_sales_price_us_fit) %>%
+  gt()
+```
+
+(f) How well do the model fits the data?
+
+```{r}
+bind_rows(
+  bind_cols(model = "small", glance(lm_sales_price_us_fit)),
+  bind_cols(model = "full", glance(lm_sales_price_urban_us_fit))
+) %>%
+  transmute(
+    model, R2 = round(r.squared, 3), RSE = round(sigma, 3)
+  ) %>%
+  gt()
+```
+
+Excluding `Urban` makes no difference to $R^2$.
+Run an $F$-test as well:
+
+```{r}
+anova(
+  extract_fit_engine(lm_sales_price_urban_us_fit),
+  extract_fit_engine(lm_sales_price_us_fit)
+)
+```
+
+(g) Obtain 95% confidence intervals for the coefficients from (e).
+
+```{r}
+tidy(lm_sales_price_us_fit, conf.int = 0.95) %>%
+  transmute(
+    term, across(c(estimate, conf.low, conf.high), round, 3)
+  ) %>%
+  gt()
+```
+
+(h) Is there evidence of outliers or high leverage observations in the model from (e)?
+
+```{r warning=FALSE, fig.height=3, fig.width=4}
+lm_sales_price_us_fit %>%
+  performance::check_model(check = "outliers")
+```
+
+No evidence of outliers or high leverage points.
+
+#### 13. Simple linear regression to simulated data {-}
+
+```{r}
+set.seed(1)
+```
+
+(a) Generate 100 observations from $N(0,1)$.
+
+```{r}
+x <- rnorm(100, 0, 1)
+```
+
+(b) Generate 100 observations from $N(0, 0.25)$.
+
+```{r}
+eps <- rnorm(100, 0, 0.25)
+```
+
+(c) Generate $Y = -1 + 0.5 X + \epsilon$
+
+```{r}
+y <- -1 + 0.5 * x + eps
+length(y)
+```
+
+$\beta_0$ = -1, and $\beta_1$ = 0.5.
+
+(d) Scatterplot between `x` and `y`.
+
+```{r fig.height=3, fig.width=3}
+d <- tibble(x, y)
+p <- ggplot(d) +
+  geom_point(aes(x, y))
+p  
+```
+
+(e) Fit the simple linear regression and compare estimates to simulation parameters.
+
+```{r}
+lm_y_x <- lm(y ~ x, data = d)
+tidy_custom(lm_y_x) %>% gt()
+```
+
+$\hat{\beta_0}$ and $\hat{\beta_1}$ are very close (essentially equal) to the simulation values.
+
+(f) Plot the least squares and population regression lines.
+
+```{r fig.height=3, fig.width=3}
+d_lines <-
+  tribble(
+    ~line, ~slope, ~intercept,
+    "Population", 0.5, -1,
+    "Least squares", coef(lm_y_x)[2], coef(lm_y_x)[1]
+  )
+p +
+  geom_abline(
+    data = d_lines,
+    aes(slope = slope, intercept = intercept, color = line),
+    size = 1.5, alpha = 0.5
+  ) +
+  labs(color = NULL) +
+  theme(legend.position = "top")
+```
+
+Exactly on top of each other.
+
+(g) Fit a polynomial regression using $x^2$.
+
+```{r}
+lm_y_x2 <- lm(y ~ x + I(x^2), data = d)
+anova(lm_y_x, lm_y_x2)
+```
+
+By an $F$-test, the $x^2$ term did not improve the model fit.
+We can also look at $R^2$:
+
+```{r}
+c(summary(lm_y_x)$r.squared, summary(lm_y_x2)$r.squared)
+```
+
+(h) Repeat with less noise.
+
+```{r fig.height=3, fig.width=3}
+d_less <- tibble(
+  x, y = -1 + 0.5 * x + rnorm(100, 0, 0.1)
+)
+lm_y_x_less <- lm(y ~ x, data = d_less)
+p <- ggplot(d_less) + geom_point(aes(x, y))
+p
+d_lines <-
+  tribble(
+    ~line, ~slope, ~intercept,
+    "Population", 0.5, -1,
+    "Least squares", coef(lm_y_x_less)[2], coef(lm_y_x_less)[1]
+  )
+p +
+  geom_abline(
+    data = d_lines,
+    aes(slope = slope, intercept = intercept, color = line),
+    size = 1.5, alpha = 0.5
+  ) +
+  labs(color = NULL) +
+  theme(legend.position = "top")
+```
+
+(i) Repeat with more noise.
+
+```{r fig.height=3, fig.width=3}
+d_more <- tibble(
+  x, y = -1 + 0.5*x + rnorm(100, 0, 0.5)
+)
+lm_y_x_more <- lm(y ~ x, data = d_more)
+p <- ggplot(d_more) + geom_point(aes(x, y))
+p
+d_lines <-
+  tribble(
+    ~line, ~slope, ~intercept,
+    "Population", 0.5, -1,
+    "Least squares", coef(lm_y_x_more)[2], coef(lm_y_x_more)[1]
+  )
+p +
+  geom_abline(
+    data = d_lines,
+    aes(slope = slope, intercept = intercept, color = line),
+    size = 1.5, alpha = 0.5
+  ) +
+  labs(color = NULL) +
+  theme(legend.position = "top")
+```
+
+(f) What are the confidence intervals of the coefficients for the different data?
+
+```{r}
+bind_rows(
+  bind_cols(data = "original", tidy(lm_y_x, conf.int = 0.95)),
+  bind_cols(data = "less", tidy(lm_y_x_less, conf.int = 0.95)),
+  bind_cols(data = "more", tidy(lm_y_x_more, conf.int = 0.95))
+) %>%
+  transmute(
+    data, term,
+    across(c(estimate, conf.low, conf.high), round, 3)
+  ) %>%
+  group_by(data) %>%
+  gt(rowname_col = "term")
+```
+
+
+#### 14. Collineratiy simulation {-}
+
+(a) Simulate.
+
+```{r}
+set.seed(1)
+d <- tibble(
+  x1 = runif(100), x2 = 0.5 * x1 + rnorm(100) / 10,
+  y = 2 + 2 * x1 + 0.3 * x2 + rnorm(100)
+)
+```
+
+$$
+Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \epsilon
+$$
+
+$\beta_0$ = 2, $\beta_1 = 2$, and $\beta_2 = 0.3$.
+
+(b) Correlation between $X_1$ and $X_2$.
+
+```{r}
+cor(d)
+```
+
+Unsurprisingly very high, $r$ = `r round(cor(d$x1, d$x2), 3)`.
+
+(c) Fit the regression model.
+
+```{r}
+lm_y_x1_x2 <- linear_reg() %>%
+  fit(y ~ x1 + x2, data = d)
+tidy_custom(lm_y_x1_x2) %>% gt()
+```
+
+We can reject the null that $\beta_2 = 0$, but not for $\beta_1$.
+The estimates are nowhere close to the true values.
+
+(d) Fit the model of $Y$ and $X_1$.
+
+```{r}
+lm_y_x1 <- linear_reg() %>%
+  fit(y ~ x1, data = d)
+tidy_custom(lm_y_x1) %>% gt()
+```
+
+We recover the approximate true parameter, and reject the null.
+
+(e) Fit the model of $Y$ and $X_2$.
+
+```{r}
+lm_y_x2 <- linear_reg() %>%
+  fit(y ~ x2, data = d)
+tidy_custom(lm_y_x2) %>% gt()
+```
+
+We can reject the null, but don't recover $\beta_2 = 0.3$.
+
+(f) Do the results contradict each other?
+
+Yes, the models give much different results.
+
+#### 15. Univariable and multivariable regression on `Boston` {-}
+
+(a) Fit univariable models.
+
+```{r}
+lm_crim_uni <-
+  tibble(
+    # Get a list of predictors
+    predictor = names(boston)[names(boston) != "crim"]
+  ) %>%
+  mutate(
+    mod = map(
+      predictor,
+      ~lm(as.formula(paste0("crim ~ ", .x)), data = boston)
+    ),
+    mod_tidy = map(mod, broom::tidy)
+  )
+```
+
+These associations were statistical significant at $\alpha = 0.05$:
+
+```{r}
+lm_crim_uni %>%
+  unnest(mod_tidy) %>%
+  filter(term != "(Intercept)", p.value < 0.05) %>%
+  transmute(
+    predictor, estimate = signif(estimate, 4),
+    p.value = scales::pvalue(p.value)
+  ) %>%
+  gt()
+```
+
+(b) Fit the multiple regression.
+
+```{r}
+lm_crim_mult <- lm(crim ~ ., data = boston)
+```
+
+```{r}
+tidy_custom(lm_crim_mult) %>%
+  gt()
+```
+
+We reject the null for these predictors: `
+`r tidy(lm_crim_mult) %>% filter(p.value < 0.05) %>% pull(term) %>% str_c(collapse = ", ")`
+`
+
+(c) Compare regression estimates.
+
+```{r fig.height=4, fig.width=4}
+lm_crim_estimates <-
+  lm_crim_uni %>%
+  unnest(mod_tidy) %>%
+  filter(term != "(Intercept)") %>%
+  transmute(
+    model = "univariable", term, estimate
+  ) %>%
+  bind_rows(
+    tidy(lm_crim_mult) %>%
+      filter(term != "(Intercept)") %>%
+      transmute(
+        model = "multivariable", term, estimate
+      )
+  ) %>%
+  pivot_wider(names_from = model, values_from = estimate)
+lm_crim_estimates %>%
+  ggplot(aes(x = univariable, y = multivariable)) +
+  geom_point(size = 2) +
+  geom_abline(slope = 1, intercept = 0)
+```
+
+One really bad outlier:
+
+```{r}
+lm_crim_estimates %>% filter(univariable > 20)
+```
+
+Exclude that term and label the points:
+
+```{r fig.height=4, fig.width=5}
+lm_crim_estimates %>%
+  filter(univariable < 20) %>%
+  ggplot(aes(x = univariable, y = multivariable)) +
+  geom_point(size = 2) +
+  ggrepel::geom_text_repel(aes(label = term)) +
+  geom_abline(slope = 1, intercept = 0)
+```
+
+(d) Is there evidence of non-linear association for any predictors?
+
+```{r error=TRUE}
+lm_crim_uni_poly <-
+  tibble(
+    predictor = names(boston)[names(boston) != "crim"]
+  ) %>%
+  mutate(
+    mod = map(
+      predictor,
+      ~lm(as.formula(paste0("crim ~ poly(", .x, ", 3)")), data = boston)
+    ),
+    mod_tidy = map(mod, broom::tidy)
+  )
+```
+
+One of these models returned an error because the predictor does not have enough unique points to use polynomial regression.
+Look at the number of unique values for each variable in `boston`:
+
+```{r}
+boston %>%
+  pivot_longer(everything()) %>%
+  group_by(name) %>%
+  summarise(n_unique_vals = n_distinct(value), .groups = "drop") %>%
+  arrange(n_unique_vals)
+```
+
+The `chas` variable is a dummy variable to indicate the Charles River.
+Exclude it and fit again:
+
+```{r}
+lm_crim_uni_poly <-
+  tibble(
+    predictor = names(boston)[names(boston) != "crim"]
+  ) %>%
+  filter(predictor != "chas") %>%
+  mutate(
+    mod = map(
+      predictor,
+      ~lm(as.formula(paste0("crim ~ poly(", .x, ", 3)")), data = boston)
+    ),
+    mod_tidy = map(mod, broom::tidy)
+  )
+```
+
+These predictors have significant polynomial terms:
+
+```{r}
+lm_crim_uni_poly %>%
+  unnest(mod_tidy) %>%
+  filter(str_detect(term, "poly")) %>%
+  group_by(predictor) %>%
+  filter(sum(p.value < 0.05) > 1) %>%
+  transmute(
+    predictor, term,
+    estimate = signif(estimate, 4), std.error = signif(std.error, 4),
+    p.value = scales::pvalue(p.value)
+  ) %>%
+  gt(rowname_col = "term")
+```
+
+
+## Reproducibility {-}
+
+<details><summary>Reproducibility receipt</summary>
+
+```{r}
+Sys.time()
+```
+
+```{r}
+if ("git2r" %in% installed.packages()) {
+  if (git2r::in_repository()) {
+    git2r::repository()
+  }
+}
+```
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>

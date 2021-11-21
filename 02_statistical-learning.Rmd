@@ -98,7 +98,7 @@ a less flexible method.
     * the focus of the book
 * Unsupervised
     * no associated response
-    * we can seek to understand relationships between variables or between obervsations
+    * we can seek to understand relationships between variables or between observations
     * one example: cluster analysis
     
 ## Assessing Model Accuracy
