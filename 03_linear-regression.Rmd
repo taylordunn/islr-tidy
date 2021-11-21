@@ -2,7 +2,7 @@
 
 ## Simple Linear Regression
 
-A straightforward approach of predicing a quantiative $Y$ from a single predictor $X$, assuming an approximately linear relationship:
+A straightforward approach of predicting a quantitative $Y$ from a single predictor $X$, assuming an approximately linear relationship:
 
 $$
 Y \approx \beta_0 + \beta_1 X
