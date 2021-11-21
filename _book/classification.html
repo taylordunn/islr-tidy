@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4 Classification | An Introduction to Statistical with the tidyverse</title>
+  <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4 Classification | An Introduction to Statistical with the tidyverse" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="github-repo" content="taylordunn/islr-tidy" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4 Classification | An Introduction to Statistical with the tidyverse" />
+  
+  <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  
+
+<meta name="author" content="Taylor Dunn" />
+
+
+<meta name="date" content="2021-11-21" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="linear-regression.html"/>
+
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Who, what, and why?</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#an-overview-of-statistical-learning"><i class="fa fa-check"></i>An Overview of Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#wage-data"><i class="fa fa-check"></i>Wage Data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#a-brief-history-of-statistical-learning"><i class="fa fa-check"></i>A Brief History of Statistical Learning</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#this-book"><i class="fa fa-check"></i>This Book</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="statistical-learning.html"><a href="statistical-learning.html"><i class="fa fa-check"></i><b>2</b> Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#what-is-statistical-learning"><i class="fa fa-check"></i><b>2.1</b> What Is Statistical Learning?</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="statistical-learning.html"><a href="statistical-learning.html#why-estimate-f"><i class="fa fa-check"></i><b>2.1.1</b> Why Estimate <span class="math inline">\(f\)</span>?</a></li>
+<li class="chapter" data-level="2.1.2" data-path="statistical-learning.html"><a href="statistical-learning.html#how-do-we-estimate-f"><i class="fa fa-check"></i><b>2.1.2</b> How Do We Estimate f?</a></li>
+<li class="chapter" data-level="2.1.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-trade-off-between-prediction-accuracy-and-model-interpretability"><i class="fa fa-check"></i><b>2.1.3</b> The Trade-Off Between Prediction Accuracy and Model Interpretability</a></li>
+<li class="chapter" data-level="2.1.4" data-path="statistical-learning.html"><a href="statistical-learning.html#supervised-versus-unsupervised-learning"><i class="fa fa-check"></i><b>2.1.4</b> Supervised Versus Unsupervised Learning</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#assessing-model-accuracy"><i class="fa fa-check"></i><b>2.2</b> Assessing Model Accuracy</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#measuring-the-quality-of-fit"><i class="fa fa-check"></i><b>2.2.1</b> Measuring the Quality of Fit</a></li>
+<li class="chapter" data-level="2.2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#the-bias-variance-trade-off"><i class="fa fa-check"></i><b>2.2.2</b> The Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="2.2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-classification-setting"><i class="fa fa-check"></i><b>2.2.3</b> The Classification Setting</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#lab-introduction-to-r"><i class="fa fa-check"></i><b>2.3</b> Lab: Introduction to R</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="linear-regression.html"><a href="linear-regression.html"><i class="fa fa-check"></i><b>3</b> Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression"><i class="fa fa-check"></i><b>3.1</b> Simple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-coefficients"><i class="fa fa-check"></i><b>3.1.1</b> Estimating the Coefficients</a></li>
+<li class="chapter" data-level="3.1.2" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-coefficient-estimates"><i class="fa fa-check"></i><b>3.1.2</b> Assessing the Accuracy of the Coefficient Estimates</a></li>
+<li class="chapter" data-level="3.1.3" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-model"><i class="fa fa-check"></i><b>3.1.3</b> Assessing the Accuracy of the Model</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression"><i class="fa fa-check"></i><b>3.2</b> Multiple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-regression-coefficients"><i class="fa fa-check"></i><b>3.2.1</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="3.2.2" data-path="linear-regression.html"><a href="linear-regression.html#some-important-questions"><i class="fa fa-check"></i><b>3.2.2</b> Some Important Questions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="linear-regression.html"><a href="linear-regression.html#other-considerations-in-the-regression-model"><i class="fa fa-check"></i><b>3.3</b> Other Considerations in the Regression Model</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors"><i class="fa fa-check"></i><b>3.3.1</b> Qualitative Predictors</a></li>
+<li class="chapter" data-level="3.3.2" data-path="linear-regression.html"><a href="linear-regression.html#extensions-of-the-linear-model"><i class="fa fa-check"></i><b>3.3.2</b> Extensions of the Linear Model</a></li>
+<li class="chapter" data-level="3.3.3" data-path="linear-regression.html"><a href="linear-regression.html#potential-problems"><i class="fa fa-check"></i><b>3.3.3</b> Potential Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="linear-regression.html"><a href="linear-regression.html#the-marketing-plan"><i class="fa fa-check"></i><b>3.4</b> The Marketing Plan</a></li>
+<li class="chapter" data-level="3.5" data-path="linear-regression.html"><a href="linear-regression.html#comparison-of-linear-regression-with-k-nearest-neighbors"><i class="fa fa-check"></i><b>3.5</b> Comparison of Linear Regression with <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="3.6" data-path="linear-regression.html"><a href="linear-regression.html#lab-linear-regression"><i class="fa fa-check"></i><b>3.6</b> Lab: Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="linear-regression.html"><a href="linear-regression.html#libraries"><i class="fa fa-check"></i><b>3.6.1</b> Libraries</a></li>
+<li class="chapter" data-level="3.6.2" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.2</b> Simple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.3" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.3</b> Multiple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.4" data-path="linear-regression.html"><a href="linear-regression.html#interaction-terms"><i class="fa fa-check"></i><b>3.6.4</b> Interaction Terms</a></li>
+<li class="chapter" data-level="3.6.5" data-path="linear-regression.html"><a href="linear-regression.html#non-linear-transformations-of-the-predictors"><i class="fa fa-check"></i><b>3.6.5</b> Non-linear Transformations of the Predictors</a></li>
+<li class="chapter" data-level="3.6.6" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors-1"><i class="fa fa-check"></i><b>3.6.6</b> Qualitative Predictors</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="linear-regression.html"><a href="linear-regression.html#exercises"><i class="fa fa-check"></i><b>3.7</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#applied"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#reproducibility"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>4</b> Classification</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="classification.html"><a href="classification.html#an-overview-of-classification"><i class="fa fa-check"></i><b>4.1</b> An Overview of Classification</a></li>
+<li class="chapter" data-level="4.2" data-path="classification.html"><a href="classification.html#why-not-linear-regression"><i class="fa fa-check"></i><b>4.2</b> Why Not Linear Regression?</a></li>
+<li class="chapter" data-level="4.3" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>4.3</b> Logistic Regression</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="classification.html"><a href="classification.html#the-logistic-model"><i class="fa fa-check"></i><b>4.3.1</b> The Logistic Model</a></li>
+<li class="chapter" data-level="4.3.2" data-path="classification.html"><a href="classification.html#estimating-the-regression-coefficients-1"><i class="fa fa-check"></i><b>4.3.2</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="4.3.3" data-path="classification.html"><a href="classification.html#making-predictions"><i class="fa fa-check"></i><b>4.3.3</b> Making Predictions</a></li>
+<li class="chapter" data-level="4.3.4" data-path="classification.html"><a href="classification.html#multiple-logistic-regression"><i class="fa fa-check"></i><b>4.3.4</b> Multiple Logistic Regression</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical with the tidyverse</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="classification" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Classification</h1>
+<blockquote>
+<p>But in many situations, the response
+variable is instead qualitative. For example, eye color is qualitative. Often qualitative variables are referred to as categorical; we will use these
+terms interchangeably. In this chapter, we study approaches for predicting
+qualitative responses, a process that is known as classification.</p>
+</blockquote>
+<p>The methods covered in this chapter include logistic regression (and Poisson regression), linear discriminant analysis, quadratic discriminant analysis, naive Bayes, and <span class="math inline">\(K\)</span>-nearest neighbors.</p>
+<div id="an-overview-of-classification" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> An Overview of Classification</h2>
+<blockquote>
+<p>In this chapter, we will illustrate the concept of classification using the
+simulated <code>Default</code> data set. We are interested in predicting whether an
+individual will default on his or her credit card payment, on the basis of
+annual income and monthly credit card balance.</p>
+</blockquote>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="classification.html#cb176-1" aria-hidden="true" tabindex="-1"></a>default <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Default</span>
+<span id="cb176-2"><a href="classification.html#cb176-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(default)</span></code></pre></div>
+<pre><code>## Rows: 10,000
+## Columns: 4
+## $ default &lt;fct&gt; No, No, No, No, No, No, No, No, No, No, No, No, No, No, No, No~
+## $ student &lt;fct&gt; No, Yes, No, No, No, Yes, No, Yes, No, No, Yes, Yes, No, No, N~
+## $ balance &lt;dbl&gt; 729.5265, 817.1804, 1073.5492, 529.2506, 785.6559, 919.5885, 8~
+## $ income  &lt;dbl&gt; 44361.625, 12106.135, 31767.139, 35704.494, 38463.496, 7491.55~</code></pre>
+<p>Randomly choose a subset of the 10000 observations and re-create Figure 4.1:</p>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="classification.html#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb178-2"><a href="classification.html#cb178-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># for composing plots</span></span>
+<span id="cb178-3"><a href="classification.html#cb178-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb178-4"><a href="classification.html#cb178-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb178-5"><a href="classification.html#cb178-5" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb178-6"><a href="classification.html#cb178-6" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
+<span id="cb178-7"><a href="classification.html#cb178-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb178-8"><a href="classification.html#cb178-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span>
+<span id="cb178-9"><a href="classification.html#cb178-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb178-10"><a href="classification.html#cb178-10" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
+<span id="cb178-11"><a href="classification.html#cb178-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(default, <span class="at">name =</span> <span class="st">&quot;n_group&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb178-12"><a href="classification.html#cb178-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(</span>
+<span id="cb178-13"><a href="classification.html#cb178-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb178-14"><a href="classification.html#cb178-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Inversely weight by group size to get more even distribution</span></span>
+<span id="cb178-15"><a href="classification.html#cb178-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight_by =</span> <span class="fu">n</span>() <span class="sc">-</span> n_group</span>
+<span id="cb178-16"><a href="classification.html#cb178-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb178-17"><a href="classification.html#cb178-17" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb178-18"><a href="classification.html#cb178-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income)) <span class="sc">+</span></span>
+<span id="cb178-19"><a href="classification.html#cb178-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> default, <span class="at">shape =</span> default),</span>
+<span id="cb178-20"><a href="classification.html#cb178-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb178-21"><a href="classification.html#cb178-21" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb178-22"><a href="classification.html#cb178-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> default, <span class="at">y =</span> balance)) <span class="sc">+</span></span>
+<span id="cb178-23"><a href="classification.html#cb178-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> default), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb178-24"><a href="classification.html#cb178-24" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb178-25"><a href="classification.html#cb178-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> default, <span class="at">y =</span> income)) <span class="sc">+</span></span>
+<span id="cb178-26"><a href="classification.html#cb178-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> default), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb178-27"><a href="classification.html#cb178-27" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> (p2 <span class="sc">|</span> p3)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.1-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="why-not-linear-regression" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Why Not Linear Regression?</h2>
+<p>Linear regression cannot predict un-ordered qualitative responses with more than two levels.</p>
+<blockquote>
+<p>Unfortunately, in general there is no natural way to
+convert a qualitative response variable with more than two levels into a
+quantitative response that is ready for linear regression.</p>
+</blockquote>
+<p>It is possible to use linear regression to predict a binary (two level) response.
+For example, if we code stroke and drug overdose as dummy variables:</p>
+<p><span class="math display">\[
+Y =
+\begin{cases}
+0 &amp; \text{if stroke;} \\
+1 &amp; \text{if drug overdose}.
+\end{cases}
+\]</span></p>
+<p>Then we predict stroke if <span class="math inline">\(\hat{Y} &lt;= 0.5\)</span> and overdose if <span class="math inline">\(\hat{Y} &gt; 0.5\)</span>.
+It turns out that these probability estimates are not unreasonble, but there can be issues:</p>
+<blockquote>
+<p>However, if we use linear regression, some of our estimates might be outside the [0, 1] interval (see Figure 4.2), making them
+hard to interpret as probabilities! Nevertheless, the predictions provide an ordering and can be interpreted as crude probability estimates.</p>
+</blockquote>
+</div>
+<div id="logistic-regression" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Logistic Regression</h2>
+<p>In logistic regression, we model the probability of <span class="math inline">\(Y\)</span> belonging to a class, rather than the response <span class="math inline">\(Y\)</span> itself.
+The probability of <code>default</code> given <code>balance</code> can be written:</p>
+<p><span class="math display">\[
+\text{Pr}(\text{default = Yes}|\text{balance}) = p(\text{balance}).
+\]</span></p>
+<p>One might predict a default for an individual with <span class="math inline">\(p(\text{balance}) &gt; 0.5\)</span>.
+Or they may alter the threshold to be conservative, e.g. <span class="math inline">\(p(\text{balance}) &gt; 0.1\)</span></p>
+<div id="the-logistic-model" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> The Logistic Model</h3>
+<p>As previously discussed, we could model the probability as linear:</p>
+<p><span class="math display">\[
+p(X) = \beta_0 + \beta_1 X
+\]</span></p>
+<p>but this could give probabilities outside of the range 0-1.
+We must instead model <span class="math inline">\(p(X)\)</span> using a function that gives outputs 0-1.
+Many funtions meet this description, but logistic regression uses the logistic function:</p>
+<p><span class="math display">\[
+p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1 X}}.
+\]</span></p>
+<p>Fit the linear and logistic probability models and re-create Figure 4.2:</p>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb179-1"><a href="classification.html#cb179-1" aria-hidden="true" tabindex="-1"></a>lm_default_balance <span class="ot">&lt;-</span></span>
+<span id="cb179-2"><a href="classification.html#cb179-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(</span>
+<span id="cb179-3"><a href="classification.html#cb179-3" aria-hidden="true" tabindex="-1"></a>    default <span class="sc">~</span> balance,</span>
+<span id="cb179-4"><a href="classification.html#cb179-4" aria-hidden="true" tabindex="-1"></a>     <span class="co"># Turn the factor levels into 0 and 1</span></span>
+<span id="cb179-5"><a href="classification.html#cb179-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> default <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">default =</span> <span class="fu">as.numeric</span>(default) <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb179-6"><a href="classification.html#cb179-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb179-7"><a href="classification.html#cb179-7" aria-hidden="true" tabindex="-1"></a>glm_default_balance <span class="ot">&lt;-</span></span>
+<span id="cb179-8"><a href="classification.html#cb179-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glm</span>(default <span class="sc">~</span> balance, <span class="at">data =</span> default,</span>
+<span id="cb179-9"><a href="classification.html#cb179-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>))</span>
+<span id="cb179-10"><a href="classification.html#cb179-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the data</span></span>
+<span id="cb179-11"><a href="classification.html#cb179-11" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
+<span id="cb179-12"><a href="classification.html#cb179-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance)) <span class="sc">+</span></span>
+<span id="cb179-13"><a href="classification.html#cb179-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">as.numeric</span>(default) <span class="sc">-</span> <span class="dv">1</span>), <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>soft_orange, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb179-14"><a href="classification.html#cb179-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the linear model</span></span>
+<span id="cb179-15"><a href="classification.html#cb179-15" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p <span class="sc">+</span></span>
+<span id="cb179-16"><a href="classification.html#cb179-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="fu">coef</span>(lm_default_balance)[<span class="st">&quot;balance&quot;</span>],</span>
+<span id="cb179-17"><a href="classification.html#cb179-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">intercept =</span> <span class="fu">coef</span>(lm_default_balance)[<span class="st">&quot;(Intercept)&quot;</span>],</span>
+<span id="cb179-18"><a href="classification.html#cb179-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue) <span class="sc">+</span></span>
+<span id="cb179-19"><a href="classification.html#cb179-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Probability of default&quot;</span>)</span>
+<span id="cb179-20"><a href="classification.html#cb179-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the logistic model</span></span>
+<span id="cb179-21"><a href="classification.html#cb179-21" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> p <span class="sc">+</span></span>
+<span id="cb179-22"><a href="classification.html#cb179-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb179-23"><a href="classification.html#cb179-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> pred_default),</span>
+<span id="cb179-24"><a href="classification.html#cb179-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">balance =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2700</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb179-25"><a href="classification.html#cb179-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb179-26"><a href="classification.html#cb179-26" aria-hidden="true" tabindex="-1"></a>        <span class="at">sum_beta =</span> <span class="fu">coef</span>(glm_default_balance)[<span class="st">&quot;(Intercept)&quot;</span>] <span class="sc">+</span></span>
+<span id="cb179-27"><a href="classification.html#cb179-27" aria-hidden="true" tabindex="-1"></a>                       balance <span class="sc">*</span> <span class="fu">coef</span>(glm_default_balance)[<span class="st">&quot;balance&quot;</span>],</span>
+<span id="cb179-28"><a href="classification.html#cb179-28" aria-hidden="true" tabindex="-1"></a>        <span class="at">pred_default =</span> <span class="fu">plogis</span>(sum_beta)</span>
+<span id="cb179-29"><a href="classification.html#cb179-29" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb179-30"><a href="classification.html#cb179-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue</span>
+<span id="cb179-31"><a href="classification.html#cb179-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb179-32"><a href="classification.html#cb179-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb179-33"><a href="classification.html#cb179-33" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.2-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>A very clear improvement.
+The mean of the fitted probabilities in both models return the overall proportion of defaulters in the data set:</p>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="classification.html#cb180-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(lm_default_balance, <span class="at">newdata =</span> default) <span class="sc">%&gt;%</span></span>
+<span id="cb180-2"><a href="classification.html#cb180-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div>
+<pre><code>## [1] 0.0333</code></pre>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="classification.html#cb182-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(glm_default_balance, <span class="at">newdata =</span> default) <span class="sc">%&gt;%</span></span>
+<span id="cb182-2"><a href="classification.html#cb182-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plogis</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb182-3"><a href="classification.html#cb182-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>()</span></code></pre></div>
+<pre><code>## [1] 0.0333</code></pre>
+<p>The odds is found by re-arranging the logistic function:</p>
+<p><span class="math display">\[
+\frac{p(X)}{1 - p(X)} = e^{\beta_0 + \beta_1 X}.
+\]</span></p>
+<p>This can take any value between 0 (<span class="math inline">\(p(X) = 0\)</span>) and <span class="math inline">\(\infty\)</span> (<span class="math inline">\(p(X) = 1\)</span>).
+Basic interpretation:</p>
+<ul>
+<li>A probability of 0.2 gives 1:4 odds.</li>
+<li>A probability of 0.9 gives 9:1 odds.</li>
+</ul>
+<p>Taking the logarithm of both sides gives us the log odds or logit which is linear in <span class="math inline">\(X\)</span>:</p>
+<p><span class="math display">\[
+\log \left(\frac{p(X)}{1 - p(X)}\right) = \beta_0 + \beta_1 X.
+\]</span>
+A one unit change in <span class="math inline">\(X\)</span> increases the log odds by <span class="math inline">\(\beta_1\)</span>.
+Equivalently, it multiplies the odds by <span class="math inline">\(e^{\beta_1}\)</span>.</p>
+</div>
+<div id="estimating-the-regression-coefficients-1" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Estimating the Regression Coefficients</h3>
+<p>We fit logistic regression models with maximum likelihood, which seeks estimates for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> such that the predicted probabilities <span class="math inline">\(\hat{p}(x_i)\)</span> corresponds as closely as possible to the to the value <span class="math inline">\(y_i\)</span>.
+This idea is formalized using a likelihood function:</p>
+<p><span class="math display">\[
+\ell (\beta_0, \beta_1) = \prod_{i: y_i = 1} p(x_i) \prod_{i&#39;: y_{i&#39;} = 0} (1 - p(x_{i&#39;})).
+\]</span></p>
+<p>We find the estimates <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> by maximizing this likelihood function.
+Note that the least squares approach to linear regression is a special case of maximum likelihood.</p>
+<p>Re-produce Table 4.1 using the fitted model:</p>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="classification.html#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Since I will be reproducing this table often, write a function</span></span>
+<span id="cb184-2"><a href="classification.html#cb184-2" aria-hidden="true" tabindex="-1"></a>tidy_custom <span class="ot">&lt;-</span> <span class="cf">function</span>(mod, <span class="at">coef_round =</span> <span class="dv">4</span>, <span class="at">se_round =</span> <span class="dv">4</span>, <span class="at">z_round =</span> <span class="dv">2</span>) {</span>
+<span id="cb184-3"><a href="classification.html#cb184-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(mod) <span class="sc">%&gt;%</span></span>
+<span id="cb184-4"><a href="classification.html#cb184-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb184-5"><a href="classification.html#cb184-5" aria-hidden="true" tabindex="-1"></a>      term,</span>
+<span id="cb184-6"><a href="classification.html#cb184-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">coefficient =</span> <span class="fu">round</span>(estimate, coef_round),</span>
+<span id="cb184-7"><a href="classification.html#cb184-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">std.error =</span> <span class="fu">round</span>(std.error, se_round),</span>
+<span id="cb184-8"><a href="classification.html#cb184-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">z-statistic</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(statistic, z_round),</span>
+<span id="cb184-9"><a href="classification.html#cb184-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">p-value</span><span class="st">`</span> <span class="ot">=</span> scales<span class="sc">::</span><span class="fu">pvalue</span>(p.value)</span>
+<span id="cb184-10"><a href="classification.html#cb184-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb184-11"><a href="classification.html#cb184-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb184-12"><a href="classification.html#cb184-12" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(glm_default_balance) <span class="sc">%&gt;%</span> <span class="fu">gt</span>() </span></code></pre></div>
+<div id="iitolowwom" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#iitolowwom .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#iitolowwom .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iitolowwom .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#iitolowwom .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#iitolowwom .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iitolowwom .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iitolowwom .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#iitolowwom .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#iitolowwom .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#iitolowwom .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#iitolowwom .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#iitolowwom .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iitolowwom .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iitolowwom .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#iitolowwom .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#iitolowwom .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#iitolowwom .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#iitolowwom .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iitolowwom .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#iitolowwom .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iitolowwom .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#iitolowwom .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#iitolowwom .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iitolowwom .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iitolowwom .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#iitolowwom .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iitolowwom .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#iitolowwom .gt_left {
+  text-align: left;
+}
+
+#iitolowwom .gt_center {
+  text-align: center;
+}
+
+#iitolowwom .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#iitolowwom .gt_font_normal {
+  font-weight: normal;
+}
+
+#iitolowwom .gt_font_bold {
+  font-weight: bold;
+}
+
+#iitolowwom .gt_font_italic {
+  font-style: italic;
+}
+
+#iitolowwom .gt_super {
+  font-size: 65%;
+}
+
+#iitolowwom .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">term</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">coefficient</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">std.error</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">z-statistic</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">p-value</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_right">-10.6513</td>
+<td class="gt_row gt_right">0.3612</td>
+<td class="gt_row gt_right">-29.49</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">balance</td>
+<td class="gt_row gt_right">0.0055</td>
+<td class="gt_row gt_right">0.0002</td>
+<td class="gt_row gt_right">24.95</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The <span class="math inline">\(z\)</span>-statistic plays the same role at the <span class="math inline">\(t\)</span>-statistic from linear regression.
+It equals <span class="math inline">\(\hat{\beta}_1 / \text{SE}(\hat{\beta}_1)\)</span> and large (absolute) values indiciate evidence against the null hypothesis <span class="math inline">\(H_0: \beta_1 = 0\)</span>.
+The small <span class="math inline">\(p\)</span>-value associated with <code>balance</code> in the above table is small, so we reject the null hypothesis.</p>
+</div>
+<div id="making-predictions" class="section level3" number="4.3.3">
+<h3><span class="header-section-number">4.3.3</span> Making Predictions</h3>
+<p>With the estimates, we can compute <code>default</code> probabilities for an individual with a <code>balance</code> of $1,000 and $2.000.</p>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb185-1"><a href="classification.html#cb185-1" aria-hidden="true" tabindex="-1"></a>example_balance <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1000</span>, <span class="dv">2000</span>)</span>
+<span id="cb185-2"><a href="classification.html#cb185-2" aria-hidden="true" tabindex="-1"></a><span class="co"># For convenience, add together the linear terms to get the log-odds</span></span>
+<span id="cb185-3"><a href="classification.html#cb185-3" aria-hidden="true" tabindex="-1"></a>sum_beta <span class="ot">&lt;-</span> <span class="fu">coef</span>(glm_default_balance)[<span class="st">&quot;(Intercept)&quot;</span>] <span class="sc">+</span></span>
+<span id="cb185-4"><a href="classification.html#cb185-4" aria-hidden="true" tabindex="-1"></a>  example_balance <span class="sc">*</span> <span class="fu">coef</span>(glm_default_balance)[<span class="st">&quot;balance&quot;</span>]</span>
+<span id="cb185-5"><a href="classification.html#cb185-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb185-6"><a href="classification.html#cb185-6" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(sum_beta) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(sum_beta))</span></code></pre></div>
+<pre><code>## [1] 0.005752145 0.585769370</code></pre>
+<p>Instead of manually writing out the full equation, here are some alternatives:</p>
+<p>This logistic distribution function <code>stats::plogis</code> (sometimes called the inverse logit) returns probabilities from the given log-odds values:</p>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb187-1"><a href="classification.html#cb187-1" aria-hidden="true" tabindex="-1"></a>stats<span class="sc">::</span><span class="fu">plogis</span>(sum_beta)</span></code></pre></div>
+<pre><code>## [1] 0.005752145 0.585769370</code></pre>
+<p>Calling the generic <code>predict</code> on a <code>glm</code> uses <code>predict.glm()</code>:</p>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb189-1"><a href="classification.html#cb189-1" aria-hidden="true" tabindex="-1"></a><span class="co"># By default, predict.glm() returns log-odds</span></span>
+<span id="cb189-2"><a href="classification.html#cb189-2" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(glm_default_balance,</span>
+<span id="cb189-3"><a href="classification.html#cb189-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">balance =</span> example_balance)) <span class="sc">%&gt;%</span></span>
+<span id="cb189-4"><a href="classification.html#cb189-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># So use the inverse logit</span></span>
+<span id="cb189-5"><a href="classification.html#cb189-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plogis</span>()</span></code></pre></div>
+<pre><code>##           1           2 
+## 0.005752145 0.585769370</code></pre>
+<p>There is an argument to <code>predict.glm()</code> called <code>type</code> that specifies the scale of the returned predictions.
+By default, <code>type</code> = “link” which refers to the link function which means log-odds are returned.
+Setting <code>type</code> = “response” returns probabilities:</p>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="classification.html#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(glm_default_balance, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">balance =</span> example_balance),</span>
+<span id="cb191-2"><a href="classification.html#cb191-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<pre><code>##           1           2 
+## 0.005752145 0.585769370</code></pre>
+<p>Fit the model with <code>student</code> as the predictor and re-create Table 4.2:</p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb193-1"><a href="classification.html#cb193-1" aria-hidden="true" tabindex="-1"></a>glm_default_student <span class="ot">&lt;-</span></span>
+<span id="cb193-2"><a href="classification.html#cb193-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glm</span>(default <span class="sc">~</span> student, <span class="at">data =</span> default,</span>
+<span id="cb193-3"><a href="classification.html#cb193-3" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Note: don&#39;t need to specify binomial(link = &quot;logit&quot;) because it is the</span></span>
+<span id="cb193-4"><a href="classification.html#cb193-4" aria-hidden="true" tabindex="-1"></a>      <span class="co">#  default link</span></span>
+<span id="cb193-5"><a href="classification.html#cb193-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">family =</span> binomial)</span>
+<span id="cb193-6"><a href="classification.html#cb193-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(glm_default_student) <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code></pre></div>
+<div id="dzgapspvwl" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#dzgapspvwl .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dzgapspvwl .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dzgapspvwl .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dzgapspvwl .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dzgapspvwl .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dzgapspvwl .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dzgapspvwl .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dzgapspvwl .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dzgapspvwl .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dzgapspvwl .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dzgapspvwl .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dzgapspvwl .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dzgapspvwl .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#dzgapspvwl .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dzgapspvwl .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dzgapspvwl .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dzgapspvwl .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#dzgapspvwl .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dzgapspvwl .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#dzgapspvwl .gt_left {
+  text-align: left;
+}
+
+#dzgapspvwl .gt_center {
+  text-align: center;
+}
+
+#dzgapspvwl .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dzgapspvwl .gt_font_normal {
+  font-weight: normal;
+}
+
+#dzgapspvwl .gt_font_bold {
+  font-weight: bold;
+}
+
+#dzgapspvwl .gt_font_italic {
+  font-style: italic;
+}
+
+#dzgapspvwl .gt_super {
+  font-size: 65%;
+}
+
+#dzgapspvwl .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">term</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">coefficient</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">std.error</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">z-statistic</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">p-value</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_right">-3.5041</td>
+<td class="gt_row gt_right">0.0707</td>
+<td class="gt_row gt_right">-49.55</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">studentYes</td>
+<td class="gt_row gt_right">0.4049</td>
+<td class="gt_row gt_right">0.1150</td>
+<td class="gt_row gt_right">3.52</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The probabilities for student and non-students:</p>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="classification.html#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(glm_default_student, <span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">student =</span> <span class="fu">c</span>(<span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)),</span>
+<span id="cb194-2"><a href="classification.html#cb194-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<pre><code>##          1          2 
+## 0.04313859 0.02919501</code></pre>
+</div>
+<div id="multiple-logistic-regression" class="section level3" number="4.3.4">
+<h3><span class="header-section-number">4.3.4</span> Multiple Logistic Regression</h3>
+<p>The extension to multiple predictors <span class="math inline">\(p\)</span> is straightfoward:</p>
+<p><span class="math display">\[
+\log \left( \frac{p(X)}{1 - p(X)} \right) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p.
+\]</span></p>
+<p>Fit the model with all three predictors (<code>income</code> in thousands of dollars):</p>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="classification.html#cb196-1" aria-hidden="true" tabindex="-1"></a>glm_default_all <span class="ot">&lt;-</span></span>
+<span id="cb196-2"><a href="classification.html#cb196-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glm</span>(default <span class="sc">~</span> .,</span>
+<span id="cb196-3"><a href="classification.html#cb196-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> default <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">income =</span> income <span class="sc">/</span> <span class="dv">1000</span>),</span>
+<span id="cb196-4"><a href="classification.html#cb196-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">family =</span> binomial)</span>
+<span id="cb196-5"><a href="classification.html#cb196-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(glm_default_all) <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code></pre></div>
+<div id="qbqjvrdpgf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#qbqjvrdpgf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#qbqjvrdpgf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#qbqjvrdpgf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#qbqjvrdpgf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#qbqjvrdpgf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#qbqjvrdpgf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#qbqjvrdpgf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#qbqjvrdpgf .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qbqjvrdpgf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qbqjvrdpgf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#qbqjvrdpgf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#qbqjvrdpgf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#qbqjvrdpgf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#qbqjvrdpgf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qbqjvrdpgf .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qbqjvrdpgf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#qbqjvrdpgf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#qbqjvrdpgf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qbqjvrdpgf .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#qbqjvrdpgf .gt_left {
+  text-align: left;
+}
+
+#qbqjvrdpgf .gt_center {
+  text-align: center;
+}
+
+#qbqjvrdpgf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#qbqjvrdpgf .gt_font_normal {
+  font-weight: normal;
+}
+
+#qbqjvrdpgf .gt_font_bold {
+  font-weight: bold;
+}
+
+#qbqjvrdpgf .gt_font_italic {
+  font-style: italic;
+}
+
+#qbqjvrdpgf .gt_super {
+  font-size: 65%;
+}
+
+#qbqjvrdpgf .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">term</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">coefficient</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">std.error</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">z-statistic</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">p-value</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_right">-10.8690</td>
+<td class="gt_row gt_right">0.4923</td>
+<td class="gt_row gt_right">-22.08</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">studentYes</td>
+<td class="gt_row gt_right">-0.6468</td>
+<td class="gt_row gt_right">0.2363</td>
+<td class="gt_row gt_right">-2.74</td>
+<td class="gt_row gt_left">0.006</td></tr>
+    <tr><td class="gt_row gt_left">balance</td>
+<td class="gt_row gt_right">0.0057</td>
+<td class="gt_row gt_right">0.0002</td>
+<td class="gt_row gt_right">24.74</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">income</td>
+<td class="gt_row gt_right">0.0030</td>
+<td class="gt_row gt_right">0.0082</td>
+<td class="gt_row gt_right">0.37</td>
+<td class="gt_row gt_left">0.712</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The coefficient for <code>student</code> is statistically significant and negative, whereas it was positive in the univariable model.
+To understand this apparent paradox, re-create Figure 4.3:</p>
+<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb197-1"><a href="classification.html#cb197-1" aria-hidden="true" tabindex="-1"></a>balance_breaks <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2700</span>, <span class="at">by =</span> <span class="dv">270</span>)</span>
+<span id="cb197-2"><a href="classification.html#cb197-2" aria-hidden="true" tabindex="-1"></a>balance_midpoints <span class="ot">&lt;-</span></span>
+<span id="cb197-3"><a href="classification.html#cb197-3" aria-hidden="true" tabindex="-1"></a>  (balance_breaks[<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(balance_breaks) <span class="sc">-</span> <span class="dv">1</span>)] <span class="sc">+</span></span>
+<span id="cb197-4"><a href="classification.html#cb197-4" aria-hidden="true" tabindex="-1"></a>     balance_breaks[<span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(balance_breaks)]) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb197-5"><a href="classification.html#cb197-5" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
+<span id="cb197-6"><a href="classification.html#cb197-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb197-7"><a href="classification.html#cb197-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">balance_binned =</span> <span class="fu">cut</span>(balance, <span class="at">breaks =</span> balance_breaks,</span>
+<span id="cb197-8"><a href="classification.html#cb197-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">labels =</span> balance_midpoints),</span>
+<span id="cb197-9"><a href="classification.html#cb197-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">balance_binned =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(balance_binned))</span>
+<span id="cb197-10"><a href="classification.html#cb197-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb197-11"><a href="classification.html#cb197-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(student, balance_binned) <span class="sc">%&gt;%</span></span>
+<span id="cb197-12"><a href="classification.html#cb197-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">p_default =</span> <span class="fu">mean</span>(default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb197-13"><a href="classification.html#cb197-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance_binned, <span class="at">y =</span> p_default, <span class="at">color =</span> student)) <span class="sc">+</span></span>
+<span id="cb197-14"><a href="classification.html#cb197-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb197-15"><a href="classification.html#cb197-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(</span>
+<span id="cb197-16"><a href="classification.html#cb197-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> default <span class="sc">%&gt;%</span></span>
+<span id="cb197-17"><a href="classification.html#cb197-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(student) <span class="sc">%&gt;%</span></span>
+<span id="cb197-18"><a href="classification.html#cb197-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">p_mean_default =</span> <span class="fu">mean</span>(default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>),</span>
+<span id="cb197-19"><a href="classification.html#cb197-19" aria-hidden="true" tabindex="-1"></a>                <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>),</span>
+<span id="cb197-20"><a href="classification.html#cb197-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">yintercept =</span> p_mean_default, <span class="at">color =</span> student), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span></span>
+<span id="cb197-21"><a href="classification.html#cb197-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb197-22"><a href="classification.html#cb197-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue,</span>
+<span id="cb197-23"><a href="classification.html#cb197-23" aria-hidden="true" tabindex="-1"></a>                                td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_red)) <span class="sc">+</span></span>
+<span id="cb197-24"><a href="classification.html#cb197-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.7</span>))</span>
+<span id="cb197-25"><a href="classification.html#cb197-25" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
+<span id="cb197-26"><a href="classification.html#cb197-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> student, <span class="at">y =</span> balance)) <span class="sc">+</span></span>
+<span id="cb197-27"><a href="classification.html#cb197-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> student)) <span class="sc">+</span></span>
+<span id="cb197-28"><a href="classification.html#cb197-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue,</span>
+<span id="cb197-29"><a href="classification.html#cb197-29" aria-hidden="true" tabindex="-1"></a>                                td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_red)) <span class="sc">+</span></span>
+<span id="cb197-30"><a href="classification.html#cb197-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb197-31"><a href="classification.html#cb197-31" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.3-1.png" width="576" style="display: block; margin: auto;" /></p>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
+</div>
+<div class="csl-entry">
+James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em><span class="nocase">An Introduction to Statistical Learning with Applications in R</span></em>. 2nd ed. New York, NY: Springer. <a href="https://doi.org/10.1007/978-1-0716-1418-1_1">https://doi.org/10.1007/978-1-0716-1418-1_1</a>.
+</div>
+<div class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
+</div>
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="linear-regression.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,3 +1,8 @@
+```{r echo=FALSE}
+knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
+                      fig.width = 6, fig.height = 3)
+```
+
 # Linear Regression
 
 ## Simple Linear Regression
@@ -286,7 +291,7 @@ Re-create Table 3.4 by regressing `sales` on `TV`, `radio`, and `newspaper`:
 
 ```{r table3.4}
 lm_sales_mult <- lm(sales ~ TV + radio + newspaper, data = advertising)
-# Since I will be reproducting this table often, write a function
+# Since I will be reproducing this table often, write a function
 tidy_custom <- function(mod, coef_round = 3, se_round = 4, t_round = 2) {
   tidy(mod) %>%
     transmute(

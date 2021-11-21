@@ -1,3 +1,8 @@
+```{r echo=FALSE}
+knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
+                      fig.width = 6, fig.height = 3)
+```
+
 # Classification
 
 >But in many situations, the response
@@ -14,14 +19,14 @@ simulated `Default` data set. We are interested in predicting whether an
 individual will default on his or her credit card payment, on the basis of
 annual income and monthly credit card balance.
 
-```{r figure4.1}
+```{r}
 default <- ISLR2::Default
 glimpse(default)
 ```
 
 Randomly choose a subset of the `r nrow(default)` observations and re-create Figure 4.1:
 
-```{r figure4.1, message=FALSE, fig.width=6, fig.height=3}
+```{r figure4.1, message=FALSE}
 library(tidyverse)
 library(patchwork) # for composing plots
 # Load my R package and set the ggplot theme
@@ -82,5 +87,242 @@ In logistic regression, we model the probability of $Y$ belonging to a class, ra
 The probability of `default` given `balance` can be written:
 
 $$
-\text{Pr}(\text{`default` = `Yes`}|\text{`balance`}) = p(\text{`balance`})
+\text{Pr}(\text{default = Yes}|\text{balance}) = p(\text{balance}).
 $$
+
+One might predict a default for an individual with $p(\text{balance}) > 0.5$.
+Or they may alter the threshold to be conservative, e.g. $p(\text{balance}) > 0.1$
+
+### The Logistic Model
+
+As previously discussed, we could model the probability as linear:
+
+$$
+p(X) = \beta_0 + \beta_1 X
+$$
+
+but this could give probabilities outside of the range 0-1.
+We must instead model $p(X)$ using a function that gives outputs 0-1.
+Many functions meet this description, but logistic regression uses the logistic function:
+
+$$
+p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1 X}}.
+$$
+
+Fit the linear and logistic probability models and re-create Figure 4.2:
+
+```{r figure4.2}
+lm_default_balance <-
+  lm(
+    default ~ balance,
+     # Turn the factor levels into 0 and 1
+    data = default %>% mutate(default = as.numeric(default) - 1)
+  )
+glm_default_balance <-
+  glm(default ~ balance, data = default,
+      family = binomial(link = "logit"))
+# Plot the data
+p <- default %>%
+  ggplot(aes(x = balance)) +
+  geom_point(aes(y = as.numeric(default) - 1), color = td_colors$nice$soft_orange, alpha = 0.5)
+# Plot the linear model
+p1 <- p +
+  geom_abline(slope = coef(lm_default_balance)["balance"],
+              intercept = coef(lm_default_balance)["(Intercept)"],
+              size = 1.5, color = td_colors$nice$strong_blue) +
+  labs(y = "Probability of default")
+# Plot the logistic model
+p2 <- p +
+  geom_line(
+    aes(y = pred_default),
+    data = tibble(balance = seq(0, 2700, 1)) %>%
+      mutate(
+        sum_beta = coef(glm_default_balance)["(Intercept)"] +
+                       balance * coef(glm_default_balance)["balance"],
+        pred_default = plogis(sum_beta)
+      ),
+    size = 1.5, color = td_colors$nice$strong_blue
+  ) +
+  labs(y = NULL)
+p1 | p2
+```
+
+
+A very clear improvement.
+The mean of the fitted probabilities in both models return the overall proportion of defaulters in the data set:
+
+```{r}
+predict(lm_default_balance, newdata = default) %>%
+  mean()
+predict(glm_default_balance, newdata = default) %>%
+  plogis() %>%
+  mean()
+```
+
+The odds is found by re-arranging the logistic function:
+
+$$
+\frac{p(X)}{1 - p(X)} = e^{\beta_0 + \beta_1 X}.
+$$
+
+
+This can take any value between 0 ($p(X) = 0$) and $\infty$ ($p(X) = 1$).
+Basic interpretation:
+
+* A probability of 0.2 gives 1:4 odds.
+* A probability of 0.9 gives 9:1 odds.
+
+Taking the logarithm of both sides gives us the log odds or logit which is linear in $X$:
+
+$$
+\log \left(\frac{p(X)}{1 - p(X)}\right) = \beta_0 + \beta_1 X.
+$$
+A one unit change in $X$ increases the log odds by $\beta_1$.
+Equivalently, it multiplies the odds by $e^{\beta_1}$.
+
+### Estimating the Regression Coefficients
+
+We fit logistic regression models with maximum likelihood, which seeks estimates for $\beta_0$ and $\beta_1$ such that the predicted probabilities $\hat{p}(x_i)$ corresponds as closely as possible to the to the value $y_i$.
+This idea is formalized using a likelihood function:
+
+$$
+\ell (\beta_0, \beta_1) = \prod_{i: y_i = 1} p(x_i) \prod_{i': y_{i'} = 0} (1 - p(x_{i'})).
+$$
+
+We find the estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ by maximizing this likelihood function.
+Note that the least squares approach to linear regression is a special case of maximum likelihood.
+
+Re-produce Table 4.1 using the fitted model:
+
+```{r table4.1}
+# Since I will be reproducing this table often, write a function
+tidy_custom <- function(mod, coef_round = 4, se_round = 4, z_round = 2) {
+  tidy(mod) %>%
+    transmute(
+      term,
+      coefficient = round(estimate, coef_round),
+      std.error = round(std.error, se_round),
+      `z-statistic` = round(statistic, z_round),
+      `p-value` = scales::pvalue(p.value)
+    )
+}
+tidy_custom(glm_default_balance) %>% gt() 
+```
+
+The $z$-statistic plays the same role at the $t$-statistic from linear regression.
+It equals $\hat{\beta}_1 / \text{SE}(\hat{\beta}_1)$ and large (absolute) values indiciate evidence against the null hypothesis $H_0: \beta_1 = 0$.
+The small $p$-value associated with `balance` in the above table is small, so we reject the null hypothesis.
+
+### Making Predictions
+
+With the estimates, we can compute `default` probabilities for an individual with a `balance` of \$1,000 and \$2.000.
+
+```{r}
+example_balance <- c(1000, 2000)
+# For convenience, add together the linear terms to get the log-odds
+sum_beta <- coef(glm_default_balance)["(Intercept)"] +
+  example_balance * coef(glm_default_balance)["balance"]
+
+exp(sum_beta) / (1 + exp(sum_beta))
+```
+
+Instead of manually writing out the full equation, here are some alternatives:
+
+This logistic distribution function `stats::plogis` (sometimes called the inverse logit) returns probabilities from the given log-odds values:
+
+```{r}
+stats::plogis(sum_beta)
+```
+
+Calling the generic `predict` on a `glm` uses `predict.glm()`:
+
+```{r}
+# By default, predict.glm() returns log-odds
+predict(glm_default_balance,
+        newdata = tibble(balance = example_balance)) %>%
+  # So use the inverse logit
+  plogis()
+```
+
+There is an argument to `predict.glm()` called `type` that specifies the scale of the returned predictions.
+By default, `type` = "link" which refers to the link function which means log-odds are returned.
+Setting `type` = "response" returns probabilities:
+
+```{r}
+predict(glm_default_balance, newdata = tibble(balance = example_balance),
+        type = "response")
+```
+
+Fit the model with `student` as the predictor and re-create Table 4.2:
+
+```{r table4.2}
+glm_default_student <-
+  glm(default ~ student, data = default,
+      # Note: don't need to specify binomial(link = "logit") because it is the
+      #  default link
+      family = binomial)
+tidy_custom(glm_default_student) %>% gt()
+```
+
+The probabilities for student and non-students:
+
+```{r}
+predict(glm_default_student, newdata = tibble(student = c("Yes", "No")),
+        type = "response")
+```
+
+### Multiple Logistic Regression
+
+The extension to multiple predictors $p$ is straightfoward:
+
+$$
+\log \left( \frac{p(X)}{1 - p(X)} \right) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p.
+$$
+
+Fit the model with all three predictors (`income` in thousands of dollars):
+
+```{r table4.3}
+glm_default_all <-
+  glm(default ~ .,
+      data = default %>% mutate(income = income / 1000),
+      family = binomial)
+tidy_custom(glm_default_all) %>% gt()
+```
+
+The coefficient for `student` is statistically significant and negative, whereas it was positive in the univariable model.
+To understand this apparent paradox, re-create Figure 4.3:
+
+```{r figure4.3}
+balance_breaks <- seq(0, 2700, by = 270)
+balance_midpoints <-
+  (balance_breaks[1:(length(balance_breaks) - 1)] +
+     balance_breaks[2:length(balance_breaks)]) / 2
+p1 <- default %>%
+  mutate(
+    balance_binned = cut(balance, breaks = balance_breaks,
+                         include.lowest = TRUE, labels = balance_midpoints),
+    balance_binned = as.numeric(as.character(balance_binned))
+  ) %>%
+  group_by(student, balance_binned) %>%
+  summarise(p_default = mean(default == "Yes"), .groups = "drop") %>%
+  ggplot(aes(x = balance_binned, y = p_default, color = student)) +
+  geom_line(size = 1.5) +
+  geom_hline(
+    data = default %>%
+      group_by(student) %>%
+      summarise(p_mean_default = mean(default == "Yes"),
+                .groups = "drop"),
+    aes(yintercept = p_mean_default, color = student), lty = 2, size = 1
+  ) +
+  scale_color_manual(values = c(td_colors$nice$strong_blue,
+                                td_colors$nice$strong_red)) +
+  theme(legend.position = c(0.2, 0.7))
+p2 <- default %>%
+  ggplot(aes(x = student, y = balance)) +
+  geom_boxplot(aes(fill = student)) +
+  scale_fill_manual(values = c(td_colors$nice$strong_blue,
+                                td_colors$nice$strong_red)) +
+  theme(legend.position = "none")
+p1 | p2
+```
+

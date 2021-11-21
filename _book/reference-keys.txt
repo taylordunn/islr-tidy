@@ -32,3 +32,11 @@ interaction-terms
 non-linear-transformations-of-the-predictors
 qualitative-predictors-1
 exercises
+classification
+an-overview-of-classification
+why-not-linear-regression
+logistic-regression
+the-logistic-model
+estimating-the-regression-coefficients-1
+making-predictions
+multiple-logistic-regression
