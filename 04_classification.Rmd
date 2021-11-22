@@ -499,14 +499,220 @@ $$
 x = \frac{\mu_1^2 - \mu_2^2}{2 (\mu_1 - \mu_2)} = \frac{\mu_1 + \mu_2}{2}.
 $$
 
+Note that in the real world, we do not know that $X$ is drawn from a Gaussian distribution within each class, or all the parameters involved, so we are not able to calculate the decision boundary for the Bayes classifier.
+This is where the linear discriminant analysis (LDA) method comes in.
+
+If we are quite certain that $X$ is Gaussian within each class, then we can use LDA to approximate the Bayes classifier with these estimates:
+
+$$
+\begin{align}
+\hat{\mu}_k &= \frac{1}{n_k} \sum_{i: y_i = k} x_i\\
+\hat{\sigma}^2_k &= \frac{1}{n - K} \sum^K_{k=1} \sum_{i: y_i = k} (x_i - \hat{u}_k)^2
+\end{align}
+$$
+
+where $n$ is the total number of training observations, and $n_k$ is the number in the $k$th class.
+The estimate for $\hat{\mu}_k$ is simply the average of the $k$th class, and $\hat{\sigma}^2$ is the weighted average of the sample variances for each of the $K$ classes.
+Sometimes we know the true fractions of class membership $\pi_k$ which can be used directly.
+Otherwise, LDA simply uses the proportion from the training observations:
+
+$$
+\hat{\pi}_k = n_k / n.
+$$
+
+Observation $X = x$ is then assigned to the class for which
+
+$$
+\hat{\delta}_k (x) = x \frac{\hat{\mu}_k}{\hat{\sigma}^2} - \frac{\hat{\mu}_k^2}{2 \hat{\sigma}^2} + \log(\hat{\pi}_k)
+$$
+
+>The word linear in the classifier’s name stems from the fact
+that the discriminant functions $\hat{\delta}_k (x)$ in (4.22) are linear functions of x (as opposed to a more complex function of $x$)
+
 Re-create the example in Figure 4.4:
 
 ```{r figure4.4}
-bayes_boundary <- 
-ggplot(data = tibble(x = seq(-4, 4, 0.1)), aes(x)) +
-  stat_function(fun = dnorm, geom = "line",
-                args = list(mean = -1.25, sd = 1)) +
-  stat_function(fun = dnorm, geom = "line",
-                args = list(mean = 1.25, sd = 1))
+mu1 <- -1.25
+mu2 <- 1.25
+sigma1 <- 1
+sigma2 <- 1
+bayes_boundary <- (mu1 + mu2) / 2
+p1 <- ggplot(data = tibble(x = seq(-4, 4, 0.1)), aes(x)) +
+  stat_function(fun = dnorm, args = list(mean = mu1, sd = sigma1),
+                geom = "line", size = 1.5, color = td_colors$nice$emerald) +
+  stat_function(fun = dnorm, args = list(mean = mu2, sd = sigma2),
+                geom = "line", size = 1.5, color = td_colors$nice$opera_mauve) +
+  geom_vline(xintercept = bayes_boundary, lty = 2, size = 1.5) +
+  remove_axis("y")
+
+set.seed(42)
+d <- tribble(
+  ~class, ~x,
+  1, rnorm(20, mean = mu1, sd = sigma1),
+  2, rnorm(20, mean = mu2, sd = sigma2)
+) %>%
+  unnest(x)
+lda_boundary <-
+  (mean(filter(d, class == 1)$x) + mean(filter(d, class == 2)$x)) / 2
+
+p2 <- d %>%
+  ggplot(aes(x, fill = factor(class), color = factor(class))) +
+  geom_histogram(bins = 13, alpha = 0.5, position = "identity") +
+  geom_vline(xintercept = bayes_boundary, lty = 2, size = 1.5) +
+  geom_vline(xintercept = lda_boundary, lty = 1, size = 1.5) +
+  scale_fill_manual(values = c(td_colors$nice$emerald,
+                               td_colors$nice$opera_mauve)) +
+  scale_color_manual(values = c(td_colors$nice$emerald,
+                               td_colors$nice$opera_mauve)) +
+  theme(legend.position = "none")
+p1 | p2
+```
+Simulate a large number of test observations and compute the Bayes and LDA test error rates:
+
+```{r}
+set.seed(2021)
+d <- tribble(
+  ~class, ~x,
+  1, rnorm(1e3, mean = mu1, sd = sigma1),
+  2, rnorm(1e3, mean = mu2, sd = sigma2)
+) %>%
+  unnest(x)
+# The LDA boundary must be recomputed with the new data
+lda_boundary <-
+  (mean(filter(d, class == 1)$x) + mean(filter(d, class == 2)$x)) / 2
+
+d %>%
+  mutate(
+    bayes_class = ifelse(x > bayes_boundary, 1, 2),
+    lda_class = ifelse(x > lda_boundary, 1, 2)
+  ) %>%
+  summarise(
+    `Bayes error rate` = mean(class == bayes_class),
+    `LDA error rate` = mean(class == lda_class)
+  )
 ```
 
+Pretty close but, as expected, the Bayes classifier has the lower error rate.
+
+
+>To reiterate, the LDA classifier results from assuming that the observations within each class come from a normal distribution with a class-specific mean and a common variance $\sigma^2$, and plugging estimates for these
+parameters into the Bayes classifier. In Section 4.4.3, we will consider a less
+stringent set of assumptions, by allowing the observations in the $k$th class
+to have a class-specific variance, $\sigma_k^2$.
+
+### Linear Discriminant Analysis for $p > 1$
+
+Extending the LDA classifier for multiple predictors involves a multi-variate Gaussian distribution with class-specific mean vector and a common covariance matrix.
+
+>The multivariate Gaussian distribution assumes that each individual predictor follows a one-dimensional normal distribution, as in (4.16), with some correlation between each pair of predictors. 
+
+I'll simulate some data with the `mvtnorm` package and plot probabilities with a 2D density plot (instead of the 3D in Figure 4.5):
+
+```{r figure4.5}
+d <- crossing(x1 = seq(-2, 2, 0.1), x2 = seq(-2, 2, 0.1))
+d1 <- d %>%
+  bind_cols(
+    prob = mvtnorm::dmvnorm(
+      x = as.matrix(d),
+      mean = c(0, 0), sigma = matrix(c(1, 0, 0, 1), nrow = 2)
+    )
+  )
+d2 <- d %>%
+  bind_cols(
+    prob = mvtnorm::dmvnorm(
+      x = as.matrix(d),
+      mean = c(0, 0), sigma = matrix(c(1, 0.7, 0.7, 1), nrow = 2)
+    )
+  )
+p1 <- d1 %>%
+  ggplot(aes(x = x1, y = x2)) +
+  geom_tile(aes(fill = prob)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(legend.position = "none")
+p2 <- d2 %>%
+  ggplot(aes(x = x1, y = x2)) +
+  geom_tile(aes(fill = prob)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme(legend.position = "none")
+p1 | p2
+```
+
+>To indicate that a $p$-dimensional random variable $X$ has a multivariate Gaussian distribution, we write $X \sim N(\mu, \Sigma)$. Here $E(X) = \mu$ is
+the mean of $X$ (a vector with $p$ components), and $\text{Cov}(X) = \Sigma$ is the
+$p \times p$ covariance matrix of $X$.
+
+The LDA classifier assumes that the observations in the $k$th class are drawn from a multivariate Gaussian distribution $N(\mu_k, \Sigma)$.
+The Bayes classifier assigns an observation $X = x$ to the class for which
+
+$$
+\delta_k (x) = x^T \Sigma^{-1} \mu_k - \frac{1}{2} \mu_k^T \Sigma^{-1} \mu_k + \log \pi_k
+$$
+ 
+is largest.
+ 
+As with the univariable case, the LDA method involves estimating the unknown parameters $\mu_k$, $\pi_k$ and $\Sigma$.
+Then the quantities $\hat{\delta}_k (x)$ are calculated and the observations $X$ are classified into the largest $\hat{\delta}_k (k)$. 
+
+We can perform LDA using the `MASS` package to predict `default` from `student` and `balance`:
+
+```{r}
+lda_default_balance_student <-
+  MASS::lda(default ~ balance + student, data = default)
+lda_default_balance_student
+```
+The resulting training error rate:
+
+```{r}
+mean(
+  predict(lda_default_balance_student,
+          newdata = default)$class != default$default
+)
+```
+
+>This sounds like a low error rate, but two caveats must be noted.
+* First of all, training error rates will usually be lower than test error
+rates, which are the real quantity of interest. In other words, we
+might expect this classifier to perform worse if we use it to predict
+whether or not a new set of individuals will default. The reason is
+that we specifically adjust the parameters of our model to do well on
+the training data. The higher the ratio of parameters $p$ to number
+of samples $n$, the more we expect this overfitting to play a role.
+For  these data we don’t expect this to be a problem, since $p = 2$ and
+$n = 10,000$.
+* Second, since only 3.33% of the individuals in the training sample
+defaulted, a simple but useless classifier that always predicts that
+an individual will not default, regardless of his or her credit card
+balance and student status, will result in an error rate of 3.33%. In
+other words, the trivial null classifier will achieve an error rate that is only a bit higher than the LDA training set error rate.
+
+Make predictions and produce the confusion matrix in Table 4.4:
+
+```{r table4.4}
+lda_pred <- 
+  bind_cols(
+    pred_default = predict(lda_default_balance_student,
+                           newdata = default)$class,
+    default 
+  ) 
+lda_pred %>%
+  count(pred_default, default) %>%
+  pivot_wider(names_from = default, values_from = n) %>%
+  mutate(Total = No + Yes) %>%
+  gt(rowname_col = "pred_default") %>%
+  gt::tab_spanner(label = "True default status", columns = everything()) %>%
+  gt::tab_stubhead("Predicted") %>%
+  # Can't get the Total row to round to 0 decimals
+  gt::summary_rows(fns = list(Total = ~round(sum(.), 0)))
+```
+
+We only missed 23 individuals who did not default, out of 9667.
+This is great, but we did quite poorly in predicting defaulters.
+
+>However, of the 333 individuals who
+defaulted, 252 (or 75.7%) were missed by LDA. So while the overall error
+rate is low, the error rate among individuals who defaulted is very high.
+From the perspective of a credit card company that is trying to identify
+high-risk individuals, an error rate of 252/333 = 75.7% among individuals
+who default may well be unacceptable.

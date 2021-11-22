@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>4 Classification | An Introduction to Statistical with the tidyverse</title>
+  <title>4 Classification | An Introduction to Statistical Learning with the tidyverse</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="4 Classification | An Introduction to Statistical with the tidyverse" />
+  <meta property="og:title" content="4 Classification | An Introduction to Statistical Learning with the tidyverse" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="taylordunn/islr-tidy" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="4 Classification | An Introduction to Statistical with the tidyverse" />
+  <meta name="twitter:title" content="4 Classification | An Introduction to Statistical Learning with the tidyverse" />
   
   <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
   
@@ -230,6 +230,10 @@ div.csl-indent {
 <li class="chapter" data-level="4.3.4" data-path="classification.html"><a href="classification.html#multiple-logistic-regression"><i class="fa fa-check"></i><b>4.3.4</b> Multiple Logistic Regression</a></li>
 <li class="chapter" data-level="4.3.5" data-path="classification.html"><a href="classification.html#multinomial-logistic-regression"><i class="fa fa-check"></i><b>4.3.5</b> Multinomial Logistic Regression</a></li>
 </ul></li>
+<li class="chapter" data-level="4.4" data-path="classification.html"><a href="classification.html#generative-models-for-classification"><i class="fa fa-check"></i><b>4.4</b> Generative Models for Classification</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1"><i class="fa fa-check"></i><b>4.4.1</b> Linear Discriminant Analysis for <span class="math inline">\(p = 1\)</span></a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -240,7 +244,7 @@ div.csl-indent {
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical with the tidyverse</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse</a>
           </h1>
         </div>
 
@@ -414,7 +418,7 @@ Equivalently, it multiplies the odds by <span class="math inline">\(e^{\beta_1}\
 </div>
 <div id="estimating-the-regression-coefficients-1" class="section level3" number="4.3.2">
 <h3><span class="header-section-number">4.3.2</span> Estimating the Regression Coefficients</h3>
-<p>We fit logistic regression models with maximum likelihood, which seeks estimates for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> such that the predicted probabilities <span class="math inline">\(\hat{p}(x_i)\)</span> corresponds as closely as possible to the to the value <span class="math inline">\(y_i\)</span>.
+<p>We fit logistic regression models with maximum likelihood, which seeks estimates for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> such that the predicted probabilities <span class="math inline">\(\hat{p}(x_i)\)</span> corresponds as closely as possible to the values <span class="math inline">\(y_i\)</span>.
 This idea is formalized using a likelihood function:</p>
 <p><span class="math display">\[
 \ell (\beta_0, \beta_1) = \prod_{i: y_i = 1} p(x_i) \prod_{i&#39;: y_{i&#39;} = 0} (1 - p(x_{i&#39;})).
@@ -1673,14 +1677,14 @@ Then for the baseline class <span class="math inline">\(K\)</span>:</p>
 \]</span></p>
 <p>The log-odds of a class <span class="math inline">\(k\)</span> is then linear in the predictors:</p>
 <p><span class="math display">\[
-\frac{\log \text{Pr} (Y = k| X = x)}{\log \text{Pr} (Y = K| X = x)} = \beta_{k0} + \beta_{k1} x_1 + \dots + \beta_{kp} x_p.
+\log \left( \frac{\text{Pr} (Y = k| X = x)}{\text{Pr} (Y = K| X = x)}\right) = \beta_{k0} + \beta_{k1} x_1 + \dots + \beta_{kp} x_p.
 \]</span></p>
-<p>Note how, in the case of two classes, the numerator becomes <span class="math inline">\(p(X)\)</span> and the denominator <span class="math inline">\(1 - p(X)\)</span>, which is exactly the same the two-class logistic regression formula (Equation 4.6).</p>
-<p>The choice is class <span class="math inline">\(K\)</span> as baseline was arbitrary.
+<p>Note that in the case of <span class="math inline">\(K = 2\)</span>, the numerator becomes <span class="math inline">\(p(X)\)</span> and the denominator <span class="math inline">\(1 - p(X)\)</span>, which is exactly the same the two-class logistic regression formula (Equation 4.6).</p>
+<p>The choice of class <span class="math inline">\(K\)</span> as baseline was arbitrary.
 The only thing that will change by choosing a different baseline will be the coefficient estimates, but the predictions (fitted values), and model metrics will be the same.</p>
 <p>When performing multinomial logistic regression, we will sometimes use an alternative to dummy coding called softmax coding.</p>
 <blockquote>
-<p>The softmax coding is equivalent softmax to the coding just described in the sense that the fitted values, log odds between any pair of classes, and other key model outputs will remain the
+<p>The softmax coding is equivalent to the coding just described in the sense that the fitted values, log odds between any pair of classes, and other key model outputs will remain the
 same, regardless of coding. But the softmax coding is used extensively in
 some areas of the machine learning literature (and will appear again in
 Chapter 10), so it is worth being aware of it. In the softmax coding, rather
@@ -1697,8 +1701,11 @@ of (4.13), the log odds ratio between the <span class="math inline">\(k\)</span>
 </blockquote>
 <p><span class="math display">\[
 \frac{\log \text{Pr} (Y = k| X = x)}{\log \text{Pr} (Y = k&#39;| X = x)} = (\beta_{k0} - \beta_{k&#39;0}) + (\beta_{k1} - \beta_{k&#39;1}) x_1 + \dots + (\beta_{kp} - \beta_{k&#39;p}) x_p.
-\]</span>
-## Generative Models for Classification</p>
+\]</span></p>
+</div>
+</div>
+<div id="generative-models-for-classification" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Generative Models for Classification</h2>
 <blockquote>
 <p>Logistic regression involves directly modeling <span class="math inline">\(\text{Pr} (Y = k|X = x)\)</span> using the
 logistic function, given by (4.7) for the case of two response classes. In
@@ -1718,7 +1725,7 @@ very similar in form to logistic regression.</p>
 parameter estimates for the logistic regression model are surprisingly
 unstable. The methods that we consider in this section do not suffer
 from this problem.</li>
-<li>If the distribution of the predictors X is approximately normal in
+<li>If the distribution of the predictors <span class="math inline">\(X\)</span> is approximately normal in
 each of the classes and the sample size is small, then the approaches
 in this section may be more accurate than logistic regression.</li>
 <li>The methods in this section can be naturally extended to the case
@@ -1727,13 +1734,121 @@ response classes, we can also use multinomial logistic regression from
 Section 4.3.5.)</li>
 </ul>
 </blockquote>
+<p>Consider a classification problem with <span class="math inline">\(K \geq 2\)</span> unordered classes.
+Let <span class="math inline">\(\pi_k\)</span> represent the prior probability that a random observation is class <span class="math inline">\(k\)</span>.
+Let <span class="math inline">\(f_k(X) \equiv \text{Pr}(X | Y = k)\)</span> denote the density function of <span class="math inline">\(X\)</span> for an observation in the <span class="math inline">\(k\)</span>th class.
+Then Bayes’ theorem states that the posterior probability than observation <span class="math inline">\(X = x\)</span> belongs to the <span class="math inline">\(k\)</span>th class is</p>
+<p><span class="math display">\[
+\text{Pr} (Y = k|X = x) = \frac{\pi_k f_k(x)}{\sum_{l=1}^K \pi_l f_l (x)} = p_k(x).
+\]</span></p>
+<p>Aside: Bayes’ theorem in the most simplistic form is</p>
+<p><span class="math display">\[
+P(Y | X) = \frac{P(X | Y) P (Y)}{P(X)}.
+\]</span></p>
+<p>So the probability of <span class="math inline">\(X\)</span> given class <span class="math inline">\(Y\)</span>/<span class="math inline">\(k\)</span> is <span class="math inline">\(P(X|Y) = f_k (x)\)</span>, the independent probability of a class <span class="math inline">\(Y\)</span>/<span class="math inline">\(k\)</span> is <span class="math inline">\(P(Y) = \pi_k\)</span>, and the denominator is a normalizing factor which sums over all possible values <span class="math inline">\(Y\)</span>/<span class="math inline">\(k\)</span> to give the independent probability <span class="math inline">\(P(X) = \sum \pi_l f_l (x)\)</span>.</p>
+<p>Estimating <span class="math inline">\(\pi_k\)</span> is easy if we have a random sample from the population – just take the fraction of the training observations belonging to class <span class="math inline">\(k\)</span>.
+Estimating the density function <span class="math inline">\(f_k (x)\)</span> is much more challenging.</p>
+<blockquote>
+<p>We know from Chapter 2 that the Bayes classifier, which classifies an
+observation <span class="math inline">\(x\)</span> to the class for which <span class="math inline">\(p_k(x)\)</span> is largest, has the lowest possible
+error rate out of all classifiers. (Of course, this is only true if all of the
+terms in (4.15) are correctly specified.) Therefore, if we can find a way to
+estimate <span class="math inline">\(f_k(x)\)</span>, then we can plug it into (4.15) in order to approximate the
+Bayes classifier.</p>
+</blockquote>
+<p>We now discuss three classifiers that use different estimates of <span class="math inline">\(f_k (x)\)</span>.</p>
+<div id="linear-discriminant-analysis-for-p-1" class="section level3" number="4.4.1">
+<h3><span class="header-section-number">4.4.1</span> Linear Discriminant Analysis for <span class="math inline">\(p = 1\)</span></h3>
+<p>For the case of one predictor, we start by assuming that <span class="math inline">\(f_k (x)\)</span> is normal or Gaussian, which has the following density in one dimension:</p>
+<p><span class="math display">\[
+f_k (x) = \frac{1}{\sqrt{2 \pi} \sigma_k} \exp \left( - \frac{1}{2\sigma_k^2} (x - \mu_k)^2\right)
+\]</span></p>
+<p>where <span class="math inline">\(\mu_k\)</span> and <span class="math inline">\(\sigma_k^2\)</span> are the mean and variance of the <span class="math inline">\(k\)</span>th class.
+For now, assume all classes have the same variance <span class="math inline">\(\sigma^2\)</span>.
+Plugging the above into Bayes’ theorem, we have:</p>
+<p><span class="math display">\[
+p_k (x) =
+\frac{\pi_k \frac{1}{\sqrt{2 \pi} \sigma} \exp \left( - \frac{1}{2\sigma^2} (x - \mu_k)^2\right)}
+{\sum_{l=1}^K \pi_l \frac{1}{\sqrt{2 \pi} \sigma} \exp \left( - \frac{1}{2\sigma^2} (x - \mu_l)^2\right)}.
+\]</span>
+The Bayes classifier assigns an observation <span class="math inline">\(X = x\)</span> to the class for which the above is largest.
+Taking the log and rearranging, this is equivalent to choosing the class for which:</p>
+<p><span class="math display">\[
+\delta_k (x) = x \frac{\mu_k}{\sigma^2} - \frac{\mu_k^2}{2 \sigma^2} + \log(\pi_k)
+\]</span></p>
+<p>is largest.</p>
+<blockquote>
+<p>For instance, if <span class="math inline">\(K = 2\)</span> and <span class="math inline">\(\pi_1 = \pi_2\)</span>, then the Bayes classifier
+assigns an observation to class 1 if <span class="math inline">\(2x (\mu_1 − \mu_2) &gt; \mu_1^2 - \mu_2^2\)</span>, and to class 2 otherwise.
+The Bayes decision boundary is the point for which <span class="math inline">\(\delta_1 (x) = \delta_2 (x)\)</span>; one can show that this amounts to</p>
+</blockquote>
+<p><span class="math display">\[
+x = \frac{\mu_1^2 - \mu_2^2}{2 (\mu_1 - \mu_2)} = \frac{\mu_1 + \mu_2}{2}.
+\]</span></p>
+<p>Note that in the real world, we do not know that <span class="math inline">\(X\)</span> is drawn from a Gaussian distribution within each class, or all the parameters involves, so we are not able to calculate the Bayes classifier.
+This is where the linear discriminant analysis (LDA) method comes in.</p>
+<p>If we are quite certain that <span class="math inline">\(X\)</span> is Gaussian within each class, then we can use LDA to approximate the Bayes classifier with these estimates:</p>
+<p><span class="math display">\[
+\begin{align}
+\hat{\mu}_k &amp;= \frac{1}{n_k} \sum_{i: y_i = k} x_i\\
+\hat{\sigma}^2_k &amp;= \frac{1}{n - K} \sum^K_{k=1} \sum_{i: y_i = k} (x_i - \hat{u}_k)^2
+\end{align}
+\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is the total number of training observations, and <span class="math inline">\(n_k\)</span> is the number in the <span class="math inline">\(k\)</span>th class.
+The estimate for <span class="math inline">\(\hat{\mu}_k\)</span> is simply the average of the <span class="math inline">\(k\)</span>th class, and <span class="math inline">\(\hat{\sigma}^2\)</span> is the weighted average of the sample variances for each of the <span class="math inline">\(K\)</span> classes.
+Sometimes we know the true fractions of class membership <span class="math inline">\(\pi_k\)</span> which can be used directly.
+Otherwise, LDA simply uses the proportion from the training observations:</p>
+<p><span class="math display">\[
+\hat{\pi}_k = n_k / n.
+\]</span></p>
+<p>Observation <span class="math inline">\(X = x\)</span> is then assigned to the class for which</p>
+<p><span class="math display">\[
+\hat{\delta}_k (x) = x \frac{\hat{\mu}_k}{\hat{\sigma}^2} - \frac{\hat{\mu}_k^2}{2 \hat{\sigma}^2} + \log(\hat{\pi}_k)
+\]</span></p>
+<blockquote>
+<p>The word linear in the classifier’s name stems from the fact
+that the discriminant functions <span class="math inline">\(\hat{\delta}_k (x)\)</span> in (4.22) are linear functions of x (as opposed to a more complex function of <span class="math inline">\(x\)</span>)</p>
+</blockquote>
+<p>Re-create the example in Figure 4.4:</p>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb200-1"><a href="classification.html#cb200-1" aria-hidden="true" tabindex="-1"></a>mu1 <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fl">1.25</span></span>
+<span id="cb200-2"><a href="classification.html#cb200-2" aria-hidden="true" tabindex="-1"></a>mu2 <span class="ot">&lt;-</span> <span class="fl">1.25</span></span>
+<span id="cb200-3"><a href="classification.html#cb200-3" aria-hidden="true" tabindex="-1"></a>sigma1 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb200-4"><a href="classification.html#cb200-4" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb200-5"><a href="classification.html#cb200-5" aria-hidden="true" tabindex="-1"></a>bayes_boundary <span class="ot">&lt;-</span> (mu1 <span class="sc">+</span> mu2) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb200-6"><a href="classification.html#cb200-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="fl">0.1</span>)), <span class="fu">aes</span>(x)) <span class="sc">+</span></span>
+<span id="cb200-7"><a href="classification.html#cb200-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> mu1, <span class="at">sd =</span> sigma1),</span>
+<span id="cb200-8"><a href="classification.html#cb200-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">geom =</span> <span class="st">&quot;line&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>emerald) <span class="sc">+</span></span>
+<span id="cb200-9"><a href="classification.html#cb200-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_function</span>(<span class="at">fun =</span> dnorm, <span class="at">args =</span> <span class="fu">list</span>(<span class="at">mean =</span> mu2, <span class="at">sd =</span> sigma2),</span>
+<span id="cb200-10"><a href="classification.html#cb200-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">geom =</span> <span class="st">&quot;line&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>, <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve) <span class="sc">+</span></span>
+<span id="cb200-11"><a href="classification.html#cb200-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> bayes_boundary, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb200-12"><a href="classification.html#cb200-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">remove_axis</span>(<span class="st">&quot;y&quot;</span>)</span>
+<span id="cb200-13"><a href="classification.html#cb200-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb200-14"><a href="classification.html#cb200-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb200-15"><a href="classification.html#cb200-15" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb200-16"><a href="classification.html#cb200-16" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>class, <span class="sc">~</span>x,</span>
+<span id="cb200-17"><a href="classification.html#cb200-17" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span>, <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="at">mean =</span> mu1, <span class="at">sd =</span> sigma1),</span>
+<span id="cb200-18"><a href="classification.html#cb200-18" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span>, <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="at">mean =</span> mu2, <span class="at">sd =</span> sigma2)</span>
+<span id="cb200-19"><a href="classification.html#cb200-19" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb200-20"><a href="classification.html#cb200-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(x)</span>
+<span id="cb200-21"><a href="classification.html#cb200-21" aria-hidden="true" tabindex="-1"></a>lda_boundary <span class="ot">&lt;-</span></span>
+<span id="cb200-22"><a href="classification.html#cb200-22" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">mean</span>(<span class="fu">filter</span>(d, class <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>x) <span class="sc">+</span> <span class="fu">mean</span>(<span class="fu">filter</span>(d, class <span class="sc">==</span> <span class="dv">2</span>)<span class="sc">$</span>x)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb200-23"><a href="classification.html#cb200-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb200-24"><a href="classification.html#cb200-24" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb200-25"><a href="classification.html#cb200-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(x, <span class="at">fill =</span> <span class="fu">factor</span>(class), <span class="at">color =</span> <span class="fu">factor</span>(class))) <span class="sc">+</span></span>
+<span id="cb200-26"><a href="classification.html#cb200-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">13</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">position =</span> <span class="st">&quot;identity&quot;</span>) <span class="sc">+</span></span>
+<span id="cb200-27"><a href="classification.html#cb200-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> bayes_boundary, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb200-28"><a href="classification.html#cb200-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> lda_boundary, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb200-29"><a href="classification.html#cb200-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>emerald,</span>
+<span id="cb200-30"><a href="classification.html#cb200-30" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve)) <span class="sc">+</span></span>
+<span id="cb200-31"><a href="classification.html#cb200-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>emerald,</span>
+<span id="cb200-32"><a href="classification.html#cb200-32" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve)) <span class="sc">+</span></span>
+<span id="cb200-33"><a href="classification.html#cb200-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb200-34"><a href="classification.html#cb200-34" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.4-1.png" width="576" style="display: block; margin: auto;" /></p>
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div class="csl-entry">
 Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
-</div>
-<div class="csl-entry">
-James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em><span class="nocase">An Introduction to Statistical Learning with Applications in R</span></em>. 2nd ed. New York, NY: Springer. <a href="https://doi.org/10.1007/978-1-0716-1418-1_1">https://doi.org/10.1007/978-1-0716-1418-1_1</a>.
 </div>
 <div class="csl-entry">
 Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
