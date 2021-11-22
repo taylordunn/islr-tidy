@@ -228,6 +228,7 @@ div.csl-indent {
 <li class="chapter" data-level="4.3.2" data-path="classification.html"><a href="classification.html#estimating-the-regression-coefficients-1"><i class="fa fa-check"></i><b>4.3.2</b> Estimating the Regression Coefficients</a></li>
 <li class="chapter" data-level="4.3.3" data-path="classification.html"><a href="classification.html#making-predictions"><i class="fa fa-check"></i><b>4.3.3</b> Making Predictions</a></li>
 <li class="chapter" data-level="4.3.4" data-path="classification.html"><a href="classification.html#multiple-logistic-regression"><i class="fa fa-check"></i><b>4.3.4</b> Multiple Logistic Regression</a></li>
+<li class="chapter" data-level="4.3.5" data-path="classification.html"><a href="classification.html#multinomial-logistic-regression"><i class="fa fa-check"></i><b>4.3.5</b> Multinomial Logistic Regression</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -264,8 +265,20 @@ simulated <code>Default</code> data set. We are interested in predicting whether
 individual will default on his or her credit card payment, on the basis of
 annual income and monthly credit card balance.</p>
 </blockquote>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="classification.html#cb176-1" aria-hidden="true" tabindex="-1"></a>default <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Default</span>
-<span id="cb176-2"><a href="classification.html#cb176-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(default)</span></code></pre></div>
+<p>Load the go-to packages and the <code>default</code> data set:</p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="classification.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb176-2"><a href="classification.html#cb176-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb176-3"><a href="classification.html#cb176-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb176-4"><a href="classification.html#cb176-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># for composing plots</span></span>
+<span id="cb176-5"><a href="classification.html#cb176-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb176-6"><a href="classification.html#cb176-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb176-7"><a href="classification.html#cb176-7" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb176-8"><a href="classification.html#cb176-8" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
+<span id="cb176-9"><a href="classification.html#cb176-9" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb176-10"><a href="classification.html#cb176-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span>
+<span id="cb176-11"><a href="classification.html#cb176-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb176-12"><a href="classification.html#cb176-12" aria-hidden="true" tabindex="-1"></a>default <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Default</span>
+<span id="cb176-13"><a href="classification.html#cb176-13" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(default)</span></code></pre></div>
 <pre><code>## Rows: 10,000
 ## Columns: 4
 ## $ default &lt;fct&gt; No, No, No, No, No, No, No, No, No, No, No, No, No, No, No, No~
@@ -273,33 +286,24 @@ annual income and monthly credit card balance.</p>
 ## $ balance &lt;dbl&gt; 729.5265, 817.1804, 1073.5492, 529.2506, 785.6559, 919.5885, 8~
 ## $ income  &lt;dbl&gt; 44361.625, 12106.135, 31767.139, 35704.494, 38463.496, 7491.55~</code></pre>
 <p>Randomly choose a subset of the 10000 observations and re-create Figure 4.1:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="classification.html#cb178-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb178-2"><a href="classification.html#cb178-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># for composing plots</span></span>
-<span id="cb178-3"><a href="classification.html#cb178-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
-<span id="cb178-4"><a href="classification.html#cb178-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
-<span id="cb178-5"><a href="classification.html#cb178-5" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb178-6"><a href="classification.html#cb178-6" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
-<span id="cb178-7"><a href="classification.html#cb178-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
-<span id="cb178-8"><a href="classification.html#cb178-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span>
-<span id="cb178-9"><a href="classification.html#cb178-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb178-10"><a href="classification.html#cb178-10" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
-<span id="cb178-11"><a href="classification.html#cb178-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(default, <span class="at">name =</span> <span class="st">&quot;n_group&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb178-12"><a href="classification.html#cb178-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(</span>
-<span id="cb178-13"><a href="classification.html#cb178-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">1000</span>,</span>
-<span id="cb178-14"><a href="classification.html#cb178-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Inversely weight by group size to get more even distribution</span></span>
-<span id="cb178-15"><a href="classification.html#cb178-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight_by =</span> <span class="fu">n</span>() <span class="sc">-</span> n_group</span>
-<span id="cb178-16"><a href="classification.html#cb178-16" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb178-17"><a href="classification.html#cb178-17" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb178-18"><a href="classification.html#cb178-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income)) <span class="sc">+</span></span>
-<span id="cb178-19"><a href="classification.html#cb178-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> default, <span class="at">shape =</span> default),</span>
-<span id="cb178-20"><a href="classification.html#cb178-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb178-21"><a href="classification.html#cb178-21" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb178-22"><a href="classification.html#cb178-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> default, <span class="at">y =</span> balance)) <span class="sc">+</span></span>
-<span id="cb178-23"><a href="classification.html#cb178-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> default), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb178-24"><a href="classification.html#cb178-24" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb178-25"><a href="classification.html#cb178-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> default, <span class="at">y =</span> income)) <span class="sc">+</span></span>
-<span id="cb178-26"><a href="classification.html#cb178-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> default), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb178-27"><a href="classification.html#cb178-27" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> (p2 <span class="sc">|</span> p3)</span></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="classification.html#cb178-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
+<span id="cb178-2"><a href="classification.html#cb178-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_count</span>(default, <span class="at">name =</span> <span class="st">&quot;n_group&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb178-3"><a href="classification.html#cb178-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(</span>
+<span id="cb178-4"><a href="classification.html#cb178-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb178-5"><a href="classification.html#cb178-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Inversely weight by group size to get more even distribution</span></span>
+<span id="cb178-6"><a href="classification.html#cb178-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight_by =</span> <span class="fu">n</span>() <span class="sc">-</span> n_group</span>
+<span id="cb178-7"><a href="classification.html#cb178-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb178-8"><a href="classification.html#cb178-8" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb178-9"><a href="classification.html#cb178-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income)) <span class="sc">+</span></span>
+<span id="cb178-10"><a href="classification.html#cb178-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> default, <span class="at">shape =</span> default),</span>
+<span id="cb178-11"><a href="classification.html#cb178-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb178-12"><a href="classification.html#cb178-12" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb178-13"><a href="classification.html#cb178-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> default, <span class="at">y =</span> balance)) <span class="sc">+</span></span>
+<span id="cb178-14"><a href="classification.html#cb178-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> default), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb178-15"><a href="classification.html#cb178-15" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb178-16"><a href="classification.html#cb178-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> default, <span class="at">y =</span> income)) <span class="sc">+</span></span>
+<span id="cb178-17"><a href="classification.html#cb178-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> default), <span class="at">show.legend =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb178-18"><a href="classification.html#cb178-18" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> (p2 <span class="sc">|</span> p3)</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure4.1-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="why-not-linear-regression" class="section level2" number="4.2">
@@ -343,7 +347,7 @@ p(X) = \beta_0 + \beta_1 X
 \]</span></p>
 <p>but this could give probabilities outside of the range 0-1.
 We must instead model <span class="math inline">\(p(X)\)</span> using a function that gives outputs 0-1.
-Many funtions meet this description, but logistic regression uses the logistic function:</p>
+Many functions meet this description, but logistic regression uses the logistic function:</p>
 <p><span class="math display">\[
 p(X) = \frac{e^{\beta_0 + \beta_1X}}{1 + e^{\beta_0 + \beta_1 X}}.
 \]</span></p>
@@ -1622,11 +1626,107 @@ To understand this apparent paradox, re-create Figure 4.3:</p>
 <span id="cb197-25"><a href="classification.html#cb197-25" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> default <span class="sc">%&gt;%</span></span>
 <span id="cb197-26"><a href="classification.html#cb197-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> student, <span class="at">y =</span> balance)) <span class="sc">+</span></span>
 <span id="cb197-27"><a href="classification.html#cb197-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> student)) <span class="sc">+</span></span>
-<span id="cb197-28"><a href="classification.html#cb197-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue,</span>
+<span id="cb197-28"><a href="classification.html#cb197-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue,</span>
 <span id="cb197-29"><a href="classification.html#cb197-29" aria-hidden="true" tabindex="-1"></a>                                td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_red)) <span class="sc">+</span></span>
 <span id="cb197-30"><a href="classification.html#cb197-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
 <span id="cb197-31"><a href="classification.html#cb197-31" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure4.3-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>In the left panel, we see that students have a higher overall default rate
+(4.3%) than non-students
+(2.9%) as shown by the dashed lines.
+This is why, in the univariable regression, <code>student</code> was associated with an increase in probability of default.
+But by the solid lines, we see that for most values of <code>balance</code>, students have lower default rates.
+And that is what the multiple logistic regression model tells us: for fixed values of <code>balance</code> and <code>income</code>, a <code>student</code> is less likely to <code>default</code>.</p>
+<p>This is explained by the right panel above: <code>student</code> and <code>balance</code> are correlated in that students tend to hold higher levels of debt, which is then associated with higher probability of default.</p>
+<p>Taken altogether, we can conclude that a student is <em>less likely to default</em> than a non-student with the same credit card balance.
+Without any information about their balance, however, a student is more likely to default because they are also more likely to carry a higher balance.</p>
+<blockquote>
+<p>This simple example illustrates the dangers and subtleties associated
+with performing regressions involving only a single predictor when other
+predictors may also be relevant. As in the linear regression setting, the
+results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among
+the predictors. In general, the phenomenon seen in Figure 4.3 is known as
+confounding.</p>
+</blockquote>
+<p>Make predictions for a student and non-student:</p>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="classification.html#cb198-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb198-2"><a href="classification.html#cb198-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">student =</span> <span class="fu">c</span>(<span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>), <span class="at">balance =</span> <span class="dv">1500</span>,</span>
+<span id="cb198-3"><a href="classification.html#cb198-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Income in thousands</span></span>
+<span id="cb198-4"><a href="classification.html#cb198-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">income =</span> <span class="dv">40000</span> <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb198-5"><a href="classification.html#cb198-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb198-6"><a href="classification.html#cb198-6" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(glm_default_all, <span class="at">newdata =</span> d, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<pre><code>##          1          2 
+## 0.05788194 0.10499192</code></pre>
+</div>
+<div id="multinomial-logistic-regression" class="section level3" number="4.3.5">
+<h3><span class="header-section-number">4.3.5</span> Multinomial Logistic Regression</h3>
+<p>For predicting <span class="math inline">\(K &gt; 2\)</span> classes, we can extend logistic regression in a method called multinomial logistic regression.
+To do this, we choose a single class <span class="math inline">\(K\)</span> to serve as the baseline.
+Then the probability of another class <span class="math inline">\(k\)</span> is:</p>
+<p><span class="math display">\[
+\text{Pr}(Y = k|X = x) = \frac{e^{\beta_{k0} + \beta_{k1} x_1 + \beta_{kp} x_p}}{1 + \sum_{l=1}^{K-1} e^{\beta_{l0} + \beta_{l1} x_1 + \beta_{lp} x_p}}
+\]</span></p>
+<p>for <span class="math inline">\(k = 1, \dots, K - 1\)</span>.
+Then for the baseline class <span class="math inline">\(K\)</span>:</p>
+<p><span class="math display">\[
+\text{Pr}(Y = K|X = x) = \frac{1}{1 + \sum_{l=1}^{K-1} e^{\beta_{l0} + \beta_{l1} x_1 + \beta_{lp} x_p}}.
+\]</span></p>
+<p>The log-odds of a class <span class="math inline">\(k\)</span> is then linear in the predictors:</p>
+<p><span class="math display">\[
+\frac{\log \text{Pr} (Y = k| X = x)}{\log \text{Pr} (Y = K| X = x)} = \beta_{k0} + \beta_{k1} x_1 + \dots + \beta_{kp} x_p.
+\]</span></p>
+<p>Note how, in the case of two classes, the numerator becomes <span class="math inline">\(p(X)\)</span> and the denominator <span class="math inline">\(1 - p(X)\)</span>, which is exactly the same the two-class logistic regression formula (Equation 4.6).</p>
+<p>The choice is class <span class="math inline">\(K\)</span> as baseline was arbitrary.
+The only thing that will change by choosing a different baseline will be the coefficient estimates, but the predictions (fitted values), and model metrics will be the same.</p>
+<p>When performing multinomial logistic regression, we will sometimes use an alternative to dummy coding called softmax coding.</p>
+<blockquote>
+<p>The softmax coding is equivalent softmax to the coding just described in the sense that the fitted values, log odds between any pair of classes, and other key model outputs will remain the
+same, regardless of coding. But the softmax coding is used extensively in
+some areas of the machine learning literature (and will appear again in
+Chapter 10), so it is worth being aware of it. In the softmax coding, rather
+than selecting a baseline class, we treat all <span class="math inline">\(K\)</span> classes symmetrically, and
+assume that for <span class="math inline">\(k = 1,...,K\)</span>,</p>
+</blockquote>
+<p><span class="math display">\[
+\text{Pr}(Y = k|X = x) = \frac{e^{\beta_{k0} + \beta_{k1} x_1 + \beta_{kp} x_p}}{ \sum_{l=1}^{K} e^{\beta_{l0} + \beta_{l1} x_1 + \beta_{lp} x_p}}.
+\]</span></p>
+<blockquote>
+<p>Thus, rather than estimating coefficients for <span class="math inline">\(K − 1\)</span> classes, we actually
+estimate coefficients for all <span class="math inline">\(K\)</span> classes. It is not hard to see that as a result
+of (4.13), the log odds ratio between the <span class="math inline">\(k\)</span>th and <span class="math inline">\(k′\)</span>th classes equals</p>
+</blockquote>
+<p><span class="math display">\[
+\frac{\log \text{Pr} (Y = k| X = x)}{\log \text{Pr} (Y = k&#39;| X = x)} = (\beta_{k0} - \beta_{k&#39;0}) + (\beta_{k1} - \beta_{k&#39;1}) x_1 + \dots + (\beta_{kp} - \beta_{k&#39;p}) x_p.
+\]</span>
+## Generative Models for Classification</p>
+<blockquote>
+<p>Logistic regression involves directly modeling <span class="math inline">\(\text{Pr} (Y = k|X = x)\)</span> using the
+logistic function, given by (4.7) for the case of two response classes. In
+statistical jargon, we model the conditional distribution of the response <span class="math inline">\(Y\)</span>,
+given the predictor(s) <span class="math inline">\(X\)</span>. We now consider an alternative and less direct
+approach to estimating these probabilities. In this new approach, we model
+the distribution of the predictors <span class="math inline">\(X\)</span> separately in each of the response
+classes (i.e. for each value of <span class="math inline">\(Y\)</span>). We then use Bayes’ theorem to flip these
+around into estimates for <span class="math inline">\(\text{Pr} (Y = k|X = x)\)</span>. When the distribution of <span class="math inline">\(X\)</span>
+within each class is assumed to be normal, it turns out that the model is
+very similar in form to logistic regression.</p>
+</blockquote>
+<p>There are several reasons to choose this method over logistic regression:</p>
+<blockquote>
+<ul>
+<li>When there is substantial separation between the two classes, the
+parameter estimates for the logistic regression model are surprisingly
+unstable. The methods that we consider in this section do not suffer
+from this problem.</li>
+<li>If the distribution of the predictors X is approximately normal in
+each of the classes and the sample size is small, then the approaches
+in this section may be more accurate than logistic regression.</li>
+<li>The methods in this section can be naturally extended to the case
+of more than two response classes. (In the case of more than two
+response classes, we can also use multinomial logistic regression from
+Section 4.3.5.)</li>
+</ul>
+</blockquote>
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div class="csl-entry">

@@ -19,15 +19,12 @@ simulated `Default` data set. We are interested in predicting whether an
 individual will default on his or her credit card payment, on the basis of
 annual income and monthly credit card balance.
 
-```{r}
-default <- ISLR2::Default
-glimpse(default)
-```
+Load the go-to packages and the `default` data set:
 
-Randomly choose a subset of the `r nrow(default)` observations and re-create Figure 4.1:
-
-```{r figure4.1, message=FALSE}
+```{r message=FALSE}
 library(tidyverse)
+library(broom)
+library(gt)
 library(patchwork) # for composing plots
 # Load my R package and set the ggplot theme
 library(dunnr)
@@ -36,6 +33,13 @@ theme_set(theme_td())
 set_geom_fonts()
 set_palette()
 
+default <- ISLR2::Default
+glimpse(default)
+```
+
+Randomly choose a subset of the `r nrow(default)` observations and re-create Figure 4.1:
+
+```{r figure4.1, message=FALSE}
 d <- default %>%
   add_count(default, name = "n_group") %>%
   slice_sample(
@@ -182,7 +186,7 @@ Equivalently, it multiplies the odds by $e^{\beta_1}$.
 
 ### Estimating the Regression Coefficients
 
-We fit logistic regression models with maximum likelihood, which seeks estimates for $\beta_0$ and $\beta_1$ such that the predicted probabilities $\hat{p}(x_i)$ corresponds as closely as possible to the to the value $y_i$.
+We fit logistic regression models with maximum likelihood, which seeks estimates for $\beta_0$ and $\beta_1$ such that the predicted probabilities $\hat{p}(x_i)$ corresponds as closely as possible to the values $y_i$.
 This idea is formalized using a likelihood function:
 
 $$
@@ -324,5 +328,185 @@ p2 <- default %>%
                                 td_colors$nice$strong_red)) +
   theme(legend.position = "none")
 p1 | p2
+```
+
+In the left panel, we see that students have a higher overall default rate
+(`r scales::percent(mean(filter(default, student == "Yes")$default == "Yes"), accuracy = 0.1)`) than non-students
+(`r scales::percent(mean(filter(default, student == "No")$default == "Yes"), accuracy = 0.1)`) as shown by the dashed lines.
+This is why, in the univariable regression, `student` was associated with an increase in probability of default.
+But by the solid lines, we see that for most values of `balance`, students have lower default rates.
+And that is what the multiple logistic regression model tells us: for fixed values of `balance` and `income`, a `student` is less likely to `default`.
+
+This is explained by the right panel above: `student` and `balance` are correlated in that students tend to hold higher levels of debt, which is then associated with higher probability of default.
+
+Taken altogether, we can conclude that a student is *less likely to default* than a non-student with the same credit card balance.
+Without any information about their balance, however, a student is more likely to default because they are also more likely to carry a higher balance.
+
+>This simple example illustrates the dangers and subtleties associated
+with performing regressions involving only a single predictor when other
+predictors may also be relevant. As in the linear regression setting, the
+results obtained using one predictor may be quite different from those obtained using multiple predictors, especially when there is correlation among
+the predictors. In general, the phenomenon seen in Figure 4.3 is known as
+confounding.
+
+Make predictions for a student and non-student:
+
+```{r}
+d <- tibble(
+  student = c("Yes", "No"), balance = 1500,
+  # Income in thousands
+  income = 40000 / 1000
+)
+predict(glm_default_all, newdata = d, type = "response")
+```
+
+### Multinomial Logistic Regression
+
+For predicting $K > 2$ classes, we can extend logistic regression in a method called multinomial logistic regression.
+To do this, we choose a single class $K$ to serve as the baseline.
+Then the probability of another class $k$ is:
+
+$$
+\text{Pr}(Y = k|X = x) = \frac{e^{\beta_{k0} + \beta_{k1} x_1 + \beta_{kp} x_p}}{1 + \sum_{l=1}^{K-1} e^{\beta_{l0} + \beta_{l1} x_1 + \beta_{lp} x_p}}
+$$
+
+for $k = 1, \dots, K - 1$.
+Then for the baseline class $K$:
+
+$$
+\text{Pr}(Y = K|X = x) = \frac{1}{1 + \sum_{l=1}^{K-1} e^{\beta_{l0} + \beta_{l1} x_1 + \beta_{lp} x_p}}.
+$$
+
+The log-odds of a class $k$ is then linear in the predictors:
+
+$$
+\log \left( \frac{\text{Pr} (Y = k| X = x)}{\text{Pr} (Y = K| X = x)}\right) = \beta_{k0} + \beta_{k1} x_1 + \dots + \beta_{kp} x_p.
+$$
+
+Note that in the case of $K = 2$, the numerator becomes $p(X)$ and the denominator $1 - p(X)$, which is exactly the same the two-class logistic regression formula (Equation 4.6).
+
+The choice of class $K$ as baseline was arbitrary.
+The only thing that will change by choosing a different baseline will be the coefficient estimates, but the predictions (fitted values), and model metrics will be the same.
+
+When performing multinomial logistic regression, we will sometimes use an alternative to dummy coding called softmax coding.
+
+>The softmax coding is equivalent to the coding just described in the sense that the fitted values, log odds between any pair of classes, and other key model outputs will remain the
+same, regardless of coding. But the softmax coding is used extensively in
+some areas of the machine learning literature (and will appear again in
+Chapter 10), so it is worth being aware of it. In the softmax coding, rather
+than selecting a baseline class, we treat all $K$ classes symmetrically, and
+assume that for $k = 1,...,K$,
+
+$$
+\text{Pr}(Y = k|X = x) = \frac{e^{\beta_{k0} + \beta_{k1} x_1 + \beta_{kp} x_p}}{ \sum_{l=1}^{K} e^{\beta_{l0} + \beta_{l1} x_1 + \beta_{lp} x_p}}.
+$$
+
+>Thus, rather than estimating coefficients for $K − 1$ classes, we actually
+estimate coefficients for all $K$ classes. It is not hard to see that as a result
+of (4.13), the log odds ratio between the $k$th and $k′$th classes equals
+
+$$
+\frac{\log \text{Pr} (Y = k| X = x)}{\log \text{Pr} (Y = k'| X = x)} = (\beta_{k0} - \beta_{k'0}) + (\beta_{k1} - \beta_{k'1}) x_1 + \dots + (\beta_{kp} - \beta_{k'p}) x_p.
+$$
+
+## Generative Models for Classification
+
+>Logistic regression involves directly modeling $\text{Pr} (Y = k|X = x)$ using the
+logistic function, given by (4.7) for the case of two response classes. In
+statistical jargon, we model the conditional distribution of the response $Y$,
+given the predictor(s) $X$. We now consider an alternative and less direct
+approach to estimating these probabilities. In this new approach, we model
+the distribution of the predictors $X$ separately in each of the response
+classes (i.e. for each value of $Y$). We then use Bayes’ theorem to flip these
+around into estimates for $\text{Pr} (Y = k|X = x)$. When the distribution of $X$
+within each class is assumed to be normal, it turns out that the model is
+very similar in form to logistic regression.
+
+There are several reasons to choose this method over logistic regression:
+
+>* When there is substantial separation between the two classes, the
+parameter estimates for the logistic regression model are surprisingly
+unstable. The methods that we consider in this section do not suffer
+from this problem.
+* If the distribution of the predictors $X$ is approximately normal in
+each of the classes and the sample size is small, then the approaches
+in this section may be more accurate than logistic regression.
+* The methods in this section can be naturally extended to the case
+of more than two response classes. (In the case of more than two
+response classes, we can also use multinomial logistic regression from
+Section 4.3.5.)
+
+Consider a classification problem with $K \geq 2$ unordered classes.
+Let $\pi_k$ represent the prior probability that a random observation is class $k$.
+Let $f_k(X) \equiv \text{Pr}(X | Y = k)$ denote the density function of $X$ for an observation in the $k$th class.
+Then Bayes' theorem states that the posterior probability than observation $X = x$ belongs to the $k$th class is
+
+$$
+\text{Pr} (Y = k|X = x) = \frac{\pi_k f_k(x)}{\sum_{l=1}^K \pi_l f_l (x)} = p_k(x).
+$$
+
+Aside: Bayes' theorem in the most simplistic form is
+
+$$
+P(Y | X) = \frac{P(X | Y) P (Y)}{P(X)}.
+$$
+
+So the probability of $X$ given class $Y$/$k$ is $P(X|Y) = f_k (x)$, the independent probability of a class $Y$/$k$ is $P(Y) = \pi_k$, and the denominator is a normalizing factor which sums over all possible values $Y$/$k$ to give the independent probability $P(X) = \sum \pi_l f_l (x)$.
+
+Estimating $\pi_k$ is easy if we have a random sample from the population -- just take the fraction of the training observations belonging to class $k$.
+Estimating the density function $f_k (x)$ is much more challenging.
+
+>We know from Chapter 2 that the Bayes classifier, which classifies an
+observation $x$ to the class for which $p_k(x)$ is largest, has the lowest possible
+error rate out of all classifiers. (Of course, this is only true if all of the
+terms in (4.15) are correctly specified.) Therefore, if we can find a way to
+estimate $f_k(x)$, then we can plug it into (4.15) in order to approximate the
+Bayes classifier.
+
+We now discuss three classifiers that use different estimates of $f_k (x)$.
+
+### Linear Discriminant Analysis for $p = 1$
+
+For the case of one predictor, we start by assuming that $f_k (x)$ is normal or Gaussian, which has the following density in one dimension:
+
+$$
+f_k (x) = \frac{1}{\sqrt{2 \pi} \sigma_k} \exp \left( - \frac{1}{2\sigma_k^2} (x - \mu_k)^2\right)
+$$
+
+where $\mu_k$ and $\sigma_k^2$ are the mean and variance of the $k$th class.
+For now, assume all classes have the same variance $\sigma^2$.
+Plugging the above into Bayes' theorem, we have:
+
+$$
+p_k (x) =
+\frac{\pi_k \frac{1}{\sqrt{2 \pi} \sigma} \exp \left( - \frac{1}{2\sigma^2} (x - \mu_k)^2\right)}
+{\sum_{l=1}^K \pi_l \frac{1}{\sqrt{2 \pi} \sigma} \exp \left( - \frac{1}{2\sigma^2} (x - \mu_l)^2\right)}.
+$$
+The Bayes classifier assigns an observation $X = x$ to the class for which the above is largest.
+Taking the log and rearranging, this is equivalent to choosing the class for which:
+
+$$
+\delta_k (x) = x \frac{\mu_k}{\sigma^2} - \frac{\mu_k^2}{2 \sigma^2} + \log(\pi_k)
+$$
+
+is largest.
+
+> For instance, if $K = 2$ and $\pi_1 = \pi_2$, then the Bayes classifier
+assigns an observation to class 1 if $2x (\mu_1 − \mu_2) > \mu_1^2 - \mu_2^2$, and to class 2 otherwise.
+The Bayes decision boundary is the point for which $\delta_1 (x) = \delta_2 (x)$; one can show that this amounts to
+
+$$
+x = \frac{\mu_1^2 - \mu_2^2}{2 (\mu_1 - \mu_2)} = \frac{\mu_1 + \mu_2}{2}.
+$$
+
+Re-create the example in Figure 4.4:
+
+```{r figure4.4}
+bayes_boundary <- 
+ggplot(data = tibble(x = seq(-4, 4, 0.1)), aes(x)) +
+  stat_function(fun = dnorm, geom = "line",
+                args = list(mean = -1.25, sd = 1)) +
+  stat_function(fun = dnorm, geom = "line",
+                args = list(mean = 1.25, sd = 1))
 ```
 

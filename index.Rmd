@@ -1,5 +1,5 @@
 ---
-title: "An Introduction to Statistical with the tidyverse"
+title: "An Introduction to Statistical Learning with the tidyverse"
 author: "Taylor Dunn"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -16,7 +16,7 @@ description: "Working through ISLR with the tidyverse and tidymodels"
 # Who, what, and why? {-}
 
 I am a data scientist and statistician who is (mostly) self-taught from textbooks and generous people sharing their work online.
-Inspired by projects like [Solomon Kurz's recoding of Statistical Rethinking](https://bookdown.org/content/3890/), I decided to publicly document my notes and code as I work through [An Introduction to Statistical Learning, 2nd edition](https://www.statlearning.com/) by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani [@James2021].
+Inspired by projects like [Solomon Kurz's recoding of Statistical Rethinking](https://bookdown.org/content/3890/), I decided to publicly document my notes and code as I work through [An Introduction to Statistical Learning, 2nd edition](https://www.statlearning.com/) by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani.
 
 I prefer to work with the [`tidyverse`](https://www.tidyverse.org/) collection of R packages, and will be teaching myself the [`tidymodels` framework](https://www.tidymodels.org/) for machine learning along the way.
 
