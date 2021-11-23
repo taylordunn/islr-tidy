@@ -43,3 +43,11 @@ multiple-logistic-regression
 multinomial-logistic-regression
 generative-models-for-classification
 linear-discriminant-analysis-for-p-1
+linear-discriminant-analysis-for-p-1-1
+quadratic-discriminant-analysis
+naive-bayes
+a-comparison-of-classification-methods
+an-analytical-comparison
+an-empirical-comparison
+generalized-linear-models
+linear-regression-on-the-bikeshare-data

@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2021-11-21" />
+<meta name="date" content="2021-11-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -233,6 +233,18 @@ div.csl-indent {
 <li class="chapter" data-level="4.4" data-path="classification.html"><a href="classification.html#generative-models-for-classification"><i class="fa fa-check"></i><b>4.4</b> Generative Models for Classification</a>
 <ul>
 <li class="chapter" data-level="4.4.1" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1"><i class="fa fa-check"></i><b>4.4.1</b> Linear Discriminant Analysis for <span class="math inline">\(p = 1\)</span></a></li>
+<li class="chapter" data-level="4.4.2" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1-1"><i class="fa fa-check"></i><b>4.4.2</b> Linear Discriminant Analysis for <span class="math inline">\(p &gt; 1\)</span></a></li>
+<li class="chapter" data-level="4.4.3" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis"><i class="fa fa-check"></i><b>4.4.3</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.4.4" data-path="classification.html"><a href="classification.html#naive-bayes"><i class="fa fa-check"></i><b>4.4.4</b> Naive Bayes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="classification.html"><a href="classification.html#a-comparison-of-classification-methods"><i class="fa fa-check"></i><b>4.5</b> A Comparison of Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="classification.html"><a href="classification.html#an-analytical-comparison"><i class="fa fa-check"></i><b>4.5.1</b> An Analytical Comparison</a></li>
+<li class="chapter" data-level="4.5.2" data-path="classification.html"><a href="classification.html#an-empirical-comparison"><i class="fa fa-check"></i><b>4.5.2</b> An Empirical Comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="classification.html"><a href="classification.html#generalized-linear-models"><i class="fa fa-check"></i><b>4.6</b> Generalized Linear Models</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="classification.html"><a href="classification.html#linear-regression-on-the-bikeshare-data"><i class="fa fa-check"></i><b>4.6.1</b> Linear Regression on the Bikeshare Data</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1745,7 +1757,7 @@ Then Bayes’ theorem states that the posterior probability than observation <sp
 <p><span class="math display">\[
 P(Y | X) = \frac{P(X | Y) P (Y)}{P(X)}.
 \]</span></p>
-<p>So the probability of <span class="math inline">\(X\)</span> given class <span class="math inline">\(Y\)</span>/<span class="math inline">\(k\)</span> is <span class="math inline">\(P(X|Y) = f_k (x)\)</span>, the independent probability of a class <span class="math inline">\(Y\)</span>/<span class="math inline">\(k\)</span> is <span class="math inline">\(P(Y) = \pi_k\)</span>, and the denominator is a normalizing factor which sums over all possible values <span class="math inline">\(Y\)</span>/<span class="math inline">\(k\)</span> to give the independent probability <span class="math inline">\(P(X) = \sum \pi_l f_l (x)\)</span>.</p>
+<p>So the probability of <span class="math inline">\(X\)</span> given class <span class="math inline">\(Y\)</span> (= <span class="math inline">\(k\)</span>) is <span class="math inline">\(P(X|Y) = f_k (x)\)</span>, the independent probability of a class <span class="math inline">\(Y\)</span> is <span class="math inline">\(P(Y) = \pi_k\)</span>, and the denominator is a normalizing factor which sums over all possible values <span class="math inline">\(Y\)</span> to give the independent probability <span class="math inline">\(P(X) = \sum \pi_l f_l (x)\)</span>.</p>
 <p>Estimating <span class="math inline">\(\pi_k\)</span> is easy if we have a random sample from the population – just take the fraction of the training observations belonging to class <span class="math inline">\(k\)</span>.
 Estimating the density function <span class="math inline">\(f_k (x)\)</span> is much more challenging.</p>
 <blockquote>
@@ -1785,7 +1797,7 @@ The Bayes decision boundary is the point for which <span class="math inline">\(\
 <p><span class="math display">\[
 x = \frac{\mu_1^2 - \mu_2^2}{2 (\mu_1 - \mu_2)} = \frac{\mu_1 + \mu_2}{2}.
 \]</span></p>
-<p>Note that in the real world, we do not know that <span class="math inline">\(X\)</span> is drawn from a Gaussian distribution within each class, or all the parameters involves, so we are not able to calculate the Bayes classifier.
+<p>Note that in the real world, we do not know that <span class="math inline">\(X\)</span> is drawn from a Gaussian distribution within each class, or all the parameters involved, so we are not able to calculate the decision boundary for the Bayes classifier.
 This is where the linear discriminant analysis (LDA) method comes in.</p>
 <p>If we are quite certain that <span class="math inline">\(X\)</span> is Gaussian within each class, then we can use LDA to approximate the Bayes classifier with these estimates:</p>
 <p><span class="math display">\[
@@ -1844,7 +1856,2900 @@ that the discriminant functions <span class="math inline">\(\hat{\delta}_k (x)\)
 <span id="cb200-32"><a href="classification.html#cb200-32" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve)) <span class="sc">+</span></span>
 <span id="cb200-33"><a href="classification.html#cb200-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
 <span id="cb200-34"><a href="classification.html#cb200-34" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
-<p><img src="_main_files/figure-html/figure4.4-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/figure4.4-1.png" width="576" style="display: block; margin: auto;" />
+Simulate a large number of test observations and compute the Bayes and LDA test error rates:</p>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="classification.html#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2021</span>)</span>
+<span id="cb201-2"><a href="classification.html#cb201-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb201-3"><a href="classification.html#cb201-3" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>class, <span class="sc">~</span>x,</span>
+<span id="cb201-4"><a href="classification.html#cb201-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span>, <span class="fu">rnorm</span>(<span class="fl">1e3</span>, <span class="at">mean =</span> mu1, <span class="at">sd =</span> sigma1),</span>
+<span id="cb201-5"><a href="classification.html#cb201-5" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span>, <span class="fu">rnorm</span>(<span class="fl">1e3</span>, <span class="at">mean =</span> mu2, <span class="at">sd =</span> sigma2)</span>
+<span id="cb201-6"><a href="classification.html#cb201-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb201-7"><a href="classification.html#cb201-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(x)</span>
+<span id="cb201-8"><a href="classification.html#cb201-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The LDA boundary must be recomputed with the new data</span></span>
+<span id="cb201-9"><a href="classification.html#cb201-9" aria-hidden="true" tabindex="-1"></a>lda_boundary <span class="ot">&lt;-</span></span>
+<span id="cb201-10"><a href="classification.html#cb201-10" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">mean</span>(<span class="fu">filter</span>(d, class <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>x) <span class="sc">+</span> <span class="fu">mean</span>(<span class="fu">filter</span>(d, class <span class="sc">==</span> <span class="dv">2</span>)<span class="sc">$</span>x)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb201-11"><a href="classification.html#cb201-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-12"><a href="classification.html#cb201-12" aria-hidden="true" tabindex="-1"></a>d <span class="sc">%&gt;%</span></span>
+<span id="cb201-13"><a href="classification.html#cb201-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb201-14"><a href="classification.html#cb201-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">bayes_class =</span> <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> bayes_boundary, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb201-15"><a href="classification.html#cb201-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">lda_class =</span> <span class="fu">ifelse</span>(x <span class="sc">&gt;</span> lda_boundary, <span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb201-16"><a href="classification.html#cb201-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb201-17"><a href="classification.html#cb201-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb201-18"><a href="classification.html#cb201-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Bayes error rate</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(class <span class="sc">==</span> bayes_class),</span>
+<span id="cb201-19"><a href="classification.html#cb201-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">LDA error rate</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">mean</span>(class <span class="sc">==</span> lda_class)</span>
+<span id="cb201-20"><a href="classification.html#cb201-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 1 x 2
+##   `Bayes error rate` `LDA error rate`
+##                &lt;dbl&gt;            &lt;dbl&gt;
+## 1              0.104            0.107</code></pre>
+<p>Pretty close but, as expected, the Bayes classifier has the lower error rate.</p>
+<blockquote>
+<p>To reiterate, the LDA classifier results from assuming that the observations within each class come from a normal distribution with a class-specific mean and a common variance <span class="math inline">\(\sigma^2\)</span>, and plugging estimates for these
+parameters into the Bayes classifier. In Section 4.4.3, we will consider a less
+stringent set of assumptions, by allowing the observations in the <span class="math inline">\(k\)</span>th class
+to have a class-specific variance, <span class="math inline">\(\sigma_k^2\)</span>.</p>
+</blockquote>
+</div>
+<div id="linear-discriminant-analysis-for-p-1-1" class="section level3" number="4.4.2">
+<h3><span class="header-section-number">4.4.2</span> Linear Discriminant Analysis for <span class="math inline">\(p &gt; 1\)</span></h3>
+<p>Extending the LDA classifier for multiple predictors involves a multi-variate Gaussian distribution with class-specific mean vector and a common covariance matrix.</p>
+<blockquote>
+<p>The multivariate Gaussian distribution assumes that each individual predictor follows a one-dimensional normal distribution, as in (4.16), with some correlation between each pair of predictors.</p>
+</blockquote>
+<p>I’ll simulate some data with the <code>mvtnorm</code> package and plot probabilities with a 2D density plot (instead of the 3D in Figure 4.5):</p>
+<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb203-1"><a href="classification.html#cb203-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">crossing</span>(<span class="at">x1 =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="fl">0.1</span>), <span class="at">x2 =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="fl">0.1</span>))</span>
+<span id="cb203-2"><a href="classification.html#cb203-2" aria-hidden="true" tabindex="-1"></a>d1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb203-3"><a href="classification.html#cb203-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb203-4"><a href="classification.html#cb203-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">prob =</span> mvtnorm<span class="sc">::</span><span class="fu">dmvnorm</span>(</span>
+<span id="cb203-5"><a href="classification.html#cb203-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="fu">as.matrix</span>(d),</span>
+<span id="cb203-6"><a href="classification.html#cb203-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb203-7"><a href="classification.html#cb203-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb203-8"><a href="classification.html#cb203-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb203-9"><a href="classification.html#cb203-9" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb203-10"><a href="classification.html#cb203-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb203-11"><a href="classification.html#cb203-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">prob =</span> mvtnorm<span class="sc">::</span><span class="fu">dmvnorm</span>(</span>
+<span id="cb203-12"><a href="classification.html#cb203-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="fu">as.matrix</span>(d),</span>
+<span id="cb203-13"><a href="classification.html#cb203-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.7</span>, <span class="fl">0.7</span>, <span class="dv">1</span>), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb203-14"><a href="classification.html#cb203-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb203-15"><a href="classification.html#cb203-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb203-16"><a href="classification.html#cb203-16" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d1 <span class="sc">%&gt;%</span></span>
+<span id="cb203-17"><a href="classification.html#cb203-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x1, <span class="at">y =</span> x2)) <span class="sc">+</span></span>
+<span id="cb203-18"><a href="classification.html#cb203-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> prob)) <span class="sc">+</span></span>
+<span id="cb203-19"><a href="classification.html#cb203-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb203-20"><a href="classification.html#cb203-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb203-21"><a href="classification.html#cb203-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb203-22"><a href="classification.html#cb203-22" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d2 <span class="sc">%&gt;%</span></span>
+<span id="cb203-23"><a href="classification.html#cb203-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x1, <span class="at">y =</span> x2)) <span class="sc">+</span></span>
+<span id="cb203-24"><a href="classification.html#cb203-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> prob)) <span class="sc">+</span></span>
+<span id="cb203-25"><a href="classification.html#cb203-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb203-26"><a href="classification.html#cb203-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb203-27"><a href="classification.html#cb203-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb203-28"><a href="classification.html#cb203-28" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.5-1.png" width="576" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>To indicate that a <span class="math inline">\(p\)</span>-dimensional random variable <span class="math inline">\(X\)</span> has a multivariate Gaussian distribution, we write <span class="math inline">\(X \sim N(\mu, \Sigma)\)</span>. Here <span class="math inline">\(E(X) = \mu\)</span> is
+the mean of <span class="math inline">\(X\)</span> (a vector with <span class="math inline">\(p\)</span> components), and <span class="math inline">\(\text{Cov}(X) = \Sigma\)</span> is the
+<span class="math inline">\(p \times p\)</span> covariance matrix of <span class="math inline">\(X\)</span>.</p>
+</blockquote>
+<p>The LDA classifier assumes that the observations in the <span class="math inline">\(k\)</span>th class are drawn from a multivariate Gaussian distribution <span class="math inline">\(N(\mu_k, \Sigma)\)</span>.
+The Bayes classifier assigns an observation <span class="math inline">\(X = x\)</span> to the class for which</p>
+<p><span class="math display">\[
+\delta_k (x) = x^T \Sigma^{-1} \mu_k - \frac{1}{2} \mu_k^T \Sigma^{-1} \mu_k + \log \pi_k
+\]</span></p>
+<p>is largest.</p>
+<p>As with the univariable case, the LDA method involves estimating the unknown parameters <span class="math inline">\(\mu_k\)</span>, <span class="math inline">\(\pi_k\)</span> and <span class="math inline">\(\Sigma\)</span>.
+Then the quantities <span class="math inline">\(\hat{\delta}_k (x)\)</span> are calculated and the observations <span class="math inline">\(X\)</span> are classified into the largest <span class="math inline">\(\hat{\delta}_k (k)\)</span>.</p>
+<p>We can perform LDA using the <code>MASS</code> package to predict <code>default</code> from <code>student</code> and <code>balance</code>:</p>
+<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="classification.html#cb204-1" aria-hidden="true" tabindex="-1"></a>lda_default_balance_student <span class="ot">&lt;-</span></span>
+<span id="cb204-2"><a href="classification.html#cb204-2" aria-hidden="true" tabindex="-1"></a>  MASS<span class="sc">::</span><span class="fu">lda</span>(default <span class="sc">~</span> balance <span class="sc">+</span> student, <span class="at">data =</span> default)</span>
+<span id="cb204-3"><a href="classification.html#cb204-3" aria-hidden="true" tabindex="-1"></a>lda_default_balance_student</span></code></pre></div>
+<pre><code>## Call:
+## lda(default ~ balance + student, data = default)
+## 
+## Prior probabilities of groups:
+##     No    Yes 
+## 0.9667 0.0333 
+## 
+## Group means:
+##       balance studentYes
+## No   803.9438  0.2914037
+## Yes 1747.8217  0.3813814
+## 
+## Coefficients of linear discriminants:
+##                     LD1
+## balance     0.002244397
+## studentYes -0.249059498</code></pre>
+<p>The resulting training error rate:</p>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb206-1"><a href="classification.html#cb206-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(</span>
+<span id="cb206-2"><a href="classification.html#cb206-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(lda_default_balance_student,</span>
+<span id="cb206-3"><a href="classification.html#cb206-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">newdata =</span> default)<span class="sc">$</span>class <span class="sc">!=</span> default<span class="sc">$</span>default</span>
+<span id="cb206-4"><a href="classification.html#cb206-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## [1] 0.0275</code></pre>
+<blockquote>
+<p>This sounds like a low error rate, but two caveats must be noted.</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>First of all, training error rates will usually be lower than test error
+rates, which are the real quantity of interest. In other words, we
+might expect this classifier to perform worse if we use it to predict
+whether or not a new set of individuals will default. The reason is
+that we specifically adjust the parameters of our model to do well on
+the training data. The higher the ratio of parameters <span class="math inline">\(p\)</span> to number
+of samples <span class="math inline">\(n\)</span>, the more we expect this overfitting to play a role.
+For these data we don’t expect this to be a problem, since <span class="math inline">\(p = 2\)</span> and
+<span class="math inline">\(n = 10,000\)</span>.</li>
+<li>Second, since only 3.33% of the individuals in the training sample
+defaulted, a simple but useless classifier that always predicts that
+an individual will not default, regardless of his or her credit card
+balance and student status, will result in an error rate of 3.33%. In
+other words, the trivial null classifier will achieve an error rate that is only a bit higher than the LDA training set error rate.</li>
+</ul>
+</blockquote>
+<p>Make predictions and produce the confusion matrix in Table 4.4:</p>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="classification.html#cb208-1" aria-hidden="true" tabindex="-1"></a>lda_pred <span class="ot">&lt;-</span> </span>
+<span id="cb208-2"><a href="classification.html#cb208-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(</span>
+<span id="cb208-3"><a href="classification.html#cb208-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_default =</span> <span class="fu">predict</span>(lda_default_balance_student,</span>
+<span id="cb208-4"><a href="classification.html#cb208-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">newdata =</span> default)<span class="sc">$</span>class,</span>
+<span id="cb208-5"><a href="classification.html#cb208-5" aria-hidden="true" tabindex="-1"></a>    default </span>
+<span id="cb208-6"><a href="classification.html#cb208-6" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb208-7"><a href="classification.html#cb208-7" aria-hidden="true" tabindex="-1"></a>lda_pred <span class="sc">%&gt;%</span></span>
+<span id="cb208-8"><a href="classification.html#cb208-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pred_default, default) <span class="sc">%&gt;%</span></span>
+<span id="cb208-9"><a href="classification.html#cb208-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> default, <span class="at">values_from =</span> n) <span class="sc">%&gt;%</span></span>
+<span id="cb208-10"><a href="classification.html#cb208-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> No <span class="sc">+</span> Yes) <span class="sc">%&gt;%</span></span>
+<span id="cb208-11"><a href="classification.html#cb208-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;pred_default&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb208-12"><a href="classification.html#cb208-12" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">&quot;True default status&quot;</span>, <span class="at">columns =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb208-13"><a href="classification.html#cb208-13" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_stubhead</span>(<span class="st">&quot;Predicted&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb208-14"><a href="classification.html#cb208-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Can&#39;t get the Total row to round to 0 decimals</span></span>
+<span id="cb208-15"><a href="classification.html#cb208-15" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">summary_rows</span>(<span class="at">fns =</span> <span class="fu">list</span>(<span class="at">Total =</span> <span class="sc">~</span><span class="fu">round</span>(<span class="fu">sum</span>(.), <span class="dv">0</span>)))</span></code></pre></div>
+<div id="skvtyzcjea" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#skvtyzcjea .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#skvtyzcjea .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#skvtyzcjea .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#skvtyzcjea .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#skvtyzcjea .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#skvtyzcjea .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#skvtyzcjea .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#skvtyzcjea .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#skvtyzcjea .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#skvtyzcjea .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#skvtyzcjea .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#skvtyzcjea .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#skvtyzcjea .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#skvtyzcjea .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#skvtyzcjea .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#skvtyzcjea .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#skvtyzcjea .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#skvtyzcjea .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#skvtyzcjea .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#skvtyzcjea .gt_left {
+  text-align: left;
+}
+
+#skvtyzcjea .gt_center {
+  text-align: center;
+}
+
+#skvtyzcjea .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#skvtyzcjea .gt_font_normal {
+  font-weight: normal;
+}
+
+#skvtyzcjea .gt_font_bold {
+  font-weight: bold;
+}
+
+#skvtyzcjea .gt_font_italic {
+  font-style: italic;
+}
+
+#skvtyzcjea .gt_super {
+  font-size: 65%;
+}
+
+#skvtyzcjea .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1">Predicted</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
+        <span class="gt_column_spanner">True default status</span>
+      </th>
+    </tr>
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">No</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Yes</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Total</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left gt_stub">No</td>
+<td class="gt_row gt_right">9644</td>
+<td class="gt_row gt_right">252</td>
+<td class="gt_row gt_right">9896</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">Yes</td>
+<td class="gt_row gt_right">23</td>
+<td class="gt_row gt_right">81</td>
+<td class="gt_row gt_right">104</td></tr>
+    <tr>
+      <td class="gt_row gt_stub gt_right gt_grand_summary_row gt_first_grand_summary_row">Total</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">9,667.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">333.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">10,000.00</td>
+    </tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>We only missed 23 individuals who did not default, out of 9667.
+This is great, but we did quite poorly in predicting defaulters.</p>
+<blockquote>
+<p>However, of the 333 individuals who
+defaulted, 252 (or 75.7%) were missed by LDA. So while the overall error
+rate is low, the error rate among individuals who defaulted is very high.
+From the perspective of a credit card company that is trying to identify
+high-risk individuals, an error rate of 252/333 = 75.7% among individuals
+who default may well be unacceptable.</p>
+</blockquote>
+<blockquote>
+<p>Class-specific performance is also important in medicine and biology,
+where the terms sensitivity and specificity characterize the performance of
+a classifier or screening test. In this case the sensitivity is the percentage
+of true defaulters that are identified; it equals 24.3%. The specificity is
+the percentage of non-defaulters that are correctly identified; it equals (1 −
+23/9667) = 99.8%.</p>
+</blockquote>
+<p>LDA has poor sensitivity here because it attempts to reduce the total error rate, regardless of class.
+In the case of a credit card company, it is probably more valuable to correctly identify individuals who will default.</p>
+<p>The LDA classifier, like the Bayes classifier to which it approximates, assigns an observation to the <code>default</code> = “Yes” class if</p>
+<p><span class="math display">\[
+\text{Pr}(\text{default = Yes}| X = x) &gt; 0.5.
+\]</span></p>
+<p>That is to say, these classifiers have a default threshold of 50% posterior probability.
+We may lower these probability as needed.
+To adjust this with the <code>MASS::lda</code> package, we can get the posterior probabilities directly via <code>predict.lda()</code>:</p>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="classification.html#cb209-1" aria-hidden="true" tabindex="-1"></a>lda_posterior <span class="ot">&lt;-</span> <span class="fu">predict</span>(lda_default_balance_student, <span class="at">newdata =</span> default)<span class="sc">$</span>posterior</span>
+<span id="cb209-2"><a href="classification.html#cb209-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lda_posterior)</span></code></pre></div>
+<pre><code>##          No         Yes
+## 1 0.9968680 0.003131975
+## 2 0.9971925 0.002807531
+## 3 0.9843970 0.015603046
+## 4 0.9987769 0.001223133
+## 5 0.9959254 0.004074582
+## 6 0.9954627 0.004537289</code></pre>
+<p>Then use the threshold of 20% to re-create Table 4.5:</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="classification.html#cb211-1" aria-hidden="true" tabindex="-1"></a>lda_pred_20 <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb211-2"><a href="classification.html#cb211-2" aria-hidden="true" tabindex="-1"></a>  default,</span>
+<span id="cb211-3"><a href="classification.html#cb211-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">posterior_prob_default =</span> lda_posterior[,<span class="dv">2</span>]</span>
+<span id="cb211-4"><a href="classification.html#cb211-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb211-5"><a href="classification.html#cb211-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb211-6"><a href="classification.html#cb211-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_default =</span> <span class="fu">ifelse</span>(posterior_prob_default <span class="sc">&gt;</span> <span class="fl">0.2</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)</span>
+<span id="cb211-7"><a href="classification.html#cb211-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb211-8"><a href="classification.html#cb211-8" aria-hidden="true" tabindex="-1"></a>lda_pred_20 <span class="sc">%&gt;%</span></span>
+<span id="cb211-9"><a href="classification.html#cb211-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pred_default, default) <span class="sc">%&gt;%</span></span>
+<span id="cb211-10"><a href="classification.html#cb211-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> default, <span class="at">values_from =</span> n) <span class="sc">%&gt;%</span></span>
+<span id="cb211-11"><a href="classification.html#cb211-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> No <span class="sc">+</span> Yes) <span class="sc">%&gt;%</span></span>
+<span id="cb211-12"><a href="classification.html#cb211-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;pred_default&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb211-13"><a href="classification.html#cb211-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">&quot;True default status&quot;</span>, <span class="at">columns =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb211-14"><a href="classification.html#cb211-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_stubhead</span>(<span class="st">&quot;Predicted&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb211-15"><a href="classification.html#cb211-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary_rows</span>(<span class="at">fns =</span> <span class="fu">list</span>(<span class="at">Total =</span> <span class="sc">~</span><span class="fu">round</span>(<span class="fu">sum</span>(.), <span class="dv">0</span>)))</span></code></pre></div>
+<div id="ggcbylpnri" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ggcbylpnri .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ggcbylpnri .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ggcbylpnri .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ggcbylpnri .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ggcbylpnri .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ggcbylpnri .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ggcbylpnri .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ggcbylpnri .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ggcbylpnri .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ggcbylpnri .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ggcbylpnri .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ggcbylpnri .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ggcbylpnri .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#ggcbylpnri .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ggcbylpnri .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ggcbylpnri .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ggcbylpnri .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ggcbylpnri .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ggcbylpnri .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ggcbylpnri .gt_left {
+  text-align: left;
+}
+
+#ggcbylpnri .gt_center {
+  text-align: center;
+}
+
+#ggcbylpnri .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ggcbylpnri .gt_font_normal {
+  font-weight: normal;
+}
+
+#ggcbylpnri .gt_font_bold {
+  font-weight: bold;
+}
+
+#ggcbylpnri .gt_font_italic {
+  font-style: italic;
+}
+
+#ggcbylpnri .gt_super {
+  font-size: 65%;
+}
+
+#ggcbylpnri .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1">Predicted</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
+        <span class="gt_column_spanner">True default status</span>
+      </th>
+    </tr>
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">No</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Yes</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Total</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left gt_stub">No</td>
+<td class="gt_row gt_right">9432</td>
+<td class="gt_row gt_right">138</td>
+<td class="gt_row gt_right">9570</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">Yes</td>
+<td class="gt_row gt_right">235</td>
+<td class="gt_row gt_right">195</td>
+<td class="gt_row gt_right">430</td></tr>
+    <tr>
+      <td class="gt_row gt_stub gt_right gt_grand_summary_row gt_first_grand_summary_row">Total</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">9,667.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">333.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">10,000.00</td>
+    </tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The sensitivity to detect defaulters has improved to 58.8%, but the specificity has dropped 97.5%.
+The overall error rate has also increased to 3.7%.</p>
+<blockquote>
+<p>But a credit card company
+may consider this slight increase in the total error rate to be a small price to
+pay for more accurate identification of individuals who do indeed default.</p>
+</blockquote>
+<blockquote>
+<p>How can we decide which threshold value is
+best? Such a decision must be based on domain knowledge, such as detailed
+information about the costs associated with default.</p>
+</blockquote>
+<p>The receiver operating character (ROC) curve is one way to visualize the trade-off between two types of error for different threshold values.
+I like the <code>yardstick::roc_curve()</code> function for this purpose:</p>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="classification.html#cb212-1" aria-hidden="true" tabindex="-1"></a>lda_roc <span class="ot">&lt;-</span></span>
+<span id="cb212-2"><a href="classification.html#cb212-2" aria-hidden="true" tabindex="-1"></a>  yardstick<span class="sc">::</span><span class="fu">roc_curve</span>(</span>
+<span id="cb212-3"><a href="classification.html#cb212-3" aria-hidden="true" tabindex="-1"></a>    lda_pred_20,</span>
+<span id="cb212-4"><a href="classification.html#cb212-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Specify the class probability and the truth variables</span></span>
+<span id="cb212-5"><a href="classification.html#cb212-5" aria-hidden="true" tabindex="-1"></a>    posterior_prob_default, <span class="at">truth =</span> default,</span>
+<span id="cb212-6"><a href="classification.html#cb212-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This argument specifies which level of truth (default) is considered</span></span>
+<span id="cb212-7"><a href="classification.html#cb212-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#  &quot;positive&quot;, so it will flip the ROC curve vertically</span></span>
+<span id="cb212-8"><a href="classification.html#cb212-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span></span>
+<span id="cb212-9"><a href="classification.html#cb212-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb212-10"><a href="classification.html#cb212-10" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(lda_roc)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.8-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>The area under the curve (AUC) summarizes the overall performance of the classifier:</p>
+<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb213-1"><a href="classification.html#cb213-1" aria-hidden="true" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">roc_auc</span>(</span>
+<span id="cb213-2"><a href="classification.html#cb213-2" aria-hidden="true" tabindex="-1"></a>  lda_pred_20,</span>
+<span id="cb213-3"><a href="classification.html#cb213-3" aria-hidden="true" tabindex="-1"></a>  posterior_prob_default, <span class="at">truth =</span> default,</span>
+<span id="cb213-4"><a href="classification.html#cb213-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span></span>
+<span id="cb213-5"><a href="classification.html#cb213-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.950</code></pre>
+<p>We get the exact same ROC AUC with logistic regression:</p>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="classification.html#cb215-1" aria-hidden="true" tabindex="-1"></a>glm_default_balance_student <span class="ot">&lt;-</span></span>
+<span id="cb215-2"><a href="classification.html#cb215-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glm</span>(default <span class="sc">~</span> balance <span class="sc">+</span> student,</span>
+<span id="cb215-3"><a href="classification.html#cb215-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> default, <span class="at">family =</span> binomial)</span>
+<span id="cb215-4"><a href="classification.html#cb215-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb215-5"><a href="classification.html#cb215-5" aria-hidden="true" tabindex="-1"></a>glm_pred <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb215-6"><a href="classification.html#cb215-6" aria-hidden="true" tabindex="-1"></a>  default,</span>
+<span id="cb215-7"><a href="classification.html#cb215-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">glm_prob_default =</span> <span class="fu">predict</span>(</span>
+<span id="cb215-8"><a href="classification.html#cb215-8" aria-hidden="true" tabindex="-1"></a>    glm_default_balance_student,</span>
+<span id="cb215-9"><a href="classification.html#cb215-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">newdata =</span> default, <span class="at">type =</span> <span class="st">&quot;response&quot;</span></span>
+<span id="cb215-10"><a href="classification.html#cb215-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb215-11"><a href="classification.html#cb215-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb215-12"><a href="classification.html#cb215-12" aria-hidden="true" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">roc_auc</span>(</span>
+<span id="cb215-13"><a href="classification.html#cb215-13" aria-hidden="true" tabindex="-1"></a>  glm_pred,</span>
+<span id="cb215-14"><a href="classification.html#cb215-14" aria-hidden="true" tabindex="-1"></a>  glm_prob_default, <span class="at">truth =</span> default,</span>
+<span id="cb215-15"><a href="classification.html#cb215-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span></span>
+<span id="cb215-16"><a href="classification.html#cb215-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## # A tibble: 1 x 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 roc_auc binary         0.950</code></pre>
+</div>
+<div id="quadratic-discriminant-analysis" class="section level3" number="4.4.3">
+<h3><span class="header-section-number">4.4.3</span> Quadratic Discriminant Analysis</h3>
+<blockquote>
+<p>As we have discussed, LDA assumes that the observations within each
+class are drawn from a multivariate Gaussian distribution with a class-specific mean vector and a covariance matrix that is common to all <span class="math inline">\(K\)</span>
+classes. Quadratic discriminant analysis (QDA) provides an alternative
+approach. Like LDA, the QDA classifier results from assuming that the
+observations from each class are drawn from a Gaussian distribution, and
+plugging estimates for the parameters into Bayes’ theorem in order to perform prediction. However, unlike LDA, QDA assumes that each class has
+its own covariance matrix. That is, it assumes that an observation from the
+<span class="math inline">\(k\)</span>th class is of the form <span class="math inline">\(X \sim N(\mu_k, \Sigma_k)\)</span>, where <span class="math inline">\(\Sigma_k\)</span> is a covariance matrix
+for the <span class="math inline">\(k\)</span>th class.</p>
+</blockquote>
+<p>An observation <span class="math inline">\(X = x\)</span> is assigned to the class for which</p>
+<p><span class="math display">\[
+\begin{align}
+\delta_k (x) = - \frac{1}{2} (x - \mu_k)^T \Sigma^{-1}_k (x - \mu_k) - \frac{1}{2} \log |\Sigma_k|+ \log \pi_k.
+\end{align}
+\]</span></p>
+<p>QDA gets its name from how the quantity <span class="math inline">\(x\)</span> appears as quadratic function in the first term of the above equation.</p>
+<blockquote>
+<p>Why does it matter whether or not we assume that the <span class="math inline">\(K\)</span> classes share a
+common covariance matrix? In other words, why would one prefer LDA to
+QDA, or vice-versa? The answer lies in the bias-variance trade-off. When
+there are <span class="math inline">\(p\)</span> predictors, then estimating a covariance matrix requires estimating <span class="math inline">\(p(p+1)/2\)</span> parameters. QDA estimates a separate covariance matrix
+for each class, for a total of <span class="math inline">\(Kp(p+1)/2\)</span> parameters.</p>
+</blockquote>
+<blockquote>
+<p>Consequently, LDA is a much less flexible classifier than QDA, and
+so has substantially lower variance. This can potentially lead to improved
+prediction performance. But there is a trade-off: if LDA’s assumption that
+the <span class="math inline">\(K\)</span> classes share a common covariance matrix is badly off, then LDA
+can suffer from high bias.</p>
+</blockquote>
+<p>In short: use LDA if there are relatively few training observations, and use QDA for many.</p>
+</div>
+<div id="naive-bayes" class="section level3" number="4.4.4">
+<h3><span class="header-section-number">4.4.4</span> Naive Bayes</h3>
+<p>The naive Bayes classifier also estimates the conditional probability <span class="math inline">\(f_k (x) = \text{Pr}(X|Y = k)\)</span>.
+In LDA, we made the very strong assumption that <span class="math inline">\(f_k\)</span> is the density function of a multivariate normal distribution with mean <span class="math inline">\(\mu_k\)</span> and shared covariance <span class="math inline">\(\Sigma\)</span>.
+In QDA, the covariance <span class="math inline">\(\Sigma_k\)</span> is class-specific.
+The naive Bayes classifier instead makes a single assumption:</p>
+<blockquote>
+<p>Within the <span class="math inline">\(k\)</span>th class, the <span class="math inline">\(p\)</span> predictors are independent.</p>
+</blockquote>
+<p>Mathematically:</p>
+<p><span class="math display">\[
+f_k (x) = f_{k1}(x_1) \times f_{k2}(x_2) \times \dots \times f_{kp}(x_p).
+\]</span></p>
+<p>where <span class="math inline">\(f_{kj}\)</span> is the density function of the <span class="math inline">\(j\)</span>th predictor among observations in the <span class="math inline">\(k\)</span>th class.</p>
+<blockquote>
+<p>Why is this assumption so powerful? Essentially, estimating a <span class="math inline">\(p\)</span>-dimensional density function is challenging because we must consider not only
+the marginal distribution of each predictor — that is, the distribution of each predictor on its own — but also the joint distribution of the predictors
+— that is, the association between the different predictors. In the case of
+a multivariate normal distribution, the association between the different
+predictors is summarized by the off-diagonal elements of the covariance
+matrix. However, in general, this association can be very hard to characterize, and exceedingly challenging to estimate. But by assuming that the
+<span class="math inline">\(p\)</span> covariates are independent within each class, we completely eliminate the
+need to worry about the association between the <span class="math inline">\(p\)</span> predictors, because we
+have simply assumed that there is no association between the predictors!</p>
+</blockquote>
+<p>This is a very stringent assumption – most of the time, we believe there to be some degree of association between predictors.
+But naive Bayes can still perform well, especially when <span class="math inline">\(n\)</span> is not large enouugh relative to <span class="math inline">\(p\)</span> to effectively estimate the joint distribution of the predictors within each class.</p>
+<blockquote>
+<p>Essentially, the naive Bayes assumption introduces some bias, but
+reduces variance, leading to a classifier that works quite well in practice as
+a result of the bias-variance trade-off.</p>
+</blockquote>
+<p>Under the naive Bayes, assumption, the posterior probability becomes:</p>
+<p><span class="math display">\[
+\text{Pr}(Y = k|X = x) = \frac{\pi_k \times f_{k1}(x_1) \times \dots \times f_{kp} (x_p)}{\sum_{l=1}^K \pi_l \times f_{l1}(x_1) \times \dots \times f_{lp} (x_p)}
+\]</span></p>
+<p>for <span class="math inline">\(k = 1, \dots, K\)</span>.</p>
+<p>To estimate the one-dimensional <span class="math inline">\(f_{kj}\)</span> from <span class="math inline">\(x_j\)</span>, we have a few options:</p>
+<ul>
+<li>Assume that the <span class="math inline">\(j\)</span>th predictor is drawn from a univariate normal distribution.
+<ul>
+<li><span class="math inline">\(X_j | Y = k \sim N(\mu_{jk}, \sigma_{jk}^2)\)</span>.</li>
+<li>This is like QDA except the covariance matrix is diagonal because the predictors are independent.</li>
+</ul></li>
+<li>Use a non-parametric estimate for <span class="math inline">\(f_{kj}\)</span>.
+<ul>
+<li>A simple way: Estimate <span class="math inline">\(f_{kj}(x_j)\)</span> as the fraction of the training observations in the <span class="math inline">\(k\)</span>th class belonging to a histogram bin.</li>
+<li>Alternatively, use a kernel density estimator, which is essentially a smoothed version of a histogram.</li>
+</ul></li>
+<li>For qualitative <span class="math inline">\(X_j\)</span>, simply count the proportion of training observations for the <span class="math inline">\(j\)</span>th predictor corresponding to each class.</li>
+</ul>
+<p>Apply the naive Bayes classifier with the <code>klaR</code> package:</p>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="classification.html#cb217-1" aria-hidden="true" tabindex="-1"></a>nb_default <span class="ot">&lt;-</span></span>
+<span id="cb217-2"><a href="classification.html#cb217-2" aria-hidden="true" tabindex="-1"></a>  klaR<span class="sc">::</span><span class="fu">NaiveBayes</span>(default <span class="sc">~</span> balance <span class="sc">+</span> student, <span class="at">data =</span> default)</span>
+<span id="cb217-3"><a href="classification.html#cb217-3" aria-hidden="true" tabindex="-1"></a>nb_pred <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb217-4"><a href="classification.html#cb217-4" aria-hidden="true" tabindex="-1"></a>  default,</span>
+<span id="cb217-5"><a href="classification.html#cb217-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">nb_prob_default =</span> <span class="fu">predict</span>(nb_default, <span class="at">newdata =</span> default)<span class="sc">$</span>posterior[,<span class="dv">2</span>]</span>
+<span id="cb217-6"><a href="classification.html#cb217-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>If we take a posterior probability of 50% or 20% as the thresholds for predicting a default, we get Tables 4.8 and 4.9:</p>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="classification.html#cb218-1" aria-hidden="true" tabindex="-1"></a>nb_pred <span class="ot">&lt;-</span> nb_pred <span class="sc">%&gt;%</span></span>
+<span id="cb218-2"><a href="classification.html#cb218-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb218-3"><a href="classification.html#cb218-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_default_0.5 =</span> <span class="fu">ifelse</span>(nb_prob_default <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>),</span>
+<span id="cb218-4"><a href="classification.html#cb218-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pred_default_0.2 =</span> <span class="fu">ifelse</span>(nb_prob_default <span class="sc">&gt;</span> <span class="fl">0.2</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)</span>
+<span id="cb218-5"><a href="classification.html#cb218-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb218-6"><a href="classification.html#cb218-6" aria-hidden="true" tabindex="-1"></a>nb_pred <span class="sc">%&gt;%</span></span>
+<span id="cb218-7"><a href="classification.html#cb218-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pred_default_0<span class="fl">.5</span>, default) <span class="sc">%&gt;%</span></span>
+<span id="cb218-8"><a href="classification.html#cb218-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> default, <span class="at">values_from =</span> n) <span class="sc">%&gt;%</span></span>
+<span id="cb218-9"><a href="classification.html#cb218-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> No <span class="sc">+</span> Yes) <span class="sc">%&gt;%</span></span>
+<span id="cb218-10"><a href="classification.html#cb218-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;pred_default_0.5&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb218-11"><a href="classification.html#cb218-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">&quot;True default status&quot;</span>, <span class="at">columns =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb218-12"><a href="classification.html#cb218-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_stubhead</span>(<span class="st">&quot;Predicted&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb218-13"><a href="classification.html#cb218-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary_rows</span>(<span class="at">fns =</span> <span class="fu">list</span>(<span class="at">Total =</span> <span class="sc">~</span><span class="fu">round</span>(<span class="fu">sum</span>(.), <span class="dv">0</span>)))</span></code></pre></div>
+<div id="ujgogwpkcm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ujgogwpkcm .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ujgogwpkcm .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ujgogwpkcm .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ujgogwpkcm .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ujgogwpkcm .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ujgogwpkcm .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ujgogwpkcm .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ujgogwpkcm .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ujgogwpkcm .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ujgogwpkcm .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ujgogwpkcm .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ujgogwpkcm .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ujgogwpkcm .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#ujgogwpkcm .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujgogwpkcm .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujgogwpkcm .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ujgogwpkcm .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ujgogwpkcm .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ujgogwpkcm .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#ujgogwpkcm .gt_left {
+  text-align: left;
+}
+
+#ujgogwpkcm .gt_center {
+  text-align: center;
+}
+
+#ujgogwpkcm .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ujgogwpkcm .gt_font_normal {
+  font-weight: normal;
+}
+
+#ujgogwpkcm .gt_font_bold {
+  font-weight: bold;
+}
+
+#ujgogwpkcm .gt_font_italic {
+  font-style: italic;
+}
+
+#ujgogwpkcm .gt_super {
+  font-size: 65%;
+}
+
+#ujgogwpkcm .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1">Predicted</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
+        <span class="gt_column_spanner">True default status</span>
+      </th>
+    </tr>
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">No</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Yes</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Total</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left gt_stub">No</td>
+<td class="gt_row gt_right">9621</td>
+<td class="gt_row gt_right">244</td>
+<td class="gt_row gt_right">9865</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">Yes</td>
+<td class="gt_row gt_right">46</td>
+<td class="gt_row gt_right">89</td>
+<td class="gt_row gt_right">135</td></tr>
+    <tr>
+      <td class="gt_row gt_stub gt_right gt_grand_summary_row gt_first_grand_summary_row">Total</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">9,667.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">333.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">10,000.00</td>
+    </tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="classification.html#cb219-1" aria-hidden="true" tabindex="-1"></a>nb_pred <span class="sc">%&gt;%</span></span>
+<span id="cb219-2"><a href="classification.html#cb219-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pred_default_0<span class="fl">.2</span>, default) <span class="sc">%&gt;%</span></span>
+<span id="cb219-3"><a href="classification.html#cb219-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> default, <span class="at">values_from =</span> n) <span class="sc">%&gt;%</span></span>
+<span id="cb219-4"><a href="classification.html#cb219-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> No <span class="sc">+</span> Yes) <span class="sc">%&gt;%</span></span>
+<span id="cb219-5"><a href="classification.html#cb219-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;pred_default_0.2&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb219-6"><a href="classification.html#cb219-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_spanner</span>(<span class="at">label =</span> <span class="st">&quot;True default status&quot;</span>, <span class="at">columns =</span> <span class="fu">everything</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb219-7"><a href="classification.html#cb219-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_stubhead</span>(<span class="st">&quot;Predicted&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb219-8"><a href="classification.html#cb219-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary_rows</span>(<span class="at">fns =</span> <span class="fu">list</span>(<span class="at">Total =</span> <span class="sc">~</span><span class="fu">round</span>(<span class="fu">sum</span>(.), <span class="dv">0</span>)))</span></code></pre></div>
+<div id="vfygpcxfsz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#vfygpcxfsz .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#vfygpcxfsz .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#vfygpcxfsz .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#vfygpcxfsz .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#vfygpcxfsz .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#vfygpcxfsz .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#vfygpcxfsz .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#vfygpcxfsz .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#vfygpcxfsz .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#vfygpcxfsz .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#vfygpcxfsz .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#vfygpcxfsz .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#vfygpcxfsz .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#vfygpcxfsz .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vfygpcxfsz .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vfygpcxfsz .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#vfygpcxfsz .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#vfygpcxfsz .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#vfygpcxfsz .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#vfygpcxfsz .gt_left {
+  text-align: left;
+}
+
+#vfygpcxfsz .gt_center {
+  text-align: center;
+}
+
+#vfygpcxfsz .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#vfygpcxfsz .gt_font_normal {
+  font-weight: normal;
+}
+
+#vfygpcxfsz .gt_font_bold {
+  font-weight: bold;
+}
+
+#vfygpcxfsz .gt_font_italic {
+  font-style: italic;
+}
+
+#vfygpcxfsz .gt_super {
+  font-size: 65%;
+}
+
+#vfygpcxfsz .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1">Predicted</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3">
+        <span class="gt_column_spanner">True default status</span>
+      </th>
+    </tr>
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">No</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Yes</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Total</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left gt_stub">No</td>
+<td class="gt_row gt_right">9339</td>
+<td class="gt_row gt_right">130</td>
+<td class="gt_row gt_right">9469</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">Yes</td>
+<td class="gt_row gt_right">328</td>
+<td class="gt_row gt_right">203</td>
+<td class="gt_row gt_right">531</td></tr>
+    <tr>
+      <td class="gt_row gt_stub gt_right gt_grand_summary_row gt_first_grand_summary_row">Total</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">9,667.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">333.00</td>
+      <td class="gt_row gt_right gt_grand_summary_row gt_first_grand_summary_row">10,000.00</td>
+    </tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The numbers are slightly different from the text, which may have to do with how <span class="math inline">\(f_{kj}\)</span> for the quantitative <code>balance</code> was estimated.
+The overall error rate, sensitivity, and specificity of the naive Bayes approach:</p>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="classification.html#cb220-1" aria-hidden="true" tabindex="-1"></a>nb_pred <span class="sc">%&gt;%</span></span>
+<span id="cb220-2"><a href="classification.html#cb220-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(default, pred_default_0<span class="fl">.2</span>, pred_default_0<span class="fl">.5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb220-3"><a href="classification.html#cb220-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(pred_default_0<span class="fl">.5</span>, pred_default_0<span class="fl">.2</span>),</span>
+<span id="cb220-4"><a href="classification.html#cb220-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;threshold&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;pred_default&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb220-5"><a href="classification.html#cb220-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">threshold =</span> <span class="fu">as.numeric</span>(<span class="fu">str_remove</span>(threshold, <span class="st">&quot;pred_default_&quot;</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb220-6"><a href="classification.html#cb220-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(threshold) <span class="sc">%&gt;%</span></span>
+<span id="cb220-7"><a href="classification.html#cb220-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb220-8"><a href="classification.html#cb220-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">overall_error =</span> <span class="fu">mean</span>(default <span class="sc">!=</span> pred_default),</span>
+<span id="cb220-9"><a href="classification.html#cb220-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">sensitivity =</span> <span class="fu">sum</span>(default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span> <span class="sc">&amp;</span> pred_default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>) <span class="sc">/</span></span>
+<span id="cb220-10"><a href="classification.html#cb220-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>),</span>
+<span id="cb220-11"><a href="classification.html#cb220-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">specificity =</span> <span class="fu">sum</span>(default <span class="sc">==</span> <span class="st">&quot;No&quot;</span> <span class="sc">&amp;</span> pred_default <span class="sc">==</span> <span class="st">&quot;No&quot;</span>) <span class="sc">/</span></span>
+<span id="cb220-12"><a href="classification.html#cb220-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(default <span class="sc">==</span> <span class="st">&quot;No&quot;</span>),</span>
+<span id="cb220-13"><a href="classification.html#cb220-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb220-14"><a href="classification.html#cb220-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb220-15"><a href="classification.html#cb220-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), scales<span class="sc">::</span>percent)) <span class="sc">%&gt;%</span></span>
+<span id="cb220-16"><a href="classification.html#cb220-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
+<div id="dolyxdntek" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#dolyxdntek .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dolyxdntek .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dolyxdntek .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dolyxdntek .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dolyxdntek .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dolyxdntek .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dolyxdntek .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dolyxdntek .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dolyxdntek .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dolyxdntek .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dolyxdntek .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dolyxdntek .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dolyxdntek .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#dolyxdntek .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dolyxdntek .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dolyxdntek .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dolyxdntek .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#dolyxdntek .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dolyxdntek .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#dolyxdntek .gt_left {
+  text-align: left;
+}
+
+#dolyxdntek .gt_center {
+  text-align: center;
+}
+
+#dolyxdntek .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dolyxdntek .gt_font_normal {
+  font-weight: normal;
+}
+
+#dolyxdntek .gt_font_bold {
+  font-weight: bold;
+}
+
+#dolyxdntek .gt_font_italic {
+  font-style: italic;
+}
+
+#dolyxdntek .gt_super {
+  font-size: 65%;
+}
+
+#dolyxdntek .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">threshold</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">overall_error</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">sensitivity</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">specificity</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">20%</td>
+<td class="gt_row gt_left">4.6%</td>
+<td class="gt_row gt_left">61%</td>
+<td class="gt_row gt_left">96.6%</td></tr>
+    <tr><td class="gt_row gt_left">50%</td>
+<td class="gt_row gt_left">2.9%</td>
+<td class="gt_row gt_left">27%</td>
+<td class="gt_row gt_left">99.5%</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The overall error rate is slightly higher, but a higher sensitivity was achieved.</p>
+<blockquote>
+<p>In this example, it should not be too surprising that naive Bayes does
+not convincingly outperform LDA: this data set has <span class="math inline">\(n = 10,000\)</span> and <span class="math inline">\(p = 4\)</span>,
+and so the reduction in variance resulting from the naive Bayes assumption
+is not necessarily worthwhile. We expect to see a greater pay-off to using
+naive Bayes relative to LDA or QDA in instances where <span class="math inline">\(p\)</span> is larger or <span class="math inline">\(n\)</span> is
+smaller, so that reducing the variance is very important.</p>
+</blockquote>
+</div>
+</div>
+<div id="a-comparison-of-classification-methods" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> A Comparison of Classification Methods</h2>
+<div id="an-analytical-comparison" class="section level3" number="4.5.1">
+<h3><span class="header-section-number">4.5.1</span> An Analytical Comparison</h3>
+<blockquote>
+<p>We now perform an analytical (or mathematical) comparison of LDA,
+QDA, naive Bayes, and logistic regression. We consider these approaches in
+a setting with <span class="math inline">\(K\)</span> classes, so that we assign an observation to the class that
+maximizes <span class="math inline">\(\text{Pr}(Y = k|X = x)\)</span>. Equivalently, we can set <span class="math inline">\(K\)</span> as the baseline
+class and assign an observation to the class that maximizes</p>
+</blockquote>
+<p><span class="math display">\[
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right)
+\]</span></p>
+<blockquote>
+<p>for <span class="math inline">\(k = 1, \dots, K\)</span>.</p>
+</blockquote>
+<p>The is the familiar log-odds of class <span class="math inline">\(k\)</span> compared to baseline class <span class="math inline">\(K\)</span>.</p>
+<p>For LDA, we assumed the predictors within each class are drawn from a multivariate normal distribution with shared co-variance matrix.
+The log-odds can be represented as:</p>
+<p><span class="math display">\[
+\begin{align}
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right) &amp;= \log \left(\frac{\pi_k f_k(x)}{\pi_K f_K(x)}\right)\\
+&amp;= a_k + \sum_{j=1}^p b_{kj} x_j.
+\end{align}
+\]</span></p>
+<p>where <span class="math inline">\(a_k\)</span> and <span class="math inline">\(b_{kj}\)</span> are functions of <span class="math inline">\(\pi_k\)</span>, <span class="math inline">\(\mu_k\)</span>, and <span class="math inline">\(\Sigma_k\)</span>.
+Like logistic regression, LDA assumes that the log-odds of the probabilities are linear in <span class="math inline">\(x\)</span>.</p>
+<p>Similarly, an additional function <span class="math inline">\(c_{kjl}\)</span> gives the log-odds in the QDA setting:</p>
+<p><span class="math display">\[
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right)
+= a_k + \sum_{j=1}^p b_{kj} x_j + \sum_{j=1}^p \sum_{l=1}^p c_{kjl} x_j x_l
+\]</span></p>
+<p>which is quadratic in <span class="math inline">\(x\)</span>.</p>
+<p>Finally, the naive Bayes setting, with one-dimensional <span class="math inline">\(f_{kj}(x_j)\)</span>:</p>
+<p>$$
+<span class="math display">\[\begin{align}
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right) &amp;= \log \left(\frac{\pi_k f_k(x)}{\pi_K f_K(x)}\right)\\
+&amp;= a_k + \sum_{j=1}^p g_{kj} (x_j).
+\end{align}\]</span></p>
+<p>$$</p>
+<p>where <span class="math inline">\(g_{kj} (x_j) = \log \frac{f_{kj}(x_j)}{f_{Kj} (x_j)}\)</span>.
+This is the form of a generalized additive model, a topic that is discussed further in Chapter 7.</p>
+<p>Looking at these forms, we have the following observations:</p>
+<ul>
+<li>LDA is a special case of QDA with <span class="math inline">\(c_{kjl} = 0\)</span>.</li>
+<li>Any classifier with a linear decision boundary is a special case of naive Bayes with <span class="math inline">\(b_{kj} (x_j) = b_{kj} x_j\)</span>. In particular, this means that LDA is a special case of naive Bayes.</li>
+<li>Naive Bayes is also a special case of LDA if <span class="math inline">\(f_{kj} (x_j)\)</span> is a modeled as a one-dimensional Gaussian distribution.</li>
+<li>QDA and naive Bayes are not special cases of the other.</li>
+</ul>
+<blockquote>
+<p>None of these methods uniformly dominates the others: in any setting, the
+choice of method will depend on the true distribution of the predictors in
+each of the <span class="math inline">\(K\)</span> classes, as well as other considerations, such as the values of
+<span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>. The latter ties into the bias-variance trade-off.</p>
+</blockquote>
+<p>Then to tie this all to logistic regression, recall the multinomial form:</p>
+<p><span class="math display">\[
+\log \left( \frac{\text{Pr} (Y = k| X = x)}{\text{Pr} (Y = K| X = x)}\right) = \beta_{k0} + \sum_{j=1}^p \beta_{kj} x_j.
+\]</span></p>
+<p>This is identical to the linear form of the LDA as both are linear functions of the predictors.
+The estimation approach differs of course:</p>
+<blockquote>
+<p>In LDA, the coefficients in this linear function are functions of estimates for <span class="math inline">\(\pi_k\)</span>, <span class="math inline">\(\pi_K\)</span>, <span class="math inline">\(\mu_k\)</span>, <span class="math inline">\(\mu_K\)</span>, and <span class="math inline">\(\Sigma\)</span>
+obtained by assuming that <span class="math inline">\(X_1,\dots, X_p\)</span> follow a normal distribution within each class. By contrast, in logistic regression, the coefficients
+are chosen to maximize the likelihood function (4.5). Thus, we expect LDA
+to outperform logistic regression when the normality assumption (approximately) holds, and we expect logistic regression to perform better when it
+does not.</p>
+</blockquote>
+<p>Lastly, some observations about <span class="math inline">\(K\)</span>-nearest neighbors, which is a non-parametric alternative to classification:</p>
+<blockquote>
+<ul>
+<li>Because KNN is completely non-parametric, we can expect this approach to dominate LDA and logistic regression when the decision
+boundary is highly non-linear, provided that <span class="math inline">\(n\)</span> is very large and <span class="math inline">\(p\)</span> is
+small.</li>
+<li>In order to provide accurate classification, KNN requires a lot of observations relative to the number of predictors – that is, <span class="math inline">\(n\)</span> much larger
+than <span class="math inline">\(p\)</span>. This has to do with the fact that KNN is non-parametric, and
+thus tends to reduce the bias while incurring a lot of variance.</li>
+<li>In settings where the decision boundary is non-linear but <span class="math inline">\(n\)</span> is only
+modest, or <span class="math inline">\(p\)</span> is not very small, then QDA may be preferred to KNN.
+This is because QDA can provide a non-linear decision boundary
+while taking advantage of a parametric form, which means that it
+requires a smaller sample size for accurate classification, relative to
+KNN.</li>
+<li>Unlike logistic regression, KNN does not tell us which predictors are
+important: we don’t get a table of coefficients as in Table 4.3.</li>
+</ul>
+</blockquote>
+</div>
+<div id="an-empirical-comparison" class="section level3" number="4.5.2">
+<h3><span class="header-section-number">4.5.2</span> An Empirical Comparison</h3>
+<p>As I don’t have access to the data, or the methodological details to simulate it, I won’t reproduce the results of this section.
+But here is my summary of the six scenarios:</p>
+<ul>
+<li>Scenario 1: uncorrelated normal variables.
+<ul>
+<li>LDA, logistic regression performed well due to linear decision boundary.</li>
+<li>KNN performed poorly.</li>
+<li>QDA worse than LDA because it was more flexible than necessary.</li>
+<li>Naive Bayes better than QDA because of independent predictors.</li>
+</ul></li>
+<li>Scenario 2: correlated normal variables.
+<ul>
+<li>Similar to scenario 1, except naive Bayes performed much worse due to correlated predictors.</li>
+</ul></li>
+<li>Scenario 3: correlated <span class="math inline">\(t\)</span>-distributed predictors (more extreme points than normal).
+<ul>
+<li>Logistic regression best (linear decision boundary).</li>
+<li>LDA a bit worse because non-normal variables.</li>
+</ul></li>
+<li>Scenario 4: normal variables with different correlations per class.
+<ul>
+<li>The QDA assumption was correct, and therefore greatly outperformed other.</li>
+</ul></li>
+<li>Scenario 5: uncorrelated normal variables, but responses samples from the logistic function applied to a complicated non-linear function of the predictors.
+<ul>
+<li>The KNN-CV method gave the best results, followed by the more flexible QDA and naive Bayes.</li>
+<li>KNN with <span class="math inline">\(K = 1\)</span> was the worst.</li>
+</ul></li>
+<li>Scenario 6: normal distribution with a different diagonal covariance matrix (uncorrelated) for each class, and with very small sample size.
+<ul>
+<li>Naive Bayes performed very well.</li>
+<li>LDA and logistic regression performed worse due to unequal covariance matrices (non-linear decision boundary).</li>
+<li>QDA performed a bit worse than naive Bayes due to small sample size, and difficulty estimating correlations between predictors.</li>
+<li>KNN’s performance also suffered due to very small sample size.</li>
+</ul></li>
+</ul>
+<blockquote>
+<p>These six examples illustrate that no one method will dominate the others in every situation. When the true decision boundaries are linear, then
+the LDA and logistic regression approaches will tend to perform well. When
+the boundaries are moderately non-linear, QDA or naive Bayes may give
+better results. Finally, for much more complicated decision boundaries, a
+non-parametric approach such as KNN can be superior. But the level of
+smoothness for a non-parametric approach must be chosen carefully. In the
+next chapter we examine a number of approaches for choosing the correct
+level of smoothness and, in general, for selecting the best overall method.</p>
+</blockquote>
+<blockquote>
+<p>Finally, recall from Chapter 3 that in the regression setting we can accommodate a non-linear relationship between the predictors and
+by performing regression using transformations of the predictors. A similar
+approach could be taken in the classification setting. For instance, we could
+create a more flexible version of logistic regression by including <span class="math inline">\(X^2\)</span>, <span class="math inline">\(X^3\)</span>,
+and even <span class="math inline">\(X^4\)</span> as predictors. This may or may not improve logistic regression’s performance, depending on whether the increase in variance due to
+the added flexibility is offset by a sufficiently large reduction in bias. We
+could do the same for LDA. If we added all possible quadratic terms and
+cross-products to LDA, the form of the model would be the same as the
+QDA model, although the parameter estimates would be different. This
+device allows us to move somewhere between an LDA and a QDA model.</p>
+</blockquote>
+</div>
+</div>
+<div id="generalized-linear-models" class="section level2" number="4.6">
+<h2><span class="header-section-number">4.6</span> Generalized Linear Models</h2>
+<p>Thus far, we have considered both quantitative and qualitative response <span class="math inline">\(Y\)</span>.
+However, sometimes <span class="math inline">\(Y\)</span> is neither, and so linear regression and classification are not applicable.</p>
+<p>The example data set to introduce generalized linear models in <code>bikeshare</code>:</p>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="classification.html#cb221-1" aria-hidden="true" tabindex="-1"></a>bikeshare <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Bikeshare</span>
+<span id="cb221-2"><a href="classification.html#cb221-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(bikeshare)</span></code></pre></div>
+<pre><code>## Rows: 8,645
+## Columns: 15
+## $ season     &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,~
+## $ mnth       &lt;fct&gt; Jan, Jan, Jan, Jan, Jan, Jan, Jan, Jan, Jan, Jan, Jan, Jan,~
+## $ day        &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,~
+## $ hr         &lt;fct&gt; 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 1~
+## $ holiday    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+## $ weekday    &lt;dbl&gt; 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,~
+## $ workingday &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,~
+## $ weathersit &lt;fct&gt; clear, clear, clear, clear, clear, cloudy/misty, clear, cle~
+## $ temp       &lt;dbl&gt; 0.24, 0.22, 0.22, 0.24, 0.24, 0.24, 0.22, 0.20, 0.24, 0.32,~
+## $ atemp      &lt;dbl&gt; 0.2879, 0.2727, 0.2727, 0.2879, 0.2879, 0.2576, 0.2727, 0.2~
+## $ hum        &lt;dbl&gt; 0.81, 0.80, 0.80, 0.75, 0.75, 0.75, 0.80, 0.86, 0.75, 0.76,~
+## $ windspeed  &lt;dbl&gt; 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0896, 0.0000, 0.0~
+## $ casual     &lt;dbl&gt; 3, 8, 5, 3, 0, 0, 2, 1, 1, 8, 12, 26, 29, 47, 35, 40, 41, 1~
+## $ registered &lt;dbl&gt; 13, 32, 27, 10, 1, 1, 0, 2, 7, 6, 24, 30, 55, 47, 71, 70, 5~
+## $ bikers     &lt;dbl&gt; 16, 40, 32, 13, 1, 1, 2, 3, 8, 14, 36, 56, 84, 94, 106, 110~</code></pre>
+<blockquote>
+<p>The response
+is <code>bikers</code>, the number of hourly users of a bike sharing program in Washington, DC. This response value is neither qualitative nor quantitative:
+instead, it takes on non-negative integer values, or counts. We will consider counts
+predicting bikers using the covariates <code>mnth</code> (month of the year), <code>hr</code> (hour
+of the day, from 0 to 23), <code>workingday</code> (an indicator variable that equals 1 if
+it is neither a weekend nor a holiday), <code>temp</code> (the normalized temperature,
+in Celsius), and <code>weathersit</code> (a qualitative variable that takes on one of four
+possible values: clear; misty or cloudy; light rain or light snow; or heavy
+rain or heavy snow.)
+In the analyses that follow, we will treat <code>mnth</code>, <code>hr</code>, and <code>weathersit</code> as
+qualitative variables.</p>
+</blockquote>
+<div id="linear-regression-on-the-bikeshare-data" class="section level3" number="4.6.1">
+<h3><span class="header-section-number">4.6.1</span> Linear Regression on the Bikeshare Data</h3>
+<p>Results of linear regression predicting <code>bikers</code>:</p>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="classification.html#cb223-1" aria-hidden="true" tabindex="-1"></a>lm_bikers <span class="ot">&lt;-</span> <span class="fu">lm</span>(bikers <span class="sc">~</span> mnth <span class="sc">+</span> hr <span class="sc">+</span> workingday <span class="sc">+</span> temp <span class="sc">+</span> weathersit,</span>
+<span id="cb223-2"><a href="classification.html#cb223-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> bikeshare)</span>
+<span id="cb223-3"><a href="classification.html#cb223-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_bikers, <span class="at">coef_round =</span> <span class="dv">2</span>, <span class="at">se_round =</span> <span class="dv">2</span>, <span class="at">z_round =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb223-4"><a href="classification.html#cb223-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Exclude mnth and hr due to space constraints</span></span>
+<span id="cb223-5"><a href="classification.html#cb223-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">&quot;mnth|hr&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb223-6"><a href="classification.html#cb223-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
+<div id="fxkprlntuf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#fxkprlntuf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#fxkprlntuf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#fxkprlntuf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#fxkprlntuf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#fxkprlntuf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#fxkprlntuf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#fxkprlntuf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#fxkprlntuf .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#fxkprlntuf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#fxkprlntuf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#fxkprlntuf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#fxkprlntuf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#fxkprlntuf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#fxkprlntuf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fxkprlntuf .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#fxkprlntuf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#fxkprlntuf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#fxkprlntuf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#fxkprlntuf .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#fxkprlntuf .gt_left {
+  text-align: left;
+}
+
+#fxkprlntuf .gt_center {
+  text-align: center;
+}
+
+#fxkprlntuf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#fxkprlntuf .gt_font_normal {
+  font-weight: normal;
+}
+
+#fxkprlntuf .gt_font_bold {
+  font-weight: bold;
+}
+
+#fxkprlntuf .gt_font_italic {
+  font-style: italic;
+}
+
+#fxkprlntuf .gt_super {
+  font-size: 65%;
+}
+
+#fxkprlntuf .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">term</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">coefficient</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">std.error</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">z-statistic</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">p-value</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_right">-68.63</td>
+<td class="gt_row gt_right">5.31</td>
+<td class="gt_row gt_right">-12.93</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">workingday</td>
+<td class="gt_row gt_right">1.27</td>
+<td class="gt_row gt_right">1.78</td>
+<td class="gt_row gt_right">0.71</td>
+<td class="gt_row gt_left">0.477</td></tr>
+    <tr><td class="gt_row gt_left">temp</td>
+<td class="gt_row gt_right">157.21</td>
+<td class="gt_row gt_right">10.26</td>
+<td class="gt_row gt_right">15.32</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">weathersitcloudy/misty</td>
+<td class="gt_row gt_right">-12.89</td>
+<td class="gt_row gt_right">1.96</td>
+<td class="gt_row gt_right">-6.56</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">weathersitlight rain/snow</td>
+<td class="gt_row gt_right">-66.49</td>
+<td class="gt_row gt_right">2.97</td>
+<td class="gt_row gt_right">-22.42</td>
+<td class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td class="gt_row gt_left">weathersitheavy rain/snow</td>
+<td class="gt_row gt_right">-109.74</td>
+<td class="gt_row gt_right">76.67</td>
+<td class="gt_row gt_right">-1.43</td>
+<td class="gt_row gt_left">0.152</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>Re-creating Figure 4.13 takes some wrangling to get the appropriate coefficients:</p>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="classification.html#cb224-1" aria-hidden="true" tabindex="-1"></a>month_coefs <span class="ot">&lt;-</span> <span class="fu">tidy</span>(lm_bikers) <span class="sc">%&gt;%</span></span>
+<span id="cb224-2"><a href="classification.html#cb224-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(term, <span class="st">&quot;Intercept|mnth&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb224-3"><a href="classification.html#cb224-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb224-4"><a href="classification.html#cb224-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Month =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb224-5"><a href="classification.html#cb224-5" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The reference level is January</span></span>
+<span id="cb224-6"><a href="classification.html#cb224-6" aria-hidden="true" tabindex="-1"></a>      term <span class="sc">==</span> <span class="st">&quot;(Intercept)&quot;</span>, <span class="st">&quot;Jan&quot;</span>,</span>
+<span id="cb224-7"><a href="classification.html#cb224-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_remove</span>(term, <span class="st">&quot;mnth&quot;</span>)</span>
+<span id="cb224-8"><a href="classification.html#cb224-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb224-9"><a href="classification.html#cb224-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">fct_inorder</span>(),</span>
+<span id="cb224-10"><a href="classification.html#cb224-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Coefficient =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb224-11"><a href="classification.html#cb224-11" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The coefficient for the reference level of just the intercept</span></span>
+<span id="cb224-12"><a href="classification.html#cb224-12" aria-hidden="true" tabindex="-1"></a>      term <span class="sc">==</span> <span class="st">&quot;(Intercept)&quot;</span>, estimate,</span>
+<span id="cb224-13"><a href="classification.html#cb224-13" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Otherwise the coefficient is relative to the intercept</span></span>
+<span id="cb224-14"><a href="classification.html#cb224-14" aria-hidden="true" tabindex="-1"></a>      estimate <span class="sc">+</span> estimate[term <span class="sc">==</span> <span class="st">&quot;(Intercept)&quot;</span>]</span>
+<span id="cb224-15"><a href="classification.html#cb224-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb224-16"><a href="classification.html#cb224-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb224-17"><a href="classification.html#cb224-17" aria-hidden="true" tabindex="-1"></a>hour_coefs <span class="ot">&lt;-</span> <span class="fu">tidy</span>(lm_bikers) <span class="sc">%&gt;%</span></span>
+<span id="cb224-18"><a href="classification.html#cb224-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(term, <span class="st">&quot;Intercept|hr&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb224-19"><a href="classification.html#cb224-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb224-20"><a href="classification.html#cb224-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Hour =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb224-21"><a href="classification.html#cb224-21" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The reference level is 00 hours (midnight)</span></span>
+<span id="cb224-22"><a href="classification.html#cb224-22" aria-hidden="true" tabindex="-1"></a>      term <span class="sc">==</span> <span class="st">&quot;(Intercept)&quot;</span>, <span class="st">&quot;0&quot;</span>,</span>
+<span id="cb224-23"><a href="classification.html#cb224-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_remove</span>(term, <span class="st">&quot;hr&quot;</span>)</span>
+<span id="cb224-24"><a href="classification.html#cb224-24" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb224-25"><a href="classification.html#cb224-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.integer</span>(),</span>
+<span id="cb224-26"><a href="classification.html#cb224-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">Coefficient =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb224-27"><a href="classification.html#cb224-27" aria-hidden="true" tabindex="-1"></a>      <span class="co"># The coefficient for the reference level of just the intercept</span></span>
+<span id="cb224-28"><a href="classification.html#cb224-28" aria-hidden="true" tabindex="-1"></a>      term <span class="sc">==</span> <span class="st">&quot;(Intercept)&quot;</span>, estimate,</span>
+<span id="cb224-29"><a href="classification.html#cb224-29" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Otherwise the coefficient is relative to the intercept</span></span>
+<span id="cb224-30"><a href="classification.html#cb224-30" aria-hidden="true" tabindex="-1"></a>      estimate <span class="sc">+</span> estimate[term <span class="sc">==</span> <span class="st">&quot;(Intercept)&quot;</span>]</span>
+<span id="cb224-31"><a href="classification.html#cb224-31" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb224-32"><a href="classification.html#cb224-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb224-33"><a href="classification.html#cb224-33" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> month_coefs <span class="sc">%&gt;%</span></span>
+<span id="cb224-34"><a href="classification.html#cb224-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Month, <span class="at">y =</span> Coefficient)) <span class="sc">+</span></span>
+<span id="cb224-35"><a href="classification.html#cb224-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb224-36"><a href="classification.html#cb224-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb224-37"><a href="classification.html#cb224-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>))</span>
+<span id="cb224-38"><a href="classification.html#cb224-38" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> hour_coefs <span class="sc">%&gt;%</span></span>
+<span id="cb224-39"><a href="classification.html#cb224-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Hour, <span class="at">y =</span> Coefficient)) <span class="sc">+</span></span>
+<span id="cb224-40"><a href="classification.html#cb224-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb224-41"><a href="classification.html#cb224-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue, <span class="at">size =</span> <span class="dv">1</span>)</span>
+<span id="cb224-42"><a href="classification.html#cb224-42" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure4.13-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>The coefficients make intuitive sense, but the issues with the linear regression become apparent when we look at the predictions:</p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="classification.html#cb225-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggdist) <span class="co"># for the stat_halfeye() plotting function</span></span>
+<span id="cb225-2"><a href="classification.html#cb225-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb225-3"><a href="classification.html#cb225-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb225-4"><a href="classification.html#cb225-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred_bikers =</span> <span class="fu">predict</span>(lm_bikers, <span class="at">newdata =</span> bikeshare,</span>
+<span id="cb225-5"><a href="classification.html#cb225-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb225-6"><a href="classification.html#cb225-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb225-7"><a href="classification.html#cb225-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> pred_bikers, <span class="at">fill =</span> <span class="fu">stat</span>(x <span class="sc">&lt;</span> <span class="dv">0</span>))) <span class="sc">+</span></span>
+<span id="cb225-8"><a href="classification.html#cb225-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stat_halfeye</span>() <span class="sc">+</span></span>
+<span id="cb225-9"><a href="classification.html#cb225-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;grey75&quot;</span>, td_colors<span class="sc">$</span>nice<span class="sc">$</span>ruby_red)) <span class="sc">+</span></span>
+<span id="cb225-10"><a href="classification.html#cb225-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">remove_axis</span>(<span class="st">&quot;y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb225-11"><a href="classification.html#cb225-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-118-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>9.6% of predictions are negative.</p>
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div class="csl-entry">

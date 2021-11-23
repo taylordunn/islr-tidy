@@ -451,7 +451,7 @@ $$
 P(Y | X) = \frac{P(X | Y) P (Y)}{P(X)}.
 $$
 
-So the probability of $X$ given class $Y$/$k$ is $P(X|Y) = f_k (x)$, the independent probability of a class $Y$/$k$ is $P(Y) = \pi_k$, and the denominator is a normalizing factor which sums over all possible values $Y$/$k$ to give the independent probability $P(X) = \sum \pi_l f_l (x)$.
+So the probability of $X$ given class $Y$ (= $k$) is $P(X|Y) = f_k (x)$, the independent probability of a class $Y$ is $P(Y) = \pi_k$, and the denominator is a normalizing factor which sums over all possible values $Y$ to give the independent probability $P(X) = \sum \pi_l f_l (x)$.
 
 Estimating $\pi_k$ is easy if we have a random sample from the population -- just take the fraction of the training observations belonging to class $k$.
 Estimating the density function $f_k (x)$ is much more challenging.
@@ -672,7 +672,8 @@ mean(
 ```
 
 >This sounds like a low error rate, but two caveats must be noted.
-* First of all, training error rates will usually be lower than test error
+
+>* First of all, training error rates will usually be lower than test error
 rates, which are the real quantity of interest. In other words, we
 might expect this classifier to perform worse if we use it to predict
 whether or not a new set of individuals will default. The reason is
@@ -716,3 +717,532 @@ rate is low, the error rate among individuals who defaulted is very high.
 From the perspective of a credit card company that is trying to identify
 high-risk individuals, an error rate of 252/333 = 75.7% among individuals
 who default may well be unacceptable.
+
+>Class-specific performance is also important in medicine and biology,
+where the terms sensitivity and specificity characterize the performance of
+a classifier or screening test. In this case the sensitivity is the percentage
+of true defaulters that are identified; it equals 24.3%. The specificity is
+the percentage of non-defaulters that are correctly identified; it equals (1 −
+23/9667) = 99.8%.
+
+LDA has poor sensitivity here because it attempts to reduce the total error rate, regardless of class.
+In the case of a credit card company, it is probably more valuable to correctly identify individuals who will default.
+
+The LDA classifier, like the Bayes classifier to which it approximates, assigns an observation to the `default` = "Yes" class if
+
+$$
+\text{Pr}(\text{default = Yes}| X = x) > 0.5.
+$$
+
+That is to say, these classifiers have a default threshold of 50% posterior probability.
+We may lower these probability as needed.
+To adjust this with the `MASS::lda` package, we can get the posterior probabilities directly via `predict.lda()`:
+
+```{r}
+lda_posterior <- predict(lda_default_balance_student, newdata = default)$posterior
+head(lda_posterior)
+```
+
+Then use the threshold of 20% to re-create Table 4.5:
+
+```{r table4.5}
+lda_pred_20 <- bind_cols(
+  default,
+  posterior_prob_default = lda_posterior[,2]
+) %>%
+  mutate(
+    pred_default = ifelse(posterior_prob_default > 0.2, "Yes", "No")
+  )
+lda_pred_20 %>%
+  count(pred_default, default) %>%
+  pivot_wider(names_from = default, values_from = n) %>%
+  mutate(Total = No + Yes) %>%
+  gt(rowname_col = "pred_default") %>%
+  tab_spanner(label = "True default status", columns = everything()) %>%
+  tab_stubhead("Predicted") %>%
+  summary_rows(fns = list(Total = ~round(sum(.), 0)))
+```
+
+The sensitivity to detect defaulters has improved to 58.8%, but the specificity has dropped 97.5%.
+The overall error rate has also increased to 3.7%.
+
+>But a credit card company
+may consider this slight increase in the total error rate to be a small price to
+pay for more accurate identification of individuals who do indeed default.
+
+>How can we decide which threshold value is
+best? Such a decision must be based on domain knowledge, such as detailed
+information about the costs associated with default.
+
+The receiver operating character (ROC) curve is one way to visualize the trade-off between two types of error for different threshold values.
+I like the `yardstick::roc_curve()` function for this purpose:
+
+```{r figure4.8}
+lda_roc <-
+  yardstick::roc_curve(
+    lda_pred_20,
+    # Specify the class probability and the truth variables
+    posterior_prob_default, truth = default,
+    # This argument specifies which level of truth (default) is considered
+    #  "positive", so it will flip the ROC curve vertically
+    event_level = "second"
+  )
+autoplot(lda_roc)
+```
+
+The area under the curve (AUC) summarizes the overall performance of the classifier:
+
+```{r}
+yardstick::roc_auc(
+  lda_pred_20,
+  posterior_prob_default, truth = default,
+  event_level = "second"
+)
+```
+
+We get the exact same ROC AUC with logistic regression:
+
+```{r}
+glm_default_balance_student <-
+  glm(default ~ balance + student,
+      data = default, family = binomial)
+
+glm_pred <- bind_cols(
+  default,
+  glm_prob_default = predict(
+    glm_default_balance_student,
+    newdata = default, type = "response"
+  )
+)
+yardstick::roc_auc(
+  glm_pred,
+  glm_prob_default, truth = default,
+  event_level = "second"
+)
+```
+
+### Quadratic Discriminant Analysis
+
+>As we have discussed, LDA assumes that the observations within each
+class are drawn from a multivariate Gaussian distribution with a class-specific mean vector and a covariance matrix that is common to all $K$
+classes. Quadratic discriminant analysis (QDA) provides an alternative
+approach. Like LDA, the QDA classifier results from assuming that the
+observations from each class are drawn from a Gaussian distribution, and
+plugging estimates for the parameters into Bayes’ theorem in order to perform prediction. However, unlike LDA, QDA assumes that each class has
+its own covariance matrix. That is, it assumes that an observation from the
+$k$th class is of the form $X \sim N(\mu_k, \Sigma_k)$, where $\Sigma_k$ is a covariance matrix
+for the $k$th class. 
+
+An observation $X = x$ is assigned to the class for which
+
+$$
+\begin{align}
+\delta_k (x) = - \frac{1}{2} (x - \mu_k)^T \Sigma^{-1}_k (x - \mu_k) - \frac{1}{2} \log |\Sigma_k|+ \log \pi_k.
+\end{align}
+$$
+
+QDA gets its name from how the quantity $x$ appears as quadratic function in the first term of the above equation.
+
+>Why does it matter whether or not we assume that the $K$ classes share a
+common covariance matrix? In other words, why would one prefer LDA to
+QDA, or vice-versa? The answer lies in the bias-variance trade-off. When
+there are $p$ predictors, then estimating a covariance matrix requires estimating $p(p+1)/2$ parameters. QDA estimates a separate covariance matrix
+for each class, for a total of $Kp(p+1)/2$ parameters.
+
+>Consequently, LDA is a much less flexible classifier than QDA, and
+so has substantially lower variance. This can potentially lead to improved
+prediction performance. But there is a trade-off: if LDA’s assumption that
+the $K$ classes share a common covariance matrix is badly off, then LDA
+can suffer from high bias.
+
+In short: use LDA if there are relatively few training observations, and use QDA for many.
+
+### Naive Bayes
+
+The naive Bayes classifier also estimates the conditional probability $f_k (x) = \text{Pr}(X|Y = k)$.
+In LDA, we made the very strong assumption that $f_k$ is the density function of a multivariate normal distribution with mean $\mu_k$ and shared covariance $\Sigma$.
+In QDA, the covariance $\Sigma_k$ is class-specific.
+The naive Bayes classifier instead makes a single assumption:
+
+>Within the $k$th class, the $p$ predictors are independent.
+
+Mathematically:
+
+$$
+f_k (x) = f_{k1}(x_1) \times f_{k2}(x_2) \times \dots \times f_{kp}(x_p).
+$$
+
+where $f_{kj}$ is the density function of the $j$th predictor among observations in the $k$th class.
+
+>Why is this assumption so powerful? Essentially, estimating a $p$-dimensional density function is challenging because we must consider not only
+the marginal distribution of each predictor — that is, the distribution of each predictor on its own — but also the joint distribution of the predictors
+— that is, the association between the different predictors. In the case of
+a multivariate normal distribution, the association between the different
+predictors is summarized by the off-diagonal elements of the covariance
+matrix. However, in general, this association can be very hard to characterize, and exceedingly challenging to estimate. But by assuming that the
+$p$ covariates are independent within each class, we completely eliminate the
+need to worry about the association between the $p$ predictors, because we
+have simply assumed that there is no association between the predictors!
+
+This is a very stringent assumption -- most of the time, we believe there to be some degree of association between predictors.
+But naive Bayes can still perform well, especially when $n$ is not large enouugh relative to $p$ to effectively estimate the joint distribution of the predictors within each class.
+
+>Essentially, the naive Bayes assumption introduces some bias, but
+reduces variance, leading to a classifier that works quite well in practice as
+a result of the bias-variance trade-off.
+
+Under the naive Bayes, assumption, the posterior probability becomes:
+
+$$
+\text{Pr}(Y = k|X = x) = \frac{\pi_k \times f_{k1}(x_1) \times \dots \times f_{kp} (x_p)}{\sum_{l=1}^K \pi_l \times f_{l1}(x_1) \times \dots \times f_{lp} (x_p)}
+$$
+
+for $k = 1, \dots, K$.
+
+To estimate the one-dimensional $f_{kj}$ from $x_j$, we have a few options:
+
+* Assume that the $j$th predictor is drawn from a univariate normal distribution.
+    * $X_j | Y = k \sim N(\mu_{jk}, \sigma_{jk}^2)$.
+    * This is like QDA except the covariance matrix is diagonal because the predictors are independent.
+* Use a non-parametric estimate for $f_{kj}$.
+    * A simple way: Estimate $f_{kj}(x_j)$ as the fraction of the training observations in the $k$th class belonging to a histogram bin.
+    * Alternatively, use a kernel density estimator, which is essentially a smoothed version of a histogram.
+* For qualitative $X_j$, simply count the proportion of training observations for the $j$th predictor corresponding to each class.
+
+Apply the naive Bayes classifier with the `klaR` package:
+
+```{r}
+nb_default <-
+  klaR::NaiveBayes(default ~ balance + student, data = default)
+nb_pred <- bind_cols(
+  default,
+  nb_prob_default = predict(nb_default, newdata = default)$posterior[,2]
+)
+```
+
+If we take a posterior probability of 50% or 20% as the thresholds for predicting a default, we get Tables 4.8 and 4.9:
+
+```{r table4.8}
+nb_pred <- nb_pred %>%
+  mutate(
+    pred_default_0.5 = ifelse(nb_prob_default > 0.5, "Yes", "No"),
+    pred_default_0.2 = ifelse(nb_prob_default > 0.2, "Yes", "No")
+  )
+nb_pred %>%
+  count(pred_default_0.5, default) %>%
+  pivot_wider(names_from = default, values_from = n) %>%
+  mutate(Total = No + Yes) %>%
+  gt(rowname_col = "pred_default_0.5") %>%
+  tab_spanner(label = "True default status", columns = everything()) %>%
+  tab_stubhead("Predicted") %>%
+  summary_rows(fns = list(Total = ~round(sum(.), 0)))
+```
+
+```{r table4.9}
+nb_pred %>%
+  count(pred_default_0.2, default) %>%
+  pivot_wider(names_from = default, values_from = n) %>%
+  mutate(Total = No + Yes) %>%
+  gt(rowname_col = "pred_default_0.2") %>%
+  tab_spanner(label = "True default status", columns = everything()) %>%
+  tab_stubhead("Predicted") %>%
+  summary_rows(fns = list(Total = ~round(sum(.), 0)))
+```
+
+The numbers are slightly different from the text, which may have to do with how $f_{kj}$ for the quantitative `balance` was estimated.
+The overall error rate, sensitivity, and specificity of the naive Bayes approach:
+
+```{r}
+nb_pred %>%
+  select(default, pred_default_0.2, pred_default_0.5) %>%
+  pivot_longer(c(pred_default_0.5, pred_default_0.2),
+               names_to = "threshold", values_to = "pred_default") %>%
+  mutate(threshold = as.numeric(str_remove(threshold, "pred_default_"))) %>%
+  group_by(threshold) %>%
+  summarise(
+    overall_error = mean(default != pred_default),
+    sensitivity = sum(default == "Yes" & pred_default == "Yes") /
+      sum(default == "Yes"),
+    specificity = sum(default == "No" & pred_default == "No") /
+      sum(default == "No"),
+    .groups = "drop"
+  ) %>%
+  mutate(across(everything(), scales::percent)) %>%
+  gt()
+```
+
+The overall error rate is slightly higher, but a higher sensitivity was achieved.
+
+>In this example, it should not be too surprising that naive Bayes does
+not convincingly outperform LDA: this data set has $n = 10,000$ and $p = 4$,
+and so the reduction in variance resulting from the naive Bayes assumption
+is not necessarily worthwhile. We expect to see a greater pay-off to using
+naive Bayes relative to LDA or QDA in instances where $p$ is larger or $n$ is
+smaller, so that reducing the variance is very important.
+
+## A Comparison of Classification Methods
+
+### An Analytical Comparison
+
+>We now perform an analytical (or mathematical) comparison of LDA,
+QDA, naive Bayes, and logistic regression. We consider these approaches in
+a setting with $K$ classes, so that we assign an observation to the class that
+maximizes $\text{Pr}(Y = k|X = x)$. Equivalently, we can set $K$ as the baseline
+class and assign an observation to the class that maximizes
+
+$$
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right)
+$$
+
+>for $k = 1, \dots, K$.
+
+The is the familiar log-odds of class $k$ compared to baseline class $K$.
+
+For LDA, we assumed the predictors within each class are drawn from a multivariate normal distribution with shared co-variance matrix.
+The log-odds can be represented as:
+
+$$
+\begin{align}
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right) &= \log \left(\frac{\pi_k f_k(x)}{\pi_K f_K(x)}\right)\\
+&= a_k + \sum_{j=1}^p b_{kj} x_j.
+\end{align}
+$$
+
+where $a_k$ and $b_{kj}$ are functions of $\pi_k$, $\mu_k$, and $\Sigma_k$.
+Like logistic regression, LDA assumes that the log-odds of the probabilities are linear in $x$.
+
+Similarly, an additional function $c_{kjl}$ gives the log-odds in the QDA setting:
+
+$$
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right)
+= a_k + \sum_{j=1}^p b_{kj} x_j + \sum_{j=1}^p \sum_{l=1}^p c_{kjl} x_j x_l
+$$
+
+which is quadratic in $x$.
+
+Finally, the naive Bayes setting, with one-dimensional $f_{kj}(x_j)$:
+
+$$
+\begin{align}
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right) &= \log \left(\frac{\pi_k f_k(x)}{\pi_K f_K(x)}\right)\\
+&= a_k + \sum_{j=1}^p g_{kj} (x_j).
+\end{align}
+
+$$
+
+where $g_{kj} (x_j) = \log \frac{f_{kj}(x_j)}{f_{Kj} (x_j)}$.
+This is the form of a generalized additive model, a topic that is discussed further in Chapter 7.
+
+Looking at these forms, we have the following observations:
+
+* LDA is a special case of QDA with $c_{kjl} = 0$.
+* Any classifier with a linear decision boundary is a special case of naive Bayes with $b_{kj} (x_j) = b_{kj} x_j$. In particular, this means that LDA is a special case of naive Bayes.
+* Naive Bayes is also a special case of LDA if $f_{kj} (x_j)$ is a modeled as a one-dimensional Gaussian distribution.
+* QDA and naive Bayes are not special cases of the other.
+
+>None of these methods uniformly dominates the others: in any setting, the
+choice of method will depend on the true distribution of the predictors in
+each of the $K$ classes, as well as other considerations, such as the values of
+$n$ and $p$. The latter ties into the bias-variance trade-off.
+
+Then to tie this all to logistic regression, recall the multinomial form:
+
+$$
+\log \left( \frac{\text{Pr} (Y = k| X = x)}{\text{Pr} (Y = K| X = x)}\right) = \beta_{k0} + \sum_{j=1}^p \beta_{kj} x_j.
+$$
+
+This is identical to the linear form of the LDA as both are linear functions of the predictors.
+The estimation approach differs of course:
+
+>In LDA, the coefficients in this linear function are functions of estimates for $\pi_k$, $\pi_K$, $\mu_k$, $\mu_K$, and $\Sigma$
+obtained by assuming that $X_1,\dots, X_p$ follow a normal distribution within each class. By contrast, in logistic regression, the coefficients
+are chosen to maximize the likelihood function (4.5). Thus, we expect LDA
+to outperform logistic regression when the normality assumption (approximately) holds, and we expect logistic regression to perform better when it
+does not.
+
+Lastly, some observations about $K$-nearest neighbors, which is a non-parametric alternative to classification:
+
+>* Because KNN is completely non-parametric, we can expect this approach to dominate LDA and logistic regression when the decision
+boundary is highly non-linear, provided that $n$ is very large and $p$ is
+small.
+* In order to provide accurate classification, KNN requires a lot of observations relative to the number of predictors -- that is, $n$ much larger
+than $p$. This has to do with the fact that KNN is non-parametric, and
+thus tends to reduce the bias while incurring a lot of variance.
+* In settings where the decision boundary is non-linear but $n$ is only
+modest, or $p$ is not very small, then QDA may be preferred to KNN.
+This is because QDA can provide a non-linear decision boundary
+while taking advantage of a parametric form, which means that it
+requires a smaller sample size for accurate classification, relative to
+KNN.
+* Unlike logistic regression, KNN does not tell us which predictors are
+important: we don’t get a table of coefficients as in Table 4.3.
+
+### An Empirical Comparison
+
+As I don't have access to the data, or the methodological details to simulate it, I won't reproduce the results of this section.
+But here is my summary of the six scenarios:
+
+* Scenario 1: uncorrelated normal variables.
+    * LDA, logistic regression performed well due to linear decision boundary.
+    * KNN performed poorly.
+    * QDA worse than LDA because it was more flexible than necessary.
+    * Naive Bayes better than QDA because of independent predictors.
+* Scenario 2: correlated normal variables.
+    * Similar to scenario 1, except naive Bayes performed much worse due to correlated predictors.
+* Scenario 3: correlated $t$-distributed predictors (more extreme points than normal).
+    * Logistic regression best (linear decision boundary).
+    * LDA a bit worse because non-normal variables.
+* Scenario 4: normal variables with different correlations per class.
+    * The QDA assumption was correct, and therefore greatly outperformed other.
+* Scenario 5: uncorrelated normal variables, but responses samples from the logistic function applied to a complicated non-linear function of the predictors.
+    * The KNN-CV method gave the best results, followed by the more flexible QDA and naive Bayes.
+    * KNN with $K = 1$ was the worst.
+* Scenario 6: normal distribution with a different diagonal covariance matrix (uncorrelated) for each class, and with very small sample size.
+    * Naive Bayes performed very well.
+    * LDA and logistic regression performed worse due to unequal covariance matrices (non-linear decision boundary).
+    * QDA performed a bit worse than naive Bayes due to small sample size, and difficulty estimating correlations between predictors.
+    * KNN's performance also suffered due to very small sample size.
+    
+>These six examples illustrate that no one method will dominate the others in every situation. When the true decision boundaries are linear, then
+the LDA and logistic regression approaches will tend to perform well. When
+the boundaries are moderately non-linear, QDA or naive Bayes may give
+better results. Finally, for much more complicated decision boundaries, a
+non-parametric approach such as KNN can be superior. But the level of
+smoothness for a non-parametric approach must be chosen carefully. In the
+next chapter we examine a number of approaches for choosing the correct
+level of smoothness and, in general, for selecting the best overall method.
+
+>Finally, recall from Chapter 3 that in the regression setting we can accommodate a non-linear relationship between the predictors and
+by performing regression using transformations of the predictors. A similar
+approach could be taken in the classification setting. For instance, we could
+create a more flexible version of logistic regression by including $X^2$, $X^3$,
+and even $X^4$ as predictors. This may or may not improve logistic regression’s performance, depending on whether the increase in variance due to
+the added flexibility is offset by a sufficiently large reduction in bias. We
+could do the same for LDA. If we added all possible quadratic terms and
+cross-products to LDA, the form of the model would be the same as the
+QDA model, although the parameter estimates would be different. This
+device allows us to move somewhere between an LDA and a QDA model.
+
+## Generalized Linear Models
+
+Thus far, we have considered both quantitative and qualitative response $Y$.
+However, sometimes $Y$ is neither, and so linear regression and classification are not applicable.
+
+The example data set to introduce generalized linear models in `bikeshare`:
+
+```{r}
+bikeshare <- ISLR2::Bikeshare
+glimpse(bikeshare)
+```
+
+>The response
+is `bikers`, the number of hourly users of a bike sharing program in Washington, DC. This response value is neither qualitative nor quantitative:
+instead, it takes on non-negative integer values, or counts. We will consider counts
+predicting bikers using the covariates `mnth` (month of the year), `hr` (hour
+of the day, from 0 to 23), `workingday` (an indicator variable that equals 1 if
+it is neither a weekend nor a holiday), `temp` (the normalized temperature,
+in Celsius), and `weathersit` (a qualitative variable that takes on one of four
+possible values: clear; misty or cloudy; light rain or light snow; or heavy
+rain or heavy snow.)
+In the analyses that follow, we will treat `mnth`, `hr`, and `weathersit` as
+qualitative variables.
+
+### Linear Regression on the Bikeshare Data
+
+Results of linear regression predicting `bikers`:
+
+```{r table4.10}
+lm_bikers <- lm(bikers ~ mnth + hr + workingday + temp + weathersit,
+                data = bikeshare)
+tidy_custom(lm_bikers, coef_round = 2, se_round = 2, z_round = 2) %>%
+  # Exclude mnth and hr due to space constraints
+  filter(!str_detect(term, "mnth|hr")) %>%
+  gt()
+```
+
+Re-creating Figure 4.13 takes some wrangling to get the appropriate coefficients:
+
+```{r figure4.13}
+month_coefs <- tidy(lm_bikers) %>%
+  filter(str_detect(term, "Intercept|mnth")) %>%
+  transmute(
+    Month = ifelse(
+      # The reference level is January
+      term == "(Intercept)", "Jan",
+      str_remove(term, "mnth")
+    ) %>%
+      fct_inorder(),
+    Coefficient = ifelse(
+      # The coefficient for the reference level of just the intercept
+      term == "(Intercept)", estimate,
+      # Otherwise the coefficient is relative to the intercept
+      estimate + estimate[term == "(Intercept)"]
+    )
+  )
+hour_coefs <- tidy(lm_bikers) %>%
+  filter(str_detect(term, "Intercept|hr")) %>%
+  transmute(
+    Hour = ifelse(
+      # The reference level is 00 hours (midnight)
+      term == "(Intercept)", "0",
+      str_remove(term, "hr")
+    ) %>%
+      as.integer(),
+    Coefficient = ifelse(
+      # The coefficient for the reference level of just the intercept
+      term == "(Intercept)", estimate,
+      # Otherwise the coefficient is relative to the intercept
+      estimate + estimate[term == "(Intercept)"]
+    )
+  )
+p1 <- month_coefs %>%
+  ggplot(aes(x = Month, y = Coefficient)) +
+  geom_point(color = td_colors$nice$spanish_blue, size = 3) +
+  geom_line(aes(group = 1), color = td_colors$nice$spanish_blue, size = 1) +
+  theme(axis.text.x = element_text(angle = 45))
+p2 <- hour_coefs %>%
+  ggplot(aes(x = Hour, y = Coefficient)) +
+  geom_point(color = td_colors$nice$spanish_blue, size = 3) +
+  geom_line(aes(group = 1), color = td_colors$nice$spanish_blue, size = 1)
+p1 | p2
+```
+
+The coefficients make intuitive sense, but the issues with the linear regression become apparent when we look at the predictions:
+
+```{r warning=FALSE}
+library(ggdist) # for the stat_halfeye() plotting function
+
+tibble(
+  pred_bikers = predict(lm_bikers, newdata = bikeshare,
+                        type = "response")
+) %>%
+  ggplot(aes(x = pred_bikers, fill = stat(x < 0))) +
+  stat_halfeye() +
+  scale_fill_manual(values = c("grey75", td_colors$nice$ruby_red)) +
+  remove_axis("y") +
+  theme(legend.position = "none")
+```
+
+`r scales::percent(mean(predict(lm_bikers, newdata = bikeshare, type = "response") < 0), accuracy = 0.1)` of predictions are negative.
+
+Another problem is heteroskedasticity, as shown in Figure 4.14:
+
+```{r figure4.14}
+p1 <- bikeshare %>%
+  mutate(hr = as.integer(hr)) %>%
+  ggplot(aes(x = hr, y = bikers)) +
+  geom_jitter(width = 0.1, height = 0, size = 0.5,
+              color = td_colors$nice$spanish_blue) +
+  # Draw a smoothling spline
+  geom_smooth(method = lm, formula = y ~ splines::bs(x, 3), se = FALSE,
+              size = 1.5, color = td_colors$nice$emerald)
+p2 <- bikeshare %>%
+  mutate(hr = as.integer(hr)) %>%
+  ggplot(aes(x = hr, y = log(bikers))) +
+  geom_jitter(width = 0.1, height = 0, size = 0.5,
+              color = td_colors$nice$spanish_blue) +
+  geom_smooth(method = lm, formula = y ~ splines::bs(x, 3), se = FALSE,
+              size = 1.5, color = td_colors$nice$emerald)
+p1 | p2
+```
+
