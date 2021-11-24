@@ -1,3 +1,4 @@
+tab:unnamed-chunk-121
 introduction
 statistical-learning
 what-is-statistical-learning
@@ -51,3 +52,13 @@ an-analytical-comparison
 an-empirical-comparison
 generalized-linear-models
 linear-regression-on-the-bikeshare-data
+poisson-regression-on-bikeshare-data
+generalized-linear-models-in-greater-generality
+lab-classification-methods
+the-stock-market-data
+logistic-regression-1
+linear-discriminant-analysis
+quadratic-discriminant-analysis-1
+naive-bayes-1
+k-nearest-neighbors-1
+poisson-regression

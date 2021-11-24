@@ -1225,7 +1225,7 @@ tibble(
 
 `r scales::percent(mean(predict(lm_bikers, newdata = bikeshare, type = "response") < 0), accuracy = 0.1)` of predictions are negative.
 
-Another problem is heteroskedasticity, as shown in Figure 4.14:
+Another problem is heteroskedasticity, as shown in the left of Figure 4.14:
 
 ```{r figure4.14}
 p1 <- bikeshare %>%
@@ -1246,3 +1246,621 @@ p2 <- bikeshare %>%
 p1 | p2
 ```
 
+Lastly, the response `bikers` is integer-valued, whereas the response in a linear model is continuous.
+
+One solution is to transform the response $Y$.
+In the above figure, we see that `log(bikers)` can fix some of the heteroskedasticity, and also avoids negative predictions.
+This won't work if there are any values of `bikers = 0`, however, and leads to challenging interpretation of the coefficients on the log scale.
+
+### Poisson Regression on Bikeshare Data
+
+A much more natural approach to count data is Poisson regression.
+First, the Poisson distribution:
+
+>Suppose that a random variable $Y$ takes on nonnegative integer values,
+i.e. $Y \in \{0, 1, 2, \dots\}$. If $Y$ follows the Poisson distribution, then
+
+$$
+\text{Pr}(Y = k) = \frac{e^{−λ}λ^k}{k!}
+\text{ for } k = 0, 1, 2, \dots
+$$
+
+
+>Here, $λ > 0$ is the expected value of $Y$, i.e. $E(Y )$. It turns out that $λ$ also
+equals the variance of $Y$, i.e. $λ = E(Y ) = \text{Var}(Y )$. This means that if $Y$
+follows the Poisson distribution, then the larger the mean of $Y$, the larger
+its variance. (In (4.35), the notation $k!$, pronounced “k factorial”, is defined
+as $k! = k × (k − 1) × (k − 2) × ... × 3 × 2 × 1.$)
+
+As an example, consider biker counts drawn from a Poisson distribution with mean $E(Y) = \lambda = 5$.
+Then the probability of 0, 1, 2, etc. bikers during a particular hour is:
+
+```{r}
+tibble(
+  n_bikers = 0:6,
+  prob = exp(-5) * 5^n_bikers / factorial(n_bikers)
+) %>%
+  mutate(
+    prob = scales::percent(prob)
+  )
+```
+
+Of course, we expect $\lambda = E(Y)$ to vary under certain conditions, so we write it as a function of the covariates:
+
+$$
+\log (\lambda (X_1, \dots, X_p)) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p.
+$$
+
+Taking the log of $\lambda$ ensures that $\lambda(X_1, \dots, X_p)$ takes on non-negative values for all values of the covariates.
+
+The coefficients $\beta_j$ are estimated using the same maximum likelihood approach as logistic regression:
+
+$$
+\ell (\beta_0, \dots, \beta_p) = \prod_{i = 1}^n p(y_i) =
+\prod_{i = 1}^n \frac{e^{-\lambda (x_i)} \lambda(x_i)^{y_i}}{y_i!}
+$$
+
+where $\lambda(x_i) = e^{\beta_0 + \dots + \beta_p x_{i}}$.
+
+Fit the Poisson model:
+
+```{r table4.11}
+glm_bikers <- glm(bikers ~ mnth + hr + workingday + temp + weathersit,
+                  data = bikeshare, family = poisson)
+tidy_custom(glm_bikers, coef_round = 2, se_round = 2, z_round = 2) %>%
+  # Exclude mnth and hr due to space constraints
+  filter(!str_detect(term, "mnth|hr")) %>%
+  gt()
+```
+
+```{r figure4.15}
+month_coefs <- tidy(glm_bikers) %>%
+  filter(str_detect(term, "Intercept|mnth")) %>%
+  transmute(
+    Month = ifelse(
+      term == "(Intercept)", "Jan",
+      str_remove(term, "mnth")
+    ) %>%
+      fct_inorder(),
+    Coefficient = ifelse(
+      term == "(Intercept)", estimate,
+      estimate + estimate[term == "(Intercept)"]
+    )
+  )
+hour_coefs <- tidy(glm_bikers) %>%
+  filter(str_detect(term, "Intercept|hr")) %>%
+  transmute(
+    Hour = ifelse(
+      term == "(Intercept)", "0",
+      str_remove(term, "hr")
+    ) %>%
+      as.integer(),
+    Coefficient = ifelse(
+      term == "(Intercept)", estimate,
+      estimate + estimate[term == "(Intercept)"]
+    )
+  )
+p1 <- month_coefs %>%
+  ggplot(aes(x = Month, y = Coefficient)) +
+  geom_point(color = td_colors$nice$spanish_blue, size = 3) +
+  geom_line(aes(group = 1), color = td_colors$nice$spanish_blue, size = 1) +
+  theme(axis.text.x = element_text(angle = 45))
+p2 <- hour_coefs %>%
+  ggplot(aes(x = Hour, y = Coefficient)) +
+  geom_point(color = td_colors$nice$spanish_blue, size = 3) +
+  geom_line(aes(group = 1), color = td_colors$nice$spanish_blue, size = 1)
+p1 | p2
+```
+
+Considerations of this model:
+
+* Qualitatively quite similar to the linear regression model. One difference is that `workingday` was statistically significant with Poisson regression.
+* A coefficient $\beta_j$ is interpreted as the associated change in $E(Y) = \lambda$ by a factor of $\exp({\beta_j})$ for a one unit increase in $X_j$.
+    * Example: a change in weather from clear to cloudy skies is associated with a change of exp(`r round(filter(tidy(glm_bikers), term == "weathersitcloudy/misty")$estimate, 3)`) = `r round(exp(filter(tidy(glm_bikers), term == "weathersitcloudy/misty")$estimate), 3)` = `r scales::percent(exp(filter(tidy(glm_bikers), term == "weathersitcloudy/misty")$estimate))` as many people will use bikes.
+* The key assumption of the Poisson model is that the variance increases with the mean, $\lambda = E(Y) = \text{Var}(Y)$, which means it can deal with the heteroskedasticity we saw in the linear model.
+* The predictions from the Poisson model, by construction, are non-negative:
+
+```{r}
+tibble(
+  pred_bikers = predict(glm_bikers, newdata = bikeshare,
+                        type = "response")
+) %>%
+  ggplot(aes(x = pred_bikers, fill = stat(x < 0))) +
+  stat_halfeye() +
+  scale_fill_manual(values = c("grey75", td_colors$nice$ruby_red)) +
+  remove_axis("y") +
+  theme(legend.position = "none")
+```
+
+### Generalized Linear Models in Greater Generality
+
+The three regression models we have seen so far (linear, logistic and Poisson) share these similarities.
+
+* Predictors $X_1, \dots, X_p$ used to predict a response $Y$, which we assume belongs to a certain family of distributions conditional on $X$.
+    * For linear regression, we typically assume Gaussian/normal.
+    * For logistic regression, we assume a Bernoulli distribution.
+    * For Poisson regression, we assume a Poisson distribution.
+* The mean of $Y$ is modeled as a function of the predictors:
+
+$$
+\begin{align}
+E(Y|X) &= \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p \\
+E(Y|X) &= \frac{e^{\beta_0 + \dots + \beta_pX_p}}{1 + e^{\beta_0 + \dots + \beta_pX_p}} \\
+E(Y|X) = \lambda (X_1, \dots, X_p) &= e^{\beta_0 + \beta_1 X_1 + \dots + \beta_p X_p}.
+\end{align}
+$$
+
+These three equations can be expressed using a link function $\eta$, which applies a transformation to $E(Y|X)$ so that the transformed mean is a lienar function of the predictors:
+
+$$
+\eta(E(Y|X)) = \beta_0 + \beta_1 X_1 + \dots + \beta_p X_p.
+$$
+
+The link functions for linear, logistic, and Poisson regression are, respectively:
+
+$$
+\begin{align}
+\eta(\mu) &= \mu \\
+\eta(\mu) &= \log \left(\frac{\mu}{1 - \mu} \right) \\
+\eta(\mu) &= \log (\mu).
+\end{align}
+$$
+
+>The Gaussian, Bernoulli, and Poisson distributions are all members of a wider class of distributions, known as the exponential family.
+Other well-known members of this family are the exponential distribution, the Gamma distribution, and the negative binomial distribution.
+In general, we can perform a regression by modeling the response $Y$ as coming from a particular member of the exponential family, and then transforming the mean of the response so that the transformed mean is a linear function of the predictors via (4.42).
+Any regression approach that follows this very general recipe is known as a generalized linear model (GLM).
+Thus, linear regression, logistic regression, and Poisson regression and three examples of GLMs. Other examples not covered here include Gamma regression and negative binomial regerssion.
+
+## Lab: Classification Methods
+
+### The Stock Market Data
+
+>We will begin by examining some numerical and graphical summaries of
+the `Smarket` data, which is part of the `ISLR2` library. This data set consists of
+percentage returns for the S&P 500 stock index over 1,250 days, from the
+beginning of 2001 until the end of 2005. For each date, we have recorded
+the percentage returns for each of the five previous trading days, `Lag1`
+through `Lag5`. We have also recorded `Volume` (the number of shares traded
+on the previous day, in billions), `Today` (the percentage return on the date
+in question) and `Direction` (whether the market was `Up` or `Down` on this
+date). Our goal is to predict `Direction` (a qualitative response) using the
+other features.
+
+I like the `skimr` package for summarizing a data set:
+
+```{r}
+smarket <- ISLR2::Smarket
+skimr::skim(smarket)
+```
+
+To produce the pairwise correlations between predictors, I'll use another new package `corrr`, which returns a tidy `tibble` that we can turn into a nice `gt` table:
+
+```{r}
+smarket %>% select(-Direction) %>%
+  corrr::correlate(method = "pearson", quiet = TRUE) %>%
+  gt(rowname_col = "term") %>%
+  gt::fmt_missing(columns = everything(), missing_text = "") %>%
+  gt::data_color(
+    columns = everything(),
+    colors = scales::col_numeric(
+      palette = td_pal("div5")(5),
+      domain = c(-0.1, 0.6)
+    )
+  ) %>%
+  gt::fmt_number(columns = everything(), decimals = 3)
+```
+
+The only substantial correlation is between `Volume` and `Year`:
+
+```{r}
+smarket %>%
+  ggplot(aes(x = factor(Year), y = Volume)) +
+  geom_jitter(width = 0.3, color = td_colors$nice$day9_yellow) +
+  geom_boxplot(alpha = 0.3, outlier.shape = NA, width = 0.2)
+```
+
+### Logistic Regression
+
+Use `tidymodels` to fit the model and produce the confusion matrix:
+
+```{r}
+library(tidymodels)
+
+glm_direction_fit <-
+  # Note that these options are the defaults
+  #  (and mode can only be "classification" for logistic)
+  logistic_reg(mode = "classification", engine = "glm") %>%
+  fit(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,
+      data = smarket)
+
+glm_direction_conf_mat <-
+  augment(glm_direction_fit, smarket) %>%
+  yardstick::conf_mat(.pred_class, Direction)
+glm_direction_conf_mat
+```
+
+This returns an object with some helpful built-in functions.
+Summary metrics:
+
+```{r}
+summary(glm_direction_conf_mat)
+```
+
+We get the same accuracy (52.2%) as that in the text.
+There is also a couple `autoplot()` options
+
+```{r}
+autoplot(glm_direction_conf_mat, type = "mosaic") |
+  autoplot(glm_direction_conf_mat, type = "heatmap")
+```
+
+The next part of this lab is (I think) the first time we are splitting the data into training and testing data.
+Typically in `tidymodels`, we randomly split the data with `rsample::initial_split`, which takes a specified proportion (`prop`) and optional stratification variable (`strata`).
+In this lab, all the data for `Year` = 2005 is the hold out set.
+We can re-create this split manually with `rsample::make_splits`:
+
+```{r}
+smarket_split <-
+  make_splits(
+    ind = list(
+      # Get row numbers for <2005
+      "analysis" = which(smarket$Year < 2005),
+      # Get row numbers for 2005
+      "assessment" = which(smarket$Year == 2005)
+    ),
+    data = smarket
+  )
+smarket_split
+```
+
+We then get the training and testing data with their matching functions:
+
+```{r}
+smarket_train <- training(smarket_split)
+smarket_test <- testing(smarket_split)
+```
+
+Re-fit the model using the training data only:
+
+```{r}
+glm_direction_fit <-
+  logistic_reg(mode = "classification", engine = "glm") %>%
+  fit(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,
+      data = smarket_train)
+```
+
+Just as a demonstration, I will evaluate the model on the training data first:
+
+```{r}
+glm_direction_train_pred <-
+  glm_direction_fit %>%
+  augment(smarket_train)
+glm_direction_train_pred %>%
+  accuracy(truth = Direction, .pred_class)
+```
+
+Quite poor.
+This was calculated using the 50% probability threshold, but we can also look at the ROC curve:
+
+```{r}
+glm_direction_train_pred %>%
+  roc_curve(truth = Direction, .pred_Up,
+            event_level = "second") %>%
+  autoplot()
+```
+
+This doesn't give a lot of confidence in the performance on the testing set:
+
+```{r}
+glm_direction_test_pred <-
+  glm_direction_fit %>%
+  augment(smarket_test)
+glm_direction_test_pred %>%
+  accuracy(truth = Direction, .pred_class)
+```
+
+We get an accuracy that is worse than random guessing.
+Disappointing, but not a surprise as the authors say:
+
+>Of course this result
+is not all that surprising, given that one would not generally expect to be
+able to use previous days’ returns to predict future market performance.
+(After all, if it were possible to do so, then the authors of this book would
+be out striking it rich rather than writing a statistics textbook.)
+
+Perhaps a simpler model would be more effective.
+
+>After all, using predictors that have no
+relationship with the response tends to cause a deterioration in the test
+error rate (since such predictors cause an increase in variance without a
+corresponding decrease in bias), and so removing such predictors may in
+turn yield an improvement.
+
+```{r}
+glm_direction_fit_simple <-
+  logistic_reg(mode = "classification", engine = "glm") %>%
+  fit(Direction ~ Lag1 + Lag2,
+      data = smarket_train)
+glm_direction_fit_simple %>%
+  augment(smarket_test) %>%
+  accuracy(truth = Direction, .pred_class)
+```
+
+Indeed it does.
+
+### Linear Discriminant Analysis
+
+Perform LDA to predict `Direction` from `Lag1` and `Lag2`:
+
+```{r}
+lda_direction_fit <-
+  # Note that this model definition does not come with parsnip, but the
+  #  extension package discrim
+  discrim::discrim_linear(mode = "classification", engine = "MASS") %>%
+  fit(Direction ~ Lag1 + Lag2, data = smarket_train)
+lda_direction_fit
+```
+
+Performance on the testing data set:
+
+```{r}
+lda_direction_test_pred <-
+  lda_direction_fit %>%
+  augment(new_data = smarket_test)
+lda_direction_test_pred %>%
+  conf_mat(truth = Direction, estimate = .pred_class)
+lda_direction_test_pred %>%
+  accuracy(truth = Direction, estimate = .pred_class)
+```
+
+Though there is a [package called `probably`](https://probably.tidymodels.org/) for adjusting probability thresholds for classification metrics, I will just manually do so here:
+
+```{r}
+lda_direction_test_pred %>%
+  filter(.pred_Down > 0.9)
+max(lda_direction_test_pred$.pred_Down)
+```
+
+### Quadratic Discriminant Analysis
+
+Performing QDA will look very similar:
+
+```{r}
+qda_direction_fit <-
+  discrim::discrim_quad(mode = "classification", engine = "MASS") %>%
+  fit(Direction ~ Lag1 + Lag2, data = smarket_train)
+qda_direction_fit
+```
+
+
+```{r}
+qda_direction_test_pred <-
+  qda_direction_fit %>%
+  augment(new_data = smarket_test)
+qda_direction_test_pred %>%
+  conf_mat(truth = Direction, estimate = .pred_class)
+qda_direction_test_pred %>%
+  accuracy(truth = Direction, estimate = .pred_class)
+```
+
+This level of accuracy is quite impressive for stock market data, suggesting that the quadratic form may capture the true relationship more accurately.
+
+### Naive Bayes
+
+By default, the `discrim::naive_Bayes()` function uses the `klaR` package as the engine (`e1071` is not an option).
+
+```{r}
+nb_direction_fit <-
+  discrim::naive_Bayes(mode = "classification", engine = "klaR") %>%
+  # The klaR engine has an argument usekernel that is always TRUE
+  # We have to set it to FALSE to not use KDE, and instead use Gaussian
+  #  distributions, as in the text
+  set_args(usekernel = FALSE) %>%
+  fit(Direction ~ Lag1 + Lag2, data = smarket_train)
+# The model output is quite long, so I won't print it here
+# nb_direction_fit
+```
+
+```{r}
+nb_direction_test_pred <-
+  nb_direction_fit %>%
+  augment(new_data = smarket_test)
+nb_direction_test_pred %>%
+  conf_mat(truth = Direction, estimate = .pred_class)
+nb_direction_test_pred %>%
+  accuracy(truth = Direction, estimate = .pred_class)
+```
+
+The naive Bayes approach was quite close (a bit worse) than QDA.
+This makes sense.
+As we saw in the correlation matrix, the `Lag1` and `Lag2` are uncorrelated, so the assumption of naive Bayes is not violated.
+
+### $K$-Nearest Neighbors
+
+I'll skip right to the $K = 3$ neighbors fit:
+
+```{r}
+knn_direction_fit <-
+  nearest_neighbor(mode = "classification", engine = "kknn",
+                   neighbors = 3) %>%
+  fit(Direction ~ Lag1 + Lag2, data = smarket_train)
+```
+
+```{r}
+knn_direction_test_pred <-
+  knn_direction_fit %>%
+  augment(new_data = smarket_test)
+knn_direction_test_pred %>%
+  conf_mat(truth = Direction, estimate = .pred_class)
+knn_direction_test_pred %>%
+  accuracy(truth = Direction, estimate = .pred_class)
+```
+
+Essentially a coin flip.
+
+To show a case where KNN does perform well, load the `Caravan` data set:
+
+```{r}
+caravan <- ISLR2::Caravan
+```
+
+This data set includes a massive 85 predictors that measure demographics for 5822 individuals who did or did not `Purchase` a caravan insurance policy.
+
+```{r}
+caravan %>% count(Purchase) %>% mutate(p = n / sum(n))
+```
+
+Split the data into training and testing based on row number:
+
+```{r}
+caravan_split <-
+  make_splits(
+    ind = list("assessment" = 1:1000,
+               "analysis" = 1001:nrow(caravan)),
+    data = caravan
+  )
+caravan_split
+caravan_train <- training(caravan_split)
+caravan_test <- testing(caravan_split)
+```
+
+KNN predicts a class based on nearby observations, and so the scale of the variables matters.
+
+>For instance, imagine a data set
+that contains two variables, `salary` and `age` (measured in dollars and years,
+respectively). As far as KNN is concerned, a difference of $1,000 in salary
+is enormous compared to a difference of 50 years in age. Consequently,
+salary will drive the KNN classification results, and age will have almost
+no effect. This is contrary to our intuition that a salary difference of $1,000
+is quite small compared to an age difference of 50 years. 
+
+
+To deal with this, we standardize/normalize the data to have mean zero and standard deviation one.
+In `tidymodels`, this means we define a `recipe` with the `step_normalize()` step:
+
+```{r}
+caravan_rec <- recipe(Purchase ~ ., data = caravan_train) %>%
+  step_normalize(all_numeric_predictors())
+```
+
+Then we define the models with 1, 3, and 5 neighbors:
+
+```{r}
+knn_spec1 <-
+  nearest_neighbor(mode = "classification", engine = "kknn", neighbors = 1)
+knn_spec3 <-
+  nearest_neighbor(mode = "classification", engine = "kknn", neighbors = 3)
+knn_spec5 <-
+  nearest_neighbor(mode = "classification", engine = "kknn", neighbors = 3)
+```
+
+We put the model and recipe together into three separate `workflow`s:
+
+```{r}
+knn_purchase_wf1 <- workflow() %>%
+  add_recipe(caravan_rec) %>%
+  add_model(knn_spec1)
+knn_purchase_wf3 <- workflow() %>%
+  add_recipe(caravan_rec) %>%
+  add_model(knn_spec3)
+knn_purchase_wf5 <- workflow() %>%
+  add_recipe(caravan_rec) %>%
+  add_model(knn_spec5)
+```
+
+Fit all the models:
+
+```{r}
+knn_purchase_fit1 <- knn_purchase_wf1 %>%
+  fit(caravan_train)
+knn_purchase_fit3 <- knn_purchase_wf3 %>%
+  fit(caravan_train)
+knn_purchase_fit5 <- knn_purchase_wf5 %>%
+  fit(caravan_train)
+```
+
+Compile the metrics:
+
+```{r}
+knn_metrics <- metric_set(accuracy, sensitivity, specificity, ppv,)
+bind_rows(
+  augment(knn_purchase_fit1, new_data = caravan_test) %>%
+    knn_metrics(truth = Purchase, estimate = .pred_class) %>%
+    mutate(neighbors = 1),
+  augment(knn_purchase_fit3, new_data = caravan_test) %>%
+    knn_metrics(truth = Purchase, estimate = .pred_class) %>%
+    mutate(neighbors = 3),
+  augment(knn_purchase_fit5, new_data = caravan_test) %>%
+    knn_metrics(truth = Purchase, estimate = .pred_class) %>%
+    mutate(neighbors = 5)
+) %>%
+  transmute(neighbors, .metric, .estimate = round(.estimate, 3)) %>%
+  pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  gt()
+```
+
+```{r eval=FALSE, include=FALSE}
+augment(knn_purchase_fit1, new_data = caravan_test) %>%
+  conf_mat(truth = Purchase, estimate = .pred_class)
+augment(knn_purchase_fit3, new_data = caravan_test) %>%
+  conf_mat(truth = Purchase, estimate = .pred_class)
+augment(knn_purchase_fit5, new_data = caravan_test) %>%
+  conf_mat(truth = Purchase, estimate = .pred_class)
+```
+
+
+The percentages reported in the text are the positive predictive value (TP / (TP + FP)).
+This is the `ppv` variable in the above table, which is way off.
+This is due to the `event_level` argument to the `ppv()` metric function (and `sensitivity` and `specificity` for that matter).
+It is calculated the PPV for the first level of the response, which is `Purchase` = "No'.
+Re-calculate PPV with the correct "positive" event identified:
+
+```{r}
+bind_rows(
+  augment(knn_purchase_fit1, new_data = caravan_test) %>%
+    ppv(truth = Purchase, estimate = .pred_class, event_level = "second") %>%
+    mutate(neighbors = 1),
+  augment(knn_purchase_fit3, new_data = caravan_test) %>%
+    ppv(truth = Purchase, estimate = .pred_class, event_level = "second") %>%
+    mutate(neighbors = 3),
+  augment(knn_purchase_fit5, new_data = caravan_test) %>%
+    ppv(truth = Purchase, estimate = .pred_class, event_level = "second") %>%
+    mutate(neighbors = 5)
+) %>%
+  transmute(neighbors, .metric, .estimate = round(.estimate, 3)) %>%
+  pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  gt()
+```
+
+I'm not getting the improved PPV with increasing neighbors as in the text.
+Not sure why.
+
+Lastly, get the PPV from a logistic regression:
+
+```{r}
+glm_purchase_wf <- workflow() %>%
+  add_recipe(caravan_rec) %>%
+  add_model(logistic_reg())
+glm_purchase_fit <- glm_purchase_wf %>%
+  fit(caravan_train)
+```
+
+PPV with a default 50% threshold:
+
+```{r}
+augment(glm_purchase_fit, new_data = caravan_test) %>%
+  ppv(truth = Purchase, estimate = .pred_class, event_level = "second")
+```
+
+PPV with a 25% threshold:
+
+```{r}
+augment(glm_purchase_fit, new_data = caravan_test) %>%
+  mutate(
+    .pred_class = ifelse(.pred_Yes > 0.25, "Yes", "No") %>% factor()
+  ) %>%
+  ppv(truth = Purchase, estimate = .pred_class, event_level = "second")
+```
+
+### Poisson Regression
