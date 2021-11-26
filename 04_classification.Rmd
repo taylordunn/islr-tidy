@@ -219,7 +219,7 @@ The small $p$-value associated with `balance` in the above table is small, so we
 
 ### Making Predictions
 
-With the estimates, we can compute `default` probabilities for an individual with a `balance` of \$1,000 and \$2.000.
+With the estimates, we can compute `default` probabilities for an individual with a `balance` of \$1,000 and \$2,000.
 
 ```{r}
 example_balance <- c(1000, 2000)
@@ -507,7 +507,7 @@ If we are quite certain that $X$ is Gaussian within each class, then we can use 
 $$
 \begin{align}
 \hat{\mu}_k &= \frac{1}{n_k} \sum_{i: y_i = k} x_i\\
-\hat{\sigma}^2_k &= \frac{1}{n - K} \sum^K_{k=1} \sum_{i: y_i = k} (x_i - \hat{u}_k)^2
+\hat{\sigma}^2 &= \frac{1}{n - K} \sum^K_{k=1} \sum_{i: y_i = k} (x_i - \hat{u}_k)^2
 \end{align}
 $$
 
@@ -855,7 +855,8 @@ prediction performance. But there is a trade-off: if LDA’s assumption that
 the $K$ classes share a common covariance matrix is badly off, then LDA
 can suffer from high bias.
 
-In short: use LDA if there are relatively few training observations, and use QDA for many.
+In general, use LDA if there are relatively few training observations, and use QDA for many.
+Also consider QDA if you have some intuition about the decision boundary being non-linear.
 
 ### Naive Bayes
 
@@ -885,7 +886,7 @@ need to worry about the association between the $p$ predictors, because we
 have simply assumed that there is no association between the predictors!
 
 This is a very stringent assumption -- most of the time, we believe there to be some degree of association between predictors.
-But naive Bayes can still perform well, especially when $n$ is not large enouugh relative to $p$ to effectively estimate the joint distribution of the predictors within each class.
+But naive Bayes can still perform well, especially when $n$ is not large enough relative to $p$ to effectively estimate the joint distribution of the predictors within each class.
 
 >Essentially, the naive Bayes assumption introduces some bias, but
 reduces variance, leading to a classifier that works quite well in practice as
@@ -996,7 +997,7 @@ $$
 
 >for $k = 1, \dots, K$.
 
-The is the familiar log-odds of class $k$ compared to baseline class $K$.
+This is the familiar log-odds of class $k$ compared to baseline class $K$.
 
 For LDA, we assumed the predictors within each class are drawn from a multivariate normal distribution with shared co-variance matrix.
 The log-odds can be represented as:
@@ -1024,10 +1025,9 @@ Finally, the naive Bayes setting, with one-dimensional $f_{kj}(x_j)$:
 
 $$
 \begin{align}
-\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right) &= \log \left(\frac{\pi_k f_k(x)}{\pi_K f_K(x)}\right)\\
+\log \left(\frac{\text{Pr}(Y = k|X = x)}{\text{Pr}(Y = K |X = x)}\right) &= \log \left(\frac{\pi_k f_k(x   )}{\pi_K f_K(x)}\right)\\
 &= a_k + \sum_{j=1}^p g_{kj} (x_j).
 \end{align}
-
 $$
 
 where $g_{kj} (x_j) = \log \frac{f_{kj}(x_j)}{f_{Kj} (x_j)}$.
@@ -1594,6 +1594,7 @@ Indeed it does.
 Perform LDA to predict `Direction` from `Lag1` and `Lag2`:
 
 ```{r}
+library(discrim)
 lda_direction_fit <-
   # Note that this model definition does not come with parsnip, but the
   #  extension package discrim
@@ -1628,7 +1629,7 @@ Performing QDA will look very similar:
 
 ```{r}
 qda_direction_fit <-
-  discrim::discrim_quad(mode = "classification", engine = "MASS") %>%
+  discrim_quad(mode = "classification", engine = "MASS") %>%
   fit(Direction ~ Lag1 + Lag2, data = smarket_train)
 qda_direction_fit
 ```
@@ -1652,7 +1653,7 @@ By default, the `discrim::naive_Bayes()` function uses the `klaR` package as the
 
 ```{r}
 nb_direction_fit <-
-  discrim::naive_Bayes(mode = "classification", engine = "klaR") %>%
+  naive_Bayes(mode = "classification", engine = "klaR") %>%
   # The klaR engine has an argument usekernel that is always TRUE
   # We have to set it to FALSE to not use KDE, and instead use Gaussian
   #  distributions, as in the text
@@ -1864,3 +1865,460 @@ augment(glm_purchase_fit, new_data = caravan_test) %>%
 ```
 
 ### Poisson Regression
+
+We will again fit the `bikeshare` data with Poisson regression, but this time with `tidymodels`:
+
+```{r}
+library(poissonreg)
+glm_bikers_model <-
+  poisson_reg(mode = "regression", engine = "glm")
+```
+
+The model specification for `poisson_reg()` is a model wrapper that comes from the `poissonreg` package.
+
+It is good practice to explicitly state that we are making dummy variables of the categorical predictors via `step_dummy()`:
+
+```{r}
+glm_bikers_rec <-
+  recipe(bikers ~ mnth + hr + workingday + temp + weathersit,
+         data = bikeshare) %>%
+  step_dummy(all_nominal_predictors())
+```
+
+Define the `workflow` and fit the model:
+
+```{r}
+glm_bikers_wf <- workflow() %>%
+  add_model(glm_bikers_model) %>%
+  add_recipe(glm_bikers_rec)
+glm_bikers_fit <- glm_bikers_wf %>%
+  fit(bikeshare)
+```
+
+We've already re-created Figure 4.15 with this model, so won't repeat it here.
+Instead, here is a plot of predictions and, just for fun, it is stratified by the weather:
+
+```{r}
+augment(glm_bikers_fit, new_data = bikeshare) %>%
+  ggplot(aes(x = bikers, y = .pred)) +
+  geom_point(color = td_colors$nice$opera_mauve, alpha = 0.4) +
+  geom_abline(slope = 1, size = 1, lty = 2) +
+  facet_wrap(~weathersit) +
+  theme(legend.position = "none") +
+  add_facet_borders()
+```
+
+## Exercises
+
+### Applied {-}
+
+#### 13. Predict returns with `Weekly` {-}
+
+```{r}
+weekly <- ISLR2::Weekly
+```
+
+(a) Data summaries.
+
+```{r}
+skimr::skim(weekly)
+```
+
+```{r}
+weekly %>% select(-Direction) %>%
+  corrr::correlate(method = "pearson", quiet = TRUE) %>%
+  gt(rowname_col = "term") %>%
+  gt::fmt_missing(columns = everything(), missing_text = "") %>%
+  gt::data_color(
+    columns = everything(),
+    colors = scales::col_numeric(
+      palette = td_pal("div5")(5),
+      domain = c(-0.1, 0.9)
+    )
+  ) %>%
+  gt::fmt_number(columns = everything(), decimals = 3)
+```
+
+As before with the `smarket` data set, there is increasing `Volume` with `Year`:
+
+```{r}
+weekly %>%
+  ggplot(aes(x = factor(Year), y = Volume)) +
+  geom_jitter(width = 0.3, color = td_colors$nice$day9_yellow) +
+  geom_boxplot(alpha = 0.3, outlier.shape = NA, width = 0.2)
+```
+
+(b) Logistic regression.
+
+Before fitting, I will reverse the order of the `Direction` factor so that the first level is "Up" because `tidymodels` treats the first level as "positive."
+
+```{r}
+weekly <- weekly %>% mutate(Direction = fct_rev(Direction))
+```
+
+```{r}
+lr_weekly_fit <-
+  logistic_reg() %>%
+  fit(Direction ~ Year + Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,
+      data = weekly)
+tidy_custom(lr_weekly_fit) %>%
+  gt()
+```
+
+Only `Lag2` was a significant predictor.
+
+(c) Confusion matrix.
+
+```{r}
+lr_weekly_fit_conf_mat <- augment(lr_weekly_fit, weekly) %>%
+  conf_mat(truth = Direction, estimate = .pred_class)
+lr_weekly_fit_conf_mat
+```
+
+```{r include=FALSE}
+lr_weekly_metrics <- summary(lr_weekly_fit_conf_mat) %>% split(.$.metric)
+```
+
+* The model predicts many more `Direction` = "Up" than "Down".
+* The overall accuracy was slightly better than guessing:
+`r scales::percent(lr_weekly_metrics$accuracy$.estimate)`.
+* The sensitivity, TP / (TP + FP) was very good: 
+`r scales::percent(lr_weekly_metrics$sens$.estimate)`.
+* The specificity, TN / (TN + FN) was very poor: 
+`r scales::percent(lr_weekly_metrics$spec$.estimate)`.
+
+(d) Logistic regression with `Lag2` as the sole predictor.
+
+Split into training and testing:
+
+```{r}
+weekly_train <- weekly %>% filter(Year <= 2008)
+weekly_test <- weekly %>% filter(Year > 2008)
+```
+
+
+```{r}
+lr_weekly_fit_lag2 <-
+  logistic_reg() %>%
+  fit(Direction ~ Lag2, data = weekly_train)
+lr_weekly_fit_lag2_conf_mat <-
+  augment(lr_weekly_fit_lag2, weekly_test) %>%
+  conf_mat(truth = Direction, estimate = .pred_class)
+lr_weekly_fit_lag2_conf_mat
+```
+
+```{r include=FALSE}
+lr_weekly_metrics_lag2 <-
+  summary(lr_weekly_fit_lag2_conf_mat) %>% split(.$.metric)
+```
+
+* The model still predicts many more `Direction` = "Up" than "Down".
+* The overall accuracy:
+`r scales::percent(lr_weekly_metrics_lag2$accuracy$.estimate)`.
+* The sensitivity:
+`r scales::percent(lr_weekly_metrics_lag2$sens$.estimate)`.
+* The specificity: 
+`r scales::percent(lr_weekly_metrics_lag2$spec$.estimate)`.
+
+(e-h) Repeat using LDA, QDA, KNN, naive Bayes.
+
+```{r}
+model_fits <-
+  list(
+    "logistic" = lr_weekly_fit_lag2,
+    "LDA" = discrim_linear() %>% fit(Direction ~ Lag2, data = weekly_train),
+    "QDA" = discrim_quad() %>% fit(Direction ~ Lag2, data = weekly_train),
+    "KNN1" = nearest_neighbor(mode = "classification", neighbors = 1) %>%
+      fit(Direction ~ Lag2, data = weekly_train),
+    "NB" = naive_Bayes() %>% fit(Direction ~ Lag2, data = weekly_train)
+  )
+
+weekly_metrics <- metric_set(accuracy, sens, spec, ppv)
+imap_dfr(
+  model_fits,
+  ~augment(.x, new_data = weekly_test) %>%
+    weekly_metrics(truth = Direction, estimate = .pred_class),
+  .id = "model"
+) %>%
+  select(model, .metric, .estimate) %>%
+  pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  gt(rowname_col = "model") %>%
+  fmt_percent(columns = -model)
+```
+
+(i) Which method was best?
+
+* LDA and logistic regression performed exactly the same, and did the best.
+* QDA predicted everything as "Up".
+* KNN with 1 neighbor was a coin flip simulator.
+* Naive Bayes did slightly worse than logistic and LDA.
+
+#### 14. Predict gas mileage with `Auto` {-}
+
+(a) Create a binary outcome `mpg01`.
+
+```{r}
+auto <- ISLR2::Auto %>%
+  mutate(mpg01 = ifelse(mpg > median(mpg), 1, 0),
+         mpg01 = factor(mpg01))
+glimpse(auto)
+```
+
+Note that `origin` is a numeric coding for 1. American, 2. European, and 3. Japanese, and so should be a factor:
+
+```{r}
+auto <- auto %>%
+  mutate(origin = factor(origin, levels = 1:3,
+                         labels = c("American", "European", "Japanese")))
+```
+
+(b) Explore the data.
+
+```{r}
+auto %>%
+  select(-name, -origin, -mpg) %>%
+  pivot_longer(-mpg01, names_to = "var", values_to = "val") %>%
+  ggplot(aes(y = mpg01, x = val)) +
+  geom_boxplot(aes(fill = factor(mpg01))) +
+  facet_wrap(~var, scales = "free_x") +
+  theme(legend.position = "none") +
+  add_facet_borders()
+```
+
+```{r fig.height=1.5, fig.width=3}
+auto %>%
+  count(origin, mpg01) %>%
+  ggplot(aes(y = origin, x = mpg01)) +
+  geom_tile(aes(fill = n)) +
+  geom_text(aes(label = n), color = "white") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  theme(legend.position = "none")
+```
+
+
+All of the variables here look useful for predicting `mpg01`, but `cylinders`, `displacement`, `origin`, and `weight` in particular.
+
+Look at the correlation between variables:
+
+```{r}
+auto %>% select(-name, -mpg01, -origin) %>%
+  corrr::correlate(method = "pearson", quiet = TRUE) %>%
+  gt(rowname_col = "term") %>%
+  gt::fmt_missing(columns = everything(), missing_text = "") %>%
+  gt::data_color(
+    columns = everything(),
+    colors = scales::col_numeric(
+      palette = td_pal("div5")(5),
+      domain = c(-1, 1)
+    )
+  ) %>%
+  gt::fmt_number(columns = everything(), decimals = 2)
+```
+
+Lots of inter-correlation.
+
+(c) Split the data into a training set and test set.
+
+Use a 3:1 split:
+
+```{r}
+set.seed(49)
+auto_split <- initial_split(auto, prop = 3 / 4)
+auto_train <- training(auto_split)
+auto_test <- testing(auto_split)
+```
+
+Normally, I would set the `strata` argument to the output variable `mpg01`, but by construction (separated by the median) the data is split in half.
+
+```{r}
+auto_train %>% count(mpg01)
+auto_test %>% count(mpg01)
+```
+
+(d-h) Perform LDA, QDA, logistic regression, naive Bayes, and KNN.
+
+Define the `recipe`, and add it to a generic `workflow`:
+
+```{r}
+auto_recipe <- recipe(
+  mpg01 ~ cylinders + displacement + horsepower + weight + acceleration +
+    year + origin,
+  data = auto_train
+) %>%
+  # Normalize numerical predictors to work with KNN
+  step_normalize(all_numeric_predictors()) %>%
+  step_dummy(origin)
+auto_workflow <- workflow() %>%
+  add_recipe(auto_recipe)
+```
+
+Fit and summarize metrics:
+
+```{r}
+model_fits <-
+  list(
+    "LDA" = auto_workflow %>%
+      add_model(discrim_linear()) %>%
+      fit(data = auto_train),
+    "QDA" = auto_workflow %>%
+      add_model(discrim_quad()) %>%
+      fit(data = auto_train),
+    "logistic" = auto_workflow %>%
+      add_model(logistic_reg()) %>%
+      fit(data = auto_train),
+    "NB" = auto_workflow %>%
+      add_model(naive_Bayes()) %>%
+      fit(data = auto_train),
+    "KNN1" = auto_workflow %>%
+      add_model(nearest_neighbor(mode = "classification", neighbors = 1)) %>%
+      fit(data = auto_train),
+    "KNN3" = auto_workflow %>%
+      add_model(nearest_neighbor(mode = "classification", neighbors = 3)) %>%
+      fit(data = auto_train),
+    "KNN5" = auto_workflow %>%
+      add_model(nearest_neighbor(mode = "classification", neighbors = 5)) %>%
+      fit(data = auto_train),
+    "KNN7" = auto_workflow %>%
+      add_model(nearest_neighbor(mode = "classification", neighbors = 7)) %>%
+      fit(data = auto_train)
+  )
+auto_metrics <- metric_set(accuracy, sens, spec, ppv)
+imap_dfr(
+  model_fits,
+  ~augment(.x, new_data = auto_test) %>%
+    auto_metrics(truth = mpg01, estimate = .pred_class),
+  .id = "model"
+) %>%
+  select(model, .metric, .estimate) %>%
+  pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  arrange(desc(accuracy)) %>%
+  gt(rowname_col = "model") %>%
+  fmt_percent(columns = -model, decimals = 1)
+```
+
+All models did well, but LDA and logistic regression were the best.
+There wasn't any difference in KNN accuracy for $K$ = 1, 3, 5, and 7.
+
+#### 16. Predict crime rate with `Boston` {-}
+
+```{r}
+boston <- ISLR2::Boston %>%
+  mutate(
+    crim01 = ifelse(crim > median(crim), 1, 0),
+    crim01 = factor(crim01),
+    # Convert the binary chas variable to TRUE/FALSE
+    chas = chas == 1
+  )
+glimpse(boston)
+```
+
+```{r}
+boston %>%
+  select(-chas) %>%
+  pivot_longer(-crim01, names_to = "var", values_to = "val") %>%
+  ggplot(aes(y = crim01, x = val)) +
+  geom_boxplot(aes(fill = factor(crim01))) +
+  facet_wrap(~var, scales = "free_x") +
+  theme(legend.position = "none") +
+  add_facet_borders()
+```
+
+```{r fig.height=1.5, fig.width=3}
+boston %>%
+  count(chas, crim01) %>%
+  ggplot(aes(y = chas, x = crim01)) +
+  geom_tile(aes(fill = n)) +
+  geom_text(aes(label = n), color = "white") +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  theme(legend.position = "none")
+```
+  
+The `chas` and `rm` (average number of rooms per dwelling) variables look the least useful of these predictors.
+Split the data:
+
+```{r}
+set.seed(98)
+# By default, splits 3:1
+boston_split <- initial_split(boston)
+boston_train <- training(boston_split)
+boston_test <- testing(boston_split)
+```
+
+Fit and summarize metrics for all the models and a few different predictor sets:
+
+```{r}
+boston_models <- list(
+  "LDA" = discrim_linear(),
+  "QDA" = discrim_quad(),
+  "logistic" = logistic_reg(),
+  "NB" = naive_Bayes(),
+  "KNN1" = nearest_neighbor(mode = "classification", neighbors = 1),
+  "KNN3" = nearest_neighbor(mode = "classification", neighbors = 3),
+  "KNN5" = nearest_neighbor(mode = "classification", neighbors = 5),
+  "KNN7" = nearest_neighbor(mode = "classification", neighbors = 7)
+)
+boston_recs <- list(
+  "rec1" = recipe(
+    crim01 ~ age + dis + indus + lstat + medv + nox + ptratio + rad + tax + zn,
+    data = boston_train
+  ) %>%
+    step_normalize(all_numeric_predictors()),
+  # Drop medv and lstat
+  "rec2" = recipe(
+    crim01 ~ age + dis + indus + nox + ptratio + rad + tax + zn,
+    data = boston_train
+  ) %>%
+    step_normalize(all_numeric_predictors()),
+  # Drop ptratio and tax
+  "rec3" = recipe(
+    crim01 ~ age + dis + indus + nox  + rad + zn,
+    data = boston_train
+  ) %>%
+    step_normalize(all_numeric_predictors())
+)
+
+boston_fits <-
+  map(
+    boston_models,
+    function(model) {
+      map(
+        boston_recs,
+        ~workflow() %>%
+          add_model(model) %>%
+          add_recipe(.x) %>%
+          fit(data = boston_train)
+      )
+    }
+  )
+
+boston_metrics <- metric_set(accuracy, sens, spec, ppv)
+imap_dfr(
+  boston_fits,
+  function(fit, y) {
+    imap_dfr(
+      fit,
+      ~augment(.x, new_data = boston_test) %>%
+        boston_metrics(truth = crim01, estimate = .pred_class),
+      .id = "recipe"
+    )
+  },
+  .id = "model"
+) %>%
+  select(model, recipe, .metric, .estimate) %>%
+  pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  arrange(recipe, desc(accuracy)) %>%
+  group_by(recipe) %>%
+  gt(rowname_col = "model") %>%
+  fmt_percent(columns = -model, decimals = 1)
+```
+
+In general, performance was best for `rec2` with these variables:
+
+```{r}
+boston_recs$rec2$term_info
+```
+
+And the models that performed best were KNN and QDA.
+

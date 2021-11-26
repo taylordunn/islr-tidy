@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2021-11-24" />
+<meta name="date" content="2021-11-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -258,6 +258,10 @@ div.csl-indent {
 <li class="chapter" data-level="4.7.6" data-path="classification.html"><a href="classification.html#k-nearest-neighbors-1"><i class="fa fa-check"></i><b>4.7.6</b> <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
 <li class="chapter" data-level="4.7.7" data-path="classification.html"><a href="classification.html#poisson-regression"><i class="fa fa-check"></i><b>4.7.7</b> Poisson Regression</a></li>
 </ul></li>
+<li class="chapter" data-level="4.8" data-path="classification.html"><a href="classification.html#exercises-1"><i class="fa fa-check"></i><b>4.8</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#applied-1"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -396,12 +400,12 @@ We can show this with the <code>stats::qt</code> function:</p>
 <span id="cb8-6"><a href="linear-regression.html#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">qt_high =</span> <span class="fu">qt</span>(<span class="at">p =</span> <span class="fl">0.975</span>, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">2</span>)</span>
 <span id="cb8-7"><a href="linear-regression.html#cb8-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb8-8"><a href="linear-regression.html#cb8-8" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>()</span></code></pre></div>
-<div id="bxwnpfyfyu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="xzhbnkmbnk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#bxwnpfyfyu .gt_table {
+#xzhbnkmbnk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -426,7 +430,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-left-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_heading {
+#xzhbnkmbnk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -438,7 +442,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-right-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_title {
+#xzhbnkmbnk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -448,7 +452,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-bottom-width: 0;
 }
 
-#bxwnpfyfyu .gt_subtitle {
+#xzhbnkmbnk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -458,13 +462,13 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-top-width: 0;
 }
 
-#bxwnpfyfyu .gt_bottom_border {
+#xzhbnkmbnk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_col_headings {
+#xzhbnkmbnk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -479,7 +483,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-right-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_col_heading {
+#xzhbnkmbnk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -499,7 +503,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   overflow-x: hidden;
 }
 
-#bxwnpfyfyu .gt_column_spanner_outer {
+#xzhbnkmbnk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -511,15 +515,15 @@ We can show this with the <code>stats::qt</code> function:</p>
   padding-right: 4px;
 }
 
-#bxwnpfyfyu .gt_column_spanner_outer:first-child {
+#xzhbnkmbnk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bxwnpfyfyu .gt_column_spanner_outer:last-child {
+#xzhbnkmbnk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bxwnpfyfyu .gt_column_spanner {
+#xzhbnkmbnk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -531,7 +535,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   width: 100%;
 }
 
-#bxwnpfyfyu .gt_group_heading {
+#xzhbnkmbnk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -553,7 +557,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   vertical-align: middle;
 }
 
-#bxwnpfyfyu .gt_empty_group_heading {
+#xzhbnkmbnk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -568,15 +572,15 @@ We can show this with the <code>stats::qt</code> function:</p>
   vertical-align: middle;
 }
 
-#bxwnpfyfyu .gt_from_md > :first-child {
+#xzhbnkmbnk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bxwnpfyfyu .gt_from_md > :last-child {
+#xzhbnkmbnk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bxwnpfyfyu .gt_row {
+#xzhbnkmbnk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -595,7 +599,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   overflow-x: hidden;
 }
 
-#bxwnpfyfyu .gt_stub {
+#xzhbnkmbnk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -607,7 +611,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   padding-left: 12px;
 }
 
-#bxwnpfyfyu .gt_summary_row {
+#xzhbnkmbnk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -617,7 +621,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   padding-right: 5px;
 }
 
-#bxwnpfyfyu .gt_first_summary_row {
+#xzhbnkmbnk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -627,7 +631,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-top-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_grand_summary_row {
+#xzhbnkmbnk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -637,7 +641,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   padding-right: 5px;
 }
 
-#bxwnpfyfyu .gt_first_grand_summary_row {
+#xzhbnkmbnk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -647,11 +651,11 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-top-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_striped {
+#xzhbnkmbnk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bxwnpfyfyu .gt_table_body {
+#xzhbnkmbnk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -660,7 +664,7 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_footnotes {
+#xzhbnkmbnk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -674,13 +678,13 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-right-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_footnote {
+#xzhbnkmbnk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#bxwnpfyfyu .gt_sourcenotes {
+#xzhbnkmbnk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -694,41 +698,41 @@ We can show this with the <code>stats::qt</code> function:</p>
   border-right-color: #D3D3D3;
 }
 
-#bxwnpfyfyu .gt_sourcenote {
+#xzhbnkmbnk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#bxwnpfyfyu .gt_left {
+#xzhbnkmbnk .gt_left {
   text-align: left;
 }
 
-#bxwnpfyfyu .gt_center {
+#xzhbnkmbnk .gt_center {
   text-align: center;
 }
 
-#bxwnpfyfyu .gt_right {
+#xzhbnkmbnk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bxwnpfyfyu .gt_font_normal {
+#xzhbnkmbnk .gt_font_normal {
   font-weight: normal;
 }
 
-#bxwnpfyfyu .gt_font_bold {
+#xzhbnkmbnk .gt_font_bold {
   font-weight: bold;
 }
 
-#bxwnpfyfyu .gt_font_italic {
+#xzhbnkmbnk .gt_font_italic {
   font-style: italic;
 }
 
-#bxwnpfyfyu .gt_super {
+#xzhbnkmbnk .gt_super {
   font-size: 65%;
 }
 
-#bxwnpfyfyu .gt_footnote_marks {
+#xzhbnkmbnk .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -865,12 +869,12 @@ With this, we can re-create Table 3.2:</p>
 <span id="cb23-5"><a href="linear-regression.html#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), as.character)) <span class="sc">%&gt;%</span></span>
 <span id="cb23-6"><a href="linear-regression.html#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">&quot;Quantity&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;Value&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb23-7"><a href="linear-regression.html#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="hnuispiynm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="imbhlsujwg" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hnuispiynm .gt_table {
+#imbhlsujwg .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -895,7 +899,7 @@ With this, we can re-create Table 3.2:</p>
   border-left-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_heading {
+#imbhlsujwg .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -907,7 +911,7 @@ With this, we can re-create Table 3.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_title {
+#imbhlsujwg .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -917,7 +921,7 @@ With this, we can re-create Table 3.2:</p>
   border-bottom-width: 0;
 }
 
-#hnuispiynm .gt_subtitle {
+#imbhlsujwg .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -927,13 +931,13 @@ With this, we can re-create Table 3.2:</p>
   border-top-width: 0;
 }
 
-#hnuispiynm .gt_bottom_border {
+#imbhlsujwg .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_col_headings {
+#imbhlsujwg .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -948,7 +952,7 @@ With this, we can re-create Table 3.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_col_heading {
+#imbhlsujwg .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -968,7 +972,7 @@ With this, we can re-create Table 3.2:</p>
   overflow-x: hidden;
 }
 
-#hnuispiynm .gt_column_spanner_outer {
+#imbhlsujwg .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -980,15 +984,15 @@ With this, we can re-create Table 3.2:</p>
   padding-right: 4px;
 }
 
-#hnuispiynm .gt_column_spanner_outer:first-child {
+#imbhlsujwg .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hnuispiynm .gt_column_spanner_outer:last-child {
+#imbhlsujwg .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hnuispiynm .gt_column_spanner {
+#imbhlsujwg .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1000,7 +1004,7 @@ With this, we can re-create Table 3.2:</p>
   width: 100%;
 }
 
-#hnuispiynm .gt_group_heading {
+#imbhlsujwg .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1022,7 +1026,7 @@ With this, we can re-create Table 3.2:</p>
   vertical-align: middle;
 }
 
-#hnuispiynm .gt_empty_group_heading {
+#imbhlsujwg .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1037,15 +1041,15 @@ With this, we can re-create Table 3.2:</p>
   vertical-align: middle;
 }
 
-#hnuispiynm .gt_from_md > :first-child {
+#imbhlsujwg .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hnuispiynm .gt_from_md > :last-child {
+#imbhlsujwg .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hnuispiynm .gt_row {
+#imbhlsujwg .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1064,7 +1068,7 @@ With this, we can re-create Table 3.2:</p>
   overflow-x: hidden;
 }
 
-#hnuispiynm .gt_stub {
+#imbhlsujwg .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1076,7 +1080,7 @@ With this, we can re-create Table 3.2:</p>
   padding-left: 12px;
 }
 
-#hnuispiynm .gt_summary_row {
+#imbhlsujwg .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1086,7 +1090,7 @@ With this, we can re-create Table 3.2:</p>
   padding-right: 5px;
 }
 
-#hnuispiynm .gt_first_summary_row {
+#imbhlsujwg .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1096,7 +1100,7 @@ With this, we can re-create Table 3.2:</p>
   border-top-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_grand_summary_row {
+#imbhlsujwg .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1106,7 +1110,7 @@ With this, we can re-create Table 3.2:</p>
   padding-right: 5px;
 }
 
-#hnuispiynm .gt_first_grand_summary_row {
+#imbhlsujwg .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1116,11 +1120,11 @@ With this, we can re-create Table 3.2:</p>
   border-top-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_striped {
+#imbhlsujwg .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hnuispiynm .gt_table_body {
+#imbhlsujwg .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1129,7 +1133,7 @@ With this, we can re-create Table 3.2:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_footnotes {
+#imbhlsujwg .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1143,13 +1147,13 @@ With this, we can re-create Table 3.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_footnote {
+#imbhlsujwg .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hnuispiynm .gt_sourcenotes {
+#imbhlsujwg .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1163,41 +1167,41 @@ With this, we can re-create Table 3.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#hnuispiynm .gt_sourcenote {
+#imbhlsujwg .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hnuispiynm .gt_left {
+#imbhlsujwg .gt_left {
   text-align: left;
 }
 
-#hnuispiynm .gt_center {
+#imbhlsujwg .gt_center {
   text-align: center;
 }
 
-#hnuispiynm .gt_right {
+#imbhlsujwg .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hnuispiynm .gt_font_normal {
+#imbhlsujwg .gt_font_normal {
   font-weight: normal;
 }
 
-#hnuispiynm .gt_font_bold {
+#imbhlsujwg .gt_font_bold {
   font-weight: bold;
 }
 
-#hnuispiynm .gt_font_italic {
+#imbhlsujwg .gt_font_italic {
   font-style: italic;
 }
 
-#hnuispiynm .gt_super {
+#imbhlsujwg .gt_super {
   font-size: 65%;
 }
 
-#hnuispiynm .gt_footnote_marks {
+#imbhlsujwg .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -1288,12 +1292,12 @@ However, the formula to estimate these parameters have more complicated forms th
 <span id="cb24-12"><a href="linear-regression.html#cb24-12" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb24-13"><a href="linear-regression.html#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_sales_mult) <span class="sc">%&gt;%</span></span>
 <span id="cb24-14"><a href="linear-regression.html#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="ondrfpubwi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="rrourvztbe" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ondrfpubwi .gt_table {
+#rrourvztbe .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1318,7 +1322,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-left-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_heading {
+#rrourvztbe .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1330,7 +1334,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_title {
+#rrourvztbe .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1340,7 +1344,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-bottom-width: 0;
 }
 
-#ondrfpubwi .gt_subtitle {
+#rrourvztbe .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1350,13 +1354,13 @@ However, the formula to estimate these parameters have more complicated forms th
   border-top-width: 0;
 }
 
-#ondrfpubwi .gt_bottom_border {
+#rrourvztbe .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_col_headings {
+#rrourvztbe .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1371,7 +1375,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_col_heading {
+#rrourvztbe .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1391,7 +1395,7 @@ However, the formula to estimate these parameters have more complicated forms th
   overflow-x: hidden;
 }
 
-#ondrfpubwi .gt_column_spanner_outer {
+#rrourvztbe .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1403,15 +1407,15 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-right: 4px;
 }
 
-#ondrfpubwi .gt_column_spanner_outer:first-child {
+#rrourvztbe .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ondrfpubwi .gt_column_spanner_outer:last-child {
+#rrourvztbe .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ondrfpubwi .gt_column_spanner {
+#rrourvztbe .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1423,7 +1427,7 @@ However, the formula to estimate these parameters have more complicated forms th
   width: 100%;
 }
 
-#ondrfpubwi .gt_group_heading {
+#rrourvztbe .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1445,7 +1449,7 @@ However, the formula to estimate these parameters have more complicated forms th
   vertical-align: middle;
 }
 
-#ondrfpubwi .gt_empty_group_heading {
+#rrourvztbe .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1460,15 +1464,15 @@ However, the formula to estimate these parameters have more complicated forms th
   vertical-align: middle;
 }
 
-#ondrfpubwi .gt_from_md > :first-child {
+#rrourvztbe .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ondrfpubwi .gt_from_md > :last-child {
+#rrourvztbe .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ondrfpubwi .gt_row {
+#rrourvztbe .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1487,7 +1491,7 @@ However, the formula to estimate these parameters have more complicated forms th
   overflow-x: hidden;
 }
 
-#ondrfpubwi .gt_stub {
+#rrourvztbe .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1499,7 +1503,7 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-left: 12px;
 }
 
-#ondrfpubwi .gt_summary_row {
+#rrourvztbe .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1509,7 +1513,7 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-right: 5px;
 }
 
-#ondrfpubwi .gt_first_summary_row {
+#rrourvztbe .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1519,7 +1523,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-top-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_grand_summary_row {
+#rrourvztbe .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1529,7 +1533,7 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-right: 5px;
 }
 
-#ondrfpubwi .gt_first_grand_summary_row {
+#rrourvztbe .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1539,11 +1543,11 @@ However, the formula to estimate these parameters have more complicated forms th
   border-top-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_striped {
+#rrourvztbe .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ondrfpubwi .gt_table_body {
+#rrourvztbe .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1552,7 +1556,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-bottom-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_footnotes {
+#rrourvztbe .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1566,13 +1570,13 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_footnote {
+#rrourvztbe .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ondrfpubwi .gt_sourcenotes {
+#rrourvztbe .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1586,41 +1590,41 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#ondrfpubwi .gt_sourcenote {
+#rrourvztbe .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ondrfpubwi .gt_left {
+#rrourvztbe .gt_left {
   text-align: left;
 }
 
-#ondrfpubwi .gt_center {
+#rrourvztbe .gt_center {
   text-align: center;
 }
 
-#ondrfpubwi .gt_right {
+#rrourvztbe .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ondrfpubwi .gt_font_normal {
+#rrourvztbe .gt_font_normal {
   font-weight: normal;
 }
 
-#ondrfpubwi .gt_font_bold {
+#rrourvztbe .gt_font_bold {
   font-weight: bold;
 }
 
-#ondrfpubwi .gt_font_italic {
+#rrourvztbe .gt_font_italic {
   font-style: italic;
 }
 
-#ondrfpubwi .gt_super {
+#rrourvztbe .gt_super {
   font-size: 65%;
 }
 
-#ondrfpubwi .gt_footnote_marks {
+#rrourvztbe .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -1671,12 +1675,12 @@ However, the formula to estimate these parameters have more complicated forms th
 <span id="cb25-5"><a href="linear-regression.html#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>(<span class="at">rownames =</span> <span class="st">&quot;var&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb25-6"><a href="linear-regression.html#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span>var, round, <span class="dv">4</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb25-7"><a href="linear-regression.html#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;var&quot;</span>)</span></code></pre></div>
-<div id="zkzinxvpzd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mguivonbfc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#zkzinxvpzd .gt_table {
+#mguivonbfc .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1701,7 +1705,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-left-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_heading {
+#mguivonbfc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1713,7 +1717,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_title {
+#mguivonbfc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1723,7 +1727,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-bottom-width: 0;
 }
 
-#zkzinxvpzd .gt_subtitle {
+#mguivonbfc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1733,13 +1737,13 @@ However, the formula to estimate these parameters have more complicated forms th
   border-top-width: 0;
 }
 
-#zkzinxvpzd .gt_bottom_border {
+#mguivonbfc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_col_headings {
+#mguivonbfc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1754,7 +1758,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_col_heading {
+#mguivonbfc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1774,7 +1778,7 @@ However, the formula to estimate these parameters have more complicated forms th
   overflow-x: hidden;
 }
 
-#zkzinxvpzd .gt_column_spanner_outer {
+#mguivonbfc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1786,15 +1790,15 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-right: 4px;
 }
 
-#zkzinxvpzd .gt_column_spanner_outer:first-child {
+#mguivonbfc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zkzinxvpzd .gt_column_spanner_outer:last-child {
+#mguivonbfc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zkzinxvpzd .gt_column_spanner {
+#mguivonbfc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1806,7 +1810,7 @@ However, the formula to estimate these parameters have more complicated forms th
   width: 100%;
 }
 
-#zkzinxvpzd .gt_group_heading {
+#mguivonbfc .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1828,7 +1832,7 @@ However, the formula to estimate these parameters have more complicated forms th
   vertical-align: middle;
 }
 
-#zkzinxvpzd .gt_empty_group_heading {
+#mguivonbfc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1843,15 +1847,15 @@ However, the formula to estimate these parameters have more complicated forms th
   vertical-align: middle;
 }
 
-#zkzinxvpzd .gt_from_md > :first-child {
+#mguivonbfc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zkzinxvpzd .gt_from_md > :last-child {
+#mguivonbfc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zkzinxvpzd .gt_row {
+#mguivonbfc .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1870,7 +1874,7 @@ However, the formula to estimate these parameters have more complicated forms th
   overflow-x: hidden;
 }
 
-#zkzinxvpzd .gt_stub {
+#mguivonbfc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1882,7 +1886,7 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-left: 12px;
 }
 
-#zkzinxvpzd .gt_summary_row {
+#mguivonbfc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1892,7 +1896,7 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-right: 5px;
 }
 
-#zkzinxvpzd .gt_first_summary_row {
+#mguivonbfc .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1902,7 +1906,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-top-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_grand_summary_row {
+#mguivonbfc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1912,7 +1916,7 @@ However, the formula to estimate these parameters have more complicated forms th
   padding-right: 5px;
 }
 
-#zkzinxvpzd .gt_first_grand_summary_row {
+#mguivonbfc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1922,11 +1926,11 @@ However, the formula to estimate these parameters have more complicated forms th
   border-top-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_striped {
+#mguivonbfc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zkzinxvpzd .gt_table_body {
+#mguivonbfc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1935,7 +1939,7 @@ However, the formula to estimate these parameters have more complicated forms th
   border-bottom-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_footnotes {
+#mguivonbfc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1949,13 +1953,13 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_footnote {
+#mguivonbfc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#zkzinxvpzd .gt_sourcenotes {
+#mguivonbfc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1969,41 +1973,41 @@ However, the formula to estimate these parameters have more complicated forms th
   border-right-color: #D3D3D3;
 }
 
-#zkzinxvpzd .gt_sourcenote {
+#mguivonbfc .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#zkzinxvpzd .gt_left {
+#mguivonbfc .gt_left {
   text-align: left;
 }
 
-#zkzinxvpzd .gt_center {
+#mguivonbfc .gt_center {
   text-align: center;
 }
 
-#zkzinxvpzd .gt_right {
+#mguivonbfc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zkzinxvpzd .gt_font_normal {
+#mguivonbfc .gt_font_normal {
   font-weight: normal;
 }
 
-#zkzinxvpzd .gt_font_bold {
+#mguivonbfc .gt_font_bold {
   font-weight: bold;
 }
 
-#zkzinxvpzd .gt_font_italic {
+#mguivonbfc .gt_font_italic {
   font-style: italic;
 }
 
-#zkzinxvpzd .gt_super {
+#mguivonbfc .gt_super {
   font-size: 65%;
 }
 
-#zkzinxvpzd .gt_footnote_marks {
+#mguivonbfc .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -2073,12 +2077,12 @@ Hence, when there is no relationship between response and predictors, we expect 
 <span id="cb26-4"><a href="linear-regression.html#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), as.character)) <span class="sc">%&gt;%</span></span>
 <span id="cb26-5"><a href="linear-regression.html#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">&quot;Quantity&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;Value&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb26-6"><a href="linear-regression.html#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="uurjrprazw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="gefdlktzqk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#uurjrprazw .gt_table {
+#gefdlktzqk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2103,7 +2107,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-left-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_heading {
+#gefdlktzqk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2115,7 +2119,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-right-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_title {
+#gefdlktzqk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2125,7 +2129,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-bottom-width: 0;
 }
 
-#uurjrprazw .gt_subtitle {
+#gefdlktzqk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2135,13 +2139,13 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-top-width: 0;
 }
 
-#uurjrprazw .gt_bottom_border {
+#gefdlktzqk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_col_headings {
+#gefdlktzqk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2156,7 +2160,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-right-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_col_heading {
+#gefdlktzqk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2176,7 +2180,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   overflow-x: hidden;
 }
 
-#uurjrprazw .gt_column_spanner_outer {
+#gefdlktzqk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2188,15 +2192,15 @@ Hence, when there is no relationship between response and predictors, we expect 
   padding-right: 4px;
 }
 
-#uurjrprazw .gt_column_spanner_outer:first-child {
+#gefdlktzqk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#uurjrprazw .gt_column_spanner_outer:last-child {
+#gefdlktzqk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#uurjrprazw .gt_column_spanner {
+#gefdlktzqk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2208,7 +2212,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   width: 100%;
 }
 
-#uurjrprazw .gt_group_heading {
+#gefdlktzqk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2230,7 +2234,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   vertical-align: middle;
 }
 
-#uurjrprazw .gt_empty_group_heading {
+#gefdlktzqk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2245,15 +2249,15 @@ Hence, when there is no relationship between response and predictors, we expect 
   vertical-align: middle;
 }
 
-#uurjrprazw .gt_from_md > :first-child {
+#gefdlktzqk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#uurjrprazw .gt_from_md > :last-child {
+#gefdlktzqk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#uurjrprazw .gt_row {
+#gefdlktzqk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2272,7 +2276,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   overflow-x: hidden;
 }
 
-#uurjrprazw .gt_stub {
+#gefdlktzqk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2284,7 +2288,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   padding-left: 12px;
 }
 
-#uurjrprazw .gt_summary_row {
+#gefdlktzqk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2294,7 +2298,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   padding-right: 5px;
 }
 
-#uurjrprazw .gt_first_summary_row {
+#gefdlktzqk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2304,7 +2308,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-top-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_grand_summary_row {
+#gefdlktzqk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2314,7 +2318,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   padding-right: 5px;
 }
 
-#uurjrprazw .gt_first_grand_summary_row {
+#gefdlktzqk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2324,11 +2328,11 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-top-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_striped {
+#gefdlktzqk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#uurjrprazw .gt_table_body {
+#gefdlktzqk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2337,7 +2341,7 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-bottom-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_footnotes {
+#gefdlktzqk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2351,13 +2355,13 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-right-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_footnote {
+#gefdlktzqk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#uurjrprazw .gt_sourcenotes {
+#gefdlktzqk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2371,41 +2375,41 @@ Hence, when there is no relationship between response and predictors, we expect 
   border-right-color: #D3D3D3;
 }
 
-#uurjrprazw .gt_sourcenote {
+#gefdlktzqk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#uurjrprazw .gt_left {
+#gefdlktzqk .gt_left {
   text-align: left;
 }
 
-#uurjrprazw .gt_center {
+#gefdlktzqk .gt_center {
   text-align: center;
 }
 
-#uurjrprazw .gt_right {
+#gefdlktzqk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#uurjrprazw .gt_font_normal {
+#gefdlktzqk .gt_font_normal {
   font-weight: normal;
 }
 
-#uurjrprazw .gt_font_bold {
+#gefdlktzqk .gt_font_bold {
   font-weight: bold;
 }
 
-#uurjrprazw .gt_font_italic {
+#gefdlktzqk .gt_font_italic {
   font-style: italic;
 }
 
-#uurjrprazw .gt_super {
+#gefdlktzqk .gt_super {
   font-size: 65%;
 }
 
-#uurjrprazw .gt_footnote_marks {
+#gefdlktzqk .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -2551,12 +2555,12 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
 <span id="cb35-3"><a href="linear-regression.html#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-4"><a href="linear-regression.html#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_balance_own, <span class="at">coef_round =</span> <span class="dv">2</span>, <span class="at">se_round =</span> <span class="dv">2</span>, <span class="at">t_round =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb35-5"><a href="linear-regression.html#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="cuuayoumej" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="otknetbcbc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#cuuayoumej .gt_table {
+#otknetbcbc .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2581,7 +2585,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-left-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_heading {
+#otknetbcbc .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2593,7 +2597,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_title {
+#otknetbcbc .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2603,7 +2607,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-bottom-width: 0;
 }
 
-#cuuayoumej .gt_subtitle {
+#otknetbcbc .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2613,13 +2617,13 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-top-width: 0;
 }
 
-#cuuayoumej .gt_bottom_border {
+#otknetbcbc .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_col_headings {
+#otknetbcbc .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2634,7 +2638,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_col_heading {
+#otknetbcbc .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2654,7 +2658,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   overflow-x: hidden;
 }
 
-#cuuayoumej .gt_column_spanner_outer {
+#otknetbcbc .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2666,15 +2670,15 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   padding-right: 4px;
 }
 
-#cuuayoumej .gt_column_spanner_outer:first-child {
+#otknetbcbc .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cuuayoumej .gt_column_spanner_outer:last-child {
+#otknetbcbc .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cuuayoumej .gt_column_spanner {
+#otknetbcbc .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2686,7 +2690,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   width: 100%;
 }
 
-#cuuayoumej .gt_group_heading {
+#otknetbcbc .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2708,7 +2712,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   vertical-align: middle;
 }
 
-#cuuayoumej .gt_empty_group_heading {
+#otknetbcbc .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2723,15 +2727,15 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   vertical-align: middle;
 }
 
-#cuuayoumej .gt_from_md > :first-child {
+#otknetbcbc .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cuuayoumej .gt_from_md > :last-child {
+#otknetbcbc .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cuuayoumej .gt_row {
+#otknetbcbc .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2750,7 +2754,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   overflow-x: hidden;
 }
 
-#cuuayoumej .gt_stub {
+#otknetbcbc .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2762,7 +2766,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   padding-left: 12px;
 }
 
-#cuuayoumej .gt_summary_row {
+#otknetbcbc .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2772,7 +2776,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   padding-right: 5px;
 }
 
-#cuuayoumej .gt_first_summary_row {
+#otknetbcbc .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2782,7 +2786,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-top-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_grand_summary_row {
+#otknetbcbc .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2792,7 +2796,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   padding-right: 5px;
 }
 
-#cuuayoumej .gt_first_grand_summary_row {
+#otknetbcbc .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2802,11 +2806,11 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-top-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_striped {
+#otknetbcbc .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#cuuayoumej .gt_table_body {
+#otknetbcbc .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2815,7 +2819,7 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-bottom-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_footnotes {
+#otknetbcbc .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2829,13 +2833,13 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_footnote {
+#otknetbcbc .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#cuuayoumej .gt_sourcenotes {
+#otknetbcbc .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2849,41 +2853,41 @@ y_i = \beta_0 + \beta_1 x_i + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#cuuayoumej .gt_sourcenote {
+#otknetbcbc .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#cuuayoumej .gt_left {
+#otknetbcbc .gt_left {
   text-align: left;
 }
 
-#cuuayoumej .gt_center {
+#otknetbcbc .gt_center {
   text-align: center;
 }
 
-#cuuayoumej .gt_right {
+#otknetbcbc .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cuuayoumej .gt_font_normal {
+#otknetbcbc .gt_font_normal {
   font-weight: normal;
 }
 
-#cuuayoumej .gt_font_bold {
+#otknetbcbc .gt_font_bold {
   font-weight: bold;
 }
 
-#cuuayoumej .gt_font_italic {
+#otknetbcbc .gt_font_italic {
   font-style: italic;
 }
 
-#cuuayoumej .gt_super {
+#otknetbcbc .gt_super {
   font-size: 65%;
 }
 
-#cuuayoumej .gt_footnote_marks {
+#otknetbcbc .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -2931,12 +2935,12 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="linear-regression.html#cb36-1" aria-hidden="true" tabindex="-1"></a>lm_balance_region <span class="ot">&lt;-</span> <span class="fu">lm</span>(Balance <span class="sc">~</span> Region, <span class="at">data =</span> credit)</span>
 <span id="cb36-2"><a href="linear-regression.html#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_balance_region, <span class="at">coef_round =</span> <span class="dv">2</span>, <span class="at">se_round =</span> <span class="dv">2</span>, <span class="at">t_round =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb36-3"><a href="linear-regression.html#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="jseroqvxaq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="aubkoljbpt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#jseroqvxaq .gt_table {
+#aubkoljbpt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2961,7 +2965,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-left-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_heading {
+#aubkoljbpt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2973,7 +2977,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_title {
+#aubkoljbpt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2983,7 +2987,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-bottom-width: 0;
 }
 
-#jseroqvxaq .gt_subtitle {
+#aubkoljbpt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2993,13 +2997,13 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-top-width: 0;
 }
 
-#jseroqvxaq .gt_bottom_border {
+#aubkoljbpt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_col_headings {
+#aubkoljbpt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3014,7 +3018,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_col_heading {
+#aubkoljbpt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3034,7 +3038,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   overflow-x: hidden;
 }
 
-#jseroqvxaq .gt_column_spanner_outer {
+#aubkoljbpt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3046,15 +3050,15 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   padding-right: 4px;
 }
 
-#jseroqvxaq .gt_column_spanner_outer:first-child {
+#aubkoljbpt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#jseroqvxaq .gt_column_spanner_outer:last-child {
+#aubkoljbpt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#jseroqvxaq .gt_column_spanner {
+#aubkoljbpt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3066,7 +3070,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   width: 100%;
 }
 
-#jseroqvxaq .gt_group_heading {
+#aubkoljbpt .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3088,7 +3092,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   vertical-align: middle;
 }
 
-#jseroqvxaq .gt_empty_group_heading {
+#aubkoljbpt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3103,15 +3107,15 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   vertical-align: middle;
 }
 
-#jseroqvxaq .gt_from_md > :first-child {
+#aubkoljbpt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#jseroqvxaq .gt_from_md > :last-child {
+#aubkoljbpt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#jseroqvxaq .gt_row {
+#aubkoljbpt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3130,7 +3134,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   overflow-x: hidden;
 }
 
-#jseroqvxaq .gt_stub {
+#aubkoljbpt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3142,7 +3146,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   padding-left: 12px;
 }
 
-#jseroqvxaq .gt_summary_row {
+#aubkoljbpt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3152,7 +3156,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   padding-right: 5px;
 }
 
-#jseroqvxaq .gt_first_summary_row {
+#aubkoljbpt .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3162,7 +3166,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-top-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_grand_summary_row {
+#aubkoljbpt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3172,7 +3176,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   padding-right: 5px;
 }
 
-#jseroqvxaq .gt_first_grand_summary_row {
+#aubkoljbpt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3182,11 +3186,11 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-top-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_striped {
+#aubkoljbpt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#jseroqvxaq .gt_table_body {
+#aubkoljbpt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3195,7 +3199,7 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-bottom-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_footnotes {
+#aubkoljbpt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3209,13 +3213,13 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_footnote {
+#aubkoljbpt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#jseroqvxaq .gt_sourcenotes {
+#aubkoljbpt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3229,41 +3233,41 @@ y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \epsilon_i =
   border-right-color: #D3D3D3;
 }
 
-#jseroqvxaq .gt_sourcenote {
+#aubkoljbpt .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#jseroqvxaq .gt_left {
+#aubkoljbpt .gt_left {
   text-align: left;
 }
 
-#jseroqvxaq .gt_center {
+#aubkoljbpt .gt_center {
   text-align: center;
 }
 
-#jseroqvxaq .gt_right {
+#aubkoljbpt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jseroqvxaq .gt_font_normal {
+#aubkoljbpt .gt_font_normal {
   font-weight: normal;
 }
 
-#jseroqvxaq .gt_font_bold {
+#aubkoljbpt .gt_font_bold {
   font-weight: bold;
 }
 
-#jseroqvxaq .gt_font_italic {
+#aubkoljbpt .gt_font_italic {
   font-style: italic;
 }
 
-#jseroqvxaq .gt_super {
+#aubkoljbpt .gt_super {
   font-size: 65%;
 }
 
-#jseroqvxaq .gt_footnote_marks {
+#aubkoljbpt .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -3337,12 +3341,12 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="linear-regression.html#cb39-1" aria-hidden="true" tabindex="-1"></a>lm_sales_inter <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span> radio <span class="sc">*</span> TV, <span class="at">data =</span> advertising)</span>
 <span id="cb39-2"><a href="linear-regression.html#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_sales_inter, <span class="at">coef_round =</span> <span class="dv">4</span>, <span class="at">se_round =</span> <span class="dv">3</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb39-3"><a href="linear-regression.html#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="eywfmqmrof" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="azwxuibwpi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#eywfmqmrof .gt_table {
+#azwxuibwpi .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3367,7 +3371,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-left-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_heading {
+#azwxuibwpi .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3379,7 +3383,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_title {
+#azwxuibwpi .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3389,7 +3393,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-bottom-width: 0;
 }
 
-#eywfmqmrof .gt_subtitle {
+#azwxuibwpi .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3399,13 +3403,13 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-top-width: 0;
 }
 
-#eywfmqmrof .gt_bottom_border {
+#azwxuibwpi .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_col_headings {
+#azwxuibwpi .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3420,7 +3424,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_col_heading {
+#azwxuibwpi .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3440,7 +3444,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   overflow-x: hidden;
 }
 
-#eywfmqmrof .gt_column_spanner_outer {
+#azwxuibwpi .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3452,15 +3456,15 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-right: 4px;
 }
 
-#eywfmqmrof .gt_column_spanner_outer:first-child {
+#azwxuibwpi .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#eywfmqmrof .gt_column_spanner_outer:last-child {
+#azwxuibwpi .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#eywfmqmrof .gt_column_spanner {
+#azwxuibwpi .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3472,7 +3476,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   width: 100%;
 }
 
-#eywfmqmrof .gt_group_heading {
+#azwxuibwpi .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3494,7 +3498,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   vertical-align: middle;
 }
 
-#eywfmqmrof .gt_empty_group_heading {
+#azwxuibwpi .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3509,15 +3513,15 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   vertical-align: middle;
 }
 
-#eywfmqmrof .gt_from_md > :first-child {
+#azwxuibwpi .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#eywfmqmrof .gt_from_md > :last-child {
+#azwxuibwpi .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#eywfmqmrof .gt_row {
+#azwxuibwpi .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3536,7 +3540,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   overflow-x: hidden;
 }
 
-#eywfmqmrof .gt_stub {
+#azwxuibwpi .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3548,7 +3552,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-left: 12px;
 }
 
-#eywfmqmrof .gt_summary_row {
+#azwxuibwpi .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3558,7 +3562,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-right: 5px;
 }
 
-#eywfmqmrof .gt_first_summary_row {
+#azwxuibwpi .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3568,7 +3572,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-top-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_grand_summary_row {
+#azwxuibwpi .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3578,7 +3582,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-right: 5px;
 }
 
-#eywfmqmrof .gt_first_grand_summary_row {
+#azwxuibwpi .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3588,11 +3592,11 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-top-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_striped {
+#azwxuibwpi .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#eywfmqmrof .gt_table_body {
+#azwxuibwpi .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3601,7 +3605,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-bottom-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_footnotes {
+#azwxuibwpi .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3615,13 +3619,13 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_footnote {
+#azwxuibwpi .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#eywfmqmrof .gt_sourcenotes {
+#azwxuibwpi .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3635,41 +3639,41 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#eywfmqmrof .gt_sourcenote {
+#azwxuibwpi .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#eywfmqmrof .gt_left {
+#azwxuibwpi .gt_left {
   text-align: left;
 }
 
-#eywfmqmrof .gt_center {
+#azwxuibwpi .gt_center {
   text-align: center;
 }
 
-#eywfmqmrof .gt_right {
+#azwxuibwpi .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#eywfmqmrof .gt_font_normal {
+#azwxuibwpi .gt_font_normal {
   font-weight: normal;
 }
 
-#eywfmqmrof .gt_font_bold {
+#azwxuibwpi .gt_font_bold {
   font-weight: bold;
 }
 
-#eywfmqmrof .gt_font_italic {
+#azwxuibwpi .gt_font_italic {
   font-style: italic;
 }
 
-#eywfmqmrof .gt_super {
+#azwxuibwpi .gt_super {
   font-size: 65%;
 }
 
-#eywfmqmrof .gt_footnote_marks {
+#azwxuibwpi .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -3723,12 +3727,12 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
 <span id="cb40-8"><a href="linear-regression.html#cb40-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb40-9"><a href="linear-regression.html#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(model, r.squared, AIC, BIC) <span class="sc">%&gt;%</span></span>
 <span id="cb40-10"><a href="linear-regression.html#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="facuentalo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ucrooqnmgt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#facuentalo .gt_table {
+#ucrooqnmgt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -3753,7 +3757,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-left-color: #D3D3D3;
 }
 
-#facuentalo .gt_heading {
+#ucrooqnmgt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3765,7 +3769,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#facuentalo .gt_title {
+#ucrooqnmgt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3775,7 +3779,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-bottom-width: 0;
 }
 
-#facuentalo .gt_subtitle {
+#ucrooqnmgt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3785,13 +3789,13 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-top-width: 0;
 }
 
-#facuentalo .gt_bottom_border {
+#ucrooqnmgt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#facuentalo .gt_col_headings {
+#ucrooqnmgt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3806,7 +3810,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#facuentalo .gt_col_heading {
+#ucrooqnmgt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3826,7 +3830,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   overflow-x: hidden;
 }
 
-#facuentalo .gt_column_spanner_outer {
+#ucrooqnmgt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3838,15 +3842,15 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-right: 4px;
 }
 
-#facuentalo .gt_column_spanner_outer:first-child {
+#ucrooqnmgt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#facuentalo .gt_column_spanner_outer:last-child {
+#ucrooqnmgt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#facuentalo .gt_column_spanner {
+#ucrooqnmgt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3858,7 +3862,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   width: 100%;
 }
 
-#facuentalo .gt_group_heading {
+#ucrooqnmgt .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3880,7 +3884,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   vertical-align: middle;
 }
 
-#facuentalo .gt_empty_group_heading {
+#ucrooqnmgt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3895,15 +3899,15 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   vertical-align: middle;
 }
 
-#facuentalo .gt_from_md > :first-child {
+#ucrooqnmgt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#facuentalo .gt_from_md > :last-child {
+#ucrooqnmgt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#facuentalo .gt_row {
+#ucrooqnmgt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3922,7 +3926,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   overflow-x: hidden;
 }
 
-#facuentalo .gt_stub {
+#ucrooqnmgt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3934,7 +3938,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-left: 12px;
 }
 
-#facuentalo .gt_summary_row {
+#ucrooqnmgt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3944,7 +3948,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-right: 5px;
 }
 
-#facuentalo .gt_first_summary_row {
+#ucrooqnmgt .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3954,7 +3958,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-top-color: #D3D3D3;
 }
 
-#facuentalo .gt_grand_summary_row {
+#ucrooqnmgt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3964,7 +3968,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   padding-right: 5px;
 }
 
-#facuentalo .gt_first_grand_summary_row {
+#ucrooqnmgt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3974,11 +3978,11 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-top-color: #D3D3D3;
 }
 
-#facuentalo .gt_striped {
+#ucrooqnmgt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#facuentalo .gt_table_body {
+#ucrooqnmgt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3987,7 +3991,7 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-bottom-color: #D3D3D3;
 }
 
-#facuentalo .gt_footnotes {
+#ucrooqnmgt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4001,13 +4005,13 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#facuentalo .gt_footnote {
+#ucrooqnmgt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#facuentalo .gt_sourcenotes {
+#ucrooqnmgt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4021,41 +4025,41 @@ Y &amp;= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \beta_3 X_1 X_2 + \epsilon
   border-right-color: #D3D3D3;
 }
 
-#facuentalo .gt_sourcenote {
+#ucrooqnmgt .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#facuentalo .gt_left {
+#ucrooqnmgt .gt_left {
   text-align: left;
 }
 
-#facuentalo .gt_center {
+#ucrooqnmgt .gt_center {
   text-align: center;
 }
 
-#facuentalo .gt_right {
+#ucrooqnmgt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#facuentalo .gt_font_normal {
+#ucrooqnmgt .gt_font_normal {
   font-weight: normal;
 }
 
-#facuentalo .gt_font_bold {
+#ucrooqnmgt .gt_font_bold {
   font-weight: bold;
 }
 
-#facuentalo .gt_font_italic {
+#ucrooqnmgt .gt_font_italic {
   font-style: italic;
 }
 
-#facuentalo .gt_super {
+#ucrooqnmgt .gt_super {
   font-size: 65%;
 }
 
-#facuentalo .gt_footnote_marks {
+#ucrooqnmgt .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -4154,12 +4158,12 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
 <span id="cb43-8"><a href="linear-regression.html#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(model, r.squared, AIC, BIC) <span class="sc">%&gt;%</span></span>
 <span id="cb43-9"><a href="linear-regression.html#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span>model, round, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb43-10"><a href="linear-regression.html#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="diyladoapi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="khlzomawcb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#diyladoapi .gt_table {
+#khlzomawcb .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4184,7 +4188,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-left-color: #D3D3D3;
 }
 
-#diyladoapi .gt_heading {
+#khlzomawcb .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -4196,7 +4200,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-right-color: #D3D3D3;
 }
 
-#diyladoapi .gt_title {
+#khlzomawcb .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -4206,7 +4210,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-bottom-width: 0;
 }
 
-#diyladoapi .gt_subtitle {
+#khlzomawcb .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -4216,13 +4220,13 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-top-width: 0;
 }
 
-#diyladoapi .gt_bottom_border {
+#khlzomawcb .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#diyladoapi .gt_col_headings {
+#khlzomawcb .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4237,7 +4241,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-right-color: #D3D3D3;
 }
 
-#diyladoapi .gt_col_heading {
+#khlzomawcb .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4257,7 +4261,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   overflow-x: hidden;
 }
 
-#diyladoapi .gt_column_spanner_outer {
+#khlzomawcb .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4269,15 +4273,15 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   padding-right: 4px;
 }
 
-#diyladoapi .gt_column_spanner_outer:first-child {
+#khlzomawcb .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#diyladoapi .gt_column_spanner_outer:last-child {
+#khlzomawcb .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#diyladoapi .gt_column_spanner {
+#khlzomawcb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -4289,7 +4293,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   width: 100%;
 }
 
-#diyladoapi .gt_group_heading {
+#khlzomawcb .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4311,7 +4315,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   vertical-align: middle;
 }
 
-#diyladoapi .gt_empty_group_heading {
+#khlzomawcb .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4326,15 +4330,15 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   vertical-align: middle;
 }
 
-#diyladoapi .gt_from_md > :first-child {
+#khlzomawcb .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#diyladoapi .gt_from_md > :last-child {
+#khlzomawcb .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#diyladoapi .gt_row {
+#khlzomawcb .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4353,7 +4357,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   overflow-x: hidden;
 }
 
-#diyladoapi .gt_stub {
+#khlzomawcb .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4365,7 +4369,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   padding-left: 12px;
 }
 
-#diyladoapi .gt_summary_row {
+#khlzomawcb .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4375,7 +4379,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   padding-right: 5px;
 }
 
-#diyladoapi .gt_first_summary_row {
+#khlzomawcb .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4385,7 +4389,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-top-color: #D3D3D3;
 }
 
-#diyladoapi .gt_grand_summary_row {
+#khlzomawcb .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4395,7 +4399,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   padding-right: 5px;
 }
 
-#diyladoapi .gt_first_grand_summary_row {
+#khlzomawcb .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4405,11 +4409,11 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-top-color: #D3D3D3;
 }
 
-#diyladoapi .gt_striped {
+#khlzomawcb .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#diyladoapi .gt_table_body {
+#khlzomawcb .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4418,7 +4422,7 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#diyladoapi .gt_footnotes {
+#khlzomawcb .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4432,13 +4436,13 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-right-color: #D3D3D3;
 }
 
-#diyladoapi .gt_footnote {
+#khlzomawcb .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#diyladoapi .gt_sourcenotes {
+#khlzomawcb .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4452,41 +4456,41 @@ A simple way to account for non-linearity is to use polynomial regression.</p>
   border-right-color: #D3D3D3;
 }
 
-#diyladoapi .gt_sourcenote {
+#khlzomawcb .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#diyladoapi .gt_left {
+#khlzomawcb .gt_left {
   text-align: left;
 }
 
-#diyladoapi .gt_center {
+#khlzomawcb .gt_center {
   text-align: center;
 }
 
-#diyladoapi .gt_right {
+#khlzomawcb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#diyladoapi .gt_font_normal {
+#khlzomawcb .gt_font_normal {
   font-weight: normal;
 }
 
-#diyladoapi .gt_font_bold {
+#khlzomawcb .gt_font_bold {
   font-weight: bold;
 }
 
-#diyladoapi .gt_font_italic {
+#khlzomawcb .gt_font_italic {
   font-style: italic;
 }
 
-#diyladoapi .gt_super {
+#khlzomawcb .gt_super {
   font-size: 65%;
 }
 
-#diyladoapi .gt_footnote_marks {
+#khlzomawcb .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -4563,12 +4567,12 @@ unwarranted sense of confidence in our model.</p>
 <span id="cb46-6"><a href="linear-regression.html#cb46-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb46-7"><a href="linear-regression.html#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(data) <span class="sc">%&gt;%</span></span>
 <span id="cb46-8"><a href="linear-regression.html#cb46-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="dmwrnopqty" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="iefazdgjfx" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#dmwrnopqty .gt_table {
+#iefazdgjfx .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -4593,7 +4597,7 @@ unwarranted sense of confidence in our model.</p>
   border-left-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_heading {
+#iefazdgjfx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -4605,7 +4609,7 @@ unwarranted sense of confidence in our model.</p>
   border-right-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_title {
+#iefazdgjfx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -4615,7 +4619,7 @@ unwarranted sense of confidence in our model.</p>
   border-bottom-width: 0;
 }
 
-#dmwrnopqty .gt_subtitle {
+#iefazdgjfx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -4625,13 +4629,13 @@ unwarranted sense of confidence in our model.</p>
   border-top-width: 0;
 }
 
-#dmwrnopqty .gt_bottom_border {
+#iefazdgjfx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_col_headings {
+#iefazdgjfx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4646,7 +4650,7 @@ unwarranted sense of confidence in our model.</p>
   border-right-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_col_heading {
+#iefazdgjfx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4666,7 +4670,7 @@ unwarranted sense of confidence in our model.</p>
   overflow-x: hidden;
 }
 
-#dmwrnopqty .gt_column_spanner_outer {
+#iefazdgjfx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4678,15 +4682,15 @@ unwarranted sense of confidence in our model.</p>
   padding-right: 4px;
 }
 
-#dmwrnopqty .gt_column_spanner_outer:first-child {
+#iefazdgjfx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dmwrnopqty .gt_column_spanner_outer:last-child {
+#iefazdgjfx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dmwrnopqty .gt_column_spanner {
+#iefazdgjfx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -4698,7 +4702,7 @@ unwarranted sense of confidence in our model.</p>
   width: 100%;
 }
 
-#dmwrnopqty .gt_group_heading {
+#iefazdgjfx .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4720,7 +4724,7 @@ unwarranted sense of confidence in our model.</p>
   vertical-align: middle;
 }
 
-#dmwrnopqty .gt_empty_group_heading {
+#iefazdgjfx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -4735,15 +4739,15 @@ unwarranted sense of confidence in our model.</p>
   vertical-align: middle;
 }
 
-#dmwrnopqty .gt_from_md > :first-child {
+#iefazdgjfx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dmwrnopqty .gt_from_md > :last-child {
+#iefazdgjfx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dmwrnopqty .gt_row {
+#iefazdgjfx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4762,7 +4766,7 @@ unwarranted sense of confidence in our model.</p>
   overflow-x: hidden;
 }
 
-#dmwrnopqty .gt_stub {
+#iefazdgjfx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -4774,7 +4778,7 @@ unwarranted sense of confidence in our model.</p>
   padding-left: 12px;
 }
 
-#dmwrnopqty .gt_summary_row {
+#iefazdgjfx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4784,7 +4788,7 @@ unwarranted sense of confidence in our model.</p>
   padding-right: 5px;
 }
 
-#dmwrnopqty .gt_first_summary_row {
+#iefazdgjfx .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4794,7 +4798,7 @@ unwarranted sense of confidence in our model.</p>
   border-top-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_grand_summary_row {
+#iefazdgjfx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -4804,7 +4808,7 @@ unwarranted sense of confidence in our model.</p>
   padding-right: 5px;
 }
 
-#dmwrnopqty .gt_first_grand_summary_row {
+#iefazdgjfx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -4814,11 +4818,11 @@ unwarranted sense of confidence in our model.</p>
   border-top-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_striped {
+#iefazdgjfx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dmwrnopqty .gt_table_body {
+#iefazdgjfx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -4827,7 +4831,7 @@ unwarranted sense of confidence in our model.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_footnotes {
+#iefazdgjfx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4841,13 +4845,13 @@ unwarranted sense of confidence in our model.</p>
   border-right-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_footnote {
+#iefazdgjfx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#dmwrnopqty .gt_sourcenotes {
+#iefazdgjfx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -4861,41 +4865,41 @@ unwarranted sense of confidence in our model.</p>
   border-right-color: #D3D3D3;
 }
 
-#dmwrnopqty .gt_sourcenote {
+#iefazdgjfx .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#dmwrnopqty .gt_left {
+#iefazdgjfx .gt_left {
   text-align: left;
 }
 
-#dmwrnopqty .gt_center {
+#iefazdgjfx .gt_center {
   text-align: center;
 }
 
-#dmwrnopqty .gt_right {
+#iefazdgjfx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dmwrnopqty .gt_font_normal {
+#iefazdgjfx .gt_font_normal {
   font-weight: normal;
 }
 
-#dmwrnopqty .gt_font_bold {
+#iefazdgjfx .gt_font_bold {
   font-weight: bold;
 }
 
-#dmwrnopqty .gt_font_italic {
+#iefazdgjfx .gt_font_italic {
   font-style: italic;
 }
 
-#dmwrnopqty .gt_super {
+#iefazdgjfx .gt_super {
   font-size: 65%;
 }
 
-#dmwrnopqty .gt_footnote_marks {
+#iefazdgjfx .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -5037,12 +5041,12 @@ means that the power of the hypothesis test – the probability of correctly det
 <span id="cb51-7"><a href="linear-regression.html#cb51-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb51-8"><a href="linear-regression.html#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(mod) <span class="sc">%&gt;%</span></span>
 <span id="cb51-9"><a href="linear-regression.html#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;term&quot;</span>)</span></code></pre></div>
-<div id="vxdhxmrpsc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ogmaoireql" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#vxdhxmrpsc .gt_table {
+#ogmaoireql .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -5067,7 +5071,7 @@ means that the power of the hypothesis test – the probability of correctly det
   border-left-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_heading {
+#ogmaoireql .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5079,7 +5083,7 @@ means that the power of the hypothesis test – the probability of correctly det
   border-right-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_title {
+#ogmaoireql .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5089,7 +5093,7 @@ means that the power of the hypothesis test – the probability of correctly det
   border-bottom-width: 0;
 }
 
-#vxdhxmrpsc .gt_subtitle {
+#ogmaoireql .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5099,13 +5103,13 @@ means that the power of the hypothesis test – the probability of correctly det
   border-top-width: 0;
 }
 
-#vxdhxmrpsc .gt_bottom_border {
+#ogmaoireql .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_col_headings {
+#ogmaoireql .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5120,7 +5124,7 @@ means that the power of the hypothesis test – the probability of correctly det
   border-right-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_col_heading {
+#ogmaoireql .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5140,7 +5144,7 @@ means that the power of the hypothesis test – the probability of correctly det
   overflow-x: hidden;
 }
 
-#vxdhxmrpsc .gt_column_spanner_outer {
+#ogmaoireql .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5152,15 +5156,15 @@ means that the power of the hypothesis test – the probability of correctly det
   padding-right: 4px;
 }
 
-#vxdhxmrpsc .gt_column_spanner_outer:first-child {
+#ogmaoireql .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#vxdhxmrpsc .gt_column_spanner_outer:last-child {
+#ogmaoireql .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#vxdhxmrpsc .gt_column_spanner {
+#ogmaoireql .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5172,7 +5176,7 @@ means that the power of the hypothesis test – the probability of correctly det
   width: 100%;
 }
 
-#vxdhxmrpsc .gt_group_heading {
+#ogmaoireql .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5194,7 +5198,7 @@ means that the power of the hypothesis test – the probability of correctly det
   vertical-align: middle;
 }
 
-#vxdhxmrpsc .gt_empty_group_heading {
+#ogmaoireql .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5209,15 +5213,15 @@ means that the power of the hypothesis test – the probability of correctly det
   vertical-align: middle;
 }
 
-#vxdhxmrpsc .gt_from_md > :first-child {
+#ogmaoireql .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#vxdhxmrpsc .gt_from_md > :last-child {
+#ogmaoireql .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#vxdhxmrpsc .gt_row {
+#ogmaoireql .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5236,7 +5240,7 @@ means that the power of the hypothesis test – the probability of correctly det
   overflow-x: hidden;
 }
 
-#vxdhxmrpsc .gt_stub {
+#ogmaoireql .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5248,7 +5252,7 @@ means that the power of the hypothesis test – the probability of correctly det
   padding-left: 12px;
 }
 
-#vxdhxmrpsc .gt_summary_row {
+#ogmaoireql .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5258,7 +5262,7 @@ means that the power of the hypothesis test – the probability of correctly det
   padding-right: 5px;
 }
 
-#vxdhxmrpsc .gt_first_summary_row {
+#ogmaoireql .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5268,7 +5272,7 @@ means that the power of the hypothesis test – the probability of correctly det
   border-top-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_grand_summary_row {
+#ogmaoireql .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5278,7 +5282,7 @@ means that the power of the hypothesis test – the probability of correctly det
   padding-right: 5px;
 }
 
-#vxdhxmrpsc .gt_first_grand_summary_row {
+#ogmaoireql .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5288,11 +5292,11 @@ means that the power of the hypothesis test – the probability of correctly det
   border-top-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_striped {
+#ogmaoireql .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#vxdhxmrpsc .gt_table_body {
+#ogmaoireql .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5301,7 +5305,7 @@ means that the power of the hypothesis test – the probability of correctly det
   border-bottom-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_footnotes {
+#ogmaoireql .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5315,13 +5319,13 @@ means that the power of the hypothesis test – the probability of correctly det
   border-right-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_footnote {
+#ogmaoireql .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#vxdhxmrpsc .gt_sourcenotes {
+#ogmaoireql .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5335,41 +5339,41 @@ means that the power of the hypothesis test – the probability of correctly det
   border-right-color: #D3D3D3;
 }
 
-#vxdhxmrpsc .gt_sourcenote {
+#ogmaoireql .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#vxdhxmrpsc .gt_left {
+#ogmaoireql .gt_left {
   text-align: left;
 }
 
-#vxdhxmrpsc .gt_center {
+#ogmaoireql .gt_center {
   text-align: center;
 }
 
-#vxdhxmrpsc .gt_right {
+#ogmaoireql .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#vxdhxmrpsc .gt_font_normal {
+#ogmaoireql .gt_font_normal {
   font-weight: normal;
 }
 
-#vxdhxmrpsc .gt_font_bold {
+#ogmaoireql .gt_font_bold {
   font-weight: bold;
 }
 
-#vxdhxmrpsc .gt_font_italic {
+#ogmaoireql .gt_font_italic {
   font-style: italic;
 }
 
-#vxdhxmrpsc .gt_super {
+#ogmaoireql .gt_super {
   font-size: 65%;
 }
 
-#vxdhxmrpsc .gt_footnote_marks {
+#ogmaoireql .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -5457,12 +5461,12 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
 <span id="cb54-9"><a href="linear-regression.html#cb54-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb54-10"><a href="linear-regression.html#cb54-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">R^2</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="st">`</span><span class="at">R^2</span><span class="st">`</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb54-11"><a href="linear-regression.html#cb54-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="crtvofnsdp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="sezeswmbze" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#crtvofnsdp .gt_table {
+#sezeswmbze .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -5487,7 +5491,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-left-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_heading {
+#sezeswmbze .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5499,7 +5503,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-right-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_title {
+#sezeswmbze .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5509,7 +5513,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-bottom-width: 0;
 }
 
-#crtvofnsdp .gt_subtitle {
+#sezeswmbze .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5519,13 +5523,13 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-top-width: 0;
 }
 
-#crtvofnsdp .gt_bottom_border {
+#sezeswmbze .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_col_headings {
+#sezeswmbze .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5540,7 +5544,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-right-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_col_heading {
+#sezeswmbze .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5560,7 +5564,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   overflow-x: hidden;
 }
 
-#crtvofnsdp .gt_column_spanner_outer {
+#sezeswmbze .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5572,15 +5576,15 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   padding-right: 4px;
 }
 
-#crtvofnsdp .gt_column_spanner_outer:first-child {
+#sezeswmbze .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#crtvofnsdp .gt_column_spanner_outer:last-child {
+#sezeswmbze .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#crtvofnsdp .gt_column_spanner {
+#sezeswmbze .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5592,7 +5596,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   width: 100%;
 }
 
-#crtvofnsdp .gt_group_heading {
+#sezeswmbze .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5614,7 +5618,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   vertical-align: middle;
 }
 
-#crtvofnsdp .gt_empty_group_heading {
+#sezeswmbze .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -5629,15 +5633,15 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   vertical-align: middle;
 }
 
-#crtvofnsdp .gt_from_md > :first-child {
+#sezeswmbze .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#crtvofnsdp .gt_from_md > :last-child {
+#sezeswmbze .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#crtvofnsdp .gt_row {
+#sezeswmbze .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5656,7 +5660,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   overflow-x: hidden;
 }
 
-#crtvofnsdp .gt_stub {
+#sezeswmbze .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5668,7 +5672,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   padding-left: 12px;
 }
 
-#crtvofnsdp .gt_summary_row {
+#sezeswmbze .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5678,7 +5682,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   padding-right: 5px;
 }
 
-#crtvofnsdp .gt_first_summary_row {
+#sezeswmbze .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5688,7 +5692,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-top-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_grand_summary_row {
+#sezeswmbze .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -5698,7 +5702,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   padding-right: 5px;
 }
 
-#crtvofnsdp .gt_first_grand_summary_row {
+#sezeswmbze .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -5708,11 +5712,11 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-top-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_striped {
+#sezeswmbze .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#crtvofnsdp .gt_table_body {
+#sezeswmbze .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5721,7 +5725,7 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-bottom-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_footnotes {
+#sezeswmbze .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5735,13 +5739,13 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-right-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_footnote {
+#sezeswmbze .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#crtvofnsdp .gt_sourcenotes {
+#sezeswmbze .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -5755,41 +5759,41 @@ where <span class="math inline">\(R^2_{X_j | X_-j}\)</span> is the <span class="
   border-right-color: #D3D3D3;
 }
 
-#crtvofnsdp .gt_sourcenote {
+#sezeswmbze .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#crtvofnsdp .gt_left {
+#sezeswmbze .gt_left {
   text-align: left;
 }
 
-#crtvofnsdp .gt_center {
+#sezeswmbze .gt_center {
   text-align: center;
 }
 
-#crtvofnsdp .gt_right {
+#sezeswmbze .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#crtvofnsdp .gt_font_normal {
+#sezeswmbze .gt_font_normal {
   font-weight: normal;
 }
 
-#crtvofnsdp .gt_font_bold {
+#sezeswmbze .gt_font_bold {
   font-weight: bold;
 }
 
-#crtvofnsdp .gt_font_italic {
+#sezeswmbze .gt_font_italic {
   font-style: italic;
 }
 
-#crtvofnsdp .gt_super {
+#sezeswmbze .gt_super {
   font-size: 65%;
 }
 
-#crtvofnsdp .gt_footnote_marks {
+#sezeswmbze .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -5860,12 +5864,12 @@ There is clear evidence of a relationship.</p>
 <span id="cb61-3"><a href="linear-regression.html#cb61-3" aria-hidden="true" tabindex="-1"></a>    term, <span class="fu">across</span>(<span class="fu">c</span>(estimate, conf.low, conf.high), round, <span class="dv">3</span>)</span>
 <span id="cb61-4"><a href="linear-regression.html#cb61-4" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb61-5"><a href="linear-regression.html#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="fmbvtpsdvf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ocsedejdbq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#fmbvtpsdvf .gt_table {
+#ocsedejdbq .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -5890,7 +5894,7 @@ There is clear evidence of a relationship.</p>
   border-left-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_heading {
+#ocsedejdbq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -5902,7 +5906,7 @@ There is clear evidence of a relationship.</p>
   border-right-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_title {
+#ocsedejdbq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -5912,7 +5916,7 @@ There is clear evidence of a relationship.</p>
   border-bottom-width: 0;
 }
 
-#fmbvtpsdvf .gt_subtitle {
+#ocsedejdbq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -5922,13 +5926,13 @@ There is clear evidence of a relationship.</p>
   border-top-width: 0;
 }
 
-#fmbvtpsdvf .gt_bottom_border {
+#ocsedejdbq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_col_headings {
+#ocsedejdbq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -5943,7 +5947,7 @@ There is clear evidence of a relationship.</p>
   border-right-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_col_heading {
+#ocsedejdbq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5963,7 +5967,7 @@ There is clear evidence of a relationship.</p>
   overflow-x: hidden;
 }
 
-#fmbvtpsdvf .gt_column_spanner_outer {
+#ocsedejdbq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -5975,15 +5979,15 @@ There is clear evidence of a relationship.</p>
   padding-right: 4px;
 }
 
-#fmbvtpsdvf .gt_column_spanner_outer:first-child {
+#ocsedejdbq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fmbvtpsdvf .gt_column_spanner_outer:last-child {
+#ocsedejdbq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fmbvtpsdvf .gt_column_spanner {
+#ocsedejdbq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -5995,7 +5999,7 @@ There is clear evidence of a relationship.</p>
   width: 100%;
 }
 
-#fmbvtpsdvf .gt_group_heading {
+#ocsedejdbq .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -6017,7 +6021,7 @@ There is clear evidence of a relationship.</p>
   vertical-align: middle;
 }
 
-#fmbvtpsdvf .gt_empty_group_heading {
+#ocsedejdbq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -6032,15 +6036,15 @@ There is clear evidence of a relationship.</p>
   vertical-align: middle;
 }
 
-#fmbvtpsdvf .gt_from_md > :first-child {
+#ocsedejdbq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fmbvtpsdvf .gt_from_md > :last-child {
+#ocsedejdbq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fmbvtpsdvf .gt_row {
+#ocsedejdbq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -6059,7 +6063,7 @@ There is clear evidence of a relationship.</p>
   overflow-x: hidden;
 }
 
-#fmbvtpsdvf .gt_stub {
+#ocsedejdbq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -6071,7 +6075,7 @@ There is clear evidence of a relationship.</p>
   padding-left: 12px;
 }
 
-#fmbvtpsdvf .gt_summary_row {
+#ocsedejdbq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -6081,7 +6085,7 @@ There is clear evidence of a relationship.</p>
   padding-right: 5px;
 }
 
-#fmbvtpsdvf .gt_first_summary_row {
+#ocsedejdbq .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -6091,7 +6095,7 @@ There is clear evidence of a relationship.</p>
   border-top-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_grand_summary_row {
+#ocsedejdbq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -6101,7 +6105,7 @@ There is clear evidence of a relationship.</p>
   padding-right: 5px;
 }
 
-#fmbvtpsdvf .gt_first_grand_summary_row {
+#ocsedejdbq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -6111,11 +6115,11 @@ There is clear evidence of a relationship.</p>
   border-top-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_striped {
+#ocsedejdbq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fmbvtpsdvf .gt_table_body {
+#ocsedejdbq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -6124,7 +6128,7 @@ There is clear evidence of a relationship.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_footnotes {
+#ocsedejdbq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -6138,13 +6142,13 @@ There is clear evidence of a relationship.</p>
   border-right-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_footnote {
+#ocsedejdbq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#fmbvtpsdvf .gt_sourcenotes {
+#ocsedejdbq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -6158,41 +6162,41 @@ There is clear evidence of a relationship.</p>
   border-right-color: #D3D3D3;
 }
 
-#fmbvtpsdvf .gt_sourcenote {
+#ocsedejdbq .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#fmbvtpsdvf .gt_left {
+#ocsedejdbq .gt_left {
   text-align: left;
 }
 
-#fmbvtpsdvf .gt_center {
+#ocsedejdbq .gt_center {
   text-align: center;
 }
 
-#fmbvtpsdvf .gt_right {
+#ocsedejdbq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fmbvtpsdvf .gt_font_normal {
+#ocsedejdbq .gt_font_normal {
   font-weight: normal;
 }
 
-#fmbvtpsdvf .gt_font_bold {
+#ocsedejdbq .gt_font_bold {
   font-weight: bold;
 }
 
-#fmbvtpsdvf .gt_font_italic {
+#ocsedejdbq .gt_font_italic {
   font-style: italic;
 }
 
-#fmbvtpsdvf .gt_super {
+#ocsedejdbq .gt_super {
   font-size: 65%;
 }
 
-#fmbvtpsdvf .gt_footnote_marks {
+#ocsedejdbq .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -6271,12 +6275,12 @@ This is done with the <code>predict.lm()</code> function and by setting the argu
 The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
 <div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="linear-regression.html#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_sales_inter) <span class="sc">%&gt;%</span></span>
 <span id="cb69-2"><a href="linear-regression.html#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="hbywbalieh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mrwmdtdojk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hbywbalieh .gt_table {
+#mrwmdtdojk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -6301,7 +6305,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-left-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_heading {
+#mrwmdtdojk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -6313,7 +6317,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-right-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_title {
+#mrwmdtdojk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -6323,7 +6327,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-bottom-width: 0;
 }
 
-#hbywbalieh .gt_subtitle {
+#mrwmdtdojk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -6333,13 +6337,13 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-top-width: 0;
 }
 
-#hbywbalieh .gt_bottom_border {
+#mrwmdtdojk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_col_headings {
+#mrwmdtdojk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -6354,7 +6358,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-right-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_col_heading {
+#mrwmdtdojk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -6374,7 +6378,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   overflow-x: hidden;
 }
 
-#hbywbalieh .gt_column_spanner_outer {
+#mrwmdtdojk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -6386,15 +6390,15 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   padding-right: 4px;
 }
 
-#hbywbalieh .gt_column_spanner_outer:first-child {
+#mrwmdtdojk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hbywbalieh .gt_column_spanner_outer:last-child {
+#mrwmdtdojk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hbywbalieh .gt_column_spanner {
+#mrwmdtdojk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -6406,7 +6410,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   width: 100%;
 }
 
-#hbywbalieh .gt_group_heading {
+#mrwmdtdojk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -6428,7 +6432,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   vertical-align: middle;
 }
 
-#hbywbalieh .gt_empty_group_heading {
+#mrwmdtdojk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -6443,15 +6447,15 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   vertical-align: middle;
 }
 
-#hbywbalieh .gt_from_md > :first-child {
+#mrwmdtdojk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hbywbalieh .gt_from_md > :last-child {
+#mrwmdtdojk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hbywbalieh .gt_row {
+#mrwmdtdojk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -6470,7 +6474,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   overflow-x: hidden;
 }
 
-#hbywbalieh .gt_stub {
+#mrwmdtdojk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -6482,7 +6486,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   padding-left: 12px;
 }
 
-#hbywbalieh .gt_summary_row {
+#mrwmdtdojk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -6492,7 +6496,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   padding-right: 5px;
 }
 
-#hbywbalieh .gt_first_summary_row {
+#mrwmdtdojk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -6502,7 +6506,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-top-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_grand_summary_row {
+#mrwmdtdojk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -6512,7 +6516,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   padding-right: 5px;
 }
 
-#hbywbalieh .gt_first_grand_summary_row {
+#mrwmdtdojk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -6522,11 +6526,11 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-top-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_striped {
+#mrwmdtdojk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hbywbalieh .gt_table_body {
+#mrwmdtdojk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -6535,7 +6539,7 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_footnotes {
+#mrwmdtdojk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -6549,13 +6553,13 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-right-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_footnote {
+#mrwmdtdojk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hbywbalieh .gt_sourcenotes {
+#mrwmdtdojk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -6569,41 +6573,41 @@ The <span class="math inline">\(p\)</span>-value of the interaction term:</p>
   border-right-color: #D3D3D3;
 }
 
-#hbywbalieh .gt_sourcenote {
+#mrwmdtdojk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hbywbalieh .gt_left {
+#mrwmdtdojk .gt_left {
   text-align: left;
 }
 
-#hbywbalieh .gt_center {
+#mrwmdtdojk .gt_center {
   text-align: center;
 }
 
-#hbywbalieh .gt_right {
+#mrwmdtdojk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hbywbalieh .gt_font_normal {
+#mrwmdtdojk .gt_font_normal {
   font-weight: normal;
 }
 
-#hbywbalieh .gt_font_bold {
+#mrwmdtdojk .gt_font_bold {
   font-weight: bold;
 }
 
-#hbywbalieh .gt_font_italic {
+#mrwmdtdojk .gt_font_italic {
   font-style: italic;
 }
 
-#hbywbalieh .gt_super {
+#mrwmdtdojk .gt_super {
   font-size: 65%;
 }
 
-#hbywbalieh .gt_footnote_marks {
+#mrwmdtdojk .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -6819,12 +6823,12 @@ available.</p>
 <div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="linear-regression.html#cb91-1" aria-hidden="true" tabindex="-1"></a>lm_medv_lstat_age <span class="ot">&lt;-</span> <span class="fu">lm</span>(medv <span class="sc">~</span> lstat <span class="sc">*</span> age, <span class="at">data =</span> boston)</span>
 <span id="cb91-2"><a href="linear-regression.html#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_medv_lstat_age) <span class="sc">%&gt;%</span></span>
 <span id="cb91-3"><a href="linear-regression.html#cb91-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="jjfsytoyik" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="lstkqgbnuw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#jjfsytoyik .gt_table {
+#lstkqgbnuw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -6849,7 +6853,7 @@ available.</p>
   border-left-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_heading {
+#lstkqgbnuw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -6861,7 +6865,7 @@ available.</p>
   border-right-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_title {
+#lstkqgbnuw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -6871,7 +6875,7 @@ available.</p>
   border-bottom-width: 0;
 }
 
-#jjfsytoyik .gt_subtitle {
+#lstkqgbnuw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -6881,13 +6885,13 @@ available.</p>
   border-top-width: 0;
 }
 
-#jjfsytoyik .gt_bottom_border {
+#lstkqgbnuw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_col_headings {
+#lstkqgbnuw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -6902,7 +6906,7 @@ available.</p>
   border-right-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_col_heading {
+#lstkqgbnuw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -6922,7 +6926,7 @@ available.</p>
   overflow-x: hidden;
 }
 
-#jjfsytoyik .gt_column_spanner_outer {
+#lstkqgbnuw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -6934,15 +6938,15 @@ available.</p>
   padding-right: 4px;
 }
 
-#jjfsytoyik .gt_column_spanner_outer:first-child {
+#lstkqgbnuw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#jjfsytoyik .gt_column_spanner_outer:last-child {
+#lstkqgbnuw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#jjfsytoyik .gt_column_spanner {
+#lstkqgbnuw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -6954,7 +6958,7 @@ available.</p>
   width: 100%;
 }
 
-#jjfsytoyik .gt_group_heading {
+#lstkqgbnuw .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -6976,7 +6980,7 @@ available.</p>
   vertical-align: middle;
 }
 
-#jjfsytoyik .gt_empty_group_heading {
+#lstkqgbnuw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -6991,15 +6995,15 @@ available.</p>
   vertical-align: middle;
 }
 
-#jjfsytoyik .gt_from_md > :first-child {
+#lstkqgbnuw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#jjfsytoyik .gt_from_md > :last-child {
+#lstkqgbnuw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#jjfsytoyik .gt_row {
+#lstkqgbnuw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -7018,7 +7022,7 @@ available.</p>
   overflow-x: hidden;
 }
 
-#jjfsytoyik .gt_stub {
+#lstkqgbnuw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -7030,7 +7034,7 @@ available.</p>
   padding-left: 12px;
 }
 
-#jjfsytoyik .gt_summary_row {
+#lstkqgbnuw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -7040,7 +7044,7 @@ available.</p>
   padding-right: 5px;
 }
 
-#jjfsytoyik .gt_first_summary_row {
+#lstkqgbnuw .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -7050,7 +7054,7 @@ available.</p>
   border-top-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_grand_summary_row {
+#lstkqgbnuw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -7060,7 +7064,7 @@ available.</p>
   padding-right: 5px;
 }
 
-#jjfsytoyik .gt_first_grand_summary_row {
+#lstkqgbnuw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -7070,11 +7074,11 @@ available.</p>
   border-top-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_striped {
+#lstkqgbnuw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#jjfsytoyik .gt_table_body {
+#lstkqgbnuw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -7083,7 +7087,7 @@ available.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_footnotes {
+#lstkqgbnuw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -7097,13 +7101,13 @@ available.</p>
   border-right-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_footnote {
+#lstkqgbnuw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#jjfsytoyik .gt_sourcenotes {
+#lstkqgbnuw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -7117,41 +7121,41 @@ available.</p>
   border-right-color: #D3D3D3;
 }
 
-#jjfsytoyik .gt_sourcenote {
+#lstkqgbnuw .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#jjfsytoyik .gt_left {
+#lstkqgbnuw .gt_left {
   text-align: left;
 }
 
-#jjfsytoyik .gt_center {
+#lstkqgbnuw .gt_center {
   text-align: center;
 }
 
-#jjfsytoyik .gt_right {
+#lstkqgbnuw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jjfsytoyik .gt_font_normal {
+#lstkqgbnuw .gt_font_normal {
   font-weight: normal;
 }
 
-#jjfsytoyik .gt_font_bold {
+#lstkqgbnuw .gt_font_bold {
   font-weight: bold;
 }
 
-#jjfsytoyik .gt_font_italic {
+#lstkqgbnuw .gt_font_italic {
   font-style: italic;
 }
 
-#jjfsytoyik .gt_super {
+#lstkqgbnuw .gt_super {
   font-size: 65%;
 }
 
-#jjfsytoyik .gt_footnote_marks {
+#lstkqgbnuw .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -7297,12 +7301,12 @@ Check the residuals:</p>
 <span id="cb107-2"><a href="linear-regression.html#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> auto)</span>
 <span id="cb107-3"><a href="linear-regression.html#cb107-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_mpg_hp_fit) <span class="sc">%&gt;%</span></span>
 <span id="cb107-4"><a href="linear-regression.html#cb107-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="avhgtdlwak" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="wmzksfhxvw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#avhgtdlwak .gt_table {
+#wmzksfhxvw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -7327,7 +7331,7 @@ Check the residuals:</p>
   border-left-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_heading {
+#wmzksfhxvw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -7339,7 +7343,7 @@ Check the residuals:</p>
   border-right-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_title {
+#wmzksfhxvw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -7349,7 +7353,7 @@ Check the residuals:</p>
   border-bottom-width: 0;
 }
 
-#avhgtdlwak .gt_subtitle {
+#wmzksfhxvw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -7359,13 +7363,13 @@ Check the residuals:</p>
   border-top-width: 0;
 }
 
-#avhgtdlwak .gt_bottom_border {
+#wmzksfhxvw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_col_headings {
+#wmzksfhxvw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -7380,7 +7384,7 @@ Check the residuals:</p>
   border-right-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_col_heading {
+#wmzksfhxvw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -7400,7 +7404,7 @@ Check the residuals:</p>
   overflow-x: hidden;
 }
 
-#avhgtdlwak .gt_column_spanner_outer {
+#wmzksfhxvw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -7412,15 +7416,15 @@ Check the residuals:</p>
   padding-right: 4px;
 }
 
-#avhgtdlwak .gt_column_spanner_outer:first-child {
+#wmzksfhxvw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#avhgtdlwak .gt_column_spanner_outer:last-child {
+#wmzksfhxvw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#avhgtdlwak .gt_column_spanner {
+#wmzksfhxvw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -7432,7 +7436,7 @@ Check the residuals:</p>
   width: 100%;
 }
 
-#avhgtdlwak .gt_group_heading {
+#wmzksfhxvw .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -7454,7 +7458,7 @@ Check the residuals:</p>
   vertical-align: middle;
 }
 
-#avhgtdlwak .gt_empty_group_heading {
+#wmzksfhxvw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -7469,15 +7473,15 @@ Check the residuals:</p>
   vertical-align: middle;
 }
 
-#avhgtdlwak .gt_from_md > :first-child {
+#wmzksfhxvw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#avhgtdlwak .gt_from_md > :last-child {
+#wmzksfhxvw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#avhgtdlwak .gt_row {
+#wmzksfhxvw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -7496,7 +7500,7 @@ Check the residuals:</p>
   overflow-x: hidden;
 }
 
-#avhgtdlwak .gt_stub {
+#wmzksfhxvw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -7508,7 +7512,7 @@ Check the residuals:</p>
   padding-left: 12px;
 }
 
-#avhgtdlwak .gt_summary_row {
+#wmzksfhxvw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -7518,7 +7522,7 @@ Check the residuals:</p>
   padding-right: 5px;
 }
 
-#avhgtdlwak .gt_first_summary_row {
+#wmzksfhxvw .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -7528,7 +7532,7 @@ Check the residuals:</p>
   border-top-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_grand_summary_row {
+#wmzksfhxvw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -7538,7 +7542,7 @@ Check the residuals:</p>
   padding-right: 5px;
 }
 
-#avhgtdlwak .gt_first_grand_summary_row {
+#wmzksfhxvw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -7548,11 +7552,11 @@ Check the residuals:</p>
   border-top-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_striped {
+#wmzksfhxvw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#avhgtdlwak .gt_table_body {
+#wmzksfhxvw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -7561,7 +7565,7 @@ Check the residuals:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_footnotes {
+#wmzksfhxvw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -7575,13 +7579,13 @@ Check the residuals:</p>
   border-right-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_footnote {
+#wmzksfhxvw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#avhgtdlwak .gt_sourcenotes {
+#wmzksfhxvw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -7595,41 +7599,41 @@ Check the residuals:</p>
   border-right-color: #D3D3D3;
 }
 
-#avhgtdlwak .gt_sourcenote {
+#wmzksfhxvw .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#avhgtdlwak .gt_left {
+#wmzksfhxvw .gt_left {
   text-align: left;
 }
 
-#avhgtdlwak .gt_center {
+#wmzksfhxvw .gt_center {
   text-align: center;
 }
 
-#avhgtdlwak .gt_right {
+#wmzksfhxvw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#avhgtdlwak .gt_font_normal {
+#wmzksfhxvw .gt_font_normal {
   font-weight: normal;
 }
 
-#avhgtdlwak .gt_font_bold {
+#wmzksfhxvw .gt_font_bold {
   font-weight: bold;
 }
 
-#avhgtdlwak .gt_font_italic {
+#wmzksfhxvw .gt_font_italic {
   font-style: italic;
 }
 
-#avhgtdlwak .gt_super {
+#wmzksfhxvw .gt_super {
   font-size: 65%;
 }
 
-#avhgtdlwak .gt_footnote_marks {
+#wmzksfhxvw .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -7842,12 +7846,12 @@ There is a point with high leverage, but it has a fairly small standardized resi
 <span id="cb125-5"><a href="linear-regression.html#cb125-5" aria-hidden="true" tabindex="-1"></a>fit_tidy <span class="ot">&lt;-</span> <span class="fu">tidy</span>(lm_sales_price_urban_us_fit)</span>
 <span id="cb125-6"><a href="linear-regression.html#cb125-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_sales_price_urban_us_fit) <span class="sc">%&gt;%</span></span>
 <span id="cb125-7"><a href="linear-regression.html#cb125-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="tupmcrmity" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mpgmzwvnvt" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#tupmcrmity .gt_table {
+#mpgmzwvnvt .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -7872,7 +7876,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-left-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_heading {
+#mpgmzwvnvt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -7884,7 +7888,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_title {
+#mpgmzwvnvt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -7894,7 +7898,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-bottom-width: 0;
 }
 
-#tupmcrmity .gt_subtitle {
+#mpgmzwvnvt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -7904,13 +7908,13 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-width: 0;
 }
 
-#tupmcrmity .gt_bottom_border {
+#mpgmzwvnvt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_col_headings {
+#mpgmzwvnvt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -7925,7 +7929,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_col_heading {
+#mpgmzwvnvt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -7945,7 +7949,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   overflow-x: hidden;
 }
 
-#tupmcrmity .gt_column_spanner_outer {
+#mpgmzwvnvt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -7957,15 +7961,15 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 4px;
 }
 
-#tupmcrmity .gt_column_spanner_outer:first-child {
+#mpgmzwvnvt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tupmcrmity .gt_column_spanner_outer:last-child {
+#mpgmzwvnvt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tupmcrmity .gt_column_spanner {
+#mpgmzwvnvt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -7977,7 +7981,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   width: 100%;
 }
 
-#tupmcrmity .gt_group_heading {
+#mpgmzwvnvt .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -7999,7 +8003,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   vertical-align: middle;
 }
 
-#tupmcrmity .gt_empty_group_heading {
+#mpgmzwvnvt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -8014,15 +8018,15 @@ There is a point with high leverage, but it has a fairly small standardized resi
   vertical-align: middle;
 }
 
-#tupmcrmity .gt_from_md > :first-child {
+#mpgmzwvnvt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tupmcrmity .gt_from_md > :last-child {
+#mpgmzwvnvt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tupmcrmity .gt_row {
+#mpgmzwvnvt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8041,7 +8045,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   overflow-x: hidden;
 }
 
-#tupmcrmity .gt_stub {
+#mpgmzwvnvt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8053,7 +8057,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-left: 12px;
 }
 
-#tupmcrmity .gt_summary_row {
+#mpgmzwvnvt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -8063,7 +8067,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 5px;
 }
 
-#tupmcrmity .gt_first_summary_row {
+#mpgmzwvnvt .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8073,7 +8077,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_grand_summary_row {
+#mpgmzwvnvt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -8083,7 +8087,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 5px;
 }
 
-#tupmcrmity .gt_first_grand_summary_row {
+#mpgmzwvnvt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8093,11 +8097,11 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_striped {
+#mpgmzwvnvt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#tupmcrmity .gt_table_body {
+#mpgmzwvnvt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -8106,7 +8110,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-bottom-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_footnotes {
+#mpgmzwvnvt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -8120,13 +8124,13 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_footnote {
+#mpgmzwvnvt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#tupmcrmity .gt_sourcenotes {
+#mpgmzwvnvt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -8140,41 +8144,41 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#tupmcrmity .gt_sourcenote {
+#mpgmzwvnvt .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#tupmcrmity .gt_left {
+#mpgmzwvnvt .gt_left {
   text-align: left;
 }
 
-#tupmcrmity .gt_center {
+#mpgmzwvnvt .gt_center {
   text-align: center;
 }
 
-#tupmcrmity .gt_right {
+#mpgmzwvnvt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tupmcrmity .gt_font_normal {
+#mpgmzwvnvt .gt_font_normal {
   font-weight: normal;
 }
 
-#tupmcrmity .gt_font_bold {
+#mpgmzwvnvt .gt_font_bold {
   font-weight: bold;
 }
 
-#tupmcrmity .gt_font_italic {
+#mpgmzwvnvt .gt_font_italic {
   font-style: italic;
 }
 
-#tupmcrmity .gt_super {
+#mpgmzwvnvt .gt_super {
   font-size: 65%;
 }
 
-#tupmcrmity .gt_footnote_marks {
+#mpgmzwvnvt .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -8256,12 +8260,12 @@ There is a point with high leverage, but it has a fairly small standardized resi
 <span id="cb127-2"><a href="linear-regression.html#cb127-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Sales <span class="sc">~</span> Price <span class="sc">+</span> US, <span class="at">data =</span> carseats)</span>
 <span id="cb127-3"><a href="linear-regression.html#cb127-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy_custom</span>(lm_sales_price_us_fit) <span class="sc">%&gt;%</span></span>
 <span id="cb127-4"><a href="linear-regression.html#cb127-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="ocshpuwanc" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ruaoegdphr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#ocshpuwanc .gt_table {
+#ruaoegdphr .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -8286,7 +8290,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-left-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_heading {
+#ruaoegdphr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -8298,7 +8302,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_title {
+#ruaoegdphr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -8308,7 +8312,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-bottom-width: 0;
 }
 
-#ocshpuwanc .gt_subtitle {
+#ruaoegdphr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -8318,13 +8322,13 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-width: 0;
 }
 
-#ocshpuwanc .gt_bottom_border {
+#ruaoegdphr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_col_headings {
+#ruaoegdphr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -8339,7 +8343,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_col_heading {
+#ruaoegdphr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8359,7 +8363,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   overflow-x: hidden;
 }
 
-#ocshpuwanc .gt_column_spanner_outer {
+#ruaoegdphr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8371,15 +8375,15 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 4px;
 }
 
-#ocshpuwanc .gt_column_spanner_outer:first-child {
+#ruaoegdphr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ocshpuwanc .gt_column_spanner_outer:last-child {
+#ruaoegdphr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ocshpuwanc .gt_column_spanner {
+#ruaoegdphr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -8391,7 +8395,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   width: 100%;
 }
 
-#ocshpuwanc .gt_group_heading {
+#ruaoegdphr .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -8413,7 +8417,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   vertical-align: middle;
 }
 
-#ocshpuwanc .gt_empty_group_heading {
+#ruaoegdphr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -8428,15 +8432,15 @@ There is a point with high leverage, but it has a fairly small standardized resi
   vertical-align: middle;
 }
 
-#ocshpuwanc .gt_from_md > :first-child {
+#ruaoegdphr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ocshpuwanc .gt_from_md > :last-child {
+#ruaoegdphr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ocshpuwanc .gt_row {
+#ruaoegdphr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8455,7 +8459,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   overflow-x: hidden;
 }
 
-#ocshpuwanc .gt_stub {
+#ruaoegdphr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8467,7 +8471,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-left: 12px;
 }
 
-#ocshpuwanc .gt_summary_row {
+#ruaoegdphr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -8477,7 +8481,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 5px;
 }
 
-#ocshpuwanc .gt_first_summary_row {
+#ruaoegdphr .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8487,7 +8491,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_grand_summary_row {
+#ruaoegdphr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -8497,7 +8501,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 5px;
 }
 
-#ocshpuwanc .gt_first_grand_summary_row {
+#ruaoegdphr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8507,11 +8511,11 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_striped {
+#ruaoegdphr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ocshpuwanc .gt_table_body {
+#ruaoegdphr .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -8520,7 +8524,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-bottom-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_footnotes {
+#ruaoegdphr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -8534,13 +8538,13 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_footnote {
+#ruaoegdphr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#ocshpuwanc .gt_sourcenotes {
+#ruaoegdphr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -8554,41 +8558,41 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#ocshpuwanc .gt_sourcenote {
+#ruaoegdphr .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#ocshpuwanc .gt_left {
+#ruaoegdphr .gt_left {
   text-align: left;
 }
 
-#ocshpuwanc .gt_center {
+#ruaoegdphr .gt_center {
   text-align: center;
 }
 
-#ocshpuwanc .gt_right {
+#ruaoegdphr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ocshpuwanc .gt_font_normal {
+#ruaoegdphr .gt_font_normal {
   font-weight: normal;
 }
 
-#ocshpuwanc .gt_font_bold {
+#ruaoegdphr .gt_font_bold {
   font-weight: bold;
 }
 
-#ocshpuwanc .gt_font_italic {
+#ruaoegdphr .gt_font_italic {
   font-style: italic;
 }
 
-#ocshpuwanc .gt_super {
+#ruaoegdphr .gt_super {
   font-size: 65%;
 }
 
-#ocshpuwanc .gt_footnote_marks {
+#ruaoegdphr .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -8637,12 +8641,12 @@ There is a point with high leverage, but it has a fairly small standardized resi
 <span id="cb128-6"><a href="linear-regression.html#cb128-6" aria-hidden="true" tabindex="-1"></a>    model, <span class="at">R2 =</span> <span class="fu">round</span>(r.squared, <span class="dv">3</span>), <span class="at">RSE =</span> <span class="fu">round</span>(sigma, <span class="dv">3</span>)</span>
 <span id="cb128-7"><a href="linear-regression.html#cb128-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb128-8"><a href="linear-regression.html#cb128-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="okdaalydmq" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="beuujdorjw" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#okdaalydmq .gt_table {
+#beuujdorjw .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -8667,7 +8671,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-left-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_heading {
+#beuujdorjw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -8679,7 +8683,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_title {
+#beuujdorjw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -8689,7 +8693,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-bottom-width: 0;
 }
 
-#okdaalydmq .gt_subtitle {
+#beuujdorjw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -8699,13 +8703,13 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-width: 0;
 }
 
-#okdaalydmq .gt_bottom_border {
+#beuujdorjw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_col_headings {
+#beuujdorjw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -8720,7 +8724,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_col_heading {
+#beuujdorjw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8740,7 +8744,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   overflow-x: hidden;
 }
 
-#okdaalydmq .gt_column_spanner_outer {
+#beuujdorjw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8752,15 +8756,15 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 4px;
 }
 
-#okdaalydmq .gt_column_spanner_outer:first-child {
+#beuujdorjw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#okdaalydmq .gt_column_spanner_outer:last-child {
+#beuujdorjw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#okdaalydmq .gt_column_spanner {
+#beuujdorjw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -8772,7 +8776,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   width: 100%;
 }
 
-#okdaalydmq .gt_group_heading {
+#beuujdorjw .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -8794,7 +8798,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   vertical-align: middle;
 }
 
-#okdaalydmq .gt_empty_group_heading {
+#beuujdorjw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -8809,15 +8813,15 @@ There is a point with high leverage, but it has a fairly small standardized resi
   vertical-align: middle;
 }
 
-#okdaalydmq .gt_from_md > :first-child {
+#beuujdorjw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#okdaalydmq .gt_from_md > :last-child {
+#beuujdorjw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#okdaalydmq .gt_row {
+#beuujdorjw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8836,7 +8840,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   overflow-x: hidden;
 }
 
-#okdaalydmq .gt_stub {
+#beuujdorjw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -8848,7 +8852,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-left: 12px;
 }
 
-#okdaalydmq .gt_summary_row {
+#beuujdorjw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -8858,7 +8862,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 5px;
 }
 
-#okdaalydmq .gt_first_summary_row {
+#beuujdorjw .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8868,7 +8872,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_grand_summary_row {
+#beuujdorjw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -8878,7 +8882,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   padding-right: 5px;
 }
 
-#okdaalydmq .gt_first_grand_summary_row {
+#beuujdorjw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -8888,11 +8892,11 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-top-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_striped {
+#beuujdorjw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#okdaalydmq .gt_table_body {
+#beuujdorjw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -8901,7 +8905,7 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-bottom-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_footnotes {
+#beuujdorjw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -8915,13 +8919,13 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_footnote {
+#beuujdorjw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#okdaalydmq .gt_sourcenotes {
+#beuujdorjw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -8935,41 +8939,41 @@ There is a point with high leverage, but it has a fairly small standardized resi
   border-right-color: #D3D3D3;
 }
 
-#okdaalydmq .gt_sourcenote {
+#beuujdorjw .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#okdaalydmq .gt_left {
+#beuujdorjw .gt_left {
   text-align: left;
 }
 
-#okdaalydmq .gt_center {
+#beuujdorjw .gt_center {
   text-align: center;
 }
 
-#okdaalydmq .gt_right {
+#beuujdorjw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#okdaalydmq .gt_font_normal {
+#beuujdorjw .gt_font_normal {
   font-weight: normal;
 }
 
-#okdaalydmq .gt_font_bold {
+#beuujdorjw .gt_font_bold {
   font-weight: bold;
 }
 
-#okdaalydmq .gt_font_italic {
+#beuujdorjw .gt_font_italic {
   font-style: italic;
 }
 
-#okdaalydmq .gt_super {
+#beuujdorjw .gt_super {
   font-size: 65%;
 }
 
-#okdaalydmq .gt_footnote_marks {
+#beuujdorjw .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -9017,12 +9021,12 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
 <span id="cb131-3"><a href="linear-regression.html#cb131-3" aria-hidden="true" tabindex="-1"></a>    term, <span class="fu">across</span>(<span class="fu">c</span>(estimate, conf.low, conf.high), round, <span class="dv">3</span>)</span>
 <span id="cb131-4"><a href="linear-regression.html#cb131-4" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb131-5"><a href="linear-regression.html#cb131-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
-<div id="bytcjwkzwk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="vmzhdfekfj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#bytcjwkzwk .gt_table {
+#vmzhdfekfj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -9047,7 +9051,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-left-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_heading {
+#vmzhdfekfj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -9059,7 +9063,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-right-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_title {
+#vmzhdfekfj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -9069,7 +9073,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-bottom-width: 0;
 }
 
-#bytcjwkzwk .gt_subtitle {
+#vmzhdfekfj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -9079,13 +9083,13 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-top-width: 0;
 }
 
-#bytcjwkzwk .gt_bottom_border {
+#vmzhdfekfj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_col_headings {
+#vmzhdfekfj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -9100,7 +9104,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-right-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_col_heading {
+#vmzhdfekfj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -9120,7 +9124,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   overflow-x: hidden;
 }
 
-#bytcjwkzwk .gt_column_spanner_outer {
+#vmzhdfekfj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -9132,15 +9136,15 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   padding-right: 4px;
 }
 
-#bytcjwkzwk .gt_column_spanner_outer:first-child {
+#vmzhdfekfj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bytcjwkzwk .gt_column_spanner_outer:last-child {
+#vmzhdfekfj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bytcjwkzwk .gt_column_spanner {
+#vmzhdfekfj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -9152,7 +9156,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   width: 100%;
 }
 
-#bytcjwkzwk .gt_group_heading {
+#vmzhdfekfj .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -9174,7 +9178,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   vertical-align: middle;
 }
 
-#bytcjwkzwk .gt_empty_group_heading {
+#vmzhdfekfj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -9189,15 +9193,15 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   vertical-align: middle;
 }
 
-#bytcjwkzwk .gt_from_md > :first-child {
+#vmzhdfekfj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bytcjwkzwk .gt_from_md > :last-child {
+#vmzhdfekfj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bytcjwkzwk .gt_row {
+#vmzhdfekfj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -9216,7 +9220,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   overflow-x: hidden;
 }
 
-#bytcjwkzwk .gt_stub {
+#vmzhdfekfj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -9228,7 +9232,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   padding-left: 12px;
 }
 
-#bytcjwkzwk .gt_summary_row {
+#vmzhdfekfj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -9238,7 +9242,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   padding-right: 5px;
 }
 
-#bytcjwkzwk .gt_first_summary_row {
+#vmzhdfekfj .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -9248,7 +9252,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-top-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_grand_summary_row {
+#vmzhdfekfj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -9258,7 +9262,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   padding-right: 5px;
 }
 
-#bytcjwkzwk .gt_first_grand_summary_row {
+#vmzhdfekfj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -9268,11 +9272,11 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-top-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_striped {
+#vmzhdfekfj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bytcjwkzwk .gt_table_body {
+#vmzhdfekfj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -9281,7 +9285,7 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_footnotes {
+#vmzhdfekfj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -9295,13 +9299,13 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-right-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_footnote {
+#vmzhdfekfj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#bytcjwkzwk .gt_sourcenotes {
+#vmzhdfekfj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -9315,41 +9319,41 @@ Run an <span class="math inline">\(F\)</span>-test as well:</p>
   border-right-color: #D3D3D3;
 }
 
-#bytcjwkzwk .gt_sourcenote {
+#vmzhdfekfj .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#bytcjwkzwk .gt_left {
+#vmzhdfekfj .gt_left {
   text-align: left;
 }
 
-#bytcjwkzwk .gt_center {
+#vmzhdfekfj .gt_center {
   text-align: center;
 }
 
-#bytcjwkzwk .gt_right {
+#vmzhdfekfj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bytcjwkzwk .gt_font_normal {
+#vmzhdfekfj .gt_font_normal {
   font-weight: normal;
 }
 
-#bytcjwkzwk .gt_font_bold {
+#vmzhdfekfj .gt_font_bold {
   font-weight: bold;
 }
 
-#bytcjwkzwk .gt_font_italic {
+#vmzhdfekfj .gt_font_italic {
   font-style: italic;
 }
 
-#bytcjwkzwk .gt_super {
+#vmzhdfekfj .gt_super {
   font-size: 65%;
 }
 
-#bytcjwkzwk .gt_footnote_marks {
+#vmzhdfekfj .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -12896,7 +12900,7 @@ Exclude it and fit again:</p>
 Reproducibility receipt
 </summary>
 <div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb170-1"><a href="linear-regression.html#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2021-11-24 00:34:40 AST&quot;</code></pre>
+<pre><code>## [1] &quot;2021-11-26 00:21:34 AST&quot;</code></pre>
 <div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="linear-regression.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
 <span id="cb172-2"><a href="linear-regression.html#cb172-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
 <span id="cb172-3"><a href="linear-regression.html#cb172-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
@@ -12904,7 +12908,7 @@ Reproducibility receipt
 <span id="cb172-5"><a href="linear-regression.html#cb172-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [a7a4ccd] 2021-11-23: Started 4.6</code></pre>
+## Head:     [3fe2970] 2021-11-24: Almost finished the lab</code></pre>
 <div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb174-1"><a href="linear-regression.html#cb174-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## - Session info ---------------------------------------------------------------
 ##  setting  value                       
@@ -12916,7 +12920,7 @@ Reproducibility receipt
 ##  collate  English_Canada.1252         
 ##  ctype    English_Canada.1252         
 ##  tz       America/Curacao             
-##  date     2021-11-24                  
+##  date     2021-11-26                  
 ## 
 ## - Packages -------------------------------------------------------------------
 ##  package      * version    date       lib source                           

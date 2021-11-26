@@ -1,4 +1,5 @@
 tab:unnamed-chunk-121
+tab:unnamed-chunk-161
 introduction
 statistical-learning
 what-is-statistical-learning
@@ -62,3 +63,4 @@ quadratic-discriminant-analysis-1
 naive-bayes-1
 k-nearest-neighbors-1
 poisson-regression
+exercises-1
