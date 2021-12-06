@@ -841,7 +841,7 @@ $$
 \end{align}
 $$
 
-QDA gets its name from how the quantity $x$ appears as quadratic function in the first term of the above equation.
+is largest. QDA gets its name from how the quantity $x$ appears as quadratic function in the first term of the above equation.
 
 >Why does it matter whether or not we assume that the $K$ classes share a
 common covariance matrix? In other words, why would one prefer LDA to
@@ -1464,7 +1464,7 @@ smarket %>%
 
 Use `tidymodels` to fit the model and produce the confusion matrix:
 
-```{r}
+```{r message=FALSE}
 library(tidymodels)
 
 glm_direction_fit <-
@@ -1593,7 +1593,7 @@ Indeed it does.
 
 Perform LDA to predict `Direction` from `Lag1` and `Lag2`:
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(discrim)
 lda_direction_fit <-
   # Note that this model definition does not come with parsnip, but the
@@ -1868,7 +1868,7 @@ augment(glm_purchase_fit, new_data = caravan_test) %>%
 
 We will again fit the `bikeshare` data with Poisson regression, but this time with `tidymodels`:
 
-```{r}
+```{r warning=FALSE}
 library(poissonreg)
 glm_bikers_model <-
   poisson_reg(mode = "regression", engine = "glm")

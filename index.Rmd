@@ -18,6 +18,10 @@ description: "Working through ISLR with the tidyverse and tidymodels"
 I am a data scientist and statistician who is (mostly) self-taught from textbooks and generous people sharing their work online.
 Inspired by projects like [Solomon Kurz's recoding of Statistical Rethinking](https://bookdown.org/content/3890/), I decided to publicly document my notes and code as I work through [An Introduction to Statistical Learning, 2nd edition](https://www.statlearning.com/) by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani.
 
-I prefer to work with the [`tidyverse`](https://www.tidyverse.org/) collection of R packages, and will be teaching myself the [`tidymodels` framework](https://www.tidymodels.org/) for machine learning along the way.
+I prefer to work with the [`tidyverse`](https://www.tidyverse.org/) collection of R packages, and so will be using those to wrangle and visualize the data.
+Along the way, I'll be teaching myself the [`tidymodels` framework](https://www.tidymodels.org/) for machine learning.
+In general, my plan for each chapter/concept is to start with the original modeling package, then move towards the `tidymodels` approach in the labs and exercises.
+For example, I'll first perform logistic regression with `glm()`, then use `parsnip::logistic_reg()` by the end of the chapter.
+I think this will help me better appreciate the unified interface provided with `tidymodels`, and maybe help me better understand what is going on under the hood.
 
 I won't be doing every exercise or section. My main goal for this project is to improve my statistical programming, so I will focus on the applied exercises rather than the conceptual.
