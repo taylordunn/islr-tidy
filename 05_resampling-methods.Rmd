@@ -111,6 +111,26 @@ p1 <- p2 %+% filter(d, rep == 1) +
 p1 | p2
 ```
 
+As is clear from the right-hand panel, this approach is highly variable depending on the testing/validation set split.
+Another downside is that, because the training set used to fit the data has fewer observations, it tends to overestimate the test error rate on the entire data set.
+
+### Leave-One-Out Cross Validation
+
+*Leave-one-out cross validation* (LOOCV) attempts to address the shortcomings of the validation set approach.
+It still involves splitting the $n$ observations into two parts, but it repeats it $n$ times, with a single observation $(x_i, y_i)$ as the hold-out "set" and the remaining $n-1$ observations as the training set.
+The MSE for each iteration is simply $\text{MSE}_i = (y_i - \hat{y}_i)^2$.
+Then the LOOCV estimate of the MSE is the average over all observations:
+
+$$
+\text{CV}_{(n)} = \frac{1}{n} \sum_{i=1}^n \text{MSE}_i.
+$$
+
+The LOOCV approach has a few advantages over the validation set approach:
+
+>
+* First, it has far less bias. In LOOCV, we repeatedly fit the statistical learning method using training sets that contain $n − 1$ observations, almost as many as are in the entire data set. This is in contrast to the validation set approach, in which the training set is typically around half the size of the original data set. Consequently, the LOOCV approach tends not to overestimate the test error rate as much as the validation set approach does.
+* Second, in contrast to the validation approach which will yield different results when applied repeatedly due to randomness in the training/validation set splits, performing LOOCV multiple times will always yield the same results: there is no randomness in the training/validation set splits.
+
 
 ## The Bootstrap
 
