@@ -64,3 +64,10 @@ naive-bayes-1
 k-nearest-neighbors-1
 poisson-regression
 exercises-1
+resampling-methods
+cross-validation
+the-validation-set-approach
+leave-one-out-cross-validation
+the-bootstrap
+lab-cross-validation-and-the-bootstrap
+exercises-2

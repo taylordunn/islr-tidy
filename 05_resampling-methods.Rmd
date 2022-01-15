@@ -32,7 +32,7 @@ In this section we consider methods which involve *holding out* a subset of the 
 
 ### The Validation Set Approach
 
-This simple strategy involves randomly dividing available oberservations into the training and validation set.
+This simple strategy involves randomly dividing available observations into training and validation sets.
 The model is fitted on the training set, and used to make predictions on the validation set.
 The corresponding metric from the validation set predictions -- usually MSE in the case of a quantitative response -- provides an estimate of the test error rate.
 To illustrate this, load the `Auto` data set and R packages:
@@ -55,7 +55,7 @@ set_palette()
 
 Randomly split the data into 50% training and 50% validation, fit on the training set, and compute the MSE on the validation set.
 Since I'll be repeating this 10 times to reproduce the figure, make it a function:
-^[In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because `yardstick` has a `rmse()` function but not an `mse()` function. If I wanted to, I could define a custom metric [like so](https://yardstick.tidymodels.org/articles/custom-metrics.html).]
+^[In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because `yardstick` has a `rmse()` function but not an `mse()` function. If I wanted to, I could define a custom metric [like this](https://yardstick.tidymodels.org/articles/custom-metrics.html).]
 
 
 ```{r}
@@ -95,15 +95,13 @@ d <- map_dfr(1:10, evaluate_auto_fit, .id = "rep")
 pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
 
 p2 <- d %>%
-  #filter(rep == 1) %>%
   ggplot(aes(x = poly, y = lm_rmse^2, fill = rep)) +
   geom_line(aes(color = rep), size = 1) +
-  #geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
   expand_limits(y = c(15, 30)) +
   scale_x_continuous(breaks = seq(2, 10, 2)) +
   scale_color_manual(values = pal) +
   scale_fill_manual(values = pal) +
-  labs(x = "Degree of polynomial") +
+  labs(x = "Degree of polynomial", y = NULL) +
   theme(legend.position = "none")
 p1 <- p2 %+% filter(d, rep == 1) +
   geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +

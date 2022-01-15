@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>1 Introduction | An Introduction to Statistical Learning with the tidyverse</title>
+  <title>5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="1 Introduction | An Introduction to Statistical Learning with the tidyverse" />
+  <meta property="og:title" content="5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="taylordunn/islr-tidy" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="1 Introduction | An Introduction to Statistical Learning with the tidyverse" />
+  <meta name="twitter:title" content="5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse" />
   
   <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="index.html"/>
-<link rel="next" href="statistical-learning.html"/>
+<link rel="prev" href="classification.html"/>
+
 <script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -291,109 +291,174 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="introduction" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Introduction</h1>
-<div id="an-overview-of-statistical-learning" class="section level2 unnumbered">
-<h2>An Overview of Statistical Learning</h2>
+<div id="resampling-methods" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Resampling Methods</h1>
 <blockquote>
-<p>Broadly speaking, supervised statistical learning involves building a statistical model for predicting, or estimating, an output based on one or more inputs.</p>
+<p>Resampling methods are an indispensable tool in modern statistics. They
+involve repeatedly drawing samples from a training set and refitting a model
+of interest on each sample in order to obtain additional information about
+the fitted model. For example, in order to estimate the variability of a linear
+regression fit, we can repeatedly draw different samples from the training
+data, fit a linear regression to each new sample, and then examine the
+extent to which the resulting fits differ. Such an approach may allow us to
+obtain information that would not be available from fitting the model only
+once using the original training sample.</p>
 </blockquote>
 <blockquote>
-<p>With unsupervised statistical learning, there are inputs but no supervising output; nevertheless we can learn relationships and structure from such data.</p>
+<p>In this chapter, we discuss two of the most commonly
+used resampling methods, <em>cross-validation</em> and the <em>bootstrap</em>.</p>
 </blockquote>
-<div id="wage-data" class="section level3 unnumbered">
-<h3>Wage Data</h3>
-<p>Load the <code>Wage</code> data set via the <code>ISLR2</code> package:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="introduction.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR2)</span>
-<span id="cb1-2"><a href="introduction.html#cb1-2" aria-hidden="true" tabindex="-1"></a>wage <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Wage</span>
-<span id="cb1-3"><a href="introduction.html#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="introduction.html#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(wage)</span></code></pre></div>
-<pre><code>##        year age           maritl     race       education             region
-## 231655 2006  18 1. Never Married 1. White    1. &lt; HS Grad 2. Middle Atlantic
-## 86582  2004  24 1. Never Married 1. White 4. College Grad 2. Middle Atlantic
-## 161300 2003  45       2. Married 1. White 3. Some College 2. Middle Atlantic
-## 155159 2003  43       2. Married 3. Asian 4. College Grad 2. Middle Atlantic
-## 11443  2005  50      4. Divorced 1. White      2. HS Grad 2. Middle Atlantic
-## 376662 2008  54       2. Married 1. White 4. College Grad 2. Middle Atlantic
-##              jobclass         health health_ins  logwage      wage
-## 231655  1. Industrial      1. &lt;=Good      2. No 4.318063  75.04315
-## 86582  2. Information 2. &gt;=Very Good      2. No 4.255273  70.47602
-## 161300  1. Industrial      1. &lt;=Good     1. Yes 4.875061 130.98218
-## 155159 2. Information 2. &gt;=Very Good     1. Yes 5.041393 154.68529
-## 11443  2. Information      1. &lt;=Good     1. Yes 4.318063  75.04315
-## 376662 2. Information 2. &gt;=Very Good     1. Yes 4.845098 127.11574</code></pre>
-<p>Load the <code>tidyverse</code>, and set my <code>ggplot2</code> theme:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="introduction.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb3-2"><a href="introduction.html#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr) <span class="co"># My personal R package</span></span>
-<span id="cb3-3"><a href="introduction.html#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># For composing plots</span></span>
-<span id="cb3-4"><a href="introduction.html#cb3-4" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-5"><a href="introduction.html#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
-<span id="cb3-6"><a href="introduction.html#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
-<span id="cb3-7"><a href="introduction.html#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
-<p>Now attempt to re-create Figure 1.1:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="introduction.html#cb4-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> wage <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="introduction.html#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> wage)) <span class="sc">+</span></span>
-<span id="cb4-3"><a href="introduction.html#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;lightgrey&quot;</span>) <span class="sc">+</span></span>
-<span id="cb4-4"><a href="introduction.html#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">color =</span> <span class="st">&quot;blue&quot;</span>)</span>
-<span id="cb4-5"><a href="introduction.html#cb4-5" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> wage <span class="sc">%&gt;%</span></span>
-<span id="cb4-6"><a href="introduction.html#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> wage)) <span class="sc">+</span></span>
-<span id="cb4-7"><a href="introduction.html#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&quot;lightgrey&quot;</span>) <span class="sc">+</span></span>
-<span id="cb4-8"><a href="introduction.html#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>)</span>
-<span id="cb4-9"><a href="introduction.html#cb4-9" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> wage <span class="sc">%&gt;%</span></span>
-<span id="cb4-10"><a href="introduction.html#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Need to re-label the factor levels</span></span>
-<span id="cb4-11"><a href="introduction.html#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">education =</span> <span class="fu">fct_relabel</span>(education, <span class="sc">~</span><span class="fu">str_extract</span>(., <span class="st">&quot;</span><span class="sc">\\</span><span class="st">d&quot;</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb4-12"><a href="introduction.html#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> education, <span class="at">y =</span> wage)) <span class="sc">+</span></span>
-<span id="cb4-13"><a href="introduction.html#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> education)) <span class="sc">+</span></span>
-<span id="cb4-14"><a href="introduction.html#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
-<span id="cb4-15"><a href="introduction.html#cb4-15" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2 <span class="sc">+</span> p3</span></code></pre></div>
-<p><img src="_main_files/figure-html/figure1.1-1.png" width="672" /></p>
+<p>Cross-validation is most often used to estimate test error associated with a statistical learning method, whereas the boostrap is most commonly used to provide a measure of accuracy for a given parameter/method.</p>
+<blockquote>
+<p>The process
+of evaluating a model’s performance is known as <em>model assessment</em>, whereas
+the process of selecting the proper level of flexibility for a model is known as <em>model selection</em>.</p>
+</blockquote>
+<div id="cross-validation" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Cross Validation</h2>
+<p>Sometimes we want to estimate the test error rate using the available training data.
+A number of approaches can be used for this.
+In this section we consider methods which involve <em>holding out</em> a subset of the training data from the fitting process, then applying the model to that hold-out set for model assessment.</p>
+<div id="the-validation-set-approach" class="section level3" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> The Validation Set Approach</h3>
+<p>This simple strategy involves randomly dividing available oberservations into the training and validation set.
+The model is fitted on the training set, and used to make predictions on the validation set.
+The corresponding metric from the validation set predictions – usually MSE in the case of a quantitative response – provides an estimate of the test error rate.
+To illustrate this, load the <code>Auto</code> data set and R packages:</p>
+<div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb332-1"><a href="resampling-methods.html#cb332-1" aria-hidden="true" tabindex="-1"></a>auto <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Auto</span>
+<span id="cb332-2"><a href="resampling-methods.html#cb332-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb332-3"><a href="resampling-methods.html#cb332-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb332-4"><a href="resampling-methods.html#cb332-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb332-5"><a href="resampling-methods.html#cb332-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb332-6"><a href="resampling-methods.html#cb332-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb332-7"><a href="resampling-methods.html#cb332-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># for composing plots</span></span>
+<span id="cb332-8"><a href="resampling-methods.html#cb332-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb332-9"><a href="resampling-methods.html#cb332-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb332-10"><a href="resampling-methods.html#cb332-10" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb332-11"><a href="resampling-methods.html#cb332-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
+<span id="cb332-12"><a href="resampling-methods.html#cb332-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb332-13"><a href="resampling-methods.html#cb332-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
+<p>Randomly split the data into 50% training and 50% validation, fit on the training set, and compute the MSE on the validation set.
+Since I’ll be repeating this 10 times to reproduce the figure, make it a function:<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb333-1"><a href="resampling-methods.html#cb333-1" aria-hidden="true" tabindex="-1"></a>evaluate_auto_fit <span class="ot">&lt;-</span> <span class="cf">function</span>(seed) {</span>
+<span id="cb333-2"><a href="resampling-methods.html#cb333-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb333-3"><a href="resampling-methods.html#cb333-3" aria-hidden="true" tabindex="-1"></a>  auto_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(auto, <span class="at">prop =</span> <span class="fl">0.5</span>)</span>
+<span id="cb333-4"><a href="resampling-methods.html#cb333-4" aria-hidden="true" tabindex="-1"></a>  auto_train <span class="ot">&lt;-</span> <span class="fu">training</span>(auto_split)</span>
+<span id="cb333-5"><a href="resampling-methods.html#cb333-5" aria-hidden="true" tabindex="-1"></a>  auto_validation <span class="ot">&lt;-</span> <span class="fu">testing</span>(auto_split)</span>
+<span id="cb333-6"><a href="resampling-methods.html#cb333-6" aria-hidden="true" tabindex="-1"></a>  auto_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto_train)</span>
+<span id="cb333-7"><a href="resampling-methods.html#cb333-7" aria-hidden="true" tabindex="-1"></a>  lm_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(<span class="fu">linear_reg</span>())</span>
+<span id="cb333-8"><a href="resampling-methods.html#cb333-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb333-9"><a href="resampling-methods.html#cb333-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">poly =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb333-10"><a href="resampling-methods.html#cb333-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb333-11"><a href="resampling-methods.html#cb333-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_rec =</span> <span class="fu">map</span>(</span>
+<span id="cb333-12"><a href="resampling-methods.html#cb333-12" aria-hidden="true" tabindex="-1"></a>        poly, <span class="sc">~</span> auto_rec <span class="sc">%&gt;%</span> <span class="fu">step_poly</span>(horsepower, <span class="at">degree =</span> .x)</span>
+<span id="cb333-13"><a href="resampling-methods.html#cb333-13" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb333-14"><a href="resampling-methods.html#cb333-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_fit =</span> <span class="fu">map</span>(</span>
+<span id="cb333-15"><a href="resampling-methods.html#cb333-15" aria-hidden="true" tabindex="-1"></a>        lm_rec, <span class="sc">~</span> lm_workflow <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(.x) <span class="sc">%&gt;%</span> <span class="fu">fit</span>(auto_train)</span>
+<span id="cb333-16"><a href="resampling-methods.html#cb333-16" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb333-17"><a href="resampling-methods.html#cb333-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_rmse =</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb333-18"><a href="resampling-methods.html#cb333-18" aria-hidden="true" tabindex="-1"></a>        lm_fit,</span>
+<span id="cb333-19"><a href="resampling-methods.html#cb333-19" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">augment</span>(.x, <span class="at">new_data =</span> auto_validation) <span class="sc">%&gt;%</span></span>
+<span id="cb333-20"><a href="resampling-methods.html#cb333-20" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rmse</span>(<span class="at">truth =</span> mpg, <span class="at">estimate =</span> .pred) <span class="sc">%&gt;%</span></span>
+<span id="cb333-21"><a href="resampling-methods.html#cb333-21" aria-hidden="true" tabindex="-1"></a>          <span class="fu">pull</span>(.estimate)</span>
+<span id="cb333-22"><a href="resampling-methods.html#cb333-22" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb333-23"><a href="resampling-methods.html#cb333-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb333-24"><a href="resampling-methods.html#cb333-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb333-25"><a href="resampling-methods.html#cb333-25" aria-hidden="true" tabindex="-1"></a><span class="fu">evaluate_auto_fit</span>(<span class="at">seed =</span> <span class="dv">308</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 4
+##     poly lm_rec   lm_fit     lm_rmse
+##    &lt;int&gt; &lt;list&gt;   &lt;list&gt;       &lt;dbl&gt;
+##  1     1 &lt;recipe&gt; &lt;workflow&gt;    4.63
+##  2     2 &lt;recipe&gt; &lt;workflow&gt;    4.17
+##  3     3 &lt;recipe&gt; &lt;workflow&gt;    4.16
+##  4     4 &lt;recipe&gt; &lt;workflow&gt;    4.16
+##  5     5 &lt;recipe&gt; &lt;workflow&gt;    4.16
+##  6     6 &lt;recipe&gt; &lt;workflow&gt;    4.14
+##  7     7 &lt;recipe&gt; &lt;workflow&gt;    4.13
+##  8     8 &lt;recipe&gt; &lt;workflow&gt;    4.22
+##  9     9 &lt;recipe&gt; &lt;workflow&gt;    4.25
+## 10    10 &lt;recipe&gt; &lt;workflow&gt;    4.26</code></pre>
+<p>Now reproduce Figure 5.2:</p>
+<div class="sourceCode" id="cb335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb335-1"><a href="resampling-methods.html#cb335-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, evaluate_auto_fit, <span class="at">.id =</span> <span class="st">&quot;rep&quot;</span>)</span>
+<span id="cb335-2"><a href="resampling-methods.html#cb335-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb335-3"><a href="resampling-methods.html#cb335-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a 10 color palette from the MetBrewer package</span></span>
+<span id="cb335-4"><a href="resampling-methods.html#cb335-4" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> MetBrewer<span class="sc">::</span><span class="fu">met.brewer</span>(<span class="st">&quot;Veronese&quot;</span>, <span class="dv">10</span>, <span class="at">type =</span> <span class="st">&quot;continuous&quot;</span>)</span>
+<span id="cb335-5"><a href="resampling-methods.html#cb335-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb335-6"><a href="resampling-methods.html#cb335-6" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb335-7"><a href="resampling-methods.html#cb335-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#filter(rep == 1) %&gt;%</span></span>
+<span id="cb335-8"><a href="resampling-methods.html#cb335-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly, <span class="at">y =</span> lm_rmse<span class="sc">^</span><span class="dv">2</span>, <span class="at">fill =</span> rep)) <span class="sc">+</span></span>
+<span id="cb335-9"><a href="resampling-methods.html#cb335-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> rep), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb335-10"><a href="resampling-methods.html#cb335-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#geom_point(aes(fill = rep), shape = 21,  color = &quot;white&quot;, size = 4) +</span></span>
+<span id="cb335-11"><a href="resampling-methods.html#cb335-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">30</span>)) <span class="sc">+</span></span>
+<span id="cb335-12"><a href="resampling-methods.html#cb335-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb335-13"><a href="resampling-methods.html#cb335-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
+<span id="cb335-14"><a href="resampling-methods.html#cb335-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
+<span id="cb335-15"><a href="resampling-methods.html#cb335-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Degree of polynomial&quot;</span>) <span class="sc">+</span></span>
+<span id="cb335-16"><a href="resampling-methods.html#cb335-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb335-17"><a href="resampling-methods.html#cb335-17" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p2 <span class="sc">%+%</span> <span class="fu">filter</span>(d, rep <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb335-18"><a href="resampling-methods.html#cb335-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> rep), <span class="at">shape =</span> <span class="dv">21</span>,  <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb335-19"><a href="resampling-methods.html#cb335-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;MSE&quot;</span>)</span>
+<span id="cb335-20"><a href="resampling-methods.html#cb335-20" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure%205.2-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>As is clear from the right-hand panel, this approach is highly variable depending on the testing/validation set split.
+Another downside is that, because the training set used to fit the data has fewer observations, it tends to overestimate the test error rate on the entire data set.</p>
+</div>
+<div id="leave-one-out-cross-validation" class="section level3" number="5.1.2">
+<h3><span class="header-section-number">5.1.2</span> Leave-One-Out Cross Validation</h3>
+<p><em>Leave-one-out cross validation</em> (LOOCV) attempts to address the shortcomings of the validation set approach.
+It still involves splitting the <span class="math inline">\(n\)</span> observations into two parts, but it repeats it <span class="math inline">\(n\)</span> times, with a single observation <span class="math inline">\((x_i, y_i)\)</span> as the hold-out “set” and the remaining <span class="math inline">\(n-1\)</span> observations as the training set.
+The MSE for each iteration is simply <span class="math inline">\(\text{MSE}_i = (y_i - \hat{y}_i)^2\)</span>.
+Then the LOOCV estimate of the MSE is the average over all observations:</p>
+<p><span class="math display">\[
+\text{CV}_{(n)} = \frac{1}{n} \sum_{i=1}^n \text{MSE}_i.
+\]</span></p>
+<p>The LOOCV approach has a few advantages over the validation set approach:</p>
+<blockquote>
+<ul>
+<li>First, it has far less bias. In LOOCV, we repeatedly fit the statistical learning method using training sets that contain <span class="math inline">\(n − 1\)</span> observations, almost as many as are in the entire data set. This is in contrast to the validation set approach, in which the training set is typically around half the size of the original data set. Consequently, the LOOCV approach tends not to overestimate the test error rate as much as the validation set approach does.</li>
+<li>Second, in contrast to the validation approach which will yield different results when applied repeatedly due to randomness in the training/validation set splits, performing LOOCV multiple times will always yield the same results: there is no randomness in the training/validation set splits.</li>
+</ul>
+</blockquote>
 </div>
 </div>
-<div id="a-brief-history-of-statistical-learning" class="section level2 unnumbered">
-<h2>A Brief History of Statistical Learning</h2>
+<div id="the-bootstrap" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> The Bootstrap</h2>
 </div>
-<div id="this-book" class="section level2 unnumbered">
-<h2>This Book</h2>
-<blockquote>
-<p>The Elements of Statistical Learning (ESL) by Hastie, Tibshirani, and
-Friedman was first published in 2001. Since that time, it has become an
-important reference on the fundamentals of statistical machine learning.
-Its success derives from its comprehensive and detailed treatment of many
-important topics in statistical learning, as well as the fact that (relative to
-many upper-level statistics textbooks) it is accessible to a wide audience.</p>
-</blockquote>
-<blockquote>
-<p>The purpose of An Introduction to Statistical Learning (ISL) is to facilitate the transition of statistical learning from an academic to a mainstream
-field. ISL is not intended to replace ESL, which is a far more comprehensive text both in terms of the number of approaches considered and the
-depth to which they are explored.</p>
-</blockquote>
-<p>I may also pull from ESL <span class="citation">(<a href="#ref-Hastie2009" role="doc-biblioref">Hastie, Tibshirani, and Friedman 2009</a>)</span> at times for more detailed treatments of complex topics.</p>
-<blockquote>
-<p>ISL is based on the following four premises
-1. Many statistical learning methods are relevant and useful in a wide
-range of academic and non-academic disciplines, beyond just the statistical sciences.
-2. Statistical learning should not be viewed as a series of black boxes.
-3. While it is important to know what job is performed by each cog, it
-is not necessary to have the skills to construct the machine inside the
-box!
-4. We presume that the reader is interested in applying statistical learning methods to real-world problems.</p>
-</blockquote>
+<div id="lab-cross-validation-and-the-bootstrap" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Lab: Cross-Validation and the Bootstrap</h2>
+</div>
+<div id="exercises-2" class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Exercises</h2>
 
-</div>
-</div>
-<h3>References</h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Hastie2009" class="csl-entry">
+<div class="csl-entry">
 Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
 </div>
+<div class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+<div class="footnotes">
+<hr />
+<ol start="1">
+<li id="fn1"><p>In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because <code>yardstick</code> has a <code>rmse()</code> function but not an <code>mse()</code> function. If I wanted to, I could define a custom metric <a href="https://yardstick.tidymodels.org/articles/custom-metrics.html">like so</a>.<a href="resampling-methods.html#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="statistical-learning.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="classification.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
