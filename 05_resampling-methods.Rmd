@@ -1,0 +1,119 @@
+```{r echo=FALSE}
+knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
+                      fig.width = 6, fig.height = 3)
+```
+
+# Resampling Methods
+
+>Resampling methods are an indispensable tool in modern statistics. They
+involve repeatedly drawing samples from a training set and refitting a model
+of interest on each sample in order to obtain additional information about
+the fitted model. For example, in order to estimate the variability of a linear
+regression fit, we can repeatedly draw different samples from the training
+data, fit a linear regression to each new sample, and then examine the
+extent to which the resulting fits differ. Such an approach may allow us to
+obtain information that would not be available from fitting the model only
+once using the original training sample.
+
+>In this chapter, we discuss two of the most commonly
+used resampling methods, *cross-validation* and the *bootstrap*.
+
+Cross-validation is most often used to estimate test error associated with a statistical learning method, whereas the boostrap is most commonly used to provide a measure of accuracy for a given parameter/method.
+
+> The process
+of evaluating a model’s performance is known as *model assessment*, whereas 
+the process of selecting the proper level of flexibility for a model is known as *model selection*.
+
+## Cross Validation
+
+Sometimes we want to estimate the test error rate using the available training data.
+A number of approaches can be used for this.
+In this section we consider methods which involve *holding out* a subset of the training data from the fitting process, then applying the model to that hold-out set for model assessment.
+
+### The Validation Set Approach
+
+This simple strategy involves randomly dividing available oberservations into the training and validation set.
+The model is fitted on the training set, and used to make predictions on the validation set.
+The corresponding metric from the validation set predictions -- usually MSE in the case of a quantitative response -- provides an estimate of the test error rate.
+To illustrate this, load the `Auto` data set and R packages:
+
+```{r message=FALSE}
+auto <- ISLR2::Auto
+
+library(tidyverse)
+library(tidymodels)
+library(broom)
+library(gt)
+library(patchwork) # for composing plots
+# Load my R package and set the ggplot theme
+library(dunnr)
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td())
+set_geom_fonts()
+set_palette()
+```
+
+Randomly split the data into 50% training and 50% validation, fit on the training set, and compute the MSE on the validation set.
+Since I'll be repeating this 10 times to reproduce the figure, make it a function:
+^[In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because `yardstick` has a `rmse()` function but not an `mse()` function. If I wanted to, I could define a custom metric [like so](https://yardstick.tidymodels.org/articles/custom-metrics.html).]
+
+
+```{r}
+evaluate_auto_fit <- function(seed) {
+  set.seed(seed)
+  auto_split <- initial_split(auto, prop = 0.5)
+  auto_train <- training(auto_split)
+  auto_validation <- testing(auto_split)
+  auto_rec <- recipe(mpg ~ horsepower, data = auto_train)
+  lm_workflow <- workflow() %>% add_model(linear_reg())
+    
+  tibble(poly = 1:10) %>%
+    mutate(
+      lm_rec = map(
+        poly, ~ auto_rec %>% step_poly(horsepower, degree = .x)
+      ),
+      lm_fit = map(
+        lm_rec, ~ lm_workflow %>% add_recipe(.x) %>% fit(auto_train)
+      ),
+      lm_rmse = map_dbl(
+        lm_fit,
+        ~ augment(.x, new_data = auto_validation) %>%
+          rmse(truth = mpg, estimate = .pred) %>%
+          pull(.estimate)
+      )
+    )
+}
+evaluate_auto_fit(seed = 308)
+```
+
+Now reproduce Figure 5.2:
+
+```{r figure 5.2}
+d <- map_dfr(1:10, evaluate_auto_fit, .id = "rep")
+
+# Use a 10 color palette from the MetBrewer package
+pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
+
+p2 <- d %>%
+  #filter(rep == 1) %>%
+  ggplot(aes(x = poly, y = lm_rmse^2, fill = rep)) +
+  geom_line(aes(color = rep), size = 1) +
+  #geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
+  expand_limits(y = c(15, 30)) +
+  scale_x_continuous(breaks = seq(2, 10, 2)) +
+  scale_color_manual(values = pal) +
+  scale_fill_manual(values = pal) +
+  labs(x = "Degree of polynomial") +
+  theme(legend.position = "none")
+p1 <- p2 %+% filter(d, rep == 1) +
+  geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
+  labs(y = "MSE")
+p1 | p2
+```
+
+
+## The Bootstrap
+
+## Lab: Cross-Validation and the Bootstrap
+
+## Exercises
