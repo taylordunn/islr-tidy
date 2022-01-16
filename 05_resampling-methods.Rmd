@@ -54,19 +54,21 @@ set_palette()
 ```
 
 Randomly split the data into 50% training and 50% validation, fit on the training set, and compute the MSE on the validation set.
-Since I'll be repeating this 10 times to reproduce the figure, make it a function:
+Since I'll be repeating this 10 times to reproduce the figure, make a couple functions:
 ^[In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because `yardstick` has a `rmse()` function but not an `mse()` function. If I wanted to, I could define a custom metric [like this](https://yardstick.tidymodels.org/articles/custom-metrics.html).]
 
 
 ```{r}
-evaluate_auto_fit <- function(seed) {
+validation_set_split <- function(seed) {
   set.seed(seed)
   auto_split <- initial_split(auto, prop = 0.5)
-  auto_train <- training(auto_split)
-  auto_validation <- testing(auto_split)
+  list(train = training(auto_split), validation = testing(auto_split))
+}
+
+evaluate_poly_fit <- function(auto_train, auto_validation) {
   auto_rec <- recipe(mpg ~ horsepower, data = auto_train)
   lm_workflow <- workflow() %>% add_model(linear_reg())
-    
+  
   tibble(poly = 1:10) %>%
     mutate(
       lm_rec = map(
@@ -83,13 +85,21 @@ evaluate_auto_fit <- function(seed) {
       )
     )
 }
-evaluate_auto_fit(seed = 308)
+auto_splits <- validation_set_split(seed = 300)
+evaluate_poly_fit(auto_splits$train, auto_splits$validation)
 ```
 
 Now reproduce Figure 5.2:
 
 ```{r figure 5.2}
-d <- map_dfr(1:10, evaluate_auto_fit, .id = "rep")
+d <- map_dfr(
+  1:10,
+  function(seed) {
+    auto_splits <- validation_set_split(seed)
+    evaluate_poly_fit(auto_splits$train, auto_splits$validation)
+  },
+  .id = "rep"
+)
 
 # Use a 10 color palette from the MetBrewer package
 pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
