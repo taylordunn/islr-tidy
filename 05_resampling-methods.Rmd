@@ -54,58 +54,73 @@ set_palette()
 ```
 
 Randomly split the data into 50% training and 50% validation, fit on the training set, and compute the MSE on the validation set.
-Since I'll be repeating this 10 times to reproduce the figure, make a couple functions:
-^[In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because `yardstick` has a `rmse()` function but not an `mse()` function. If I wanted to, I could define a custom metric [like this](https://yardstick.tidymodels.org/articles/custom-metrics.html).]
-
+Since I'll be repeating this 10 times to reproduce the figure, make a couple functions.
+First, a function to set a random seed and split the data into training and validation set (called `assessment` set in the `rsample` package):
 
 ```{r}
-validation_set_split <- function(seed) {
+auto_validation_split <- function(seed) {
   set.seed(seed)
-  auto_split <- initial_split(auto, prop = 0.5)
-  list(train = training(auto_split), validation = testing(auto_split))
+  validation_split(auto, prop = 0.5)
 }
+auto_splits <- auto_validation_split(seed = 10)
+auto_splits
+```
 
-evaluate_poly_fit <- function(auto_train, auto_validation) {
-  auto_rec <- recipe(mpg ~ horsepower, data = auto_train)
-  lm_workflow <- workflow() %>% add_model(linear_reg())
-  
-  tibble(poly = 1:10) %>%
+Similar to the `initial_split` workflow, I can access the training and validation sets as follows:
+
+```{r}
+training(auto_splits$splits[[1]])
+assessment(auto_splits$splits[[1]])
+```
+
+Second, a function to fit 10 models (1 to 10 polynomial degrees of freedom) on the training set, and evaluate on the validation set with `fit_resamples`.
+^[In the text, they compute the MSE but here I am computing RMSE then squaring it. This is because `yardstick` has a `rmse()` function but not an `mse()` function. If I wanted to, I could define a custom metric [like this](https://yardstick.tidymodels.org/articles/custom-metrics.html).]
+
+```{r}
+auto_rec <- recipe(mpg ~ horsepower, data = auto)
+lm_workflow <- workflow() %>% add_model(linear_reg())
+
+evaluate_poly_fits <- function(auto_splits) {
+  tibble(poly_df = 1:10) %>%
     mutate(
       lm_rec = map(
-        poly, ~ auto_rec %>% step_poly(horsepower, degree = .x)
+        poly_df, ~ auto_rec %>% step_poly(horsepower, degree = .x)
       ),
       lm_fit = map(
-        lm_rec, ~ lm_workflow %>% add_recipe(.x) %>% fit(auto_train)
+        lm_rec,
+        ~ lm_workflow %>% add_recipe(.x) %>% fit_resamples(auto_splits)
       ),
-      lm_rmse = map_dbl(
-        lm_fit,
-        ~ augment(.x, new_data = auto_validation) %>%
-          rmse(truth = mpg, estimate = .pred) %>%
-          pull(.estimate)
-      )
-    )
+      lm_metrics = map(lm_fit, collect_metrics)
+    ) %>%
+    unnest(lm_metrics) %>%
+    filter(.metric == "rmse") %>%
+    select(poly_df, rmse = mean)
 }
-auto_splits <- validation_set_split(seed = 300)
-evaluate_poly_fit(auto_splits$train, auto_splits$validation)
+auto_poly_fits <- evaluate_poly_fits(auto_splits)
+auto_poly_fits
 ```
 
 Now reproduce Figure 5.2:
 
 ```{r figure 5.2}
-d <- map_dfr(
-  1:10,
-  function(seed) {
-    auto_splits <- validation_set_split(seed)
-    evaluate_poly_fit(auto_splits$train, auto_splits$validation)
-  },
-  .id = "rep"
+auto_poly_fits <- bind_rows(
+  # 9 additional sets of fits
+  map_dfr(
+    1:9,
+    function(seed) {
+      auto_splits <- auto_validation_split(seed)
+      evaluate_poly_fits(auto_splits)
+    },
+    .id = "rep"
+  ),
+  auto_poly_fits %>% mutate(rep = "10")
 )
 
 # Use a 10 color palette from the MetBrewer package
 pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
 
-p2 <- d %>%
-  ggplot(aes(x = poly, y = lm_rmse^2, fill = rep)) +
+p2 <- auto_poly_fits %>%
+  ggplot(aes(x = poly_df, y = rmse^2, fill = rep)) +
   geom_line(aes(color = rep), size = 1) +
   expand_limits(y = c(15, 30)) +
   scale_x_continuous(breaks = seq(2, 10, 2)) +
@@ -113,7 +128,7 @@ p2 <- d %>%
   scale_fill_manual(values = pal) +
   labs(x = "Degree of polynomial", y = NULL) +
   theme(legend.position = "none")
-p1 <- p2 %+% filter(d, rep == 1) +
+p1 <- p2 %+% filter(auto_poly_fits, rep == "1") +
   geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
   labs(y = "MSE")
 p1 | p2
@@ -138,6 +153,126 @@ The LOOCV approach has a few advantages over the validation set approach:
 >
 * First, it has far less bias. In LOOCV, we repeatedly fit the statistical learning method using training sets that contain $n − 1$ observations, almost as many as are in the entire data set. This is in contrast to the validation set approach, in which the training set is typically around half the size of the original data set. Consequently, the LOOCV approach tends not to overestimate the test error rate as much as the validation set approach does.
 * Second, in contrast to the validation approach which will yield different results when applied repeatedly due to randomness in the training/validation set splits, performing LOOCV multiple times will always yield the same results: there is no randomness in the training/validation set splits.
+
+Define a new function to split the data by LOOCV:
+^[Since there is no random splitting with this approach, I don't need use a function that sets the random seed.]
+
+```{r}
+auto_splits <- loo_cv(auto)
+auto_splits
+```
+
+`r nrow(auto_splits)` splits, which is the number of observations, as expected.
+Fit:
+
+```{r error=TRUE}
+auto_poly_fits_loo_cv <- evaluate_poly_fits(auto_splits)
+```
+
+As the error says, LOOCV is not supported.
+Here's an [explanation I found online](https://www.tmwr.org/resampling.html#leave-one-out-cross-validation):
+
+>
+Leave-one-out methods are deficient compared to almost any other method. For anything but pathologically small samples, LOO is computationally excessive and it may not have good statistical properties. Although rsample contains a loo_cv() function, these objects are not generally integrated into the broader tidymodels frameworks.
+
+Fair enough.
+For demonstration purposes, I will mimic LOOCV by using $k$-fold CV with $k$ = $n$:
+
+```{r}
+auto_splits <- vfold_cv(auto, v = nrow(auto))
+```
+
+```{r}
+tic()
+auto_poly_fits_loo_cv <- evaluate_poly_fits(auto_splits)
+toc()
+```
+
+```{r}
+auto_poly_fits_loo_cv
+```
+
+### $k$-fold Cross-Validation
+
+As we just saw, LOOCV is a special cases of *$k$-fold CV*, which involves randomly dividing the observations into $k$ groups/folds of approximately equal size.
+The first fold is used as the validation/assessment set, and the remaining $k-1$ folds used to fit the model.
+This is repeated $k$ times, with each fold being used as the assessment set once.
+The $k$-fold CV estimate of the test error is then the average:
+
+$$
+\text{CV}_{(k)} = \frac{1}{k} \sum_{i=1}^k \text{MSE}_i.
+$$
+
+>
+It is not hard to see that LOOCV is a special case of $k$-fold CV in which $k$
+is set to equal $n$. In practice, one typically performs $k$-fold CV using $k$ = 5
+or $k$ = 10. What is the advantage of using $k$ = 5 or $k$ = 10 rather than
+$k$ = $n$? The most obvious advantage is computational. LOOCV requires
+fitting the statistical learning method $n$ times. This has the potential to be
+computationally expensive (except for linear models fit by least squares,
+in which case formula (5.2) can be used). But cross-validation is a very
+general approach that can be applied to almost any statistical learning
+method. Some statistical learning methods have computationally intensive
+fitting procedures, and so performing LOOCV may pose computational
+problems, especially if $n$ is extremely large. In contrast, performing 10-fold
+CV requires fitting the learning procedure only ten times, which may be
+much more feasible. As we see in Section 5.1.4, there also can be other
+non-computational advantages to performing 5-fold or 10-fold CV, which
+involve the bias-variance trade-off.
+
+Fit the polynomial models with 10-fold CV:
+
+```{r}
+auto_10_fold_cv <- function(seed) {
+  set.seed(seed)
+  vfold_cv(auto, v = 10)
+}
+auto_splits <- auto_10_fold_cv(seed = 10)
+auto_splits
+```
+
+```{r}
+tic()
+auto_poly_fits_10_fold_cv <- evaluate_poly_fits(auto_splits)
+toc()
+```
+
+```{r}
+auto_poly_fits_10_fold_cv
+```
+
+Now repeat this another 9 times, and reproduce Figure 5.4:
+
+```{r figure 5.4}
+tic()
+auto_poly_fits_10_fold_cv <- bind_rows(
+  # 9 additional sets of fits
+  map_dfr(
+    1:9,
+    function(seed) {
+      auto_splits <- auto_10_fold_cv(seed)
+      evaluate_poly_fits(auto_splits)
+    },
+    .id = "rep"
+  ),
+  auto_poly_fits_10_fold_cv %>% mutate(rep = "10")
+)
+toc()
+
+p2 <- auto_poly_fits_10_fold_cv %>%
+  ggplot(aes(x = poly_df, y = rmse^2, fill = rep)) +
+  geom_line(aes(color = rep), size = 1) +
+  expand_limits(y = c(15, 30)) +
+  scale_x_continuous(breaks = seq(2, 10, 2)) +
+  scale_color_manual(values = pal) +
+  scale_fill_manual(values = pal) +
+  labs(x = "Degree of polynomial", y = NULL) +
+  theme(legend.position = "none")
+p1 <- p2 %+% mutate(auto_poly_fits_loo_cv, rep == "1") +
+  geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
+  labs(y = "MSE")
+p1 | p2
+```
 
 
 ## The Bootstrap
