@@ -30,7 +30,7 @@ Sometimes we want to estimate the test error rate using the available training d
 A number of approaches can be used for this.
 In this section we consider methods which involve *holding out* a subset of the training data from the fitting process, then applying the model to that hold-out set for model assessment.
 
-### The Validation Set Approach
+### The Validation Set Approach {#validation-set}
 
 This simple strategy involves randomly dividing available observations into training and validation sets.
 The model is fitted on the training set, and used to make predictions on the validation set.
@@ -102,7 +102,7 @@ auto_poly_fits
 
 Now reproduce Figure 5.2:
 
-```{r figure 5.2}
+```{r figure5.2}
 auto_poly_fits <- bind_rows(
   # 9 additional sets of fits
   map_dfr(
@@ -137,7 +137,7 @@ p1 | p2
 As is clear from the right-hand panel, this approach is highly variable depending on the testing/validation set split.
 Another downside is that, because the training set used to fit the data has fewer observations, it tends to overestimate the test error rate on the entire data set.
 
-### Leave-One-Out Cross Validation
+### Leave-One-Out Cross Validation {#loocv}
 
 *Leave-one-out cross validation* (LOOCV) attempts to address the shortcomings of the validation set approach.
 It still involves splitting the $n$ observations into two parts, but it repeats it $n$ times, with a single observation $(x_i, y_i)$ as the hold-out "set" and the remaining $n-1$ observations as the training set.
@@ -192,7 +192,7 @@ toc()
 auto_poly_fits_loo_cv
 ```
 
-### $k$-fold Cross-Validation
+### $k$-fold Cross-Validation {#kfoldcv}
 
 As we just saw, LOOCV is a special cases of *$k$-fold CV*, which involves randomly dividing the observations into $k$ groups/folds of approximately equal size.
 The first fold is used as the validation/assessment set, and the remaining $k-1$ folds used to fit the model.
@@ -243,7 +243,7 @@ auto_poly_fits_10_fold_cv
 
 Now repeat this another 9 times, and reproduce Figure 5.4:
 
-```{r figure 5.4}
+```{r}
 tic()
 auto_poly_fits_10_fold_cv <- bind_rows(
   # 9 additional sets of fits
@@ -258,7 +258,10 @@ auto_poly_fits_10_fold_cv <- bind_rows(
   auto_poly_fits_10_fold_cv %>% mutate(rep = "10")
 )
 toc()
+```
 
+
+```{r figure5.4}
 p2 <- auto_poly_fits_10_fold_cv %>%
   ggplot(aes(x = poly_df, y = rmse^2, fill = rep)) +
   geom_line(aes(color = rep), size = 1) +
@@ -268,15 +271,167 @@ p2 <- auto_poly_fits_10_fold_cv %>%
   scale_fill_manual(values = pal) +
   labs(x = "Degree of polynomial", y = NULL) +
   theme(legend.position = "none")
-p1 <- p2 %+% mutate(auto_poly_fits_loo_cv, rep == "1") +
+p1 <- p2 %+% mutate(auto_poly_fits_loo_cv, rep = "1") +
   geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
   labs(y = "MSE")
 p1 | p2
 ```
 
+The $k$-fold CV approach (right panel) still has some variability due to random splitting, but much less than the validation set approach.
+
+As a reminder, with cross-validation we are trying to approximate the true test MSE, which we cannot know for certain unless the data are simulated (like in Figure 5.6).
+The true error value itself is important if we want to know how a model will perform on independent data.
+However, if all we care about is parameter(s) that give the minimum error (like the degree of polynomial in these examples), then the CV estimate will usually come close to the true answer.
+
+### Bias-Variance Trade-Off for $k$-Fold Cross-Validation
+
+In addition to being computationally more efficient than LOOCV, $k$-fold CV with $k < n$ also often gives more accurate estimates of the test error rate due to the bias-variance tradeoff.
+
+* $k$-fold CV has moderate bias in comparison to LOOCV, which is approximately unbiased.
+* $k$-fold CV (average over $k$ fitted models) tends to have lower variance than LOOCV (average over $n$ fitted models, highly correlated with eachother).
+
+>To summarize, there is a bias-variance trade-off associated with the
+choice of $k$ in $k$-fold cross-validation. Typically, given these considerations,
+one performs $k$-fold cross-validation using $k$ = 5 or $k$ = 10, as these values
+have been shown empirically to yield test error rate estimates that suffer
+neither from excessively high bias nor from very high variance.
+
+### Cross-Validation on Classification Problems
+
+Rather than quantitative $Y$, cross-validation works just as well with qualitative $Y$.
+Instead of MSE, we use the number of misclassified observations, $\text{Err}_i = I(y_i \neq \hat{y}_i)$.
+The LOOCV error rate:
+
+$$
+\text{CV}_{(n)} = \frac{1}{n} \sum_{i=1}^n \text{Err}_i.
+$$
+
+The $k$-fold CV and validation set error rates are defined analogously.
 
 ## The Bootstrap
 
+>
+The *bootstrap* is a widely applicable and extremely powerful statistical tool that can be used to quantify the uncertainty associated with a given estimator or statistical learning method. As a simple example, the bootstrap can be used to estimate the standard errors of the coefficients from a linear regression fit. In the specific case of linear regression, this is not particularly useful, since we saw in Chapter 3 that standard statistical software such as R outputs such standard errors automatically. However, the power of the bootstrap lies in the fact that it can be easily applied to a wide range of statistical learning methods, including some for which a measure of variability is otherwise difficult to obtain and is not automatically output by
+statistical software.
+
+```{r}
+sim_alpha <- function(x = NULL, y = NULL) {
+  if (is.null(x)) x <- rnorm(100)
+  if (is.null(y)) y <- rnorm(100)
+  (var(y) -  cov(x, y)) / (var(x) + var(y) - 2 * cov(x, y))
+}
+sim_alpha()
+```
+
+
+```{r figure5.9}
+d4 <- tibble(sim = 1:4) %>%
+  rowwise() %>%
+  mutate(x = list(rnorm(100)), y = list(rnorm(100))) %>%
+  ungroup() %>%
+  mutate(
+    alpha = map2_dbl(x, y, sim_alpha) %>% round(3)
+  ) %>%
+  unnest(cols = c(x, y))
+d4 %>%
+  ggplot(aes(x, y)) +
+  geom_point() +
+  facet_wrap(~alpha, labeller = "label_both") +
+  add_facet_borders()
+```
+
+```{r}
+d <- bind_rows(
+  d4 %>% distinct(sim, alpha),
+  tibble(sim = 5:1000) %>%
+    rowwise() %>%
+    mutate(alpha = sim_alpha()) %>%
+    ungroup()
+)
+```
+
+
+```{r}
+d1_boot <- d4 %>% filter(sim == 1) %>% select(x, y) %>%
+  rsample::bootstraps(times = 1000)
+d1_boot$splits
+```
+
+
+```{r}
+d1_boot_alpha <- map_dbl(
+  d1_boot$splits,
+  function(split) {
+    xy <- as.data.frame(split)
+    sim_alpha(xy$x, xy$y)
+  }
+)
+d <- bind_rows(
+  d %>% mutate(estimates = "true"),
+  tibble(alpha = d1_boot_alpha, estimates = "bootstrap")
+) %>%
+  mutate(estimates = fct_rev(estimates))
+
+p1 <- d %>%
+  ggplot(aes(x = alpha, fill = estimates)) +
+  geom_histogram(binwidth = 0.025, show.legend = FALSE) +
+  facet_wrap(~ estimates, nrow = 1) +
+  scale_fill_manual(values = c(td_colors$nice$soft_orange,
+                               td_colors$nice$strong_blue))
+p2 <- d %>%
+  ggplot(aes(y = alpha, x = estimates)) +
+  geom_boxplot(aes(fill = estimates), show.legend = FALSE) +
+  scale_fill_manual(values = c(td_colors$nice$soft_orange,
+                               td_colors$nice$strong_blue))
+p1 | p2
+```
+
+
 ## Lab: Cross-Validation and the Bootstrap
+
+### The Validation Set Approach
+
+\@ref(#validation-set)
+
+```{r}
+auto_poly_fits %>%
+  filter(poly_df <= 3) %>%
+  mutate(mse = rmse^2)
+```
+
+
+### Leave-One-Out Cross-Validation
+
+\@ref(#loocv)
+
+```{r}
+auto_poly_fits_loo_cv %>% mutate(mse = rmse^2)
+```
+
+### $k$-fold Cross-Validation
+
+\@ref{#kfoldcv}
+
+```{r}
+auto_poly_fits_10_fold_cv %>%
+  filter(rep == 1) %>%
+  mutate(mse = rmse^2)
+```
+
+### The Bootstrap
+
+#### Estimating the Accuracy of a Statistic of Interest
+
+```{r}
+portfolio <- ISLR2::Portfolio
+glimpse(portfolio)
+```
+
+#### Estimating the Accuracy of a Regression Model
+
+```{r}
+
+```
+
 
 ## Exercises
