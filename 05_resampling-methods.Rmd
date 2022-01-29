@@ -96,14 +96,14 @@ evaluate_poly_fits <- function(auto_splits) {
     filter(.metric == "rmse") %>%
     select(poly_df, rmse = mean)
 }
-auto_poly_fits <- evaluate_poly_fits(auto_splits)
-auto_poly_fits
+auto_poly_fits_validation <- evaluate_poly_fits(auto_splits)
+auto_poly_fits_validation
 ```
 
 Now reproduce Figure 5.2:
 
 ```{r figure5.2}
-auto_poly_fits <- bind_rows(
+auto_poly_fits_validation <- bind_rows(
   # 9 additional sets of fits
   map_dfr(
     1:9,
@@ -113,13 +113,13 @@ auto_poly_fits <- bind_rows(
     },
     .id = "rep"
   ),
-  auto_poly_fits %>% mutate(rep = "10")
+  auto_poly_fits_validation %>% mutate(rep = "10")
 )
 
 # Use a 10 color palette from the MetBrewer package
 pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
 
-p2 <- auto_poly_fits %>%
+p2 <- auto_poly_fits_validation %>%
   ggplot(aes(x = poly_df, y = rmse^2, fill = rep)) +
   geom_line(aes(color = rep), size = 1) +
   expand_limits(y = c(15, 30)) +
@@ -128,7 +128,7 @@ p2 <- auto_poly_fits %>%
   scale_fill_manual(values = pal) +
   labs(x = "Degree of polynomial", y = NULL) +
   theme(legend.position = "none")
-p1 <- p2 %+% filter(auto_poly_fits, rep == "1") +
+p1 <- p2 %+% filter(auto_poly_fits_validation, rep == "1") +
   geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
   labs(y = "MSE")
 p1 | p2
@@ -173,28 +173,27 @@ As the error says, LOOCV is not supported.
 Here's an [explanation I found online](https://www.tmwr.org/resampling.html#leave-one-out-cross-validation):
 
 >
-Leave-one-out methods are deficient compared to almost any other method. For anything but pathologically small samples, LOO is computationally excessive and it may not have good statistical properties. Although rsample contains a loo_cv() function, these objects are not generally integrated into the broader tidymodels frameworks.
+Leave-one-out methods are deficient compared to almost any other method. For anything but pathologically small samples, LOO is computationally excessive and it may not have good statistical properties. Although rsample contains a `loo_cv()` function, these objects are not generally integrated into the broader tidymodels frameworks.
 
 Fair enough.
-For demonstration purposes, I will mimic LOOCV by using $k$-fold CV with $k$ = $n$:
+For completeness, I will still get the LOOCV estimates using `boot::cv.glm()`:
 
 ```{r}
-auto_splits <- vfold_cv(auto, v = nrow(auto))
-```
-
-```{r}
-tic()
-auto_poly_fits_loo_cv <- evaluate_poly_fits(auto_splits)
-toc()
-```
-
-```{r}
+auto_poly_fits_loo_cv <- tibble(
+  poly_df = 1:10,
+  mse = map_dbl(poly_df,
+    function(poly_df) {
+      glm_fit <- glm(mpg ~ poly(horsepower, degree = poly_df), data = auto)
+      boot::cv.glm(auto, glm_fit)$delta[1]
+    }
+  )
+)
 auto_poly_fits_loo_cv
 ```
 
 ### $k$-fold Cross-Validation {#kfoldcv}
 
-As we just saw, LOOCV is a special cases of *$k$-fold CV*, which involves randomly dividing the observations into $k$ groups/folds of approximately equal size.
+*$k$-fold CV* involves randomly dividing the observations into $k$ groups/folds of approximately equal size.
 The first fold is used as the validation/assessment set, and the remaining $k-1$ folds used to fit the model.
 This is repeated $k$ times, with each fold being used as the assessment set once.
 The $k$-fold CV estimate of the test error is then the average:
@@ -202,6 +201,8 @@ The $k$-fold CV estimate of the test error is then the average:
 $$
 \text{CV}_{(k)} = \frac{1}{k} \sum_{i=1}^k \text{MSE}_i.
 $$
+
+This should look familiar:
 
 >
 It is not hard to see that LOOCV is a special case of $k$-fold CV in which $k$
