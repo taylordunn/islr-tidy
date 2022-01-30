@@ -233,18 +233,19 @@ auto_splits
 ```
 
 ```{r}
-tic()
 auto_poly_fits_10_fold_cv <- evaluate_poly_fits(auto_splits)
-toc()
-```
-
-```{r}
 auto_poly_fits_10_fold_cv
 ```
 
-Now repeat this another 9 times, and reproduce Figure 5.4:
+Now repeat this another 9 times.
+Thought it won't take *too* long to run, I'll make use of `parallel` to speed it up a bit:
 
 ```{r}
+n_cores <- parallel::detectCores(logical = FALSE)
+library(doParallel)
+cl <- makePSOCKcluster(n_cores - 1)
+registerDoParallel(cl)
+
 tic()
 auto_poly_fits_10_fold_cv <- bind_rows(
   # 9 additional sets of fits
@@ -261,10 +262,12 @@ auto_poly_fits_10_fold_cv <- bind_rows(
 toc()
 ```
 
+Now reproduce Figure 5.4:
 
 ```{r figure5.4}
 p2 <- auto_poly_fits_10_fold_cv %>%
-  ggplot(aes(x = poly_df, y = rmse^2, fill = rep)) +
+  mutate(mse = rmse^2) %>%
+  ggplot(aes(x = poly_df, y = mse, fill = rep)) +
   geom_line(aes(color = rep), size = 1) +
   expand_limits(y = c(15, 30)) +
   scale_x_continuous(breaks = seq(2, 10, 2)) +
@@ -289,7 +292,7 @@ However, if all we care about is parameter(s) that give the minimum error (like 
 In addition to being computationally more efficient than LOOCV, $k$-fold CV with $k < n$ also often gives more accurate estimates of the test error rate due to the bias-variance tradeoff.
 
 * $k$-fold CV has moderate bias in comparison to LOOCV, which is approximately unbiased.
-* $k$-fold CV (average over $k$ fitted models) tends to have lower variance than LOOCV (average over $n$ fitted models, highly correlated with eachother).
+* $k$-fold CV (average over $k$ fitted models) tends to have lower variance than LOOCV (average over $n$ fitted models, highly correlated with each other).
 
 >To summarize, there is a bias-variance trade-off associated with the
 choice of $k$ in $k$-fold cross-validation. Typically, given these considerations,
@@ -315,8 +318,39 @@ The $k$-fold CV and validation set error rates are defined analogously.
 The *bootstrap* is a widely applicable and extremely powerful statistical tool that can be used to quantify the uncertainty associated with a given estimator or statistical learning method. As a simple example, the bootstrap can be used to estimate the standard errors of the coefficients from a linear regression fit. In the specific case of linear regression, this is not particularly useful, since we saw in Chapter 3 that standard statistical software such as R outputs such standard errors automatically. However, the power of the bootstrap lies in the fact that it can be easily applied to a wide range of statistical learning methods, including some for which a measure of variability is otherwise difficult to obtain and is not automatically output by
 statistical software.
 
+The toy example in this section is about investment in two assets $X$ and $Y$.
+We wish to choose a fraction $\alpha$ of investment into $X$ which minimizes the total variance (risk) of the investment.
+In can be shown that the optimal value is given by:
+
+$$
+\alpha = \frac{\sigma_Y^2 - \sigma_{XY}}{\sigma_X^2 + \sigma_Y^2 - 2\sigma_{XY}},
+$$
+
+where $\sigma_X^2 = \text{Var}(X)$, $\sigma_Y^2 = \text{Var}(Y)$, and $\sigma_{XY} = \text{Cov}(X, Y)$.
+In reality, we don't know these variances and covariance, so we estimate them (e.g. $\hat{\sigma}_X^2$) using observations of $X$ and $Y$ to get an estimated $\hat{\alpha}$.
+
+To illustrate, we simulate 100 pairs of $X$ and $Y$, and compute the estimated $\alpha$.
+The simulation parameters are $\sigma_X^2 = 1$, $\sigma_Y^2 = 1.25$, and $\sigma_{XY} = 0.5$.
+Presumably, these are bivariate normally distributed, which I can simulate with the `mvtnorm` package:
+
+```{r}
+library(mvtnorm)
+sigma_x <- 1
+sigma_y <- sqrt(1.25)
+sigma_xy <- 0.5
+# The variance-covariance matrix
+sigma <- matrix(c(sigma_x, sigma_xy, sigma_xy, sigma_y), nrow = 2)
+# Generate 5 observations
+rmvnorm(n = 5, mean = c(0, 0), sigma = sigma, )
+```
+
+
+
+I don't have access to the simulation parameters, so I'll just use a standard normal distribution (mean 0, SD 1) for both variables:
+
 ```{r}
 sim_alpha <- function(x = NULL, y = NULL) {
+  # Allow the function to provide the x and y values, or simulate if missing
   if (is.null(x)) x <- rnorm(100)
   if (is.null(y)) y <- rnorm(100)
   (var(y) -  cov(x, y)) / (var(x) + var(y) - 2 * cov(x, y))
@@ -324,19 +358,18 @@ sim_alpha <- function(x = NULL, y = NULL) {
 sim_alpha()
 ```
 
+Since this is a simulation, we can simply generate new data and get many estimates $\hat{\alpha}$:
 
 ```{r figure5.9}
 d4 <- tibble(sim = 1:4) %>%
   rowwise() %>%
   mutate(x = list(rnorm(100)), y = list(rnorm(100))) %>%
   ungroup() %>%
-  mutate(
-    alpha = map2_dbl(x, y, sim_alpha) %>% round(3)
-  ) %>%
+  mutate(alpha = map2_dbl(x, y, sim_alpha) %>% round(3)) %>%
   unnest(cols = c(x, y))
 d4 %>%
   ggplot(aes(x, y)) +
-  geom_point() +
+  geom_point(color = td_colors$nice$emerald, size = 2) +
   facet_wrap(~alpha, labeller = "label_both") +
   add_facet_borders()
 ```
