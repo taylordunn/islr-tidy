@@ -312,7 +312,7 @@ $$
 
 The $k$-fold CV and validation set error rates are defined analogously.
 
-## The Bootstrap
+## The Bootstrap {#bootstrap}
 
 >
 The *bootstrap* is a widely applicable and extremely powerful statistical tool that can be used to quantify the uncertainty associated with a given estimator or statistical learning method. As a simple example, the bootstrap can be used to estimate the standard errors of the coefficients from a linear regression fit. In the specific case of linear regression, this is not particularly useful, since we saw in Chapter 3 that standard statistical software such as R outputs such standard errors automatically. However, the power of the bootstrap lies in the fact that it can be easily applied to a wide range of statistical learning methods, including some for which a measure of variability is otherwise difficult to obtain and is not automatically output by
@@ -339,33 +339,33 @@ sigma_x <- 1
 sigma_y <- sqrt(1.25)
 sigma_xy <- 0.5
 # The variance-covariance matrix
-sigma <- matrix(c(sigma_x, sigma_xy, sigma_xy, sigma_y), nrow = 2)
+sigma <- matrix(c(sigma_x^2, sigma_xy, sigma_xy, sigma_y^2), nrow = 2)
 # Generate 5 observations
-rmvnorm(n = 5, mean = c(0, 0), sigma = sigma, )
+rmvnorm(n = 5, mean = c(0, 0), sigma = sigma)
 ```
 
-
-
-I don't have access to the simulation parameters, so I'll just use a standard normal distribution (mean 0, SD 1) for both variables:
+Write a function to compute $\alpha$ from the simulated $X$ and $Y$:
 
 ```{r}
-sim_alpha <- function(x = NULL, y = NULL) {
-  # Allow the function to provide the x and y values, or simulate if missing
-  if (is.null(x)) x <- rnorm(100)
-  if (is.null(y)) y <- rnorm(100)
+sim_alpha <- function(xy = NULL) {
+  if (is.null(xy)) {
+    xy <- rmvnorm(n = 100, mean = c(0, 0), sigma = sigma)
+  }
+  x <- xy[,1]; y <- xy[,2]
   (var(y) -  cov(x, y)) / (var(x) + var(y) - 2 * cov(x, y))
 }
 sim_alpha()
 ```
 
-Since this is a simulation, we can simply generate new data and get many estimates $\hat{\alpha}$:
+Run four simulations and plot $X$ vs $Y$ for Figure 5.9
 
 ```{r figure5.9}
 d4 <- tibble(sim = 1:4) %>%
   rowwise() %>%
-  mutate(x = list(rnorm(100)), y = list(rnorm(100))) %>%
+  mutate(xy = list(rmvnorm(n = 100, mean = c(0, 0), sigma = sigma))) %>%
   ungroup() %>%
-  mutate(alpha = map2_dbl(x, y, sim_alpha) %>% round(3)) %>%
+  mutate(alpha = map_dbl(xy, sim_alpha) %>% round(3),
+         x = map(xy, ~ .x[,1]), y = map(xy, ~ .x[,2])) %>%
   unnest(cols = c(x, y))
 d4 %>%
   ggplot(aes(x, y)) +
@@ -373,6 +373,8 @@ d4 %>%
   facet_wrap(~alpha, labeller = "label_both") +
   add_facet_borders()
 ```
+
+For Figure 5.10, I first simulate 1000 data sets from the true population and estimate $\alpha$ for each:
 
 ```{r}
 d <- bind_rows(
@@ -382,69 +384,86 @@ d <- bind_rows(
     mutate(alpha = sim_alpha()) %>%
     ungroup()
 )
+d
 ```
 
+And then, using just the first simulated data set, use the `rsample::boostraps()` function to generate 1000 bootstrap resamples:
 
 ```{r}
 d1_boot <- d4 %>% filter(sim == 1) %>% select(x, y) %>%
   rsample::bootstraps(times = 1000)
-d1_boot$splits
+d1_boot
 ```
 
+Compute $\hat{\alpha}$ from each split:
 
 ```{r}
 d1_boot_alpha <- map_dbl(
   d1_boot$splits,
   function(split) {
     xy <- as.data.frame(split)
-    sim_alpha(xy$x, xy$y)
+    sim_alpha(as.matrix(xy))
   }
 )
 d <- bind_rows(
-  d %>% mutate(estimates = "true"),
-  tibble(alpha = d1_boot_alpha, estimates = "bootstrap")
+  d %>% mutate(population = "true"),
+  tibble(alpha = d1_boot_alpha, population = "bootstrap resamples")
 ) %>%
-  mutate(estimates = fct_rev(estimates))
+  mutate(population = fct_rev(population))
 
+true_alpha <- (sigma_y^2 - sigma_xy) / (sigma_x^2 + sigma_y^2 - 2 * sigma_xy)
 p1 <- d %>%
-  ggplot(aes(x = alpha, fill = estimates)) +
-  geom_histogram(binwidth = 0.025, show.legend = FALSE) +
-  facet_wrap(~ estimates, nrow = 1) +
+  ggplot(aes(x = alpha, fill = population)) +
+  geom_histogram(binwidth = 0.05, show.legend = FALSE, color = "black") +
+  geom_vline(xintercept = true_alpha,
+             color = td_colors$nice$light_coral, size = 1.5) +
+  facet_wrap(~ population, nrow = 1) +
   scale_fill_manual(values = c(td_colors$nice$soft_orange,
                                td_colors$nice$strong_blue))
 p2 <- d %>%
-  ggplot(aes(y = alpha, x = estimates)) +
-  geom_boxplot(aes(fill = estimates), show.legend = FALSE) +
+  ggplot(aes(y = alpha, x = population)) +
+  geom_boxplot(aes(fill = population), show.legend = FALSE) +
+  geom_hline(yintercept = true_alpha,
+             color = td_colors$nice$light_coral, size = 1.5) +
   scale_fill_manual(values = c(td_colors$nice$soft_orange,
                                td_colors$nice$strong_blue))
 p1 | p2
 ```
 
+>
+Note that the histogram looks very similar to the left-hand panel, which
+displays the idealized histogram of the estimates of α obtained by generating 1,000 simulated data sets from the true population. In particular the
+bootstrap estimate $\text{SE}(\hat{\alpha})$ from (5.8) is 0.087, very close to the estimate
+of 0.083 obtained using 1,000 simulated data sets. The right-hand panel
+displays the information in the center and left panels in a different way, via
+boxplots of the estimates for $\alpha$ obtained by generating 1,000 simulated data
+sets from the true population and using the bootstrap approach. Again, the
+boxplots have similar spreads, indicating that the bootstrap approach can
+be used to effectively estimate the variability associated with $\hat{\alpha}$.
 
 ## Lab: Cross-Validation and the Bootstrap
 
 ### The Validation Set Approach
 
-\@ref(#validation-set)
+Here are the MSE values as computed in \@ref(#validation-set):
 
 ```{r}
-auto_poly_fits %>%
-  filter(poly_df <= 3) %>%
+auto_poly_fits_validation %>%
+  filter(poly_df <= 3, rep == 1) %>%
   mutate(mse = rmse^2)
 ```
 
-
 ### Leave-One-Out Cross-Validation
 
-\@ref(#loocv)
+Because LOOCV is deterministic (not random), the process in \@ref(#loocv) produces the same MSE values:
 
 ```{r}
-auto_poly_fits_loo_cv %>% mutate(mse = rmse^2)
+auto_poly_fits_loo_cv
 ```
 
 ### $k$-fold Cross-Validation
 
-\@ref{#kfoldcv}
+The MSE values as computed in \@ref{#kfoldcv}:
 
 ```{r}
 auto_poly_fits_10_fold_cv %>%
@@ -459,6 +478,26 @@ auto_poly_fits_10_fold_cv %>%
 ```{r}
 portfolio <- ISLR2::Portfolio
 glimpse(portfolio)
+```
+
+The `tidymodels` approach to bootstrap estimates, as in \@ref{#boostrap}:
+
+```{r}
+portfolio_boot <- rsample::bootstraps(portfolio, times = 1000)
+portfolio_boot_alpha <- map_dbl(
+  portfolio_boot$splits,
+  function(split) {
+    xy <- as.data.frame(split)
+    (var(xy$Y) - cov(xy$X, xy$Y)) /
+      (var(xy$X) + var(xy$Y) - 2 * cov(xy$X, xy$Y))
+  }
+)
+mean(portfolio_boot_alpha); sd(portfolio_boot_alpha)
+```
+
+```{r}
+xy <- portfolio_boot$splits[[1]]
+xy <- as.data.frame(xy)
 ```
 
 #### Estimating the Accuracy of a Regression Model
