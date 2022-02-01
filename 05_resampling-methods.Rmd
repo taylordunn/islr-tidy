@@ -506,33 +506,68 @@ xy <- as.data.frame(xy)
 The bootstrap approach can be used to assess the variability of the coefficient estimates and predictions from a statistical learning method. Here we use the bootstrap approach in order to assess the variability of the estimates for $\beta_0$ and $\beta_1$, the intercept and slope terms for the linear regression model that uses horsepower to predict mpg in the `Auto` data set. We will compare the estimates obtained using the bootstrap to those obtained using the formulas for $\text{SE}(\hat{\beta}_0)$ and $\text{SE}(\hat{\beta}_1)$ described in Section 3.1.2.
 
 ```{r}
-auto_boot <- rsample::bootstraps(auto, times = 10)
+auto_boot <- rsample::bootstraps(auto, times = 1000)
 auto_boot
 ```
 
-https://www.tidymodels.org/learn/models/coefficients/
+By default, the `tune::fit_resamples()` function does not keep the model object from each fit.
+Usually, all we care about is the performance metrics and (if we're tuning) the best hyper parameters.
+So in order to get the actual regression coefficients, I need to provide a `control_grid()` object to the `control` argument of `fit_resamples()` (see [this article for more explanation]( https://www.tidymodels.org/learn/models/coefficients):
 
 ```{r}
 get_lm_coefs <- function(x) {
-  x %>% extract_fit_engine() %>% tidy()
+  x %>% extract_fit_engine() %>% broom::tidy()
 }
 tidy_ctrl <- control_grid(extract = get_lm_coefs)
+```
 
+Now fit the resamples with this with control object:
+
+```{r cache=TRUE}
+tic()
 auto_boot_fit <- workflow() %>%
   add_model(linear_reg()) %>%
   add_recipe(recipe(mpg ~ horsepower, data = auto)) %>%
   fit_resamples(auto_boot, control = tidy_ctrl)
-auto_boot_fit %>%
+toc()
+auto_boot_fit
+```
+
+The `.extracts` column contains the tidy model objects.
+It is a but clunky to work with -- it is a list column with a list of tibbles, so requires `tidyr::unnest()` twice:
+
+```{r}
+# A single `.extracts` element, which contains a tibble
+auto_boot_fit$.extracts[[1]]
+# Using `unnest` to get all `.extracts`
+auto_boot_fit_coefs <- auto_boot_fit %>%
   unnest(.extracts) %>%
   unnest(.extracts) %>%
+  select(id, term, estimate, std.error)
+auto_boot_fit_coefs
+```
+
+Then taking the mean of the estimates, and applying equation 5.8 to get the standard error:
+
+```{r}
+auto_boot_fit_coefs %>%
   group_by(term) %>%
+  #mutate(correction_factor = mean(estimate)) %>%
   summarise(
-    mean_estimate = mean(estimate), sd_estimate = sd(estimate),
-    #mean_se = mean(std.error), sd_se = sd(std.error),
+    mean_estimate = mean(estimate),
+    se_estimate = sqrt(
+      (1 / (n() - 1)) * sum((estimate - mean_estimate)^2)
+    ),
     .groups = "drop"
   ) %>%
   gt() %>%
-  fmt_number(columns = -term, decimals = 3)
+  fmt_number(columns = -term, decimals = 4)
+```
+
+
+Not quite 
+
+```{r}
 ```
 
 
