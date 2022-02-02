@@ -33,8 +33,9 @@ In this section we consider methods which involve *holding out* a subset of the 
 ### The Validation Set Approach {#validation-set}
 
 This simple strategy involves randomly dividing available observations into training and validation sets.
-The model is fitted on the training set, and used to make predictions on the validation set.
+The model is fit on the training set, and used to make predictions on the validation set.
 The corresponding metric from the validation set predictions -- usually MSE in the case of a quantitative response -- provides an estimate of the test error rate.
+
 To illustrate this, load the `Auto` data set and R packages:
 
 ```{r message=FALSE}
@@ -45,6 +46,7 @@ library(tidymodels)
 library(broom)
 library(gt)
 library(patchwork) # for composing plots
+library(tictoc)
 # Load my R package and set the ggplot theme
 library(dunnr)
 extrafont::loadfonts(device = "win", quiet = TRUE)
@@ -69,8 +71,8 @@ auto_splits
 Similar to the `initial_split` workflow, I can access the training and validation sets as follows:
 
 ```{r}
-training(auto_splits$splits[[1]])
-assessment(auto_splits$splits[[1]])
+training(auto_splits$splits[[1]]) %>% head()
+assessment(auto_splits$splits[[1]]) %>% head()
 ```
 
 Second, a function to fit 10 models (1 to 10 polynomial degrees of freedom) on the training set, and evaluate on the validation set with `fit_resamples`.
@@ -240,12 +242,15 @@ auto_poly_fits_10_fold_cv
 Now repeat this another 9 times.
 Thought it won't take *too* long to run, I'll make use of `parallel` to speed it up a bit:
 
-```{r}
+```{r echo=FALSE}
 n_cores <- parallel::detectCores(logical = FALSE)
 library(doParallel)
 cl <- makePSOCKcluster(n_cores - 1)
 registerDoParallel(cl)
+```
 
+
+```{r}
 tic()
 auto_poly_fits_10_fold_cv <- bind_rows(
   # 9 additional sets of fits
@@ -360,6 +365,7 @@ sim_alpha()
 Run four simulations and plot $X$ vs $Y$ for Figure 5.9
 
 ```{r figure5.9}
+set.seed(319)
 d4 <- tibble(sim = 1:4) %>%
   rowwise() %>%
   mutate(xy = list(rmvnorm(n = 100, mean = c(0, 0), sigma = sigma))) %>%
@@ -405,6 +411,11 @@ d1_boot_alpha <- map_dbl(
     sim_alpha(as.matrix(xy))
   }
 )
+```
+
+Now reproduce the figure:
+
+```{r figure5.10}
 d <- bind_rows(
   d %>% mutate(population = "true"),
   tibble(alpha = d1_boot_alpha, population = "bootstrap resamples")
@@ -455,7 +466,7 @@ auto_poly_fits_validation %>%
 
 ### Leave-One-Out Cross-Validation
 
-Because LOOCV is deterministic (not random), the process in \@ref(#loocv) produces the same MSE values:
+Because LOOCV is deterministic (not random), the process in \@ref(loocv) produces the same MSE values:
 
 ```{r}
 auto_poly_fits_loo_cv
@@ -463,7 +474,7 @@ auto_poly_fits_loo_cv
 
 ### $k$-fold Cross-Validation
 
-The MSE values as computed in \@ref{#kfoldcv}:
+The MSE values as computed in \@ref(kfoldcv):
 
 ```{r}
 auto_poly_fits_10_fold_cv %>%
@@ -480,10 +491,10 @@ portfolio <- ISLR2::Portfolio
 glimpse(portfolio)
 ```
 
-The `tidymodels` approach to bootstrap estimates, as in \@ref{#boostrap}:
+The `tidymodels` approach to bootstrap estimates, as in \@ref(bootstrap):
 
 ```{r}
-portfolio_boot <- rsample::bootstraps(portfolio, times = 1000)
+portfolio_boot <- bootstraps(portfolio, times = 1000)
 portfolio_boot_alpha <- map_dbl(
   portfolio_boot$splits,
   function(split) {
@@ -495,24 +506,18 @@ portfolio_boot_alpha <- map_dbl(
 mean(portfolio_boot_alpha); sd(portfolio_boot_alpha)
 ```
 
-```{r}
-xy <- portfolio_boot$splits[[1]]
-xy <- as.data.frame(xy)
-```
-
 #### Estimating the Accuracy of a Regression Model
 
 >
 The bootstrap approach can be used to assess the variability of the coefficient estimates and predictions from a statistical learning method. Here we use the bootstrap approach in order to assess the variability of the estimates for $\beta_0$ and $\beta_1$, the intercept and slope terms for the linear regression model that uses horsepower to predict mpg in the `Auto` data set. We will compare the estimates obtained using the bootstrap to those obtained using the formulas for $\text{SE}(\hat{\beta}_0)$ and $\text{SE}(\hat{\beta}_1)$ described in Section 3.1.2.
 
 ```{r}
-auto_boot <- rsample::bootstraps(auto, times = 1000)
-auto_boot
+auto_boot <- bootstraps(auto, times = 1000)
 ```
 
 By default, the `tune::fit_resamples()` function does not keep the model object from each fit.
 Usually, all we care about is the performance metrics and (if we're tuning) the best hyper parameters.
-So in order to get the actual regression coefficients, I need to provide a `control_grid()` object to the `control` argument of `fit_resamples()` (see [this article for more explanation]( https://www.tidymodels.org/learn/models/coefficients):
+So in order to get the actual regression coefficients, I need to provide a `control_grid()` object to the `control` argument of `fit_resamples()` (see [this article for more explanation]( https://www.tidymodels.org/learn/models/coefficients)):
 
 ```{r}
 get_lm_coefs <- function(x) {
@@ -530,7 +535,7 @@ auto_boot_fit <- workflow() %>%
   add_recipe(recipe(mpg ~ horsepower, data = auto)) %>%
   fit_resamples(auto_boot, control = tidy_ctrl)
 toc()
-auto_boot_fit
+auto_boot_fit %>% head()
 ```
 
 The `.extracts` column contains the tidy model objects.
@@ -544,7 +549,7 @@ auto_boot_fit_coefs <- auto_boot_fit %>%
   unnest(.extracts) %>%
   unnest(.extracts) %>%
   select(id, term, estimate, std.error)
-auto_boot_fit_coefs
+auto_boot_fit_coefs %>% head()
 ```
 
 Then taking the mean of the estimates, and applying equation 5.8 to get the standard error:
@@ -552,7 +557,6 @@ Then taking the mean of the estimates, and applying equation 5.8 to get the stan
 ```{r}
 auto_boot_fit_coefs %>%
   group_by(term) %>%
-  #mutate(correction_factor = mean(estimate)) %>%
   summarise(
     mean_estimate = mean(estimate),
     se_estimate = sqrt(
@@ -564,11 +568,67 @@ auto_boot_fit_coefs %>%
   fmt_number(columns = -term, decimals = 4)
 ```
 
-
-Not quite 
+Not exactly the same as those in the text due to the difference in the random bootstrap samples.
+And here are the SE estimates using the formula from section 3.1.2:
 
 ```{r}
+tidy(lm(mpg ~ horsepower, data = auto)) %>%
+  select(term, estimate, se_estimate = std.error) %>%
+  gt() %>%
+  fmt_number(columns = -term, decimals = 4)
 ```
 
+There are quite different to the bootstrap estimates.
+
+>
+Does this indicate a problem with the bootstrap? In fact, it suggests the opposite. Recall that the standard formulas given in Equation 3.8 on page 66 rely on certain assumptions. For example, they depend on the unknown parameter $\sigma^2$, the noise variance. We then estimate $\sigma^2$ using the RSS. Now although the formulas for the standard errors do not rely on the linear model being correct, the estimate for $\sigma^2$ does. We see in
+Figure 3.8 on page 91 that there is a non-linear relationship in the data, and so the residuals from a linear fit will be inflated, and so will $\hat{\sigma}^2$. Secondly, the standard formulas assume (somewhat unrealistically) that the $x_i$ are fixed, and all the variability comes from the variation in the errors $\epsilon_i$. The bootstrap approach does not rely on any of these assumptions, and so it is likely giving a more accurate estimate of the standard errors of $\hat{\beta}_0$ and $\hat{\beta}_1$ than is the `summary()` function.
+
+We can find better correspondence between bootstrap and regression estimates if we use the quadratic model because it better fits the data:
+
+```{r cache=TRUE}
+tic()
+auto_boot_quad_fit <- workflow() %>%
+  add_model(linear_reg()) %>%
+  add_recipe(
+    recipe(mpg ~ horsepower, data = auto) %>%
+      # Need to set `raw` = TRUE to not use orthogonal polynomials
+      step_poly(horsepower, degree = 2, options = list(raw = TRUE))
+  ) %>%
+  fit_resamples(auto_boot, control = tidy_ctrl)
+toc()
+```
+```{r}
+auto_boot_quad_fit %>%
+  unnest(.extracts) %>%
+  unnest(.extracts) %>%
+  group_by(term) %>%
+  summarise(
+    mean_estimate = mean(estimate),
+    se_estimate = sqrt(
+      (1 / (n() - 1)) * sum((estimate - mean_estimate)^2)
+    ),
+    .groups = "drop"
+  ) %>%
+  gt() %>%
+  fmt_number(columns = -term, decimals = 4)
+```
+
+```{r}
+# Need to set `raw` = TRUE to not use orthogonal polynomials
+tidy(lm(mpg ~ poly(horsepower, 2, raw = TRUE), data = auto)) %>%
+  select(term, estimate, se_estimate = std.error) %>%
+  gt() %>%
+  fmt_number(columns = -term, decimals = 4)
+```
 
 ## Exercises
+
+### Applied
+
+#### 5. Logistic regression with `default`
+
+```{r}
+default <- ISLR2::Default
+```
+
