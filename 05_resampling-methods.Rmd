@@ -484,7 +484,7 @@ auto_poly_fits_10_fold_cv %>%
 
 ### The Bootstrap
 
-#### Estimating the Accuracy of a Statistic of Interest
+#### Estimating the Accuracy of a Statistic of Interest {-}
 
 ```{r}
 portfolio <- ISLR2::Portfolio
@@ -506,7 +506,7 @@ portfolio_boot_alpha <- map_dbl(
 mean(portfolio_boot_alpha); sd(portfolio_boot_alpha)
 ```
 
-#### Estimating the Accuracy of a Regression Model
+#### Estimating the Accuracy of a Regression Model {-}
 
 >
 The bootstrap approach can be used to assess the variability of the coefficient estimates and predictions from a statistical learning method. Here we use the bootstrap approach in order to assess the variability of the estimates for $\beta_0$ and $\beta_1$, the intercept and slope terms for the linear regression model that uses horsepower to predict mpg in the `Auto` data set. We will compare the estimates obtained using the bootstrap to those obtained using the formulas for $\text{SE}(\hat{\beta}_0)$ and $\text{SE}(\hat{\beta}_1)$ described in Section 3.1.2.
@@ -624,11 +624,105 @@ tidy(lm(mpg ~ poly(horsepower, 2, raw = TRUE), data = auto)) %>%
 
 ## Exercises
 
-### Applied
+### Applied {-}
 
-#### 5. Logistic regression with `default`
+#### 5. Logistic regression with `default` {-}
 
 ```{r}
 default <- ISLR2::Default
 ```
 
+(a) Fit a logistic regression model that uses `income` and `balance` to predict `default`.
+
+```{r}
+default_workflow <- workflow() %>%
+  add_model(logistic_reg(mode = "classification", engine = "glm"))
+default_rec <- recipe(default ~ income + balance, data = default)
+
+default_fit <- default_workflow %>%
+  add_recipe(default_rec) %>%
+  fit(data = default)
+extract_fit_parsnip(default_fit)
+```
+
+(b) Using the validation set approach, estimate the test error of this model.
+
+Set seed and split:
+
+```{r}
+set.seed(940)
+default_splits <- validation_split(default, prop = 0.5)
+```
+
+Fit and evaluate the model with the hold out:
+
+```{r}
+default_fit_validation <- default_workflow %>%
+  add_recipe(default_rec) %>%
+  fit_resamples(default_splits)
+collect_metrics(default_fit_validation)
+```
+
+The accuracy of the model is
+`r scales::percent(collect_metrics(default_fit_validation)$mean[[1]], accuracy = 0.01)`
+and so the test error is
+`r scales::percent(1 - collect_metrics(default_fit_validation)$mean[[1]], accuracy = 0.01)`.
+
+The `tidymodels` workflow made fitting and assessing this model very easy -- just 5 lines of code.
+For comparison purposes, here is how you could do it without `tidymodels` (excluding the data splitting part):
+
+```{r}
+default_train <- training(default_splits$splits[[1]])
+default_assess <- assessment(default_splits$splits[[1]])
+
+default_glm <- glm(default ~ income + balance, data = default_train,
+                   family = "binomial")
+augment(default_glm, newdata = default_assess, type.predict = "response") %>%
+  mutate(default_pred = ifelse(.fitted > 0.5, "Yes", "No")) %>%
+  summarise(error_rate = mean(default != default_pred)) %>%
+  .$error_rate %>% scales::percent(accuracy = 0.01)
+```
+
+(c) Repeat the process in (b) three times, using three different splits of the observations. Comment on the results.
+
+```{r}
+set.seed(109)
+bind_rows(
+  collect_metrics(default_fit_validation) %>% mutate(rep = 1),
+  map_dfr(2:4,
+    function(rep) {
+      default_workflow %>%
+        add_recipe(default_rec) %>%
+        fit_resamples(validation_split(default, prop = 0.5)) %>%
+        collect_metrics() %>%
+        mutate(rep = rep)
+    }
+  )
+) %>%
+  filter(.metric == "accuracy") %>%
+  transmute(
+    rep,
+    accuracy = scales::percent(mean, accuracy = 0.01),
+    test_error = scales::percent(1 - mean, accuracy = 0.01)
+  ) %>%
+  gt()
+```
+
+The estimates are actually quite stable.
+
+(d) Add the dummy variable `student` to the logistic regression model. Comment on whether or not this leads to a reduction in the test error rate.
+
+```{r}
+default_rec_student <-
+  recipe(default ~ income + balance + student, data = default) %>%
+  step_dummy(student)
+
+default_fit_validation_student <- default_workflow %>%
+  add_recipe(default_rec_student) %>%
+  fit_resamples(default_splits)
+collect_metrics(default_fit_validation_student)
+```
+
+Adding the `student` variable resulted in a test error rate of
+`r scales::percent(1 - collect_metrics(default_fit_validation_student)$mean[1], accuracy = 0.01)`
+and so did not lead to a reduction compared to the original model.

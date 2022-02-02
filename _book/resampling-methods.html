@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-02-01" />
+<meta name="date" content="2022-02-02" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -262,6 +262,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#applied-1"><i class="fa fa-check"></i>Applied</a></li>
 </ul></li>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#reproducibility-1"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="resampling-methods.html"><a href="resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a>
 <ul>
@@ -283,7 +284,7 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="resampling-methods.html"><a href="resampling-methods.html#exercises-2"><i class="fa fa-check"></i><b>5.4</b> Exercises</a>
 <ul>
-<li class="chapter" data-level="5.4.1" data-path="resampling-methods.html"><a href="resampling-methods.html#applied-2"><i class="fa fa-check"></i><b>5.4.1</b> Applied</a></li>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#applied-2"><i class="fa fa-check"></i>Applied</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -337,36 +338,36 @@ In this section we consider methods which involve <em>holding out</em> a subset 
 The model is fit on the training set, and used to make predictions on the validation set.
 The corresponding metric from the validation set predictions – usually MSE in the case of a quantitative response – provides an estimate of the test error rate.</p>
 <p>To illustrate this, load the <code>Auto</code> data set and R packages:</p>
-<div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb332-1"><a href="resampling-methods.html#cb332-1" aria-hidden="true" tabindex="-1"></a>auto <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Auto</span>
-<span id="cb332-2"><a href="resampling-methods.html#cb332-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb332-3"><a href="resampling-methods.html#cb332-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb332-4"><a href="resampling-methods.html#cb332-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb332-5"><a href="resampling-methods.html#cb332-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb332-6"><a href="resampling-methods.html#cb332-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
-<span id="cb332-7"><a href="resampling-methods.html#cb332-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># for composing plots</span></span>
-<span id="cb332-8"><a href="resampling-methods.html#cb332-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
-<span id="cb332-9"><a href="resampling-methods.html#cb332-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
-<span id="cb332-10"><a href="resampling-methods.html#cb332-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
-<span id="cb332-11"><a href="resampling-methods.html#cb332-11" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb332-12"><a href="resampling-methods.html#cb332-12" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
-<span id="cb332-13"><a href="resampling-methods.html#cb332-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
-<span id="cb332-14"><a href="resampling-methods.html#cb332-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="resampling-methods.html#cb338-1" aria-hidden="true" tabindex="-1"></a>auto <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Auto</span>
+<span id="cb338-2"><a href="resampling-methods.html#cb338-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb338-3"><a href="resampling-methods.html#cb338-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb338-4"><a href="resampling-methods.html#cb338-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb338-5"><a href="resampling-methods.html#cb338-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb338-6"><a href="resampling-methods.html#cb338-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb338-7"><a href="resampling-methods.html#cb338-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork) <span class="co"># for composing plots</span></span>
+<span id="cb338-8"><a href="resampling-methods.html#cb338-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb338-9"><a href="resampling-methods.html#cb338-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb338-10"><a href="resampling-methods.html#cb338-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb338-11"><a href="resampling-methods.html#cb338-11" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb338-12"><a href="resampling-methods.html#cb338-12" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
+<span id="cb338-13"><a href="resampling-methods.html#cb338-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb338-14"><a href="resampling-methods.html#cb338-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
 <p>Randomly split the data into 50% training and 50% validation, fit on the training set, and compute the MSE on the validation set.
 Since I’ll be repeating this 10 times to reproduce the figure, make a couple functions.
 First, a function to set a random seed and split the data into training and validation set (called <code>assessment</code> set in the <code>rsample</code> package):</p>
-<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb333-1"><a href="resampling-methods.html#cb333-1" aria-hidden="true" tabindex="-1"></a>auto_validation_split <span class="ot">&lt;-</span> <span class="cf">function</span>(seed) {</span>
-<span id="cb333-2"><a href="resampling-methods.html#cb333-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
-<span id="cb333-3"><a href="resampling-methods.html#cb333-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">validation_split</span>(auto, <span class="at">prop =</span> <span class="fl">0.5</span>)</span>
-<span id="cb333-4"><a href="resampling-methods.html#cb333-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb333-5"><a href="resampling-methods.html#cb333-5" aria-hidden="true" tabindex="-1"></a>auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_validation_split</span>(<span class="at">seed =</span> <span class="dv">10</span>)</span>
-<span id="cb333-6"><a href="resampling-methods.html#cb333-6" aria-hidden="true" tabindex="-1"></a>auto_splits</span></code></pre></div>
+<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="resampling-methods.html#cb339-1" aria-hidden="true" tabindex="-1"></a>auto_validation_split <span class="ot">&lt;-</span> <span class="cf">function</span>(seed) {</span>
+<span id="cb339-2"><a href="resampling-methods.html#cb339-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb339-3"><a href="resampling-methods.html#cb339-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">validation_split</span>(auto, <span class="at">prop =</span> <span class="fl">0.5</span>)</span>
+<span id="cb339-4"><a href="resampling-methods.html#cb339-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb339-5"><a href="resampling-methods.html#cb339-5" aria-hidden="true" tabindex="-1"></a>auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_validation_split</span>(<span class="at">seed =</span> <span class="dv">10</span>)</span>
+<span id="cb339-6"><a href="resampling-methods.html#cb339-6" aria-hidden="true" tabindex="-1"></a>auto_splits</span></code></pre></div>
 <pre><code>## # Validation Set Split (0.5/0.5)  
 ## # A tibble: 1 x 2
 ##   splits            id        
 ##   &lt;list&gt;            &lt;chr&gt;     
 ## 1 &lt;split [196/196]&gt; validation</code></pre>
 <p>Similar to the <code>initial_split</code> workflow, I can access the training and validation sets as follows:</p>
-<div class="sourceCode" id="cb335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb335-1"><a href="resampling-methods.html#cb335-1" aria-hidden="true" tabindex="-1"></a><span class="fu">training</span>(auto_splits<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="resampling-methods.html#cb341-1" aria-hidden="true" tabindex="-1"></a><span class="fu">training</span>(auto_splits<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
 <pre><code>##      mpg cylinders displacement horsepower weight acceleration year origin
 ## 139 14.0         8          318        150   4457         13.5   74      1
 ## 333 29.8         4           89         62   1845         15.3   80      2
@@ -381,7 +382,7 @@ First, a function to set a random seed and split the data into training and vali
 ## 73           amc matador (sw)
 ## 213          cadillac seville
 ## 348            datsun 210 mpg</code></pre>
-<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb337-1"><a href="resampling-methods.html#cb337-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assessment</span>(auto_splits<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="resampling-methods.html#cb343-1" aria-hidden="true" tabindex="-1"></a><span class="fu">assessment</span>(auto_splits<span class="sc">$</span>splits[[<span class="dv">1</span>]]) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
 <pre><code>##   mpg cylinders displacement horsepower weight acceleration year origin
 ## 1  18         8          307        130   3504         12.0   70      1
 ## 2  15         8          350        165   3693         11.5   70      1
@@ -397,27 +398,27 @@ First, a function to set a random seed and split the data into training and vali
 ## 6          ford galaxie 500
 ## 7          chevrolet impala</code></pre>
 <p>Second, a function to fit 10 models (1 to 10 polynomial degrees of freedom) on the training set, and evaluate on the validation set with <code>fit_resamples</code>.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
-<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="resampling-methods.html#cb339-1" aria-hidden="true" tabindex="-1"></a>auto_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)</span>
-<span id="cb339-2"><a href="resampling-methods.html#cb339-2" aria-hidden="true" tabindex="-1"></a>lm_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(<span class="fu">linear_reg</span>())</span>
-<span id="cb339-3"><a href="resampling-methods.html#cb339-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb339-4"><a href="resampling-methods.html#cb339-4" aria-hidden="true" tabindex="-1"></a>evaluate_poly_fits <span class="ot">&lt;-</span> <span class="cf">function</span>(auto_splits) {</span>
-<span id="cb339-5"><a href="resampling-methods.html#cb339-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">poly_df =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb339-6"><a href="resampling-methods.html#cb339-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb339-7"><a href="resampling-methods.html#cb339-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_rec =</span> <span class="fu">map</span>(</span>
-<span id="cb339-8"><a href="resampling-methods.html#cb339-8" aria-hidden="true" tabindex="-1"></a>        poly_df, <span class="sc">~</span> auto_rec <span class="sc">%&gt;%</span> <span class="fu">step_poly</span>(horsepower, <span class="at">degree =</span> .x)</span>
-<span id="cb339-9"><a href="resampling-methods.html#cb339-9" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb339-10"><a href="resampling-methods.html#cb339-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_fit =</span> <span class="fu">map</span>(</span>
-<span id="cb339-11"><a href="resampling-methods.html#cb339-11" aria-hidden="true" tabindex="-1"></a>        lm_rec,</span>
-<span id="cb339-12"><a href="resampling-methods.html#cb339-12" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> lm_workflow <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(.x) <span class="sc">%&gt;%</span> <span class="fu">fit_resamples</span>(auto_splits)</span>
-<span id="cb339-13"><a href="resampling-methods.html#cb339-13" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb339-14"><a href="resampling-methods.html#cb339-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_metrics =</span> <span class="fu">map</span>(lm_fit, collect_metrics)</span>
-<span id="cb339-15"><a href="resampling-methods.html#cb339-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb339-16"><a href="resampling-methods.html#cb339-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(lm_metrics) <span class="sc">%&gt;%</span></span>
-<span id="cb339-17"><a href="resampling-methods.html#cb339-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb339-18"><a href="resampling-methods.html#cb339-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(poly_df, <span class="at">rmse =</span> mean)</span>
-<span id="cb339-19"><a href="resampling-methods.html#cb339-19" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb339-20"><a href="resampling-methods.html#cb339-20" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
-<span id="cb339-21"><a href="resampling-methods.html#cb339-21" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation</span></code></pre></div>
+<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="resampling-methods.html#cb345-1" aria-hidden="true" tabindex="-1"></a>auto_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)</span>
+<span id="cb345-2"><a href="resampling-methods.html#cb345-2" aria-hidden="true" tabindex="-1"></a>lm_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> <span class="fu">add_model</span>(<span class="fu">linear_reg</span>())</span>
+<span id="cb345-3"><a href="resampling-methods.html#cb345-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb345-4"><a href="resampling-methods.html#cb345-4" aria-hidden="true" tabindex="-1"></a>evaluate_poly_fits <span class="ot">&lt;-</span> <span class="cf">function</span>(auto_splits) {</span>
+<span id="cb345-5"><a href="resampling-methods.html#cb345-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">poly_df =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb345-6"><a href="resampling-methods.html#cb345-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb345-7"><a href="resampling-methods.html#cb345-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_rec =</span> <span class="fu">map</span>(</span>
+<span id="cb345-8"><a href="resampling-methods.html#cb345-8" aria-hidden="true" tabindex="-1"></a>        poly_df, <span class="sc">~</span> auto_rec <span class="sc">%&gt;%</span> <span class="fu">step_poly</span>(horsepower, <span class="at">degree =</span> .x)</span>
+<span id="cb345-9"><a href="resampling-methods.html#cb345-9" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb345-10"><a href="resampling-methods.html#cb345-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_fit =</span> <span class="fu">map</span>(</span>
+<span id="cb345-11"><a href="resampling-methods.html#cb345-11" aria-hidden="true" tabindex="-1"></a>        lm_rec,</span>
+<span id="cb345-12"><a href="resampling-methods.html#cb345-12" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> lm_workflow <span class="sc">%&gt;%</span> <span class="fu">add_recipe</span>(.x) <span class="sc">%&gt;%</span> <span class="fu">fit_resamples</span>(auto_splits)</span>
+<span id="cb345-13"><a href="resampling-methods.html#cb345-13" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb345-14"><a href="resampling-methods.html#cb345-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">lm_metrics =</span> <span class="fu">map</span>(lm_fit, collect_metrics)</span>
+<span id="cb345-15"><a href="resampling-methods.html#cb345-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb345-16"><a href="resampling-methods.html#cb345-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest</span>(lm_metrics) <span class="sc">%&gt;%</span></span>
+<span id="cb345-17"><a href="resampling-methods.html#cb345-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb345-18"><a href="resampling-methods.html#cb345-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(poly_df, <span class="at">rmse =</span> mean)</span>
+<span id="cb345-19"><a href="resampling-methods.html#cb345-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb345-20"><a href="resampling-methods.html#cb345-20" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
+<span id="cb345-21"><a href="resampling-methods.html#cb345-21" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 2
 ##    poly_df  rmse
 ##      &lt;int&gt; &lt;dbl&gt;
@@ -432,35 +433,35 @@ First, a function to set a random seed and split the data into training and vali
 ##  9       9  4.32
 ## 10      10  4.60</code></pre>
 <p>Now reproduce Figure 5.2:</p>
-<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="resampling-methods.html#cb341-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb341-2"><a href="resampling-methods.html#cb341-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 9 additional sets of fits</span></span>
-<span id="cb341-3"><a href="resampling-methods.html#cb341-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(</span>
-<span id="cb341-4"><a href="resampling-methods.html#cb341-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,</span>
-<span id="cb341-5"><a href="resampling-methods.html#cb341-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(seed) {</span>
-<span id="cb341-6"><a href="resampling-methods.html#cb341-6" aria-hidden="true" tabindex="-1"></a>      auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_validation_split</span>(seed)</span>
-<span id="cb341-7"><a href="resampling-methods.html#cb341-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
-<span id="cb341-8"><a href="resampling-methods.html#cb341-8" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb341-9"><a href="resampling-methods.html#cb341-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.id =</span> <span class="st">&quot;rep&quot;</span></span>
-<span id="cb341-10"><a href="resampling-methods.html#cb341-10" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb341-11"><a href="resampling-methods.html#cb341-11" aria-hidden="true" tabindex="-1"></a>  auto_poly_fits_validation <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="st">&quot;10&quot;</span>)</span>
-<span id="cb341-12"><a href="resampling-methods.html#cb341-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb341-13"><a href="resampling-methods.html#cb341-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb341-14"><a href="resampling-methods.html#cb341-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a 10 color palette from the MetBrewer package</span></span>
-<span id="cb341-15"><a href="resampling-methods.html#cb341-15" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> MetBrewer<span class="sc">::</span><span class="fu">met.brewer</span>(<span class="st">&quot;Veronese&quot;</span>, <span class="dv">10</span>, <span class="at">type =</span> <span class="st">&quot;continuous&quot;</span>)</span>
-<span id="cb341-16"><a href="resampling-methods.html#cb341-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb341-17"><a href="resampling-methods.html#cb341-17" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> auto_poly_fits_validation <span class="sc">%&gt;%</span></span>
-<span id="cb341-18"><a href="resampling-methods.html#cb341-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_df, <span class="at">y =</span> rmse<span class="sc">^</span><span class="dv">2</span>, <span class="at">fill =</span> rep)) <span class="sc">+</span></span>
-<span id="cb341-19"><a href="resampling-methods.html#cb341-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> rep), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb341-20"><a href="resampling-methods.html#cb341-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">30</span>)) <span class="sc">+</span></span>
-<span id="cb341-21"><a href="resampling-methods.html#cb341-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
-<span id="cb341-22"><a href="resampling-methods.html#cb341-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
-<span id="cb341-23"><a href="resampling-methods.html#cb341-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
-<span id="cb341-24"><a href="resampling-methods.html#cb341-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Degree of polynomial&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb341-25"><a href="resampling-methods.html#cb341-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
-<span id="cb341-26"><a href="resampling-methods.html#cb341-26" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p2 <span class="sc">%+%</span> <span class="fu">filter</span>(auto_poly_fits_validation, rep <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="sc">+</span></span>
-<span id="cb341-27"><a href="resampling-methods.html#cb341-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> rep), <span class="at">shape =</span> <span class="dv">21</span>,  <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb341-28"><a href="resampling-methods.html#cb341-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;MSE&quot;</span>)</span>
-<span id="cb341-29"><a href="resampling-methods.html#cb341-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="resampling-methods.html#cb347-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb347-2"><a href="resampling-methods.html#cb347-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 9 additional sets of fits</span></span>
+<span id="cb347-3"><a href="resampling-methods.html#cb347-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(</span>
+<span id="cb347-4"><a href="resampling-methods.html#cb347-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,</span>
+<span id="cb347-5"><a href="resampling-methods.html#cb347-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(seed) {</span>
+<span id="cb347-6"><a href="resampling-methods.html#cb347-6" aria-hidden="true" tabindex="-1"></a>      auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_validation_split</span>(seed)</span>
+<span id="cb347-7"><a href="resampling-methods.html#cb347-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
+<span id="cb347-8"><a href="resampling-methods.html#cb347-8" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb347-9"><a href="resampling-methods.html#cb347-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.id =</span> <span class="st">&quot;rep&quot;</span></span>
+<span id="cb347-10"><a href="resampling-methods.html#cb347-10" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb347-11"><a href="resampling-methods.html#cb347-11" aria-hidden="true" tabindex="-1"></a>  auto_poly_fits_validation <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="st">&quot;10&quot;</span>)</span>
+<span id="cb347-12"><a href="resampling-methods.html#cb347-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb347-13"><a href="resampling-methods.html#cb347-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb347-14"><a href="resampling-methods.html#cb347-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a 10 color palette from the MetBrewer package</span></span>
+<span id="cb347-15"><a href="resampling-methods.html#cb347-15" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> MetBrewer<span class="sc">::</span><span class="fu">met.brewer</span>(<span class="st">&quot;Veronese&quot;</span>, <span class="dv">10</span>, <span class="at">type =</span> <span class="st">&quot;continuous&quot;</span>)</span>
+<span id="cb347-16"><a href="resampling-methods.html#cb347-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb347-17"><a href="resampling-methods.html#cb347-17" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> auto_poly_fits_validation <span class="sc">%&gt;%</span></span>
+<span id="cb347-18"><a href="resampling-methods.html#cb347-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_df, <span class="at">y =</span> rmse<span class="sc">^</span><span class="dv">2</span>, <span class="at">fill =</span> rep)) <span class="sc">+</span></span>
+<span id="cb347-19"><a href="resampling-methods.html#cb347-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> rep), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb347-20"><a href="resampling-methods.html#cb347-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">30</span>)) <span class="sc">+</span></span>
+<span id="cb347-21"><a href="resampling-methods.html#cb347-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb347-22"><a href="resampling-methods.html#cb347-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
+<span id="cb347-23"><a href="resampling-methods.html#cb347-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
+<span id="cb347-24"><a href="resampling-methods.html#cb347-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Degree of polynomial&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb347-25"><a href="resampling-methods.html#cb347-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb347-26"><a href="resampling-methods.html#cb347-26" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p2 <span class="sc">%+%</span> <span class="fu">filter</span>(auto_poly_fits_validation, rep <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="sc">+</span></span>
+<span id="cb347-27"><a href="resampling-methods.html#cb347-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> rep), <span class="at">shape =</span> <span class="dv">21</span>,  <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb347-28"><a href="resampling-methods.html#cb347-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;MSE&quot;</span>)</span>
+<span id="cb347-29"><a href="resampling-methods.html#cb347-29" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure5.2-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>As is clear from the right-hand panel, this approach is highly variable depending on the testing/validation set split.
 Another downside is that, because the training set used to fit the data has fewer observations, it tends to overestimate the test error rate on the entire data set.</p>
@@ -482,8 +483,8 @@ Then the LOOCV estimate of the MSE is the average over all observations:</p>
 </ul>
 </blockquote>
 <p>Define a new function to split the data by LOOCV:<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
-<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="resampling-methods.html#cb342-1" aria-hidden="true" tabindex="-1"></a>auto_splits <span class="ot">&lt;-</span> <span class="fu">loo_cv</span>(auto)</span>
-<span id="cb342-2"><a href="resampling-methods.html#cb342-2" aria-hidden="true" tabindex="-1"></a>auto_splits</span></code></pre></div>
+<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="resampling-methods.html#cb348-1" aria-hidden="true" tabindex="-1"></a>auto_splits <span class="ot">&lt;-</span> <span class="fu">loo_cv</span>(auto)</span>
+<span id="cb348-2"><a href="resampling-methods.html#cb348-2" aria-hidden="true" tabindex="-1"></a>auto_splits</span></code></pre></div>
 <pre><code>## # Leave-one-out cross-validation 
 ## # A tibble: 392 x 2
 ##    splits          id        
@@ -501,7 +502,7 @@ Then the LOOCV estimate of the MSE is the average over all observations:</p>
 ## # ... with 382 more rows</code></pre>
 <p>392 splits, which is the number of observations, as expected.
 Fit:</p>
-<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="resampling-methods.html#cb344-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span></code></pre></div>
+<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="resampling-methods.html#cb350-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span></code></pre></div>
 <pre><code>## Error: Problem with `mutate()` column `lm_fit`.
 ## i `lm_fit = map(lm_rec, ~lm_workflow %&gt;% add_recipe(.x) %&gt;% fit_resamples(auto_splits))`.
 ## x Leave-one-out cross-validation is not currently supported with tune.</code></pre>
@@ -512,16 +513,16 @@ Here’s an <a href="https://www.tmwr.org/resampling.html#leave-one-out-cross-va
 </blockquote>
 <p>Fair enough.
 For completeness, I will still get the LOOCV estimates using <code>boot::cv.glm()</code>:</p>
-<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="resampling-methods.html#cb346-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb346-2"><a href="resampling-methods.html#cb346-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">poly_df =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
-<span id="cb346-3"><a href="resampling-methods.html#cb346-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="fu">map_dbl</span>(poly_df,</span>
-<span id="cb346-4"><a href="resampling-methods.html#cb346-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(poly_df) {</span>
-<span id="cb346-5"><a href="resampling-methods.html#cb346-5" aria-hidden="true" tabindex="-1"></a>      glm_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="at">degree =</span> poly_df), <span class="at">data =</span> auto)</span>
-<span id="cb346-6"><a href="resampling-methods.html#cb346-6" aria-hidden="true" tabindex="-1"></a>      boot<span class="sc">::</span><span class="fu">cv.glm</span>(auto, glm_fit)<span class="sc">$</span>delta[<span class="dv">1</span>]</span>
-<span id="cb346-7"><a href="resampling-methods.html#cb346-7" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb346-8"><a href="resampling-methods.html#cb346-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb346-9"><a href="resampling-methods.html#cb346-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb346-10"><a href="resampling-methods.html#cb346-10" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv</span></code></pre></div>
+<div class="sourceCode" id="cb352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb352-1"><a href="resampling-methods.html#cb352-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb352-2"><a href="resampling-methods.html#cb352-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">poly_df =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
+<span id="cb352-3"><a href="resampling-methods.html#cb352-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">mse =</span> <span class="fu">map_dbl</span>(poly_df,</span>
+<span id="cb352-4"><a href="resampling-methods.html#cb352-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(poly_df) {</span>
+<span id="cb352-5"><a href="resampling-methods.html#cb352-5" aria-hidden="true" tabindex="-1"></a>      glm_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="at">degree =</span> poly_df), <span class="at">data =</span> auto)</span>
+<span id="cb352-6"><a href="resampling-methods.html#cb352-6" aria-hidden="true" tabindex="-1"></a>      boot<span class="sc">::</span><span class="fu">cv.glm</span>(auto, glm_fit)<span class="sc">$</span>delta[<span class="dv">1</span>]</span>
+<span id="cb352-7"><a href="resampling-methods.html#cb352-7" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb352-8"><a href="resampling-methods.html#cb352-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb352-9"><a href="resampling-methods.html#cb352-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb352-10"><a href="resampling-methods.html#cb352-10" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 2
 ##    poly_df   mse
 ##      &lt;int&gt; &lt;dbl&gt;
@@ -564,12 +565,12 @@ non-computational advantages to performing 5-fold or 10-fold CV, which
 involve the bias-variance trade-off.</p>
 </blockquote>
 <p>Fit the polynomial models with 10-fold CV:</p>
-<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="resampling-methods.html#cb348-1" aria-hidden="true" tabindex="-1"></a>auto_10_fold_cv <span class="ot">&lt;-</span> <span class="cf">function</span>(seed) {</span>
-<span id="cb348-2"><a href="resampling-methods.html#cb348-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
-<span id="cb348-3"><a href="resampling-methods.html#cb348-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vfold_cv</span>(auto, <span class="at">v =</span> <span class="dv">10</span>)</span>
-<span id="cb348-4"><a href="resampling-methods.html#cb348-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb348-5"><a href="resampling-methods.html#cb348-5" aria-hidden="true" tabindex="-1"></a>auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_10_fold_cv</span>(<span class="at">seed =</span> <span class="dv">10</span>)</span>
-<span id="cb348-6"><a href="resampling-methods.html#cb348-6" aria-hidden="true" tabindex="-1"></a>auto_splits</span></code></pre></div>
+<div class="sourceCode" id="cb354"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb354-1"><a href="resampling-methods.html#cb354-1" aria-hidden="true" tabindex="-1"></a>auto_10_fold_cv <span class="ot">&lt;-</span> <span class="cf">function</span>(seed) {</span>
+<span id="cb354-2"><a href="resampling-methods.html#cb354-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb354-3"><a href="resampling-methods.html#cb354-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vfold_cv</span>(auto, <span class="at">v =</span> <span class="dv">10</span>)</span>
+<span id="cb354-4"><a href="resampling-methods.html#cb354-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb354-5"><a href="resampling-methods.html#cb354-5" aria-hidden="true" tabindex="-1"></a>auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_10_fold_cv</span>(<span class="at">seed =</span> <span class="dv">10</span>)</span>
+<span id="cb354-6"><a href="resampling-methods.html#cb354-6" aria-hidden="true" tabindex="-1"></a>auto_splits</span></code></pre></div>
 <pre><code>## #  10-fold cross-validation 
 ## # A tibble: 10 x 2
 ##    splits           id    
@@ -584,8 +585,8 @@ involve the bias-variance trade-off.</p>
 ##  8 &lt;split [353/39]&gt; Fold08
 ##  9 &lt;split [353/39]&gt; Fold09
 ## 10 &lt;split [353/39]&gt; Fold10</code></pre>
-<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="resampling-methods.html#cb350-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
-<span id="cb350-2"><a href="resampling-methods.html#cb350-2" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv</span></code></pre></div>
+<div class="sourceCode" id="cb356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb356-1"><a href="resampling-methods.html#cb356-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
+<span id="cb356-2"><a href="resampling-methods.html#cb356-2" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 2
 ##    poly_df  rmse
 ##      &lt;int&gt; &lt;dbl&gt;
@@ -609,36 +610,36 @@ Thought it won’t take <em>too</em> long to run, I’ll make use of <code>paral
 ##     accumulate, when</code></pre>
 <pre><code>## Loading required package: iterators</code></pre>
 <pre><code>## Loading required package: parallel</code></pre>
-<div class="sourceCode" id="cb357"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb357-1"><a href="resampling-methods.html#cb357-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb357-2"><a href="resampling-methods.html#cb357-2" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb357-3"><a href="resampling-methods.html#cb357-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 9 additional sets of fits</span></span>
-<span id="cb357-4"><a href="resampling-methods.html#cb357-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(</span>
-<span id="cb357-5"><a href="resampling-methods.html#cb357-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,</span>
-<span id="cb357-6"><a href="resampling-methods.html#cb357-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(seed) {</span>
-<span id="cb357-7"><a href="resampling-methods.html#cb357-7" aria-hidden="true" tabindex="-1"></a>      auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_10_fold_cv</span>(seed)</span>
-<span id="cb357-8"><a href="resampling-methods.html#cb357-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
-<span id="cb357-9"><a href="resampling-methods.html#cb357-9" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb357-10"><a href="resampling-methods.html#cb357-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.id =</span> <span class="st">&quot;rep&quot;</span></span>
-<span id="cb357-11"><a href="resampling-methods.html#cb357-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb357-12"><a href="resampling-methods.html#cb357-12" aria-hidden="true" tabindex="-1"></a>  auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="st">&quot;10&quot;</span>)</span>
-<span id="cb357-13"><a href="resampling-methods.html#cb357-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb357-14"><a href="resampling-methods.html#cb357-14" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 91.87 sec elapsed</code></pre>
+<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb363-1"><a href="resampling-methods.html#cb363-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb363-2"><a href="resampling-methods.html#cb363-2" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb363-3"><a href="resampling-methods.html#cb363-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 9 additional sets of fits</span></span>
+<span id="cb363-4"><a href="resampling-methods.html#cb363-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(</span>
+<span id="cb363-5"><a href="resampling-methods.html#cb363-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>,</span>
+<span id="cb363-6"><a href="resampling-methods.html#cb363-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(seed) {</span>
+<span id="cb363-7"><a href="resampling-methods.html#cb363-7" aria-hidden="true" tabindex="-1"></a>      auto_splits <span class="ot">&lt;-</span> <span class="fu">auto_10_fold_cv</span>(seed)</span>
+<span id="cb363-8"><a href="resampling-methods.html#cb363-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">evaluate_poly_fits</span>(auto_splits)</span>
+<span id="cb363-9"><a href="resampling-methods.html#cb363-9" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb363-10"><a href="resampling-methods.html#cb363-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.id =</span> <span class="st">&quot;rep&quot;</span></span>
+<span id="cb363-11"><a href="resampling-methods.html#cb363-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb363-12"><a href="resampling-methods.html#cb363-12" aria-hidden="true" tabindex="-1"></a>  auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="st">&quot;10&quot;</span>)</span>
+<span id="cb363-13"><a href="resampling-methods.html#cb363-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb363-14"><a href="resampling-methods.html#cb363-14" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 85.91 sec elapsed</code></pre>
 <p>Now reproduce Figure 5.4:</p>
-<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb359-1"><a href="resampling-methods.html#cb359-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span></span>
-<span id="cb359-2"><a href="resampling-methods.html#cb359-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb359-3"><a href="resampling-methods.html#cb359-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_df, <span class="at">y =</span> mse, <span class="at">fill =</span> rep)) <span class="sc">+</span></span>
-<span id="cb359-4"><a href="resampling-methods.html#cb359-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> rep), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb359-5"><a href="resampling-methods.html#cb359-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">30</span>)) <span class="sc">+</span></span>
-<span id="cb359-6"><a href="resampling-methods.html#cb359-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
-<span id="cb359-7"><a href="resampling-methods.html#cb359-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
-<span id="cb359-8"><a href="resampling-methods.html#cb359-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
-<span id="cb359-9"><a href="resampling-methods.html#cb359-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Degree of polynomial&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb359-10"><a href="resampling-methods.html#cb359-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
-<span id="cb359-11"><a href="resampling-methods.html#cb359-11" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p2 <span class="sc">%+%</span> <span class="fu">mutate</span>(auto_poly_fits_loo_cv, <span class="at">rep =</span> <span class="st">&quot;1&quot;</span>) <span class="sc">+</span></span>
-<span id="cb359-12"><a href="resampling-methods.html#cb359-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> rep), <span class="at">shape =</span> <span class="dv">21</span>,  <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb359-13"><a href="resampling-methods.html#cb359-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;MSE&quot;</span>)</span>
-<span id="cb359-14"><a href="resampling-methods.html#cb359-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="resampling-methods.html#cb365-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span></span>
+<span id="cb365-2"><a href="resampling-methods.html#cb365-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb365-3"><a href="resampling-methods.html#cb365-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> poly_df, <span class="at">y =</span> mse, <span class="at">fill =</span> rep)) <span class="sc">+</span></span>
+<span id="cb365-4"><a href="resampling-methods.html#cb365-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">color =</span> rep), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb365-5"><a href="resampling-methods.html#cb365-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">30</span>)) <span class="sc">+</span></span>
+<span id="cb365-6"><a href="resampling-methods.html#cb365-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb365-7"><a href="resampling-methods.html#cb365-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
+<span id="cb365-8"><a href="resampling-methods.html#cb365-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> pal) <span class="sc">+</span></span>
+<span id="cb365-9"><a href="resampling-methods.html#cb365-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Degree of polynomial&quot;</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb365-10"><a href="resampling-methods.html#cb365-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb365-11"><a href="resampling-methods.html#cb365-11" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p2 <span class="sc">%+%</span> <span class="fu">mutate</span>(auto_poly_fits_loo_cv, <span class="at">rep =</span> <span class="st">&quot;1&quot;</span>) <span class="sc">+</span></span>
+<span id="cb365-12"><a href="resampling-methods.html#cb365-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">fill =</span> rep), <span class="at">shape =</span> <span class="dv">21</span>,  <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb365-13"><a href="resampling-methods.html#cb365-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;MSE&quot;</span>)</span>
+<span id="cb365-14"><a href="resampling-methods.html#cb365-14" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure5.4-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>The <span class="math inline">\(k\)</span>-fold CV approach (right panel) still has some variability due to random splitting, but much less than the validation set approach.</p>
 <p>As a reminder, with cross-validation we are trying to approximate the true test MSE, which we cannot know for certain unless the data are simulated (like in Figure 5.6).
@@ -688,14 +689,14 @@ In reality, we don’t know these variances and covariance, so we estimate them 
 <p>To illustrate, we simulate 100 pairs of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, and compute the estimated <span class="math inline">\(\alpha\)</span>.
 The simulation parameters are <span class="math inline">\(\sigma_X^2 = 1\)</span>, <span class="math inline">\(\sigma_Y^2 = 1.25\)</span>, and <span class="math inline">\(\sigma_{XY} = 0.5\)</span>.
 Presumably, these are bivariate normally distributed, which I can simulate with the <code>mvtnorm</code> package:</p>
-<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb360-1"><a href="resampling-methods.html#cb360-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
-<span id="cb360-2"><a href="resampling-methods.html#cb360-2" aria-hidden="true" tabindex="-1"></a>sigma_x <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb360-3"><a href="resampling-methods.html#cb360-3" aria-hidden="true" tabindex="-1"></a>sigma_y <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fl">1.25</span>)</span>
-<span id="cb360-4"><a href="resampling-methods.html#cb360-4" aria-hidden="true" tabindex="-1"></a>sigma_xy <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb360-5"><a href="resampling-methods.html#cb360-5" aria-hidden="true" tabindex="-1"></a><span class="co"># The variance-covariance matrix</span></span>
-<span id="cb360-6"><a href="resampling-methods.html#cb360-6" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(sigma_x<span class="sc">^</span><span class="dv">2</span>, sigma_xy, sigma_xy, sigma_y<span class="sc">^</span><span class="dv">2</span>), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
-<span id="cb360-7"><a href="resampling-methods.html#cb360-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate 5 observations</span></span>
-<span id="cb360-8"><a href="resampling-methods.html#cb360-8" aria-hidden="true" tabindex="-1"></a><span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> sigma)</span></code></pre></div>
+<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="resampling-methods.html#cb366-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mvtnorm)</span>
+<span id="cb366-2"><a href="resampling-methods.html#cb366-2" aria-hidden="true" tabindex="-1"></a>sigma_x <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb366-3"><a href="resampling-methods.html#cb366-3" aria-hidden="true" tabindex="-1"></a>sigma_y <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fl">1.25</span>)</span>
+<span id="cb366-4"><a href="resampling-methods.html#cb366-4" aria-hidden="true" tabindex="-1"></a>sigma_xy <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb366-5"><a href="resampling-methods.html#cb366-5" aria-hidden="true" tabindex="-1"></a><span class="co"># The variance-covariance matrix</span></span>
+<span id="cb366-6"><a href="resampling-methods.html#cb366-6" aria-hidden="true" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(sigma_x<span class="sc">^</span><span class="dv">2</span>, sigma_xy, sigma_xy, sigma_y<span class="sc">^</span><span class="dv">2</span>), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb366-7"><a href="resampling-methods.html#cb366-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate 5 observations</span></span>
+<span id="cb366-8"><a href="resampling-methods.html#cb366-8" aria-hidden="true" tabindex="-1"></a><span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">5</span>, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> sigma)</span></code></pre></div>
 <pre><code>##            [,1]       [,2]
 ## [1,] -0.6198186  0.2723180
 ## [2,] -0.4510171 -1.4568201
@@ -703,103 +704,105 @@ Presumably, these are bivariate normally distributed, which I can simulate with 
 ## [4,] -0.3405990 -0.3004827
 ## [5,] -0.3552014  1.1948117</code></pre>
 <p>Write a function to compute <span class="math inline">\(\alpha\)</span> from the simulated <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>:</p>
-<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="resampling-methods.html#cb362-1" aria-hidden="true" tabindex="-1"></a>sim_alpha <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">xy =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb362-2"><a href="resampling-methods.html#cb362-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(xy)) {</span>
-<span id="cb362-3"><a href="resampling-methods.html#cb362-3" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> sigma)</span>
-<span id="cb362-4"><a href="resampling-methods.html#cb362-4" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb362-5"><a href="resampling-methods.html#cb362-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> xy[,<span class="dv">1</span>]; y <span class="ot">&lt;-</span> xy[,<span class="dv">2</span>]</span>
-<span id="cb362-6"><a href="resampling-methods.html#cb362-6" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">var</span>(y) <span class="sc">-</span>  <span class="fu">cov</span>(x, y)) <span class="sc">/</span> (<span class="fu">var</span>(x) <span class="sc">+</span> <span class="fu">var</span>(y) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">cov</span>(x, y))</span>
-<span id="cb362-7"><a href="resampling-methods.html#cb362-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb362-8"><a href="resampling-methods.html#cb362-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sim_alpha</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="resampling-methods.html#cb368-1" aria-hidden="true" tabindex="-1"></a>sim_alpha <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">xy =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb368-2"><a href="resampling-methods.html#cb368-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(xy)) {</span>
+<span id="cb368-3"><a href="resampling-methods.html#cb368-3" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> <span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> sigma)</span>
+<span id="cb368-4"><a href="resampling-methods.html#cb368-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb368-5"><a href="resampling-methods.html#cb368-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> xy[,<span class="dv">1</span>]; y <span class="ot">&lt;-</span> xy[,<span class="dv">2</span>]</span>
+<span id="cb368-6"><a href="resampling-methods.html#cb368-6" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">var</span>(y) <span class="sc">-</span>  <span class="fu">cov</span>(x, y)) <span class="sc">/</span> (<span class="fu">var</span>(x) <span class="sc">+</span> <span class="fu">var</span>(y) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">cov</span>(x, y))</span>
+<span id="cb368-7"><a href="resampling-methods.html#cb368-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb368-8"><a href="resampling-methods.html#cb368-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sim_alpha</span>()</span></code></pre></div>
 <pre><code>## [1] 0.577909</code></pre>
 <p>Run four simulations and plot <span class="math inline">\(X\)</span> vs <span class="math inline">\(Y\)</span> for Figure 5.9</p>
-<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="resampling-methods.html#cb364-1" aria-hidden="true" tabindex="-1"></a>d4 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">sim =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb364-2"><a href="resampling-methods.html#cb364-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb364-3"><a href="resampling-methods.html#cb364-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">xy =</span> <span class="fu">list</span>(<span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> sigma))) <span class="sc">%&gt;%</span></span>
-<span id="cb364-4"><a href="resampling-methods.html#cb364-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb364-5"><a href="resampling-methods.html#cb364-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">alpha =</span> <span class="fu">map_dbl</span>(xy, sim_alpha) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>),</span>
-<span id="cb364-6"><a href="resampling-methods.html#cb364-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="fu">map</span>(xy, <span class="sc">~</span> .x[,<span class="dv">1</span>]), <span class="at">y =</span> <span class="fu">map</span>(xy, <span class="sc">~</span> .x[,<span class="dv">2</span>])) <span class="sc">%&gt;%</span></span>
-<span id="cb364-7"><a href="resampling-methods.html#cb364-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(x, y))</span>
-<span id="cb364-8"><a href="resampling-methods.html#cb364-8" aria-hidden="true" tabindex="-1"></a>d4 <span class="sc">%&gt;%</span></span>
-<span id="cb364-9"><a href="resampling-methods.html#cb364-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
-<span id="cb364-10"><a href="resampling-methods.html#cb364-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>emerald, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb364-11"><a href="resampling-methods.html#cb364-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>alpha, <span class="at">labeller =</span> <span class="st">&quot;label_both&quot;</span>) <span class="sc">+</span></span>
-<span id="cb364-12"><a href="resampling-methods.html#cb364-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_facet_borders</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="resampling-methods.html#cb370-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">319</span>)</span>
+<span id="cb370-2"><a href="resampling-methods.html#cb370-2" aria-hidden="true" tabindex="-1"></a>d4 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">sim =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb370-3"><a href="resampling-methods.html#cb370-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb370-4"><a href="resampling-methods.html#cb370-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">xy =</span> <span class="fu">list</span>(<span class="fu">rmvnorm</span>(<span class="at">n =</span> <span class="dv">100</span>, <span class="at">mean =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">sigma =</span> sigma))) <span class="sc">%&gt;%</span></span>
+<span id="cb370-5"><a href="resampling-methods.html#cb370-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb370-6"><a href="resampling-methods.html#cb370-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">alpha =</span> <span class="fu">map_dbl</span>(xy, sim_alpha) <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">3</span>),</span>
+<span id="cb370-7"><a href="resampling-methods.html#cb370-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="fu">map</span>(xy, <span class="sc">~</span> .x[,<span class="dv">1</span>]), <span class="at">y =</span> <span class="fu">map</span>(xy, <span class="sc">~</span> .x[,<span class="dv">2</span>])) <span class="sc">%&gt;%</span></span>
+<span id="cb370-8"><a href="resampling-methods.html#cb370-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(x, y))</span>
+<span id="cb370-9"><a href="resampling-methods.html#cb370-9" aria-hidden="true" tabindex="-1"></a>d4 <span class="sc">%&gt;%</span></span>
+<span id="cb370-10"><a href="resampling-methods.html#cb370-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
+<span id="cb370-11"><a href="resampling-methods.html#cb370-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>emerald, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb370-12"><a href="resampling-methods.html#cb370-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>alpha, <span class="at">labeller =</span> <span class="st">&quot;label_both&quot;</span>) <span class="sc">+</span></span>
+<span id="cb370-13"><a href="resampling-methods.html#cb370-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_facet_borders</span>()</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure5.9-1.png" width="576" style="display: block; margin: auto;" /></p>
 <p>For Figure 5.10, I first simulate 1000 data sets from the true population and estimate <span class="math inline">\(\alpha\)</span> for each:</p>
-<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="resampling-methods.html#cb365-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb365-2"><a href="resampling-methods.html#cb365-2" aria-hidden="true" tabindex="-1"></a>  d4 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(sim, alpha),</span>
-<span id="cb365-3"><a href="resampling-methods.html#cb365-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">sim =</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb365-4"><a href="resampling-methods.html#cb365-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb365-5"><a href="resampling-methods.html#cb365-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">alpha =</span> <span class="fu">sim_alpha</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb365-6"><a href="resampling-methods.html#cb365-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
-<span id="cb365-7"><a href="resampling-methods.html#cb365-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb365-8"><a href="resampling-methods.html#cb365-8" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
+<div class="sourceCode" id="cb371"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb371-1"><a href="resampling-methods.html#cb371-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb371-2"><a href="resampling-methods.html#cb371-2" aria-hidden="true" tabindex="-1"></a>  d4 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(sim, alpha),</span>
+<span id="cb371-3"><a href="resampling-methods.html#cb371-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">sim =</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb371-4"><a href="resampling-methods.html#cb371-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb371-5"><a href="resampling-methods.html#cb371-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">alpha =</span> <span class="fu">sim_alpha</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb371-6"><a href="resampling-methods.html#cb371-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb371-7"><a href="resampling-methods.html#cb371-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb371-8"><a href="resampling-methods.html#cb371-8" aria-hidden="true" tabindex="-1"></a>d</span></code></pre></div>
 <pre><code>## # A tibble: 1,000 x 2
 ##      sim alpha
 ##    &lt;int&gt; &lt;dbl&gt;
-##  1     1 0.392
-##  2     2 0.653
-##  3     3 0.58 
-##  4     4 0.635
-##  5     5 0.604
-##  6     6 0.680
-##  7     7 0.648
-##  8     8 0.662
-##  9     9 0.674
-## 10    10 0.597
+##  1     1 0.555
+##  2     2 0.622
+##  3     3 0.615
+##  4     4 0.453
+##  5     5 0.588
+##  6     6 0.605
+##  7     7 0.483
+##  8     8 0.598
+##  9     9 0.602
+## 10    10 0.633
 ## # ... with 990 more rows</code></pre>
 <p>And then, using just the first simulated data set, use the <code>rsample::boostraps()</code> function to generate 1000 bootstrap resamples:</p>
-<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb367-1"><a href="resampling-methods.html#cb367-1" aria-hidden="true" tabindex="-1"></a>d1_boot <span class="ot">&lt;-</span> d4 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(sim <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(x, y) <span class="sc">%&gt;%</span></span>
-<span id="cb367-2"><a href="resampling-methods.html#cb367-2" aria-hidden="true" tabindex="-1"></a>  rsample<span class="sc">::</span><span class="fu">bootstraps</span>(<span class="at">times =</span> <span class="dv">1000</span>)</span>
-<span id="cb367-3"><a href="resampling-methods.html#cb367-3" aria-hidden="true" tabindex="-1"></a>d1_boot</span></code></pre></div>
+<div class="sourceCode" id="cb373"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb373-1"><a href="resampling-methods.html#cb373-1" aria-hidden="true" tabindex="-1"></a>d1_boot <span class="ot">&lt;-</span> d4 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(sim <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(x, y) <span class="sc">%&gt;%</span></span>
+<span id="cb373-2"><a href="resampling-methods.html#cb373-2" aria-hidden="true" tabindex="-1"></a>  rsample<span class="sc">::</span><span class="fu">bootstraps</span>(<span class="at">times =</span> <span class="dv">1000</span>)</span>
+<span id="cb373-3"><a href="resampling-methods.html#cb373-3" aria-hidden="true" tabindex="-1"></a>d1_boot</span></code></pre></div>
 <pre><code>## # Bootstrap sampling 
 ## # A tibble: 1,000 x 2
 ##    splits           id           
 ##    &lt;list&gt;           &lt;chr&gt;        
 ##  1 &lt;split [100/34]&gt; Bootstrap0001
 ##  2 &lt;split [100/37]&gt; Bootstrap0002
-##  3 &lt;split [100/43]&gt; Bootstrap0003
-##  4 &lt;split [100/34]&gt; Bootstrap0004
-##  5 &lt;split [100/38]&gt; Bootstrap0005
-##  6 &lt;split [100/37]&gt; Bootstrap0006
-##  7 &lt;split [100/36]&gt; Bootstrap0007
-##  8 &lt;split [100/37]&gt; Bootstrap0008
-##  9 &lt;split [100/36]&gt; Bootstrap0009
-## 10 &lt;split [100/41]&gt; Bootstrap0010
+##  3 &lt;split [100/32]&gt; Bootstrap0003
+##  4 &lt;split [100/35]&gt; Bootstrap0004
+##  5 &lt;split [100/39]&gt; Bootstrap0005
+##  6 &lt;split [100/38]&gt; Bootstrap0006
+##  7 &lt;split [100/43]&gt; Bootstrap0007
+##  8 &lt;split [100/39]&gt; Bootstrap0008
+##  9 &lt;split [100/31]&gt; Bootstrap0009
+## 10 &lt;split [100/44]&gt; Bootstrap0010
 ## # ... with 990 more rows</code></pre>
 <p>Compute <span class="math inline">\(\hat{\alpha}\)</span> from each split:</p>
-<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb369-1"><a href="resampling-methods.html#cb369-1" aria-hidden="true" tabindex="-1"></a>d1_boot_alpha <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
-<span id="cb369-2"><a href="resampling-methods.html#cb369-2" aria-hidden="true" tabindex="-1"></a>  d1_boot<span class="sc">$</span>splits,</span>
-<span id="cb369-3"><a href="resampling-methods.html#cb369-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(split) {</span>
-<span id="cb369-4"><a href="resampling-methods.html#cb369-4" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(split)</span>
-<span id="cb369-5"><a href="resampling-methods.html#cb369-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sim_alpha</span>(<span class="fu">as.matrix</span>(xy))</span>
-<span id="cb369-6"><a href="resampling-methods.html#cb369-6" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb369-7"><a href="resampling-methods.html#cb369-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb369-8"><a href="resampling-methods.html#cb369-8" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb369-9"><a href="resampling-methods.html#cb369-9" aria-hidden="true" tabindex="-1"></a>  d <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">population =</span> <span class="st">&quot;true&quot;</span>),</span>
-<span id="cb369-10"><a href="resampling-methods.html#cb369-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">alpha =</span> d1_boot_alpha, <span class="at">population =</span> <span class="st">&quot;bootstrap resamples&quot;</span>)</span>
-<span id="cb369-11"><a href="resampling-methods.html#cb369-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb369-12"><a href="resampling-methods.html#cb369-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">fct_rev</span>(population))</span>
-<span id="cb369-13"><a href="resampling-methods.html#cb369-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb369-14"><a href="resampling-methods.html#cb369-14" aria-hidden="true" tabindex="-1"></a>true_alpha <span class="ot">&lt;-</span> (sigma_y<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> sigma_xy) <span class="sc">/</span> (sigma_x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> sigma_y<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> sigma_xy)</span>
-<span id="cb369-15"><a href="resampling-methods.html#cb369-15" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb369-16"><a href="resampling-methods.html#cb369-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> alpha, <span class="at">fill =</span> population)) <span class="sc">+</span></span>
-<span id="cb369-17"><a href="resampling-methods.html#cb369-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.05</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
-<span id="cb369-18"><a href="resampling-methods.html#cb369-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> true_alpha,</span>
-<span id="cb369-19"><a href="resampling-methods.html#cb369-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>light_coral, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb369-20"><a href="resampling-methods.html#cb369-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> population, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb369-21"><a href="resampling-methods.html#cb369-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>soft_orange,</span>
-<span id="cb369-22"><a href="resampling-methods.html#cb369-22" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue))</span>
-<span id="cb369-23"><a href="resampling-methods.html#cb369-23" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb369-24"><a href="resampling-methods.html#cb369-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> alpha, <span class="at">x =</span> population)) <span class="sc">+</span></span>
-<span id="cb369-25"><a href="resampling-methods.html#cb369-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> population), <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb369-26"><a href="resampling-methods.html#cb369-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> true_alpha,</span>
-<span id="cb369-27"><a href="resampling-methods.html#cb369-27" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>light_coral, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
-<span id="cb369-28"><a href="resampling-methods.html#cb369-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>soft_orange,</span>
-<span id="cb369-29"><a href="resampling-methods.html#cb369-29" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue))</span>
-<span id="cb369-30"><a href="resampling-methods.html#cb369-30" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-203-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb375-1"><a href="resampling-methods.html#cb375-1" aria-hidden="true" tabindex="-1"></a>d1_boot_alpha <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb375-2"><a href="resampling-methods.html#cb375-2" aria-hidden="true" tabindex="-1"></a>  d1_boot<span class="sc">$</span>splits,</span>
+<span id="cb375-3"><a href="resampling-methods.html#cb375-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(split) {</span>
+<span id="cb375-4"><a href="resampling-methods.html#cb375-4" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(split)</span>
+<span id="cb375-5"><a href="resampling-methods.html#cb375-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sim_alpha</span>(<span class="fu">as.matrix</span>(xy))</span>
+<span id="cb375-6"><a href="resampling-methods.html#cb375-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb375-7"><a href="resampling-methods.html#cb375-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Now reproduce the figure:</p>
+<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="resampling-methods.html#cb376-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb376-2"><a href="resampling-methods.html#cb376-2" aria-hidden="true" tabindex="-1"></a>  d <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">population =</span> <span class="st">&quot;true&quot;</span>),</span>
+<span id="cb376-3"><a href="resampling-methods.html#cb376-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">alpha =</span> d1_boot_alpha, <span class="at">population =</span> <span class="st">&quot;bootstrap resamples&quot;</span>)</span>
+<span id="cb376-4"><a href="resampling-methods.html#cb376-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb376-5"><a href="resampling-methods.html#cb376-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">population =</span> <span class="fu">fct_rev</span>(population))</span>
+<span id="cb376-6"><a href="resampling-methods.html#cb376-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb376-7"><a href="resampling-methods.html#cb376-7" aria-hidden="true" tabindex="-1"></a>true_alpha <span class="ot">&lt;-</span> (sigma_y<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> sigma_xy) <span class="sc">/</span> (sigma_x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> sigma_y<span class="sc">^</span><span class="dv">2</span> <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> sigma_xy)</span>
+<span id="cb376-8"><a href="resampling-methods.html#cb376-8" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb376-9"><a href="resampling-methods.html#cb376-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> alpha, <span class="at">fill =</span> population)) <span class="sc">+</span></span>
+<span id="cb376-10"><a href="resampling-methods.html#cb376-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="fl">0.05</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb376-11"><a href="resampling-methods.html#cb376-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> true_alpha,</span>
+<span id="cb376-12"><a href="resampling-methods.html#cb376-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>light_coral, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb376-13"><a href="resampling-methods.html#cb376-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> population, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb376-14"><a href="resampling-methods.html#cb376-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>soft_orange,</span>
+<span id="cb376-15"><a href="resampling-methods.html#cb376-15" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue))</span>
+<span id="cb376-16"><a href="resampling-methods.html#cb376-16" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb376-17"><a href="resampling-methods.html#cb376-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">y =</span> alpha, <span class="at">x =</span> population)) <span class="sc">+</span></span>
+<span id="cb376-18"><a href="resampling-methods.html#cb376-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> population), <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb376-19"><a href="resampling-methods.html#cb376-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> true_alpha,</span>
+<span id="cb376-20"><a href="resampling-methods.html#cb376-20" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>light_coral, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb376-21"><a href="resampling-methods.html#cb376-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>nice<span class="sc">$</span>soft_orange,</span>
+<span id="cb376-22"><a href="resampling-methods.html#cb376-22" aria-hidden="true" tabindex="-1"></a>                               td_colors<span class="sc">$</span>nice<span class="sc">$</span>strong_blue))</span>
+<span id="cb376-23"><a href="resampling-methods.html#cb376-23" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure5.10-1.png" width="576" style="display: block; margin: auto;" /></p>
 <blockquote>
 <p>Note that the histogram looks very similar to the left-hand panel, which
 displays the idealized histogram of the estimates of α obtained by generating 1,000 simulated data sets from the true population. In particular the
@@ -817,9 +820,9 @@ be used to effectively estimate the variability associated with <span class="mat
 <div id="the-validation-set-approach" class="section level3" number="5.3.1">
 <h3><span class="header-section-number">5.3.1</span> The Validation Set Approach</h3>
 <p>Here are the MSE values as computed in @ref(#validation-set):</p>
-<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="resampling-methods.html#cb370-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation <span class="sc">%&gt;%</span></span>
-<span id="cb370-2"><a href="resampling-methods.html#cb370-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(poly_df <span class="sc">&lt;=</span> <span class="dv">3</span>, rep <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb370-3"><a href="resampling-methods.html#cb370-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="resampling-methods.html#cb377-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_validation <span class="sc">%&gt;%</span></span>
+<span id="cb377-2"><a href="resampling-methods.html#cb377-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(poly_df <span class="sc">&lt;=</span> <span class="dv">3</span>, rep <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb377-3"><a href="resampling-methods.html#cb377-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 3 x 4
 ##   rep   poly_df  rmse   mse
 ##   &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -829,8 +832,8 @@ be used to effectively estimate the variability associated with <span class="mat
 </div>
 <div id="leave-one-out-cross-validation" class="section level3" number="5.3.2">
 <h3><span class="header-section-number">5.3.2</span> Leave-One-Out Cross-Validation</h3>
-<p>Because LOOCV is deterministic (not random), the process in @ref(#loocv) produces the same MSE values:</p>
-<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb372-1"><a href="resampling-methods.html#cb372-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv</span></code></pre></div>
+<p>Because LOOCV is deterministic (not random), the process in <a href="resampling-methods.html#loocv">5.1.2</a> produces the same MSE values:</p>
+<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="resampling-methods.html#cb379-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 2
 ##    poly_df   mse
 ##      &lt;int&gt; &lt;dbl&gt;
@@ -847,10 +850,10 @@ be used to effectively estimate the variability associated with <span class="mat
 </div>
 <div id="k-fold-cross-validation" class="section level3" number="5.3.3">
 <h3><span class="header-section-number">5.3.3</span> <span class="math inline">\(k\)</span>-fold Cross-Validation</h3>
-<p>The MSE values as computed in @ref{#kfoldcv}:</p>
-<div class="sourceCode" id="cb374"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb374-1"><a href="resampling-methods.html#cb374-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span></span>
-<span id="cb374-2"><a href="resampling-methods.html#cb374-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rep <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb374-3"><a href="resampling-methods.html#cb374-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<p>The MSE values as computed in <a href="resampling-methods.html#kfoldcv">5.1.3</a>:</p>
+<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="resampling-methods.html#cb381-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span></span>
+<span id="cb381-2"><a href="resampling-methods.html#cb381-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rep <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb381-3"><a href="resampling-methods.html#cb381-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 10 x 4
 ##    rep   poly_df  rmse   mse
 ##    &lt;chr&gt;   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -867,130 +870,100 @@ be used to effectively estimate the variability associated with <span class="mat
 </div>
 <div id="the-bootstrap" class="section level3" number="5.3.4">
 <h3><span class="header-section-number">5.3.4</span> The Bootstrap</h3>
-<div id="estimating-the-accuracy-of-a-statistic-of-interest" class="section level4" number="5.3.4.1">
-<h4><span class="header-section-number">5.3.4.1</span> Estimating the Accuracy of a Statistic of Interest</h4>
-<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="resampling-methods.html#cb376-1" aria-hidden="true" tabindex="-1"></a>portfolio <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Portfolio</span>
-<span id="cb376-2"><a href="resampling-methods.html#cb376-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(portfolio)</span></code></pre></div>
+<div id="estimating-the-accuracy-of-a-statistic-of-interest" class="section level4 unnumbered">
+<h4>Estimating the Accuracy of a Statistic of Interest</h4>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="resampling-methods.html#cb383-1" aria-hidden="true" tabindex="-1"></a>portfolio <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Portfolio</span>
+<span id="cb383-2"><a href="resampling-methods.html#cb383-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(portfolio)</span></code></pre></div>
 <pre><code>## Rows: 100
 ## Columns: 2
 ## $ X &lt;dbl&gt; -0.89525089, -1.56245433, -0.41708988, 1.04435573, -0.31556841, -1.7~
 ## $ Y &lt;dbl&gt; -0.2349235, -0.8851760, 0.2718880, -0.7341975, 0.8419834, -2.0371910~</code></pre>
-<p>The <code>tidymodels</code> approach to bootstrap estimates, as in @ref{#boostrap}:</p>
-<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="resampling-methods.html#cb378-1" aria-hidden="true" tabindex="-1"></a>portfolio_boot <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">bootstraps</span>(portfolio, <span class="at">times =</span> <span class="dv">1000</span>)</span>
-<span id="cb378-2"><a href="resampling-methods.html#cb378-2" aria-hidden="true" tabindex="-1"></a>portfolio_boot_alpha <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
-<span id="cb378-3"><a href="resampling-methods.html#cb378-3" aria-hidden="true" tabindex="-1"></a>  portfolio_boot<span class="sc">$</span>splits,</span>
-<span id="cb378-4"><a href="resampling-methods.html#cb378-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(split) {</span>
-<span id="cb378-5"><a href="resampling-methods.html#cb378-5" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(split)</span>
-<span id="cb378-6"><a href="resampling-methods.html#cb378-6" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">var</span>(xy<span class="sc">$</span>Y) <span class="sc">-</span> <span class="fu">cov</span>(xy<span class="sc">$</span>X, xy<span class="sc">$</span>Y)) <span class="sc">/</span></span>
-<span id="cb378-7"><a href="resampling-methods.html#cb378-7" aria-hidden="true" tabindex="-1"></a>      (<span class="fu">var</span>(xy<span class="sc">$</span>X) <span class="sc">+</span> <span class="fu">var</span>(xy<span class="sc">$</span>Y) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">cov</span>(xy<span class="sc">$</span>X, xy<span class="sc">$</span>Y))</span>
-<span id="cb378-8"><a href="resampling-methods.html#cb378-8" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb378-9"><a href="resampling-methods.html#cb378-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb378-10"><a href="resampling-methods.html#cb378-10" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(portfolio_boot_alpha); <span class="fu">sd</span>(portfolio_boot_alpha)</span></code></pre></div>
-<pre><code>## [1] 0.5739259</code></pre>
-<pre><code>## [1] 0.09040623</code></pre>
-<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="resampling-methods.html#cb381-1" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> portfolio_boot<span class="sc">$</span>splits[[<span class="dv">1</span>]]</span>
-<span id="cb381-2"><a href="resampling-methods.html#cb381-2" aria-hidden="true" tabindex="-1"></a>xy <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(xy)</span></code></pre></div>
+<p>The <code>tidymodels</code> approach to bootstrap estimates, as in <a href="resampling-methods.html#bootstrap">5.2</a>:</p>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="resampling-methods.html#cb385-1" aria-hidden="true" tabindex="-1"></a>portfolio_boot <span class="ot">&lt;-</span> <span class="fu">bootstraps</span>(portfolio, <span class="at">times =</span> <span class="dv">1000</span>)</span>
+<span id="cb385-2"><a href="resampling-methods.html#cb385-2" aria-hidden="true" tabindex="-1"></a>portfolio_boot_alpha <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb385-3"><a href="resampling-methods.html#cb385-3" aria-hidden="true" tabindex="-1"></a>  portfolio_boot<span class="sc">$</span>splits,</span>
+<span id="cb385-4"><a href="resampling-methods.html#cb385-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">function</span>(split) {</span>
+<span id="cb385-5"><a href="resampling-methods.html#cb385-5" aria-hidden="true" tabindex="-1"></a>    xy <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(split)</span>
+<span id="cb385-6"><a href="resampling-methods.html#cb385-6" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">var</span>(xy<span class="sc">$</span>Y) <span class="sc">-</span> <span class="fu">cov</span>(xy<span class="sc">$</span>X, xy<span class="sc">$</span>Y)) <span class="sc">/</span></span>
+<span id="cb385-7"><a href="resampling-methods.html#cb385-7" aria-hidden="true" tabindex="-1"></a>      (<span class="fu">var</span>(xy<span class="sc">$</span>X) <span class="sc">+</span> <span class="fu">var</span>(xy<span class="sc">$</span>Y) <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">cov</span>(xy<span class="sc">$</span>X, xy<span class="sc">$</span>Y))</span>
+<span id="cb385-8"><a href="resampling-methods.html#cb385-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb385-9"><a href="resampling-methods.html#cb385-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb385-10"><a href="resampling-methods.html#cb385-10" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(portfolio_boot_alpha); <span class="fu">sd</span>(portfolio_boot_alpha)</span></code></pre></div>
+<pre><code>## [1] 0.5784967</code></pre>
+<pre><code>## [1] 0.08952573</code></pre>
 </div>
-<div id="estimating-the-accuracy-of-a-regression-model" class="section level4" number="5.3.4.2">
-<h4><span class="header-section-number">5.3.4.2</span> Estimating the Accuracy of a Regression Model</h4>
+<div id="estimating-the-accuracy-of-a-regression-model" class="section level4 unnumbered">
+<h4>Estimating the Accuracy of a Regression Model</h4>
 <blockquote>
 <p>The bootstrap approach can be used to assess the variability of the coefficient estimates and predictions from a statistical learning method. Here we use the bootstrap approach in order to assess the variability of the estimates for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, the intercept and slope terms for the linear regression model that uses horsepower to predict mpg in the <code>Auto</code> data set. We will compare the estimates obtained using the bootstrap to those obtained using the formulas for <span class="math inline">\(\text{SE}(\hat{\beta}_0)\)</span> and <span class="math inline">\(\text{SE}(\hat{\beta}_1)\)</span> described in Section 3.1.2.</p>
 </blockquote>
-<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="resampling-methods.html#cb382-1" aria-hidden="true" tabindex="-1"></a>auto_boot <span class="ot">&lt;-</span> rsample<span class="sc">::</span><span class="fu">bootstraps</span>(auto, <span class="at">times =</span> <span class="dv">1000</span>)</span>
-<span id="cb382-2"><a href="resampling-methods.html#cb382-2" aria-hidden="true" tabindex="-1"></a>auto_boot</span></code></pre></div>
-<pre><code>## # Bootstrap sampling 
-## # A tibble: 1,000 x 2
-##    splits            id           
-##    &lt;list&gt;            &lt;chr&gt;        
-##  1 &lt;split [392/146]&gt; Bootstrap0001
-##  2 &lt;split [392/154]&gt; Bootstrap0002
-##  3 &lt;split [392/140]&gt; Bootstrap0003
-##  4 &lt;split [392/148]&gt; Bootstrap0004
-##  5 &lt;split [392/129]&gt; Bootstrap0005
-##  6 &lt;split [392/143]&gt; Bootstrap0006
-##  7 &lt;split [392/140]&gt; Bootstrap0007
-##  8 &lt;split [392/143]&gt; Bootstrap0008
-##  9 &lt;split [392/142]&gt; Bootstrap0009
-## 10 &lt;split [392/140]&gt; Bootstrap0010
-## # ... with 990 more rows</code></pre>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="resampling-methods.html#cb388-1" aria-hidden="true" tabindex="-1"></a>auto_boot <span class="ot">&lt;-</span> <span class="fu">bootstraps</span>(auto, <span class="at">times =</span> <span class="dv">1000</span>)</span></code></pre></div>
 <p>By default, the <code>tune::fit_resamples()</code> function does not keep the model object from each fit.
 Usually, all we care about is the performance metrics and (if we’re tuning) the best hyper parameters.
-So in order to get the actual regression coefficients, I need to provide a <code>control_grid()</code> object to the <code>control</code> argument of <code>fit_resamples()</code> (see <a href="https://www.tidymodels.org/learn/models/coefficients">this article for more explanation</a>:</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="resampling-methods.html#cb384-1" aria-hidden="true" tabindex="-1"></a>get_lm_coefs <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb384-2"><a href="resampling-methods.html#cb384-2" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span> broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
-<span id="cb384-3"><a href="resampling-methods.html#cb384-3" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb384-4"><a href="resampling-methods.html#cb384-4" aria-hidden="true" tabindex="-1"></a>tidy_ctrl <span class="ot">&lt;-</span> <span class="fu">control_grid</span>(<span class="at">extract =</span> get_lm_coefs)</span></code></pre></div>
+So in order to get the actual regression coefficients, I need to provide a <code>control_grid()</code> object to the <code>control</code> argument of <code>fit_resamples()</code> (see <a href="https://www.tidymodels.org/learn/models/coefficients">this article for more explanation</a>):</p>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="resampling-methods.html#cb389-1" aria-hidden="true" tabindex="-1"></a>get_lm_coefs <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb389-2"><a href="resampling-methods.html#cb389-2" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span> broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb389-3"><a href="resampling-methods.html#cb389-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb389-4"><a href="resampling-methods.html#cb389-4" aria-hidden="true" tabindex="-1"></a>tidy_ctrl <span class="ot">&lt;-</span> <span class="fu">control_grid</span>(<span class="at">extract =</span> get_lm_coefs)</span></code></pre></div>
 <p>Now fit the resamples with this with control object:</p>
-<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="resampling-methods.html#cb385-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb385-2"><a href="resampling-methods.html#cb385-2" aria-hidden="true" tabindex="-1"></a>auto_boot_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb385-3"><a href="resampling-methods.html#cb385-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">linear_reg</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb385-4"><a href="resampling-methods.html#cb385-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(<span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
-<span id="cb385-5"><a href="resampling-methods.html#cb385-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(auto_boot, <span class="at">control =</span> tidy_ctrl)</span>
-<span id="cb385-6"><a href="resampling-methods.html#cb385-6" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 81.84 sec elapsed</code></pre>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="resampling-methods.html#cb387-1" aria-hidden="true" tabindex="-1"></a>auto_boot_fit</span></code></pre></div>
-<pre><code>## # Resampling results
-## # Bootstrap sampling 
-## # A tibble: 1,000 x 5
-##    splits            id            .metrics         .notes           .extracts  
-##    &lt;list&gt;            &lt;chr&gt;         &lt;list&gt;           &lt;list&gt;           &lt;list&gt;     
-##  1 &lt;split [392/146]&gt; Bootstrap0001 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  2 &lt;split [392/154]&gt; Bootstrap0002 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  3 &lt;split [392/140]&gt; Bootstrap0003 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  4 &lt;split [392/148]&gt; Bootstrap0004 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  5 &lt;split [392/129]&gt; Bootstrap0005 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  6 &lt;split [392/143]&gt; Bootstrap0006 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  7 &lt;split [392/140]&gt; Bootstrap0007 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  8 &lt;split [392/143]&gt; Bootstrap0008 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-##  9 &lt;split [392/142]&gt; Bootstrap0009 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-## 10 &lt;split [392/140]&gt; Bootstrap0010 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1~
-## # ... with 990 more rows</code></pre>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="resampling-methods.html#cb390-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb390-2"><a href="resampling-methods.html#cb390-2" aria-hidden="true" tabindex="-1"></a>auto_boot_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb390-3"><a href="resampling-methods.html#cb390-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">linear_reg</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb390-4"><a href="resampling-methods.html#cb390-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(<span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
+<span id="cb390-5"><a href="resampling-methods.html#cb390-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(auto_boot, <span class="at">control =</span> tidy_ctrl)</span>
+<span id="cb390-6"><a href="resampling-methods.html#cb390-6" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 78.14 sec elapsed</code></pre>
+<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="resampling-methods.html#cb392-1" aria-hidden="true" tabindex="-1"></a>auto_boot_fit <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 6 x 5
+##   splits            id            .metrics         .notes           .extracts   
+##   &lt;list&gt;            &lt;chr&gt;         &lt;list&gt;           &lt;list&gt;           &lt;list&gt;      
+## 1 &lt;split [392/152]&gt; Bootstrap0001 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1 ~
+## 2 &lt;split [392/145]&gt; Bootstrap0002 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1 ~
+## 3 &lt;split [392/152]&gt; Bootstrap0003 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1 ~
+## 4 &lt;split [392/154]&gt; Bootstrap0004 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1 ~
+## 5 &lt;split [392/139]&gt; Bootstrap0005 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1 ~
+## 6 &lt;split [392/138]&gt; Bootstrap0006 &lt;tibble [2 x 4]&gt; &lt;tibble [0 x 1]&gt; &lt;tibble [1 ~</code></pre>
 <p>The <code>.extracts</code> column contains the tidy model objects.
 It is a but clunky to work with – it is a list column with a list of tibbles, so requires <code>tidyr::unnest()</code> twice:</p>
-<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="resampling-methods.html#cb389-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A single `.extracts` element, which contains a tibble</span></span>
-<span id="cb389-2"><a href="resampling-methods.html#cb389-2" aria-hidden="true" tabindex="-1"></a>auto_boot_fit<span class="sc">$</span>.extracts[[<span class="dv">1</span>]]</span></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="resampling-methods.html#cb394-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A single `.extracts` element, which contains a tibble</span></span>
+<span id="cb394-2"><a href="resampling-methods.html#cb394-2" aria-hidden="true" tabindex="-1"></a>auto_boot_fit<span class="sc">$</span>.extracts[[<span class="dv">1</span>]]</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 2
 ##   .extracts        .config             
 ##   &lt;list&gt;           &lt;chr&gt;               
 ## 1 &lt;tibble [2 x 5]&gt; Preprocessor1_Model1</code></pre>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="resampling-methods.html#cb391-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using `unnest` to get all `.extracts`</span></span>
-<span id="cb391-2"><a href="resampling-methods.html#cb391-2" aria-hidden="true" tabindex="-1"></a>auto_boot_fit_coefs <span class="ot">&lt;-</span> auto_boot_fit <span class="sc">%&gt;%</span></span>
-<span id="cb391-3"><a href="resampling-methods.html#cb391-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
-<span id="cb391-4"><a href="resampling-methods.html#cb391-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
-<span id="cb391-5"><a href="resampling-methods.html#cb391-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, term, estimate, std.error)</span>
-<span id="cb391-6"><a href="resampling-methods.html#cb391-6" aria-hidden="true" tabindex="-1"></a>auto_boot_fit_coefs</span></code></pre></div>
-<pre><code>## # A tibble: 2,000 x 4
-##    id            term        estimate std.error
-##    &lt;chr&gt;         &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
-##  1 Bootstrap0001 (Intercept)   41.7     0.734  
-##  2 Bootstrap0001 horsepower    -0.174   0.00655
-##  3 Bootstrap0002 (Intercept)   39.3     0.683  
-##  4 Bootstrap0002 horsepower    -0.153   0.00620
-##  5 Bootstrap0003 (Intercept)   39.3     0.703  
-##  6 Bootstrap0003 horsepower    -0.153   0.00624
-##  7 Bootstrap0004 (Intercept)   39.4     0.738  
-##  8 Bootstrap0004 horsepower    -0.154   0.00667
-##  9 Bootstrap0005 (Intercept)   38.1     0.698  
-## 10 Bootstrap0005 horsepower    -0.144   0.00617
-## # ... with 1,990 more rows</code></pre>
+<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="resampling-methods.html#cb396-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using `unnest` to get all `.extracts`</span></span>
+<span id="cb396-2"><a href="resampling-methods.html#cb396-2" aria-hidden="true" tabindex="-1"></a>auto_boot_fit_coefs <span class="ot">&lt;-</span> auto_boot_fit <span class="sc">%&gt;%</span></span>
+<span id="cb396-3"><a href="resampling-methods.html#cb396-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
+<span id="cb396-4"><a href="resampling-methods.html#cb396-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
+<span id="cb396-5"><a href="resampling-methods.html#cb396-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, term, estimate, std.error)</span>
+<span id="cb396-6"><a href="resampling-methods.html#cb396-6" aria-hidden="true" tabindex="-1"></a>auto_boot_fit_coefs <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 6 x 4
+##   id            term        estimate std.error
+##   &lt;chr&gt;         &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Bootstrap0001 (Intercept)   39.4     0.695  
+## 2 Bootstrap0001 horsepower    -0.154   0.00601
+## 3 Bootstrap0002 (Intercept)   37.6     0.665  
+## 4 Bootstrap0002 horsepower    -0.139   0.00587
+## 5 Bootstrap0003 (Intercept)   39.6     0.688  
+## 6 Bootstrap0003 horsepower    -0.154   0.00620</code></pre>
 <p>Then taking the mean of the estimates, and applying equation 5.8 to get the standard error:</p>
-<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="resampling-methods.html#cb393-1" aria-hidden="true" tabindex="-1"></a>auto_boot_fit_coefs <span class="sc">%&gt;%</span></span>
-<span id="cb393-2"><a href="resampling-methods.html#cb393-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
-<span id="cb393-3"><a href="resampling-methods.html#cb393-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb393-4"><a href="resampling-methods.html#cb393-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate),</span>
-<span id="cb393-5"><a href="resampling-methods.html#cb393-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sqrt</span>(</span>
-<span id="cb393-6"><a href="resampling-methods.html#cb393-6" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">/</span> (<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="fu">sum</span>((estimate <span class="sc">-</span> mean_estimate)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb393-7"><a href="resampling-methods.html#cb393-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb393-8"><a href="resampling-methods.html#cb393-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb393-9"><a href="resampling-methods.html#cb393-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb393-10"><a href="resampling-methods.html#cb393-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb393-11"><a href="resampling-methods.html#cb393-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
-<div id="xqmmecrbyi" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="resampling-methods.html#cb398-1" aria-hidden="true" tabindex="-1"></a>auto_boot_fit_coefs <span class="sc">%&gt;%</span></span>
+<span id="cb398-2"><a href="resampling-methods.html#cb398-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
+<span id="cb398-3"><a href="resampling-methods.html#cb398-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb398-4"><a href="resampling-methods.html#cb398-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate),</span>
+<span id="cb398-5"><a href="resampling-methods.html#cb398-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sqrt</span>(</span>
+<span id="cb398-6"><a href="resampling-methods.html#cb398-6" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">/</span> (<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="fu">sum</span>((estimate <span class="sc">-</span> mean_estimate)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb398-7"><a href="resampling-methods.html#cb398-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb398-8"><a href="resampling-methods.html#cb398-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb398-9"><a href="resampling-methods.html#cb398-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb398-10"><a href="resampling-methods.html#cb398-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb398-11"><a href="resampling-methods.html#cb398-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div id="ygtskbpuab" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#xqmmecrbyi .gt_table {
+#ygtskbpuab .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1015,7 +988,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-left-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_heading {
+#ygtskbpuab .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1027,7 +1000,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-right-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_title {
+#ygtskbpuab .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1037,7 +1010,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-bottom-width: 0;
 }
 
-#xqmmecrbyi .gt_subtitle {
+#ygtskbpuab .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1047,13 +1020,13 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-top-width: 0;
 }
 
-#xqmmecrbyi .gt_bottom_border {
+#ygtskbpuab .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_col_headings {
+#ygtskbpuab .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1068,7 +1041,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-right-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_col_heading {
+#ygtskbpuab .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1088,7 +1061,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   overflow-x: hidden;
 }
 
-#xqmmecrbyi .gt_column_spanner_outer {
+#ygtskbpuab .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1100,15 +1073,15 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   padding-right: 4px;
 }
 
-#xqmmecrbyi .gt_column_spanner_outer:first-child {
+#ygtskbpuab .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#xqmmecrbyi .gt_column_spanner_outer:last-child {
+#ygtskbpuab .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#xqmmecrbyi .gt_column_spanner {
+#ygtskbpuab .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1120,7 +1093,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   width: 100%;
 }
 
-#xqmmecrbyi .gt_group_heading {
+#ygtskbpuab .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1142,7 +1115,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   vertical-align: middle;
 }
 
-#xqmmecrbyi .gt_empty_group_heading {
+#ygtskbpuab .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1157,15 +1130,15 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   vertical-align: middle;
 }
 
-#xqmmecrbyi .gt_from_md > :first-child {
+#ygtskbpuab .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#xqmmecrbyi .gt_from_md > :last-child {
+#ygtskbpuab .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#xqmmecrbyi .gt_row {
+#ygtskbpuab .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1184,7 +1157,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   overflow-x: hidden;
 }
 
-#xqmmecrbyi .gt_stub {
+#ygtskbpuab .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1196,7 +1169,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   padding-left: 12px;
 }
 
-#xqmmecrbyi .gt_summary_row {
+#ygtskbpuab .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1206,7 +1179,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   padding-right: 5px;
 }
 
-#xqmmecrbyi .gt_first_summary_row {
+#ygtskbpuab .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1216,7 +1189,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-top-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_grand_summary_row {
+#ygtskbpuab .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1226,7 +1199,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   padding-right: 5px;
 }
 
-#xqmmecrbyi .gt_first_grand_summary_row {
+#ygtskbpuab .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1236,11 +1209,11 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-top-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_striped {
+#ygtskbpuab .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#xqmmecrbyi .gt_table_body {
+#ygtskbpuab .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1249,7 +1222,7 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-bottom-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_footnotes {
+#ygtskbpuab .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1263,13 +1236,13 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-right-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_footnote {
+#ygtskbpuab .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#xqmmecrbyi .gt_sourcenotes {
+#ygtskbpuab .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1283,41 +1256,41 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   border-right-color: #D3D3D3;
 }
 
-#xqmmecrbyi .gt_sourcenote {
+#ygtskbpuab .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#xqmmecrbyi .gt_left {
+#ygtskbpuab .gt_left {
   text-align: left;
 }
 
-#xqmmecrbyi .gt_center {
+#ygtskbpuab .gt_center {
   text-align: center;
 }
 
-#xqmmecrbyi .gt_right {
+#ygtskbpuab .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#xqmmecrbyi .gt_font_normal {
+#ygtskbpuab .gt_font_normal {
   font-weight: normal;
 }
 
-#xqmmecrbyi .gt_font_bold {
+#ygtskbpuab .gt_font_bold {
   font-weight: bold;
 }
 
-#xqmmecrbyi .gt_font_italic {
+#ygtskbpuab .gt_font_italic {
   font-style: italic;
 }
 
-#xqmmecrbyi .gt_super {
+#ygtskbpuab .gt_super {
   font-size: 65%;
 }
 
-#xqmmecrbyi .gt_footnote_marks {
+#ygtskbpuab .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -1334,11 +1307,11 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
   </thead>
   <tbody class="gt_table_body">
     <tr><td class="gt_row gt_left">(Intercept)</td>
-<td class="gt_row gt_right">39.9594</td>
-<td class="gt_row gt_right">0.8563</td></tr>
+<td class="gt_row gt_right">39.9855</td>
+<td class="gt_row gt_right">0.8707</td></tr>
     <tr><td class="gt_row gt_left">horsepower</td>
-<td class="gt_row gt_right">&minus;0.1582</td>
-<td class="gt_row gt_right">0.0074</td></tr>
+<td class="gt_row gt_right">&minus;0.1583</td>
+<td class="gt_row gt_right">0.0075</td></tr>
   </tbody>
   
   
@@ -1346,16 +1319,16 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
 </div>
 <p>Not exactly the same as those in the text due to the difference in the random bootstrap samples.
 And here are the SE estimates using the formula from section 3.1.2:</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="resampling-methods.html#cb394-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(<span class="fu">lm</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
-<span id="cb394-2"><a href="resampling-methods.html#cb394-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(term, estimate, <span class="at">se_estimate =</span> std.error) <span class="sc">%&gt;%</span></span>
-<span id="cb394-3"><a href="resampling-methods.html#cb394-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb394-4"><a href="resampling-methods.html#cb394-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
-<div id="bbneihskdr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="resampling-methods.html#cb399-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(<span class="fu">lm</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
+<span id="cb399-2"><a href="resampling-methods.html#cb399-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(term, estimate, <span class="at">se_estimate =</span> std.error) <span class="sc">%&gt;%</span></span>
+<span id="cb399-3"><a href="resampling-methods.html#cb399-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb399-4"><a href="resampling-methods.html#cb399-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div id="qtmzcvzhec" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#bbneihskdr .gt_table {
+#qtmzcvzhec .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1380,7 +1353,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-left-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_heading {
+#qtmzcvzhec .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1392,7 +1365,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_title {
+#qtmzcvzhec .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1402,7 +1375,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-bottom-width: 0;
 }
 
-#bbneihskdr .gt_subtitle {
+#qtmzcvzhec .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1412,13 +1385,13 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-top-width: 0;
 }
 
-#bbneihskdr .gt_bottom_border {
+#qtmzcvzhec .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_col_headings {
+#qtmzcvzhec .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1433,7 +1406,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_col_heading {
+#qtmzcvzhec .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1453,7 +1426,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   overflow-x: hidden;
 }
 
-#bbneihskdr .gt_column_spanner_outer {
+#qtmzcvzhec .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1465,15 +1438,15 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   padding-right: 4px;
 }
 
-#bbneihskdr .gt_column_spanner_outer:first-child {
+#qtmzcvzhec .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bbneihskdr .gt_column_spanner_outer:last-child {
+#qtmzcvzhec .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bbneihskdr .gt_column_spanner {
+#qtmzcvzhec .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1485,7 +1458,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   width: 100%;
 }
 
-#bbneihskdr .gt_group_heading {
+#qtmzcvzhec .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1507,7 +1480,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   vertical-align: middle;
 }
 
-#bbneihskdr .gt_empty_group_heading {
+#qtmzcvzhec .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1522,15 +1495,15 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   vertical-align: middle;
 }
 
-#bbneihskdr .gt_from_md > :first-child {
+#qtmzcvzhec .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bbneihskdr .gt_from_md > :last-child {
+#qtmzcvzhec .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bbneihskdr .gt_row {
+#qtmzcvzhec .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1549,7 +1522,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   overflow-x: hidden;
 }
 
-#bbneihskdr .gt_stub {
+#qtmzcvzhec .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1561,7 +1534,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   padding-left: 12px;
 }
 
-#bbneihskdr .gt_summary_row {
+#qtmzcvzhec .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1571,7 +1544,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   padding-right: 5px;
 }
 
-#bbneihskdr .gt_first_summary_row {
+#qtmzcvzhec .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1581,7 +1554,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-top-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_grand_summary_row {
+#qtmzcvzhec .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1591,7 +1564,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   padding-right: 5px;
 }
 
-#bbneihskdr .gt_first_grand_summary_row {
+#qtmzcvzhec .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1601,11 +1574,11 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-top-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_striped {
+#qtmzcvzhec .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bbneihskdr .gt_table_body {
+#qtmzcvzhec .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1614,7 +1587,7 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_footnotes {
+#qtmzcvzhec .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1628,13 +1601,13 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_footnote {
+#qtmzcvzhec .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#bbneihskdr .gt_sourcenotes {
+#qtmzcvzhec .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1648,41 +1621,41 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
   border-right-color: #D3D3D3;
 }
 
-#bbneihskdr .gt_sourcenote {
+#qtmzcvzhec .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#bbneihskdr .gt_left {
+#qtmzcvzhec .gt_left {
   text-align: left;
 }
 
-#bbneihskdr .gt_center {
+#qtmzcvzhec .gt_center {
   text-align: center;
 }
 
-#bbneihskdr .gt_right {
+#qtmzcvzhec .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bbneihskdr .gt_font_normal {
+#qtmzcvzhec .gt_font_normal {
   font-weight: normal;
 }
 
-#bbneihskdr .gt_font_bold {
+#qtmzcvzhec .gt_font_bold {
   font-weight: bold;
 }
 
-#bbneihskdr .gt_font_italic {
+#qtmzcvzhec .gt_font_italic {
   font-style: italic;
 }
 
-#bbneihskdr .gt_super {
+#qtmzcvzhec .gt_super {
   font-size: 65%;
 }
 
-#bbneihskdr .gt_footnote_marks {
+#qtmzcvzhec .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -1715,36 +1688,36 @@ And here are the SE estimates using the formula from section 3.1.2:</p>
 Figure 3.8 on page 91 that there is a non-linear relationship in the data, and so the residuals from a linear fit will be inflated, and so will <span class="math inline">\(\hat{\sigma}^2\)</span>. Secondly, the standard formulas assume (somewhat unrealistically) that the <span class="math inline">\(x_i\)</span> are fixed, and all the variability comes from the variation in the errors <span class="math inline">\(\epsilon_i\)</span>. The bootstrap approach does not rely on any of these assumptions, and so it is likely giving a more accurate estimate of the standard errors of <span class="math inline">\(\hat{\beta}_0\)</span> and <span class="math inline">\(\hat{\beta}_1\)</span> than is the <code>summary()</code> function.</p>
 </blockquote>
 <p>We can find better correspondence between bootstrap and regression estimates if we use the quadratic model because it better fits the data:</p>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="resampling-methods.html#cb395-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb395-2"><a href="resampling-methods.html#cb395-2" aria-hidden="true" tabindex="-1"></a>auto_boot_quad_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb395-3"><a href="resampling-methods.html#cb395-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">linear_reg</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb395-4"><a href="resampling-methods.html#cb395-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(</span>
-<span id="cb395-5"><a href="resampling-methods.html#cb395-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto) <span class="sc">%&gt;%</span></span>
-<span id="cb395-6"><a href="resampling-methods.html#cb395-6" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Need to set `raw` = TRUE to not use orthogonal polynomials</span></span>
-<span id="cb395-7"><a href="resampling-methods.html#cb395-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">step_poly</span>(horsepower, <span class="at">degree =</span> <span class="dv">2</span>, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">raw =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb395-8"><a href="resampling-methods.html#cb395-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb395-9"><a href="resampling-methods.html#cb395-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(auto_boot, <span class="at">control =</span> tidy_ctrl)</span>
-<span id="cb395-10"><a href="resampling-methods.html#cb395-10" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 87.42 sec elapsed</code></pre>
-<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="resampling-methods.html#cb397-1" aria-hidden="true" tabindex="-1"></a>auto_boot_quad_fit <span class="sc">%&gt;%</span></span>
-<span id="cb397-2"><a href="resampling-methods.html#cb397-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
-<span id="cb397-3"><a href="resampling-methods.html#cb397-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
-<span id="cb397-4"><a href="resampling-methods.html#cb397-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
-<span id="cb397-5"><a href="resampling-methods.html#cb397-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb397-6"><a href="resampling-methods.html#cb397-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate),</span>
-<span id="cb397-7"><a href="resampling-methods.html#cb397-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sqrt</span>(</span>
-<span id="cb397-8"><a href="resampling-methods.html#cb397-8" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">/</span> (<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="fu">sum</span>((estimate <span class="sc">-</span> mean_estimate)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb397-9"><a href="resampling-methods.html#cb397-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb397-10"><a href="resampling-methods.html#cb397-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb397-11"><a href="resampling-methods.html#cb397-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb397-12"><a href="resampling-methods.html#cb397-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb397-13"><a href="resampling-methods.html#cb397-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
-<div id="yttrklbnrs" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="resampling-methods.html#cb400-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb400-2"><a href="resampling-methods.html#cb400-2" aria-hidden="true" tabindex="-1"></a>auto_boot_quad_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb400-3"><a href="resampling-methods.html#cb400-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">linear_reg</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb400-4"><a href="resampling-methods.html#cb400-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(</span>
+<span id="cb400-5"><a href="resampling-methods.html#cb400-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto) <span class="sc">%&gt;%</span></span>
+<span id="cb400-6"><a href="resampling-methods.html#cb400-6" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Need to set `raw` = TRUE to not use orthogonal polynomials</span></span>
+<span id="cb400-7"><a href="resampling-methods.html#cb400-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">step_poly</span>(horsepower, <span class="at">degree =</span> <span class="dv">2</span>, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">raw =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb400-8"><a href="resampling-methods.html#cb400-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb400-9"><a href="resampling-methods.html#cb400-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(auto_boot, <span class="at">control =</span> tidy_ctrl)</span>
+<span id="cb400-10"><a href="resampling-methods.html#cb400-10" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 82.58 sec elapsed</code></pre>
+<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="resampling-methods.html#cb402-1" aria-hidden="true" tabindex="-1"></a>auto_boot_quad_fit <span class="sc">%&gt;%</span></span>
+<span id="cb402-2"><a href="resampling-methods.html#cb402-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
+<span id="cb402-3"><a href="resampling-methods.html#cb402-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
+<span id="cb402-4"><a href="resampling-methods.html#cb402-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
+<span id="cb402-5"><a href="resampling-methods.html#cb402-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb402-6"><a href="resampling-methods.html#cb402-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate),</span>
+<span id="cb402-7"><a href="resampling-methods.html#cb402-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sqrt</span>(</span>
+<span id="cb402-8"><a href="resampling-methods.html#cb402-8" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">/</span> (<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="fu">sum</span>((estimate <span class="sc">-</span> mean_estimate)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb402-9"><a href="resampling-methods.html#cb402-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb402-10"><a href="resampling-methods.html#cb402-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb402-11"><a href="resampling-methods.html#cb402-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb402-12"><a href="resampling-methods.html#cb402-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb402-13"><a href="resampling-methods.html#cb402-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div id="uyasfyvmkp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#yttrklbnrs .gt_table {
+#uyasfyvmkp .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1769,7 +1742,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-left-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_heading {
+#uyasfyvmkp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1781,7 +1754,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_title {
+#uyasfyvmkp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1791,7 +1764,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-bottom-width: 0;
 }
 
-#yttrklbnrs .gt_subtitle {
+#uyasfyvmkp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1801,13 +1774,13 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-top-width: 0;
 }
 
-#yttrklbnrs .gt_bottom_border {
+#uyasfyvmkp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_col_headings {
+#uyasfyvmkp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1822,7 +1795,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_col_heading {
+#uyasfyvmkp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1842,7 +1815,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   overflow-x: hidden;
 }
 
-#yttrklbnrs .gt_column_spanner_outer {
+#uyasfyvmkp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1854,15 +1827,15 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-right: 4px;
 }
 
-#yttrklbnrs .gt_column_spanner_outer:first-child {
+#uyasfyvmkp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#yttrklbnrs .gt_column_spanner_outer:last-child {
+#uyasfyvmkp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#yttrklbnrs .gt_column_spanner {
+#uyasfyvmkp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1874,7 +1847,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   width: 100%;
 }
 
-#yttrklbnrs .gt_group_heading {
+#uyasfyvmkp .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1896,7 +1869,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   vertical-align: middle;
 }
 
-#yttrklbnrs .gt_empty_group_heading {
+#uyasfyvmkp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1911,15 +1884,15 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   vertical-align: middle;
 }
 
-#yttrklbnrs .gt_from_md > :first-child {
+#uyasfyvmkp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#yttrklbnrs .gt_from_md > :last-child {
+#uyasfyvmkp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#yttrklbnrs .gt_row {
+#uyasfyvmkp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1938,7 +1911,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   overflow-x: hidden;
 }
 
-#yttrklbnrs .gt_stub {
+#uyasfyvmkp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1950,7 +1923,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-left: 12px;
 }
 
-#yttrklbnrs .gt_summary_row {
+#uyasfyvmkp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1960,7 +1933,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-right: 5px;
 }
 
-#yttrklbnrs .gt_first_summary_row {
+#uyasfyvmkp .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1970,7 +1943,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-top-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_grand_summary_row {
+#uyasfyvmkp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1980,7 +1953,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-right: 5px;
 }
 
-#yttrklbnrs .gt_first_grand_summary_row {
+#uyasfyvmkp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1990,11 +1963,11 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-top-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_striped {
+#uyasfyvmkp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#yttrklbnrs .gt_table_body {
+#uyasfyvmkp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2003,7 +1976,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-bottom-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_footnotes {
+#uyasfyvmkp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2017,13 +1990,13 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_footnote {
+#uyasfyvmkp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#yttrklbnrs .gt_sourcenotes {
+#uyasfyvmkp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2037,41 +2010,41 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#yttrklbnrs .gt_sourcenote {
+#uyasfyvmkp .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#yttrklbnrs .gt_left {
+#uyasfyvmkp .gt_left {
   text-align: left;
 }
 
-#yttrklbnrs .gt_center {
+#uyasfyvmkp .gt_center {
   text-align: center;
 }
 
-#yttrklbnrs .gt_right {
+#uyasfyvmkp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#yttrklbnrs .gt_font_normal {
+#uyasfyvmkp .gt_font_normal {
   font-weight: normal;
 }
 
-#yttrklbnrs .gt_font_bold {
+#uyasfyvmkp .gt_font_bold {
   font-weight: bold;
 }
 
-#yttrklbnrs .gt_font_italic {
+#uyasfyvmkp .gt_font_italic {
   font-style: italic;
 }
 
-#yttrklbnrs .gt_super {
+#uyasfyvmkp .gt_super {
   font-size: 65%;
 }
 
-#yttrklbnrs .gt_footnote_marks {
+#uyasfyvmkp .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -2088,11 +2061,11 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   </thead>
   <tbody class="gt_table_body">
     <tr><td class="gt_row gt_left">(Intercept)</td>
-<td class="gt_row gt_right">56.9224</td>
-<td class="gt_row gt_right">2.1379</td></tr>
+<td class="gt_row gt_right">56.9755</td>
+<td class="gt_row gt_right">2.1490</td></tr>
     <tr><td class="gt_row gt_left">horsepower_poly_1</td>
-<td class="gt_row gt_right">&minus;0.4667</td>
-<td class="gt_row gt_right">0.0341</td></tr>
+<td class="gt_row gt_right">&minus;0.4673</td>
+<td class="gt_row gt_right">0.0340</td></tr>
     <tr><td class="gt_row gt_left">horsepower_poly_2</td>
 <td class="gt_row gt_right">0.0012</td>
 <td class="gt_row gt_right">0.0001</td></tr>
@@ -2101,17 +2074,17 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   
 </table>
 </div>
-<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="resampling-methods.html#cb398-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Need to set `raw` = TRUE to not use orthogonal polynomials</span></span>
-<span id="cb398-2"><a href="resampling-methods.html#cb398-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(<span class="fu">lm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="dv">2</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
-<span id="cb398-3"><a href="resampling-methods.html#cb398-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(term, estimate, <span class="at">se_estimate =</span> std.error) <span class="sc">%&gt;%</span></span>
-<span id="cb398-4"><a href="resampling-methods.html#cb398-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb398-5"><a href="resampling-methods.html#cb398-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
-<div id="iyennmwejz" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="resampling-methods.html#cb403-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Need to set `raw` = TRUE to not use orthogonal polynomials</span></span>
+<span id="cb403-2"><a href="resampling-methods.html#cb403-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(<span class="fu">lm</span>(mpg <span class="sc">~</span> <span class="fu">poly</span>(horsepower, <span class="dv">2</span>, <span class="at">raw =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
+<span id="cb403-3"><a href="resampling-methods.html#cb403-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(term, estimate, <span class="at">se_estimate =</span> std.error) <span class="sc">%&gt;%</span></span>
+<span id="cb403-4"><a href="resampling-methods.html#cb403-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb403-5"><a href="resampling-methods.html#cb403-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div id="zkvxoecmrv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#iyennmwejz .gt_table {
+#zkvxoecmrv .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -2136,7 +2109,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-left-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_heading {
+#zkvxoecmrv .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2148,7 +2121,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_title {
+#zkvxoecmrv .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2158,7 +2131,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-bottom-width: 0;
 }
 
-#iyennmwejz .gt_subtitle {
+#zkvxoecmrv .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2168,13 +2141,13 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-top-width: 0;
 }
 
-#iyennmwejz .gt_bottom_border {
+#zkvxoecmrv .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_col_headings {
+#zkvxoecmrv .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2189,7 +2162,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_col_heading {
+#zkvxoecmrv .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2209,7 +2182,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   overflow-x: hidden;
 }
 
-#iyennmwejz .gt_column_spanner_outer {
+#zkvxoecmrv .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2221,15 +2194,15 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-right: 4px;
 }
 
-#iyennmwejz .gt_column_spanner_outer:first-child {
+#zkvxoecmrv .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#iyennmwejz .gt_column_spanner_outer:last-child {
+#zkvxoecmrv .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#iyennmwejz .gt_column_spanner {
+#zkvxoecmrv .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2241,7 +2214,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   width: 100%;
 }
 
-#iyennmwejz .gt_group_heading {
+#zkvxoecmrv .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2263,7 +2236,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   vertical-align: middle;
 }
 
-#iyennmwejz .gt_empty_group_heading {
+#zkvxoecmrv .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2278,15 +2251,15 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   vertical-align: middle;
 }
 
-#iyennmwejz .gt_from_md > :first-child {
+#zkvxoecmrv .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#iyennmwejz .gt_from_md > :last-child {
+#zkvxoecmrv .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#iyennmwejz .gt_row {
+#zkvxoecmrv .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2305,7 +2278,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   overflow-x: hidden;
 }
 
-#iyennmwejz .gt_stub {
+#zkvxoecmrv .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2317,7 +2290,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-left: 12px;
 }
 
-#iyennmwejz .gt_summary_row {
+#zkvxoecmrv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2327,7 +2300,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-right: 5px;
 }
 
-#iyennmwejz .gt_first_summary_row {
+#zkvxoecmrv .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2337,7 +2310,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-top-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_grand_summary_row {
+#zkvxoecmrv .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2347,7 +2320,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   padding-right: 5px;
 }
 
-#iyennmwejz .gt_first_grand_summary_row {
+#zkvxoecmrv .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2357,11 +2330,11 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-top-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_striped {
+#zkvxoecmrv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#iyennmwejz .gt_table_body {
+#zkvxoecmrv .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2370,7 +2343,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-bottom-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_footnotes {
+#zkvxoecmrv .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2384,13 +2357,13 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_footnote {
+#zkvxoecmrv .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#iyennmwejz .gt_sourcenotes {
+#zkvxoecmrv .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2404,41 +2377,41 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
   border-right-color: #D3D3D3;
 }
 
-#iyennmwejz .gt_sourcenote {
+#zkvxoecmrv .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#iyennmwejz .gt_left {
+#zkvxoecmrv .gt_left {
   text-align: left;
 }
 
-#iyennmwejz .gt_center {
+#zkvxoecmrv .gt_center {
   text-align: center;
 }
 
-#iyennmwejz .gt_right {
+#zkvxoecmrv .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#iyennmwejz .gt_font_normal {
+#zkvxoecmrv .gt_font_normal {
   font-weight: normal;
 }
 
-#iyennmwejz .gt_font_bold {
+#zkvxoecmrv .gt_font_bold {
   font-weight: bold;
 }
 
-#iyennmwejz .gt_font_italic {
+#zkvxoecmrv .gt_font_italic {
   font-style: italic;
 }
 
-#iyennmwejz .gt_super {
+#zkvxoecmrv .gt_super {
   font-size: 65%;
 }
 
-#iyennmwejz .gt_footnote_marks {
+#zkvxoecmrv .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -2473,11 +2446,475 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 </div>
 <div id="exercises-2" class="section level2" number="5.4">
 <h2><span class="header-section-number">5.4</span> Exercises</h2>
-<div id="applied-2" class="section level3" number="5.4.1">
-<h3><span class="header-section-number">5.4.1</span> Applied</h3>
-<div id="logistic-regression-with-default" class="section level4" number="5.4.1.1">
-<h4><span class="header-section-number">5.4.1.1</span> 5. Logistic regression with <code>default</code></h4>
-<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="resampling-methods.html#cb399-1" aria-hidden="true" tabindex="-1"></a>default <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Default</span></code></pre></div>
+<div id="applied-2" class="section level3 unnumbered">
+<h3>Applied</h3>
+<div id="logistic-regression-with-default" class="section level4 unnumbered">
+<h4>5. Logistic regression with <code>default</code></h4>
+<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="resampling-methods.html#cb404-1" aria-hidden="true" tabindex="-1"></a>default <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Default</span></code></pre></div>
+<ol style="list-style-type: lower-alpha">
+<li>Fit a logistic regression model that uses <code>income</code> and <code>balance</code> to predict <code>default</code>.</li>
+</ol>
+<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb405-1"><a href="resampling-methods.html#cb405-1" aria-hidden="true" tabindex="-1"></a>default_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb405-2"><a href="resampling-methods.html#cb405-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>, <span class="at">engine =</span> <span class="st">&quot;glm&quot;</span>))</span>
+<span id="cb405-3"><a href="resampling-methods.html#cb405-3" aria-hidden="true" tabindex="-1"></a>default_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance, <span class="at">data =</span> default)</span>
+<span id="cb405-4"><a href="resampling-methods.html#cb405-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb405-5"><a href="resampling-methods.html#cb405-5" aria-hidden="true" tabindex="-1"></a>default_fit <span class="ot">&lt;-</span> default_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb405-6"><a href="resampling-methods.html#cb405-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(default_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb405-7"><a href="resampling-methods.html#cb405-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> default)</span>
+<span id="cb405-8"><a href="resampling-methods.html#cb405-8" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_parsnip</span>(default_fit)</span></code></pre></div>
+<pre><code>## parsnip model object
+## 
+## Fit time:  30ms 
+## 
+## Call:  stats::glm(formula = ..y ~ ., family = stats::binomial, data = data)
+## 
+## Coefficients:
+## (Intercept)       income      balance  
+##  -1.154e+01    2.081e-05    5.647e-03  
+## 
+## Degrees of Freedom: 9999 Total (i.e. Null);  9997 Residual
+## Null Deviance:       2921 
+## Residual Deviance: 1579  AIC: 1585</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Using the validation set approach, estimate the test error of this model.</li>
+</ol>
+<p>Set seed and split:</p>
+<div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="resampling-methods.html#cb407-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">940</span>)</span>
+<span id="cb407-2"><a href="resampling-methods.html#cb407-2" aria-hidden="true" tabindex="-1"></a>default_splits <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(default, <span class="at">prop =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+<p>Fit and evaluate the model with the hold out:</p>
+<div class="sourceCode" id="cb408"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb408-1"><a href="resampling-methods.html#cb408-1" aria-hidden="true" tabindex="-1"></a>default_fit_validation <span class="ot">&lt;-</span> default_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb408-2"><a href="resampling-methods.html#cb408-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(default_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb408-3"><a href="resampling-methods.html#cb408-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(default_splits)</span>
+<span id="cb408-4"><a href="resampling-methods.html#cb408-4" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(default_fit_validation)</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 6
+##   .metric  .estimator  mean     n std_err .config             
+##   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+## 1 accuracy binary     0.973     1      NA Preprocessor1_Model1
+## 2 roc_auc  binary     0.949     1      NA Preprocessor1_Model1</code></pre>
+<p>The accuracy of the model is
+97.26%
+and so the test error is
+2.74%.</p>
+<p>The <code>tidymodels</code> workflow made fitting and assessing this model very easy – just 5 lines of code.
+For comparison purposes, here is how you could do it without <code>tidymodels</code> (excluding the data splitting part):</p>
+<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="resampling-methods.html#cb410-1" aria-hidden="true" tabindex="-1"></a>default_train <span class="ot">&lt;-</span> <span class="fu">training</span>(default_splits<span class="sc">$</span>splits[[<span class="dv">1</span>]])</span>
+<span id="cb410-2"><a href="resampling-methods.html#cb410-2" aria-hidden="true" tabindex="-1"></a>default_assess <span class="ot">&lt;-</span> <span class="fu">assessment</span>(default_splits<span class="sc">$</span>splits[[<span class="dv">1</span>]])</span>
+<span id="cb410-3"><a href="resampling-methods.html#cb410-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb410-4"><a href="resampling-methods.html#cb410-4" aria-hidden="true" tabindex="-1"></a>default_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance, <span class="at">data =</span> default_train,</span>
+<span id="cb410-5"><a href="resampling-methods.html#cb410-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span>
+<span id="cb410-6"><a href="resampling-methods.html#cb410-6" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(default_glm, <span class="at">newdata =</span> default_assess, <span class="at">type.predict =</span> <span class="st">&quot;response&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb410-7"><a href="resampling-methods.html#cb410-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">default_pred =</span> <span class="fu">ifelse</span>(.fitted <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb410-8"><a href="resampling-methods.html#cb410-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">error_rate =</span> <span class="fu">mean</span>(default <span class="sc">!=</span> default_pred)) <span class="sc">%&gt;%</span></span>
+<span id="cb410-9"><a href="resampling-methods.html#cb410-9" aria-hidden="true" tabindex="-1"></a>  .<span class="sc">$</span>error_rate <span class="sc">%&gt;%</span> scales<span class="sc">::</span><span class="fu">percent</span>(<span class="at">accuracy =</span> <span class="fl">0.1</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;2.7%&quot;</code></pre>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Repeat the process in (b) three times, using three different splits of the observations. Comment on the results.</li>
+</ol>
+<div class="sourceCode" id="cb412"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb412-1"><a href="resampling-methods.html#cb412-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">109</span>)</span>
+<span id="cb412-2"><a href="resampling-methods.html#cb412-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb412-3"><a href="resampling-methods.html#cb412-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(default_fit_validation) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="dv">1</span>),</span>
+<span id="cb412-4"><a href="resampling-methods.html#cb412-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>,</span>
+<span id="cb412-5"><a href="resampling-methods.html#cb412-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(rep) {</span>
+<span id="cb412-6"><a href="resampling-methods.html#cb412-6" aria-hidden="true" tabindex="-1"></a>      default_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb412-7"><a href="resampling-methods.html#cb412-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">add_recipe</span>(default_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb412-8"><a href="resampling-methods.html#cb412-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">fit_resamples</span>(<span class="fu">validation_split</span>(default, <span class="at">prop =</span> <span class="fl">0.5</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb412-9"><a href="resampling-methods.html#cb412-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb412-10"><a href="resampling-methods.html#cb412-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">rep =</span> rep)</span>
+<span id="cb412-11"><a href="resampling-methods.html#cb412-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb412-12"><a href="resampling-methods.html#cb412-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb412-13"><a href="resampling-methods.html#cb412-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb412-14"><a href="resampling-methods.html#cb412-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;accuracy&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb412-15"><a href="resampling-methods.html#cb412-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb412-16"><a href="resampling-methods.html#cb412-16" aria-hidden="true" tabindex="-1"></a>    rep,</span>
+<span id="cb412-17"><a href="resampling-methods.html#cb412-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">accuracy =</span> scales<span class="sc">::</span><span class="fu">percent</span>(mean, <span class="at">accuracy =</span> <span class="fl">0.01</span>),</span>
+<span id="cb412-18"><a href="resampling-methods.html#cb412-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">test_error =</span> scales<span class="sc">::</span><span class="fu">percent</span>(<span class="dv">1</span> <span class="sc">-</span> mean, <span class="at">accuracy =</span> <span class="fl">0.01</span>)</span>
+<span id="cb412-19"><a href="resampling-methods.html#cb412-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb412-20"><a href="resampling-methods.html#cb412-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code></pre></div>
+<div id="zqpjldwoxf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#zqpjldwoxf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#zqpjldwoxf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#zqpjldwoxf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#zqpjldwoxf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#zqpjldwoxf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#zqpjldwoxf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#zqpjldwoxf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#zqpjldwoxf .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#zqpjldwoxf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#zqpjldwoxf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#zqpjldwoxf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#zqpjldwoxf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#zqpjldwoxf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#zqpjldwoxf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zqpjldwoxf .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#zqpjldwoxf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#zqpjldwoxf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#zqpjldwoxf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#zqpjldwoxf .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#zqpjldwoxf .gt_left {
+  text-align: left;
+}
+
+#zqpjldwoxf .gt_center {
+  text-align: center;
+}
+
+#zqpjldwoxf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#zqpjldwoxf .gt_font_normal {
+  font-weight: normal;
+}
+
+#zqpjldwoxf .gt_font_bold {
+  font-weight: bold;
+}
+
+#zqpjldwoxf .gt_font_italic {
+  font-style: italic;
+}
+
+#zqpjldwoxf .gt_super {
+  font-size: 65%;
+}
+
+#zqpjldwoxf .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">rep</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">accuracy</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">test_error</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_right">1</td>
+<td class="gt_row gt_left">97.26%</td>
+<td class="gt_row gt_left">2.74%</td></tr>
+    <tr><td class="gt_row gt_right">2</td>
+<td class="gt_row gt_left">97.52%</td>
+<td class="gt_row gt_left">2.48%</td></tr>
+    <tr><td class="gt_row gt_right">3</td>
+<td class="gt_row gt_left">97.46%</td>
+<td class="gt_row gt_left">2.54%</td></tr>
+    <tr><td class="gt_row gt_right">4</td>
+<td class="gt_row gt_left">97.26%</td>
+<td class="gt_row gt_left">2.74%</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The estimates are actually quite stable.</p>
+<ol start="4" style="list-style-type: lower-alpha">
+<li>Add the dummy variable <code>student</code> to the logistic regression model. Comment on whether or not this leads to a reduction in the test error rate.</li>
+</ol>
+<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb413-1"><a href="resampling-methods.html#cb413-1" aria-hidden="true" tabindex="-1"></a>default_rec_student <span class="ot">&lt;-</span></span>
+<span id="cb413-2"><a href="resampling-methods.html#cb413-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance <span class="sc">+</span> student, <span class="at">data =</span> default) <span class="sc">%&gt;%</span></span>
+<span id="cb413-3"><a href="resampling-methods.html#cb413-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(student)</span>
+<span id="cb413-4"><a href="resampling-methods.html#cb413-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb413-5"><a href="resampling-methods.html#cb413-5" aria-hidden="true" tabindex="-1"></a>default_fit_validation_student <span class="ot">&lt;-</span> default_workflow <span class="sc">%&gt;%</span></span>
+<span id="cb413-6"><a href="resampling-methods.html#cb413-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(default_rec_student) <span class="sc">%&gt;%</span></span>
+<span id="cb413-7"><a href="resampling-methods.html#cb413-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(default_splits)</span>
+<span id="cb413-8"><a href="resampling-methods.html#cb413-8" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(default_fit_validation_student)</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 6
+##   .metric  .estimator  mean     n std_err .config             
+##   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+## 1 accuracy binary     0.972     1      NA Preprocessor1_Model1
+## 2 roc_auc  binary     0.949     1      NA Preprocessor1_Model1</code></pre>
+<p>Adding the <code>student</code> variable resulted in a test error rate of
+2.78%
+which is only sligthly lower than the model without <code>student</code>.</p>
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div class="csl-entry">

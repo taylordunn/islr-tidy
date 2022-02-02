@@ -77,8 +77,4 @@ the-validation-set-approach
 leave-one-out-cross-validation
 k-fold-cross-validation
 the-bootstrap
-estimating-the-accuracy-of-a-statistic-of-interest
-estimating-the-accuracy-of-a-regression-model
 exercises-2
-applied-2
-logistic-regression-with-default
