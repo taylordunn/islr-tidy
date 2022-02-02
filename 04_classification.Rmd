@@ -2322,3 +2322,24 @@ boston_recs$rec2$term_info
 
 And the models that performed best were KNN and QDA.
 
+## Reproducibility {-}
+
+<details><summary>Reproducibility receipt</summary>
+
+```{r}
+Sys.time()
+```
+
+```{r}
+if ("git2r" %in% installed.packages()) {
+  if (git2r::in_repository()) {
+    git2r::repository()
+  }
+}
+```
+
+```{r}
+sessioninfo::session_info()
+```
+
+</details>
