@@ -1,6 +1,7 @@
 ```{r echo=FALSE}
 knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
-                      fig.width = 6, fig.height = 3)
+                      fig.width = 6, fig.height = 3,
+                      cache.path = "cache/")
 ```
 
 # Resampling Methods
@@ -250,7 +251,7 @@ registerDoParallel(cl)
 ```
 
 
-```{r}
+```{r auto_poly_fits_10_fold_cv, cache=TRUE}
 tic()
 auto_poly_fits_10_fold_cv <- bind_rows(
   # 9 additional sets of fits
@@ -506,7 +507,7 @@ portfolio_boot_alpha <- map_dbl(
 mean(portfolio_boot_alpha); sd(portfolio_boot_alpha)
 ```
 
-#### Estimating the Accuracy of a Regression Model {-}
+#### Estimating the Accuracy of a Regression Model {-} {#bootstrap-regression}
 
 >
 The bootstrap approach can be used to assess the variability of the coefficient estimates and predictions from a statistical learning method. Here we use the bootstrap approach in order to assess the variability of the estimates for $\beta_0$ and $\beta_1$, the intercept and slope terms for the linear regression model that uses horsepower to predict mpg in the `Auto` data set. We will compare the estimates obtained using the bootstrap to those obtained using the formulas for $\text{SE}(\hat{\beta}_0)$ and $\text{SE}(\hat{\beta}_1)$ described in Section 3.1.2.
@@ -528,7 +529,7 @@ tidy_ctrl <- control_grid(extract = get_lm_coefs)
 
 Now fit the resamples with this with control object:
 
-```{r cache=TRUE}
+```{r auto_boot_fit, cache=TRUE}
 tic()
 auto_boot_fit <- workflow() %>%
   add_model(linear_reg()) %>%
@@ -559,9 +560,7 @@ auto_boot_fit_coefs %>%
   group_by(term) %>%
   summarise(
     mean_estimate = mean(estimate),
-    se_estimate = sqrt(
-      (1 / (n() - 1)) * sum((estimate - mean_estimate)^2)
-    ),
+    se_estimate = sd(estimate),
     .groups = "drop"
   ) %>%
   gt() %>%
@@ -586,7 +585,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 
 We can find better correspondence between bootstrap and regression estimates if we use the quadratic model because it better fits the data:
 
-```{r cache=TRUE}
+```{r auto_boot_quad_fit, cache=TRUE}
 tic()
 auto_boot_quad_fit <- workflow() %>%
   add_model(linear_reg()) %>%
@@ -605,9 +604,7 @@ auto_boot_quad_fit %>%
   group_by(term) %>%
   summarise(
     mean_estimate = mean(estimate),
-    se_estimate = sqrt(
-      (1 / (n() - 1)) * sum((estimate - mean_estimate)^2)
-    ),
+    se_estimate = sd(estimate),
     .groups = "drop"
   ) %>%
   gt() %>%
@@ -626,7 +623,7 @@ tidy(lm(mpg ~ poly(horsepower, 2, raw = TRUE), data = auto)) %>%
 
 ### Applied {-}
 
-#### 5. Logistic regression with `default` {-}
+#### 5. Logistic regression with `default` - validation set {-}
 
 ```{r}
 default <- ISLR2::Default
@@ -726,3 +723,91 @@ collect_metrics(default_fit_validation_student)
 Adding the `student` variable resulted in a test error rate of
 `r scales::percent(1 - collect_metrics(default_fit_validation_student)$mean[1], accuracy = 0.01)`
 and so did not lead to a reduction compared to the original model.
+
+#### 6. Logistic regression with `default` - standard error estimation {-}
+
+(a) Determine the estimated standard errors for the coefficients using `summary()` and `glm()`.
+
+Here it is in base R:
+
+```{r}
+glm(default ~ income + balance, data = default, family = "binomial") %>%
+  summary()
+```
+
+In `tidymodels`, I can use the `extract_fit_engine()` function to get the same:
+
+```{r}
+logistic_reg() %>%
+  fit(default ~ income + balance, data = default) %>%
+  extract_fit_engine() %>%
+  summary()
+```
+
+(b) Write a function that takes as input the `default` data set as well as the index of the observations, and that outputs the coefficient estimates for `income` and `balance` in the multiple logistic regression model.
+
+Instead of the workflow I used in \@ref(bootstrap-regression) (with `fit_resamples()`), I'll show a different way.
+First, a function that takes a `split` object (a bootstrap sample), fits the model and returns the tidy regression coefficients:
+
+```{r}
+default_boot <- bootstraps(default, times = 1000)
+
+get_tidy_default_fit <- function(split) {
+  logistic_reg() %>%
+    fit(default ~ income + balance, data = as.data.frame(split)) %>%
+    broom::tidy()
+}
+```
+
+(c) Get the bootstrap estimates for the standard errors.
+
+Now I use `purrr::map()` to fit the models using the function from (b):
+
+```{r default_fits, cache=TRUE}
+tic()
+default_fits <- map_dfr(
+  default_boot$splits, get_tidy_default_fit,
+  .id = "split"
+)
+toc()
+```
+
+Then estimate the standard errors of the coefficients:
+
+```{r}
+default_fits %>%
+  group_by(term) %>%
+  summarise(mean_estimate = mean(estimate), se_estimate = sd(estimate)) %>%
+  gt() %>%
+  fmt_number(columns = -term, n_sigfig = 3)
+```
+
+(d) Comment on the estimated standard errors obtained using the `glm()` function and using your bootstrap function.
+
+```{r}
+glm(default ~ income + balance, data = default, family = "binomial") %>%
+  broom::tidy() %>%
+  select(term, estimate, se_estimate = std.error) %>%
+  gt() %>%
+  fmt_number(columns = -term, n_sigfig = 3)
+```
+
+The estimates are essentially the same between the two methods.
+
+## Reproducibility {-}
+
+```{r}
+Sys.time()
+```
+
+```{r}
+if ("git2r" %in% installed.packages()) {
+  if (git2r::in_repository()) {
+    git2r::repository()
+  }
+}
+```
+
+```{r}
+sessioninfo::session_info()
+```

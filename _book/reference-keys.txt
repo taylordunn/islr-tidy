@@ -77,4 +77,5 @@ the-validation-set-approach
 leave-one-out-cross-validation
 k-fold-cross-validation
 the-bootstrap
+bootstrap-regression
 exercises-2

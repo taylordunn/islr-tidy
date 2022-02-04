@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-02-02" />
+<meta name="date" content="2022-02-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -286,6 +286,7 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#applied-2"><i class="fa fa-check"></i>Applied</a></li>
 </ul></li>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#reproducibility-2"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
 </ul>
 
@@ -624,7 +625,7 @@ Thought it won’t take <em>too</em> long to run, I’ll make use of <code>paral
 <span id="cb363-12"><a href="resampling-methods.html#cb363-12" aria-hidden="true" tabindex="-1"></a>  auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rep =</span> <span class="st">&quot;10&quot;</span>)</span>
 <span id="cb363-13"><a href="resampling-methods.html#cb363-13" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb363-14"><a href="resampling-methods.html#cb363-14" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 85.91 sec elapsed</code></pre>
+<pre><code>## 93.12 sec elapsed</code></pre>
 <p>Now reproduce Figure 5.4:</p>
 <div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="resampling-methods.html#cb365-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> auto_poly_fits_10_fold_cv <span class="sc">%&gt;%</span></span>
 <span id="cb365-2"><a href="resampling-methods.html#cb365-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> rmse<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
@@ -892,8 +893,8 @@ be used to effectively estimate the variability associated with <span class="mat
 <pre><code>## [1] 0.5784967</code></pre>
 <pre><code>## [1] 0.08952573</code></pre>
 </div>
-<div id="estimating-the-accuracy-of-a-regression-model" class="section level4 unnumbered">
-<h4>Estimating the Accuracy of a Regression Model</h4>
+<div id="bootstrap-regression" class="section level4" number="5.3.4.1">
+<h4><span class="header-section-number">5.3.4.1</span> Estimating the Accuracy of a Regression Model {-}</h4>
 <blockquote>
 <p>The bootstrap approach can be used to assess the variability of the coefficient estimates and predictions from a statistical learning method. Here we use the bootstrap approach in order to assess the variability of the estimates for <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>, the intercept and slope terms for the linear regression model that uses horsepower to predict mpg in the <code>Auto</code> data set. We will compare the estimates obtained using the bootstrap to those obtained using the formulas for <span class="math inline">\(\text{SE}(\hat{\beta}_0)\)</span> and <span class="math inline">\(\text{SE}(\hat{\beta}_1)\)</span> described in Section 3.1.2.</p>
 </blockquote>
@@ -912,7 +913,7 @@ So in order to get the actual regression coefficients, I need to provide a <code
 <span id="cb390-4"><a href="resampling-methods.html#cb390-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(<span class="fu">recipe</span>(mpg <span class="sc">~</span> horsepower, <span class="at">data =</span> auto)) <span class="sc">%&gt;%</span></span>
 <span id="cb390-5"><a href="resampling-methods.html#cb390-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(auto_boot, <span class="at">control =</span> tidy_ctrl)</span>
 <span id="cb390-6"><a href="resampling-methods.html#cb390-6" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 78.14 sec elapsed</code></pre>
+<pre><code>## 72.1 sec elapsed</code></pre>
 <div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="resampling-methods.html#cb392-1" aria-hidden="true" tabindex="-1"></a>auto_boot_fit <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
 <pre><code>## # A tibble: 6 x 5
 ##   splits            id            .metrics         .notes           .extracts   
@@ -951,13 +952,11 @@ It is a but clunky to work with – it is a list column with a list of tibbles, 
 <span id="cb398-2"><a href="resampling-methods.html#cb398-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
 <span id="cb398-3"><a href="resampling-methods.html#cb398-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb398-4"><a href="resampling-methods.html#cb398-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate),</span>
-<span id="cb398-5"><a href="resampling-methods.html#cb398-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sqrt</span>(</span>
-<span id="cb398-6"><a href="resampling-methods.html#cb398-6" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">/</span> (<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="fu">sum</span>((estimate <span class="sc">-</span> mean_estimate)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb398-7"><a href="resampling-methods.html#cb398-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb398-8"><a href="resampling-methods.html#cb398-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb398-9"><a href="resampling-methods.html#cb398-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb398-10"><a href="resampling-methods.html#cb398-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb398-11"><a href="resampling-methods.html#cb398-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
+<span id="cb398-5"><a href="resampling-methods.html#cb398-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sd</span>(estimate),</span>
+<span id="cb398-6"><a href="resampling-methods.html#cb398-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb398-7"><a href="resampling-methods.html#cb398-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb398-8"><a href="resampling-methods.html#cb398-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb398-9"><a href="resampling-methods.html#cb398-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
 <div id="ygtskbpuab" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -1698,20 +1697,18 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 <span id="cb400-8"><a href="resampling-methods.html#cb400-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb400-9"><a href="resampling-methods.html#cb400-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(auto_boot, <span class="at">control =</span> tidy_ctrl)</span>
 <span id="cb400-10"><a href="resampling-methods.html#cb400-10" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 82.58 sec elapsed</code></pre>
+<pre><code>## 76.58 sec elapsed</code></pre>
 <div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="resampling-methods.html#cb402-1" aria-hidden="true" tabindex="-1"></a>auto_boot_quad_fit <span class="sc">%&gt;%</span></span>
 <span id="cb402-2"><a href="resampling-methods.html#cb402-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
 <span id="cb402-3"><a href="resampling-methods.html#cb402-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(.extracts) <span class="sc">%&gt;%</span></span>
 <span id="cb402-4"><a href="resampling-methods.html#cb402-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
 <span id="cb402-5"><a href="resampling-methods.html#cb402-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb402-6"><a href="resampling-methods.html#cb402-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate),</span>
-<span id="cb402-7"><a href="resampling-methods.html#cb402-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sqrt</span>(</span>
-<span id="cb402-8"><a href="resampling-methods.html#cb402-8" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">/</span> (<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">*</span> <span class="fu">sum</span>((estimate <span class="sc">-</span> mean_estimate)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb402-9"><a href="resampling-methods.html#cb402-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb402-10"><a href="resampling-methods.html#cb402-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb402-11"><a href="resampling-methods.html#cb402-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb402-12"><a href="resampling-methods.html#cb402-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb402-13"><a href="resampling-methods.html#cb402-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
+<span id="cb402-7"><a href="resampling-methods.html#cb402-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">se_estimate =</span> <span class="fu">sd</span>(estimate),</span>
+<span id="cb402-8"><a href="resampling-methods.html#cb402-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb402-9"><a href="resampling-methods.html#cb402-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb402-10"><a href="resampling-methods.html#cb402-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb402-11"><a href="resampling-methods.html#cb402-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">decimals =</span> <span class="dv">4</span>)</span></code></pre></div>
 <div id="uyasfyvmkp" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
@@ -2448,8 +2445,8 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 <h2><span class="header-section-number">5.4</span> Exercises</h2>
 <div id="applied-2" class="section level3 unnumbered">
 <h3>Applied</h3>
-<div id="logistic-regression-with-default" class="section level4 unnumbered">
-<h4>5. Logistic regression with <code>default</code></h4>
+<div id="logistic-regression-with-default---validation-set" class="section level4 unnumbered">
+<h4>5. Logistic regression with <code>default</code> - validation set</h4>
 <div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="resampling-methods.html#cb404-1" aria-hidden="true" tabindex="-1"></a>default <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Default</span></code></pre></div>
 <ol style="list-style-type: lower-alpha">
 <li>Fit a logistic regression model that uses <code>income</code> and <code>balance</code> to predict <code>default</code>.</li>
@@ -2464,7 +2461,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 <span id="cb405-8"><a href="resampling-methods.html#cb405-8" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_parsnip</span>(default_fit)</span></code></pre></div>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  30ms 
+## Fit time:  31ms 
 ## 
 ## Call:  stats::glm(formula = ..y ~ ., family = stats::binomial, data = data)
 ## 
@@ -2505,8 +2502,8 @@ For comparison purposes, here is how you could do it without <code>tidymodels</c
 <span id="cb410-6"><a href="resampling-methods.html#cb410-6" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(default_glm, <span class="at">newdata =</span> default_assess, <span class="at">type.predict =</span> <span class="st">&quot;response&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb410-7"><a href="resampling-methods.html#cb410-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">default_pred =</span> <span class="fu">ifelse</span>(.fitted <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb410-8"><a href="resampling-methods.html#cb410-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">error_rate =</span> <span class="fu">mean</span>(default <span class="sc">!=</span> default_pred)) <span class="sc">%&gt;%</span></span>
-<span id="cb410-9"><a href="resampling-methods.html#cb410-9" aria-hidden="true" tabindex="-1"></a>  .<span class="sc">$</span>error_rate <span class="sc">%&gt;%</span> scales<span class="sc">::</span><span class="fu">percent</span>(<span class="at">accuracy =</span> <span class="fl">0.1</span>)</span></code></pre></div>
-<pre><code>## [1] &quot;2.7%&quot;</code></pre>
+<span id="cb410-9"><a href="resampling-methods.html#cb410-9" aria-hidden="true" tabindex="-1"></a>  .<span class="sc">$</span>error_rate <span class="sc">%&gt;%</span> scales<span class="sc">::</span><span class="fu">percent</span>(<span class="at">accuracy =</span> <span class="fl">0.01</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;2.74%&quot;</code></pre>
 <ol start="3" style="list-style-type: lower-alpha">
 <li>Repeat the process in (b) three times, using three different splits of the observations. Comment on the results.</li>
 </ol>
@@ -2914,7 +2911,1038 @@ For comparison purposes, here is how you could do it without <code>tidymodels</c
 ## 2 roc_auc  binary     0.949     1      NA Preprocessor1_Model1</code></pre>
 <p>Adding the <code>student</code> variable resulted in a test error rate of
 2.78%
-which is only sligthly lower than the model without <code>student</code>.</p>
+and so did not lead to a reduction compared to the original model.</p>
+</div>
+<div id="logistic-regression-with-default---standard-error-estimation" class="section level4 unnumbered">
+<h4>6. Logistic regression with <code>default</code> - standard error estimation</h4>
+<ol style="list-style-type: lower-alpha">
+<li>Determine the estimated standard errors for the coefficients using <code>summary()</code> and <code>glm()</code>.</li>
+</ol>
+<p>Here it is in base R:</p>
+<div class="sourceCode" id="cb415"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb415-1"><a href="resampling-methods.html#cb415-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance, <span class="at">data =</span> default, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb415-2"><a href="resampling-methods.html#cb415-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = default ~ income + balance, family = &quot;binomial&quot;, 
+##     data = default)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.4725  -0.1444  -0.0574  -0.0211   3.7245  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -1.154e+01  4.348e-01 -26.545  &lt; 2e-16 ***
+## income       2.081e-05  4.985e-06   4.174 2.99e-05 ***
+## balance      5.647e-03  2.274e-04  24.836  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2920.6  on 9999  degrees of freedom
+## Residual deviance: 1579.0  on 9997  degrees of freedom
+## AIC: 1585
+## 
+## Number of Fisher Scoring iterations: 8</code></pre>
+<p>In <code>tidymodels</code>, I can use the <code>extract_fit_engine()</code> function to get the same:</p>
+<div class="sourceCode" id="cb417"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb417-1"><a href="resampling-methods.html#cb417-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb417-2"><a href="resampling-methods.html#cb417-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance, <span class="at">data =</span> default) <span class="sc">%&gt;%</span></span>
+<span id="cb417-3"><a href="resampling-methods.html#cb417-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb417-4"><a href="resampling-methods.html#cb417-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## stats::glm(formula = default ~ income + balance, family = stats::binomial, 
+##     data = data)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.4725  -0.1444  -0.0574  -0.0211   3.7245  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -1.154e+01  4.348e-01 -26.545  &lt; 2e-16 ***
+## income       2.081e-05  4.985e-06   4.174 2.99e-05 ***
+## balance      5.647e-03  2.274e-04  24.836  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2920.6  on 9999  degrees of freedom
+## Residual deviance: 1579.0  on 9997  degrees of freedom
+## AIC: 1585
+## 
+## Number of Fisher Scoring iterations: 8</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Write a function that takes as input the <code>default</code> data set as well as the index of the observations, and that outputs the coefficient estimates for <code>income</code> and <code>balance</code> in the multiple logistic regression model.</li>
+</ol>
+<p>Instead of the workflow I used in <a href="resampling-methods.html#bootstrap-regression">5.3.4.1</a> (with <code>fit_resamples()</code>), I’ll show a different way.
+First, a function that takes a <code>split</code> object (a bootstrap sample), fits the model and returns the tidy regression coefficients:</p>
+<div class="sourceCode" id="cb419"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb419-1"><a href="resampling-methods.html#cb419-1" aria-hidden="true" tabindex="-1"></a>default_boot <span class="ot">&lt;-</span> <span class="fu">bootstraps</span>(default, <span class="at">times =</span> <span class="dv">1000</span>)</span>
+<span id="cb419-2"><a href="resampling-methods.html#cb419-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb419-3"><a href="resampling-methods.html#cb419-3" aria-hidden="true" tabindex="-1"></a>get_tidy_default_fit <span class="ot">&lt;-</span> <span class="cf">function</span>(split) {</span>
+<span id="cb419-4"><a href="resampling-methods.html#cb419-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb419-5"><a href="resampling-methods.html#cb419-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance, <span class="at">data =</span> <span class="fu">as.data.frame</span>(split)) <span class="sc">%&gt;%</span></span>
+<span id="cb419-6"><a href="resampling-methods.html#cb419-6" aria-hidden="true" tabindex="-1"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>()</span>
+<span id="cb419-7"><a href="resampling-methods.html#cb419-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<ol start="3" style="list-style-type: lower-alpha">
+<li>Get the bootstrap estimates for the standard errors.</li>
+</ol>
+<p>Now I use <code>purrr::map()</code> to fit the models using the function from (b):</p>
+<div class="sourceCode" id="cb420"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb420-1"><a href="resampling-methods.html#cb420-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb420-2"><a href="resampling-methods.html#cb420-2" aria-hidden="true" tabindex="-1"></a>default_fits <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(</span>
+<span id="cb420-3"><a href="resampling-methods.html#cb420-3" aria-hidden="true" tabindex="-1"></a>  default_boot<span class="sc">$</span>splits, get_tidy_default_fit,</span>
+<span id="cb420-4"><a href="resampling-methods.html#cb420-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">&quot;split&quot;</span></span>
+<span id="cb420-5"><a href="resampling-methods.html#cb420-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb420-6"><a href="resampling-methods.html#cb420-6" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 291.56 sec elapsed</code></pre>
+<p>Then estimate the standard errors of the coefficients:</p>
+<div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb422-1"><a href="resampling-methods.html#cb422-1" aria-hidden="true" tabindex="-1"></a>default_fits <span class="sc">%&gt;%</span></span>
+<span id="cb422-2"><a href="resampling-methods.html#cb422-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(term) <span class="sc">%&gt;%</span></span>
+<span id="cb422-3"><a href="resampling-methods.html#cb422-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate), <span class="at">se_estimate =</span> <span class="fu">sd</span>(estimate)) <span class="sc">%&gt;%</span></span>
+<span id="cb422-4"><a href="resampling-methods.html#cb422-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb422-5"><a href="resampling-methods.html#cb422-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">n_sigfig =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div id="xybuvpvhkb" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#xybuvpvhkb .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#xybuvpvhkb .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#xybuvpvhkb .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#xybuvpvhkb .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#xybuvpvhkb .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#xybuvpvhkb .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#xybuvpvhkb .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#xybuvpvhkb .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#xybuvpvhkb .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#xybuvpvhkb .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#xybuvpvhkb .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#xybuvpvhkb .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#xybuvpvhkb .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#xybuvpvhkb .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xybuvpvhkb .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#xybuvpvhkb .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#xybuvpvhkb .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#xybuvpvhkb .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#xybuvpvhkb .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#xybuvpvhkb .gt_left {
+  text-align: left;
+}
+
+#xybuvpvhkb .gt_center {
+  text-align: center;
+}
+
+#xybuvpvhkb .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#xybuvpvhkb .gt_font_normal {
+  font-weight: normal;
+}
+
+#xybuvpvhkb .gt_font_bold {
+  font-weight: bold;
+}
+
+#xybuvpvhkb .gt_font_italic {
+  font-style: italic;
+}
+
+#xybuvpvhkb .gt_super {
+  font-size: 65%;
+}
+
+#xybuvpvhkb .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">term</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">mean_estimate</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">se_estimate</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_right">&minus;11.6</td>
+<td class="gt_row gt_right">0.443</td></tr>
+    <tr><td class="gt_row gt_left">balance</td>
+<td class="gt_row gt_right">0.00566</td>
+<td class="gt_row gt_right">0.000235</td></tr>
+    <tr><td class="gt_row gt_left">income</td>
+<td class="gt_row gt_right">0.0000210</td>
+<td class="gt_row gt_right">0.00000492</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<ol start="4" style="list-style-type: lower-alpha">
+<li>Comment on the estimated standard errors obtained using the <code>glm()</code> function and using your bootstrap function.</li>
+</ol>
+<div class="sourceCode" id="cb423"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb423-1"><a href="resampling-methods.html#cb423-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(default <span class="sc">~</span> income <span class="sc">+</span> balance, <span class="at">data =</span> default, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb423-2"><a href="resampling-methods.html#cb423-2" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb423-3"><a href="resampling-methods.html#cb423-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(term, estimate, <span class="at">se_estimate =</span> std.error) <span class="sc">%&gt;%</span></span>
+<span id="cb423-4"><a href="resampling-methods.html#cb423-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb423-5"><a href="resampling-methods.html#cb423-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="sc">-</span>term, <span class="at">n_sigfig =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div id="qotavlpmco" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#qotavlpmco .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#qotavlpmco .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#qotavlpmco .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#qotavlpmco .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#qotavlpmco .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#qotavlpmco .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#qotavlpmco .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#qotavlpmco .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qotavlpmco .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qotavlpmco .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#qotavlpmco .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#qotavlpmco .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#qotavlpmco .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#qotavlpmco .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qotavlpmco .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qotavlpmco .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#qotavlpmco .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#qotavlpmco .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qotavlpmco .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#qotavlpmco .gt_left {
+  text-align: left;
+}
+
+#qotavlpmco .gt_center {
+  text-align: center;
+}
+
+#qotavlpmco .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#qotavlpmco .gt_font_normal {
+  font-weight: normal;
+}
+
+#qotavlpmco .gt_font_bold {
+  font-weight: bold;
+}
+
+#qotavlpmco .gt_font_italic {
+  font-style: italic;
+}
+
+#qotavlpmco .gt_super {
+  font-size: 65%;
+}
+
+#qotavlpmco .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">term</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">estimate</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">se_estimate</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_right">&minus;11.5</td>
+<td class="gt_row gt_right">0.435</td></tr>
+    <tr><td class="gt_row gt_left">income</td>
+<td class="gt_row gt_right">0.0000208</td>
+<td class="gt_row gt_right">0.00000499</td></tr>
+    <tr><td class="gt_row gt_left">balance</td>
+<td class="gt_row gt_right">0.00565</td>
+<td class="gt_row gt_right">0.000227</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+<p>The estimates are essentially the same between the two methods.</p>
+</div>
+</div>
+</div>
+<div id="reproducibility-2" class="section level2 unnumbered">
+<h2>Reproducibility</h2>
+<div class="sourceCode" id="cb424"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb424-1"><a href="resampling-methods.html#cb424-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2022-02-03 23:54:54 AST&quot;</code></pre>
+<div class="sourceCode" id="cb426"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb426-1"><a href="resampling-methods.html#cb426-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
+<span id="cb426-2"><a href="resampling-methods.html#cb426-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
+<span id="cb426-3"><a href="resampling-methods.html#cb426-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
+<span id="cb426-4"><a href="resampling-methods.html#cb426-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb426-5"><a href="resampling-methods.html#cb426-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
+## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
+## Head:     [2e82f0c] 2022-02-02: Exercise 5</code></pre>
+<div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb428-1"><a href="resampling-methods.html#cb428-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
+<pre><code>## - Session info ---------------------------------------------------------------
+##  setting  value                       
+##  version  R version 4.1.2 (2021-11-01)
+##  os       Windows 10 x64              
+##  system   x86_64, mingw32             
+##  ui       RTerm                       
+##  language (EN)                        
+##  collate  English_Canada.1252         
+##  ctype    English_Canada.1252         
+##  tz       America/Curacao             
+##  date     2022-02-03                  
+## 
+## - Packages -------------------------------------------------------------------
+##  package        * version    date       lib source                           
+##  abind            1.4-5      2016-07-21 [1] CRAN (R 4.1.1)                   
+##  assertthat       0.2.1      2019-03-21 [1] CRAN (R 4.1.0)                   
+##  backports        1.2.1      2020-12-09 [1] CRAN (R 4.1.0)                   
+##  base64enc        0.1-3      2015-07-28 [1] CRAN (R 4.1.0)                   
+##  bayestestR       0.10.5     2021-07-26 [1] CRAN (R 4.1.0)                   
+##  bit              4.0.4      2020-08-04 [1] CRAN (R 4.1.2)                   
+##  bit64            4.0.5      2020-08-30 [1] CRAN (R 4.1.2)                   
+##  bookdown         0.24       2021-09-02 [1] CRAN (R 4.1.1)                   
+##  boot             1.3-28     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  broom          * 0.7.10     2021-10-31 [1] CRAN (R 4.1.2)                   
+##  bslib            0.2.5.1    2021-05-18 [1] CRAN (R 4.1.0)                   
+##  cachem           1.0.6      2021-08-19 [1] CRAN (R 4.1.1)                   
+##  car              3.0-12     2021-11-06 [1] CRAN (R 4.1.2)                   
+##  carData          3.0-4      2020-05-22 [1] CRAN (R 4.1.1)                   
+##  cellranger       1.1.0      2016-07-27 [1] CRAN (R 4.1.0)                   
+##  checkmate        2.0.0      2020-02-06 [1] CRAN (R 4.1.0)                   
+##  class            7.3-19     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  cli              3.1.1      2022-01-20 [1] CRAN (R 4.1.2)                   
+##  coda             0.19-4     2020-09-30 [1] CRAN (R 4.1.0)                   
+##  codetools        0.2-18     2020-11-04 [2] CRAN (R 4.1.2)                   
+##  colorspace       2.0-2      2021-06-24 [1] CRAN (R 4.1.0)                   
+##  combinat         0.0-8      2012-10-29 [1] CRAN (R 4.1.1)                   
+##  corrr          * 0.4.3      2020-11-24 [1] CRAN (R 4.1.0)                   
+##  crayon           1.4.2      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  datawizard       0.1.0      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  DBI              1.1.2      2021-12-20 [1] CRAN (R 4.1.2)                   
+##  dbplyr           2.1.1      2021-04-06 [1] CRAN (R 4.1.0)                   
+##  DEoptimR         1.0-9      2021-05-24 [1] CRAN (R 4.1.0)                   
+##  dials          * 0.0.10     2021-09-10 [1] CRAN (R 4.1.1)                   
+##  DiceDesign       1.9        2021-02-13 [1] CRAN (R 4.1.0)                   
+##  digest           0.6.29     2021-12-01 [1] CRAN (R 4.1.2)                   
+##  discrim        * 0.1.3      2021-07-21 [1] CRAN (R 4.1.2)                   
+##  distill          1.3        2021-10-13 [1] CRAN (R 4.1.2)                   
+##  distributional   0.2.2      2021-02-02 [1] CRAN (R 4.1.2)                   
+##  doParallel     * 1.0.16     2020-10-16 [1] CRAN (R 4.1.1)                   
+##  downlit          0.4.0      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  dplyr          * 1.0.7      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  dunnr          * 0.2.5      2022-01-15 [1] Github (taylordunn/dunnr@c83b30e)
+##  effectsize       0.4.5      2021-05-25 [1] CRAN (R 4.1.0)                   
+##  ellipsis         0.3.2      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  emmeans          1.7.0      2021-09-29 [1] CRAN (R 4.1.2)                   
+##  equatiomatic     0.2.0      2021-01-30 [1] CRAN (R 4.1.0)                   
+##  estimability     1.3        2018-02-11 [1] CRAN (R 4.1.1)                   
+##  evaluate         0.14       2019-05-28 [1] CRAN (R 4.1.0)                   
+##  extrafont        0.17       2014-12-08 [1] CRAN (R 4.1.0)                   
+##  extrafontdb      1.0        2012-06-11 [1] CRAN (R 4.1.0)                   
+##  fansi            1.0.2      2022-01-14 [1] CRAN (R 4.1.2)                   
+##  farver           2.1.0      2021-02-28 [1] CRAN (R 4.1.0)                   
+##  fastmap          1.1.0      2021-01-25 [1] CRAN (R 4.1.0)                   
+##  forcats        * 0.5.1      2021-01-27 [1] CRAN (R 4.1.0)                   
+##  foreach        * 1.5.1      2020-10-15 [1] CRAN (R 4.1.0)                   
+##  fs               1.5.2      2021-12-08 [1] CRAN (R 4.1.2)                   
+##  furrr            0.2.3      2021-06-25 [1] CRAN (R 4.1.2)                   
+##  future           1.23.0     2021-10-31 [1] CRAN (R 4.1.2)                   
+##  generics         0.1.1      2021-10-25 [1] CRAN (R 4.1.1)                   
+##  GGally           2.1.2      2021-06-21 [1] CRAN (R 4.1.0)                   
+##  ggdist         * 3.0.0      2021-07-19 [1] CRAN (R 4.1.2)                   
+##  ggplot2        * 3.3.5      2021-06-25 [1] CRAN (R 4.1.0)                   
+##  ggrepel          0.9.1      2021-01-15 [1] CRAN (R 4.1.0)                   
+##  ggridges         0.5.3      2021-01-08 [1] CRAN (R 4.1.0)                   
+##  git2r            0.28.0     2021-01-10 [1] CRAN (R 4.1.0)                   
+##  globals          0.14.0     2020-11-22 [1] CRAN (R 4.1.0)                   
+##  glue             1.6.0      2021-12-17 [1] CRAN (R 4.1.2)                   
+##  gower            0.2.2      2020-06-23 [1] CRAN (R 4.1.0)                   
+##  GPfit            1.0-8      2019-02-08 [1] CRAN (R 4.1.0)                   
+##  gridExtra        2.3        2017-09-09 [1] CRAN (R 4.1.0)                   
+##  gt             * 0.3.1      2021-08-07 [1] CRAN (R 4.1.2)                   
+##  gtable           0.3.0      2019-03-25 [1] CRAN (R 4.1.0)                   
+##  hardhat          0.1.6      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  haven            2.4.1      2021-04-23 [1] CRAN (R 4.1.0)                   
+##  here           * 1.0.1      2020-12-13 [1] CRAN (R 4.1.0)                   
+##  highr            0.9        2021-04-16 [1] CRAN (R 4.1.0)                   
+##  hms              1.1.1      2021-09-26 [1] CRAN (R 4.1.2)                   
+##  htmltools        0.5.2      2021-08-25 [1] CRAN (R 4.1.1)                   
+##  httpuv           1.6.5      2022-01-05 [1] CRAN (R 4.1.2)                   
+##  httr             1.4.2      2020-07-20 [1] CRAN (R 4.1.0)                   
+##  igraph           1.2.6      2020-10-06 [1] CRAN (R 4.1.0)                   
+##  infer          * 1.0.0      2021-08-13 [1] CRAN (R 4.1.1)                   
+##  insight          0.14.2     2021-06-22 [1] CRAN (R 4.1.0)                   
+##  ipred            0.9-12     2021-09-15 [1] CRAN (R 4.1.1)                   
+##  ISLR2          * 1.3-1      2022-01-10 [1] CRAN (R 4.1.2)                   
+##  iterators      * 1.0.13     2020-10-15 [1] CRAN (R 4.1.0)                   
+##  jquerylib        0.1.4      2021-04-26 [1] CRAN (R 4.1.0)                   
+##  jsonlite         1.7.3      2022-01-17 [1] CRAN (R 4.1.2)                   
+##  kknn             1.3.1      2016-03-26 [1] CRAN (R 4.1.2)                   
+##  klaR             0.6-15     2020-02-19 [1] CRAN (R 4.1.2)                   
+##  knitr            1.37       2021-12-16 [1] CRAN (R 4.1.2)                   
+##  labeling         0.4.2      2020-10-20 [1] CRAN (R 4.1.0)                   
+##  labelled         2.8.0      2021-03-08 [1] CRAN (R 4.1.0)                   
+##  later            1.3.0      2021-08-18 [1] CRAN (R 4.1.2)                   
+##  lattice          0.20-45    2021-09-22 [2] CRAN (R 4.1.2)                   
+##  lava             1.6.9      2021-03-11 [1] CRAN (R 4.1.0)                   
+##  lhs              1.1.1      2020-10-05 [1] CRAN (R 4.1.0)                   
+##  lifecycle        1.0.1      2021-09-24 [1] CRAN (R 4.1.1)                   
+##  listenv          0.8.0      2019-12-05 [1] CRAN (R 4.1.0)                   
+##  lubridate        1.8.0      2021-10-07 [1] CRAN (R 4.1.1)                   
+##  magrittr         2.0.1      2020-11-17 [1] CRAN (R 4.1.0)                   
+##  MASS             7.3-54     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  Matrix           1.3-4      2021-06-01 [2] CRAN (R 4.1.2)                   
+##  memoise          2.0.1      2021-11-26 [1] CRAN (R 4.1.2)                   
+##  MetBrewer        0.1.0      2022-01-05 [1] CRAN (R 4.1.2)                   
+##  mgcv             1.8-38     2021-10-06 [2] CRAN (R 4.1.2)                   
+##  mime             0.12       2021-09-28 [1] CRAN (R 4.1.1)                   
+##  miniUI           0.1.1.1    2018-05-18 [1] CRAN (R 4.1.1)                   
+##  modeldata      * 0.1.1      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  modelr           0.1.8      2020-05-19 [1] CRAN (R 4.1.0)                   
+##  munsell          0.5.0      2018-06-12 [1] CRAN (R 4.1.0)                   
+##  mvtnorm        * 1.1-3      2021-10-08 [1] CRAN (R 4.1.1)                   
+##  nlme             3.1-153    2021-09-07 [2] CRAN (R 4.1.2)                   
+##  nnet             7.3-16     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  parallelly       1.27.0     2021-07-19 [1] CRAN (R 4.1.0)                   
+##  parameters       0.14.0     2021-05-29 [1] CRAN (R 4.1.0)                   
+##  parsnip        * 0.1.7      2021-07-21 [1] CRAN (R 4.1.0)                   
+##  patchwork      * 1.1.1      2020-12-17 [1] CRAN (R 4.1.0)                   
+##  performance      0.7.3      2021-07-21 [1] CRAN (R 4.1.1)                   
+##  pillar           1.6.4      2021-10-18 [1] CRAN (R 4.1.1)                   
+##  pkgconfig        2.0.3      2019-09-22 [1] CRAN (R 4.1.0)                   
+##  plyr             1.8.6      2020-03-03 [1] CRAN (R 4.1.0)                   
+##  poissonreg     * 0.1.1      2021-08-07 [1] CRAN (R 4.1.2)                   
+##  prettyunits      1.1.1      2020-01-24 [1] CRAN (R 4.1.0)                   
+##  pROC             1.17.0.1   2021-01-13 [1] CRAN (R 4.1.0)                   
+##  prodlim          2019.11.13 2019-11-17 [1] CRAN (R 4.1.0)                   
+##  promises         1.2.0.1    2021-02-11 [1] CRAN (R 4.1.0)                   
+##  purrr          * 0.3.4      2020-04-17 [1] CRAN (R 4.1.2)                   
+##  qqplotr          0.0.5      2021-04-23 [1] CRAN (R 4.1.0)                   
+##  questionr        0.7.5      2021-10-06 [1] CRAN (R 4.1.2)                   
+##  R6               2.5.1      2021-08-19 [1] CRAN (R 4.1.1)                   
+##  RColorBrewer     1.1-2      2014-12-07 [1] CRAN (R 4.1.0)                   
+##  Rcpp             1.0.8      2022-01-13 [1] CRAN (R 4.1.2)                   
+##  readr          * 2.1.1      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  readxl           1.3.1      2019-03-13 [1] CRAN (R 4.1.0)                   
+##  recipes        * 0.1.17     2021-09-27 [1] CRAN (R 4.1.1)                   
+##  repr             1.1.3      2021-01-21 [1] CRAN (R 4.1.1)                   
+##  reprex           2.0.0      2021-04-02 [1] CRAN (R 4.1.0)                   
+##  reshape          0.8.8      2018-10-23 [1] CRAN (R 4.1.0)                   
+##  rlang          * 0.4.12     2021-10-18 [1] CRAN (R 4.1.1)                   
+##  rmarkdown        2.11       2021-09-14 [1] CRAN (R 4.1.1)                   
+##  robustbase       0.93-8     2021-06-02 [1] CRAN (R 4.1.0)                   
+##  rpart            4.1-15     2019-04-12 [2] CRAN (R 4.1.2)                   
+##  rprojroot        2.0.2      2020-11-15 [1] CRAN (R 4.1.0)                   
+##  rsample        * 0.1.0      2021-05-08 [1] CRAN (R 4.1.0)                   
+##  rstudioapi       0.13       2020-11-12 [1] CRAN (R 4.1.0)                   
+##  Rttf2pt1         1.3.8      2020-01-10 [1] CRAN (R 4.1.1)                   
+##  rvest            1.0.0      2021-03-09 [1] CRAN (R 4.1.0)                   
+##  sass             0.4.0      2021-05-12 [1] CRAN (R 4.1.0)                   
+##  scales         * 1.1.1      2020-05-11 [1] CRAN (R 4.1.0)                   
+##  see              0.6.4      2021-05-29 [1] CRAN (R 4.1.0)                   
+##  sessioninfo      1.1.1      2018-11-05 [1] CRAN (R 4.1.0)                   
+##  shiny            1.6.0      2021-01-25 [1] CRAN (R 4.1.0)                   
+##  skimr            2.1.3      2021-03-07 [1] CRAN (R 4.1.1)                   
+##  stringi          1.7.6      2021-11-29 [1] CRAN (R 4.1.2)                   
+##  stringr        * 1.4.0      2019-02-10 [1] CRAN (R 4.1.0)                   
+##  survival         3.2-13     2021-08-24 [2] CRAN (R 4.1.2)                   
+##  tibble         * 3.1.6      2021-11-07 [1] CRAN (R 4.1.1)                   
+##  tictoc         * 1.0.1      2021-04-19 [1] CRAN (R 4.1.1)                   
+##  tidymodels     * 0.1.4      2021-10-01 [1] CRAN (R 4.1.1)                   
+##  tidyr          * 1.1.4      2021-09-27 [1] CRAN (R 4.1.1)                   
+##  tidyselect       1.1.1      2021-04-30 [1] CRAN (R 4.1.0)                   
+##  tidyverse      * 1.3.1      2021-04-15 [1] CRAN (R 4.1.2)                   
+##  timeDate         3043.102   2018-02-21 [1] CRAN (R 4.1.0)                   
+##  tune           * 0.1.6      2021-07-21 [1] CRAN (R 4.1.0)                   
+##  tzdb             0.2.0      2021-10-27 [1] CRAN (R 4.1.2)                   
+##  usethis          2.1.5      2021-12-09 [1] CRAN (R 4.1.2)                   
+##  utf8             1.2.2      2021-07-24 [1] CRAN (R 4.1.0)                   
+##  vctrs          * 0.3.8      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  vroom            1.5.7      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  withr            2.4.3      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  workflows      * 0.2.3      2021-07-16 [1] CRAN (R 4.1.0)                   
+##  workflowsets   * 0.1.0      2021-07-22 [1] CRAN (R 4.1.0)                   
+##  xfun             0.29       2021-12-14 [1] CRAN (R 4.1.2)                   
+##  xml2             1.3.3      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  xtable           1.8-4      2019-04-21 [1] CRAN (R 4.1.0)                   
+##  yaml             2.2.1      2020-02-01 [1] CRAN (R 4.1.0)                   
+##  yardstick      * 0.0.8      2021-03-28 [1] CRAN (R 4.1.0)                   
+## 
+## [1] C:/Users/tdunn/Documents/R/win-library/4.1
+## [2] C:/Program Files/R/R-4.1.2/library</code></pre>
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div class="csl-entry">
@@ -2922,8 +3950,6 @@ Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="n
 </div>
 <div class="csl-entry">
 Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
-</div>
-</div>
 </div>
 </div>
 </div>
