@@ -71,11 +71,10 @@ loocv
 kfoldcv
 bias-variance-trade-off-for-k-fold-cross-validation
 cross-validation-on-classification-problems
-bootstrap
+bootstrap-lab
 lab-cross-validation-and-the-bootstrap
 the-validation-set-approach
 leave-one-out-cross-validation
 k-fold-cross-validation
-the-bootstrap
-bootstrap-regression
+bootstrap
 exercises-2

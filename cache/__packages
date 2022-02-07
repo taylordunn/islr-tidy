@@ -36,3 +36,4 @@ foreach
 iterators
 doParallel
 mvtnorm
+future

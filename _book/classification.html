@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-02-03" />
+<meta name="date" content="2022-02-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -274,13 +274,13 @@ div.csl-indent {
 <li class="chapter" data-level="5.1.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bias-variance-trade-off-for-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Bias-Variance Trade-Off for <span class="math inline">\(k\)</span>-Fold Cross-Validation</a></li>
 <li class="chapter" data-level="5.1.5" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation-on-classification-problems"><i class="fa fa-check"></i><b>5.1.5</b> Cross-Validation on Classification Problems</a></li>
 </ul></li>
-<li class="chapter" data-level="5.2" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap"><i class="fa fa-check"></i><b>5.2</b> The Bootstrap</a></li>
+<li class="chapter" data-level="5.2" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap-lab"><i class="fa fa-check"></i><b>5.2</b> The Bootstrap</a></li>
 <li class="chapter" data-level="5.3" data-path="resampling-methods.html"><a href="resampling-methods.html#lab-cross-validation-and-the-bootstrap"><i class="fa fa-check"></i><b>5.3</b> Lab: Cross-Validation and the Bootstrap</a>
 <ul>
 <li class="chapter" data-level="5.3.1" data-path="resampling-methods.html"><a href="resampling-methods.html#the-validation-set-approach"><i class="fa fa-check"></i><b>5.3.1</b> The Validation Set Approach</a></li>
 <li class="chapter" data-level="5.3.2" data-path="resampling-methods.html"><a href="resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3.2</b> Leave-One-Out Cross-Validation</a></li>
 <li class="chapter" data-level="5.3.3" data-path="resampling-methods.html"><a href="resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.3.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
-<li class="chapter" data-level="5.3.4" data-path="resampling-methods.html"><a href="resampling-methods.html#the-bootstrap"><i class="fa fa-check"></i><b>5.3.4</b> The Bootstrap</a></li>
+<li class="chapter" data-level="5.3.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap"><i class="fa fa-check"></i><b>5.3.4</b> The Bootstrap</a></li>
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="resampling-methods.html"><a href="resampling-methods.html#exercises-2"><i class="fa fa-check"></i><b>5.4</b> Exercises</a>
 <ul>
@@ -10240,7 +10240,7 @@ Split the data:</p>
 Reproducibility receipt
 </summary>
 <div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb332-1"><a href="classification.html#cb332-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-02-03 23:44:13 AST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-02-06 20:49:49 AST&quot;</code></pre>
 <div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb334-1"><a href="classification.html#cb334-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
 <span id="cb334-2"><a href="classification.html#cb334-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
 <span id="cb334-3"><a href="classification.html#cb334-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
@@ -10248,7 +10248,7 @@ Reproducibility receipt
 <span id="cb334-5"><a href="classification.html#cb334-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [2e82f0c] 2022-02-02: Exercise 5</code></pre>
+## Head:     [089592c] 2022-02-04: Started using `cache_path` to store long computations</code></pre>
 <div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb336-1"><a href="classification.html#cb336-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## - Session info ---------------------------------------------------------------
 ##  setting  value                       
@@ -10260,7 +10260,7 @@ Reproducibility receipt
 ##  collate  English_Canada.1252         
 ##  ctype    English_Canada.1252         
 ##  tz       America/Curacao             
-##  date     2022-02-03                  
+##  date     2022-02-06                  
 ## 
 ## - Packages -------------------------------------------------------------------
 ##  package        * version    date       lib source                           
@@ -10376,7 +10376,7 @@ Reproducibility receipt
 ##  parsnip        * 0.1.7      2021-07-21 [1] CRAN (R 4.1.0)                   
 ##  patchwork      * 1.1.1      2020-12-17 [1] CRAN (R 4.1.0)                   
 ##  performance      0.7.3      2021-07-21 [1] CRAN (R 4.1.1)                   
-##  pillar           1.6.4      2021-10-18 [1] CRAN (R 4.1.1)                   
+##  pillar           1.7.0      2022-02-01 [1] CRAN (R 4.1.2)                   
 ##  pkgconfig        2.0.3      2019-09-22 [1] CRAN (R 4.1.0)                   
 ##  plyr             1.8.6      2020-03-03 [1] CRAN (R 4.1.0)                   
 ##  poissonreg     * 0.1.1      2021-08-07 [1] CRAN (R 4.1.2)                   
