@@ -1,0 +1,216 @@
+```{r echo=FALSE}
+knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
+                      fig.width = 6, fig.height = 3,
+                      cache.path = "cache/")
+```
+
+
+# Linear Model Selection and Regularization
+
+Load the packages used in this chapter:
+
+```{r message=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(broom)
+library(gt)
+library(patchwork)
+library(tictoc)
+
+# Load my R package and set the ggplot theme
+library(dunnr)
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td())
+set_geom_fonts()
+set_palette()
+```
+
+
+Before discussing non-linear models in Chapters 7, 8 and 10, this chapter discusses some ways in which the simple linear model can be improved by replacing the familiar least squares fitting with some alternative fitting procedures.
+These alternatives can sometimes yield better *prediction accuracy* and *model interpretability*.
+
+>
+Prediction Accuracy: Provided that the true relationship between the
+response and the predictors is approximately linear, the least squares
+estimates will have low bias. If $n >> p$—that is, if $n$, the number of
+observations, is much larger than $p$, the number of variables—then the
+least squares estimates tend to also have low variance, and hence will
+perform well on test observations. However, if $n$ is not much larger
+than $p$, then there can be a lot of variability in the least squares fit,
+resulting in overfitting and consequently poor predictions on future
+observations not used in model training. And if $p > n$, then there
+is no longer a unique least squares coefficient estimate: the variance
+is infinite so the method cannot be used at all. By constraining or
+shrinking the estimated coefficients, we can often substantially reduce
+the variance at the cost of a negligible increase in bias. This can
+lead to substantial improvements in the accuracy with which we can
+predict the response for observations not used in model training.
+
+>
+Model Interpretability: It is often the case that some or many of the
+variables used in a multiple regression model are in fact not associated with the response. Including such irrelevant variables leads to
+unnecessary complexity in the resulting model. By removing these
+variables—that is, by setting the corresponding coefficient estimates
+to zero—we can obtain a model that is more easily interpreted. Now
+least squares is extremely unlikely to yield any coefficient estimates
+that are exactly zero. In this chapter, we see some approaches for au-
+tomatically performing feature selection or variable selection—that is, feature
+for excluding irrelevant variables from a multiple regression model.
+
+In this chapter, we discuss three important classes of methods:
+
+>
+Subset Selection. This approach involves identifying a subset of the $p$
+predictors that we believe to be related to the response. We then fit
+a model using least squares on the reduced set of variables.
+>
+Shrinkage. This approach involves fitting a model involving all $p$ predictors. However, the estimated coefficients are shrunken towards zero
+relative to the least squares estimates. This shrinkage (also known as
+regularization) has the effect of reducing variance. Depending on what
+type of shrinkage is performed, some of the coefficients may be esti-
+mated to be exactly zero. Hence, shrinkage methods can also perform
+variable selection.
+>
+Dimension Reduction. This approach involves projecting the $p$ predictors into an $M$-dimensional subspace, where $M < p$. This is achieved
+by computing $M$ different linear combinations, or projections, of the
+variables. Then these $M$ projections are used as predictors to fit a
+linear regression model by least squares.
+
+Although this chapter is specifically about extensions to the linear model for regression, the same concepts apply to other methods, such as the classification models in Chapter 4.
+
+## Subset Selection
+
+Disclaimer at the top: as mentioned in section 3.1, there are a lot of reasons to avoid subset and stepwise model selection.
+Here are some resources on this topic:
+
+* @Smith2018.
+* [A Stack Overflow response.](https://stats.stackexchange.com/questions/20836/algorithms-for-automatic-model-selection/20856#20856)
+* [Frank Harrell comments.](https://www.stata.com/support/faqs/statistics/stepwise-regression-problems/)
+
+Regardless, I will still work through the examples in the text as a programming exercise.
+
+### Best Subset Selection
+
+To perform *best subset selection*, we fit $p$ models that contain exactly one predictor, ${p \choose 2} = p(p-1)/2$ models that contain exactly two predictors, and so on.
+In total, this involves fitting $2^p$ models.
+Then we select the model that is best, usually following these steps
+
+1. Let $\mathcal{M}_0$ denote the *null model*, which contains no predictors. This model simply predictors the sample mean for each observation.
+2. For $k = 1, 2, \dots, p$:
+    * Fit all ${p \choose k}$ models that contain exactly $k$ predictors.
+    * Pick the best among these ${p \choose k}$ models, and call it $\mathcal{M}_k$. Here, *best* is defined as having the smallest RSS, or equivalently the largest $R^2$.
+3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
+
+Step 2 identified the best model (on the training data) for each subset size, in order to reduce the problem from $2^p$ to $p + 1$ possible models.
+
+```{r}
+credit <- ISLR2::Credit
+glimpse(credit)
+```
+
+
+```{r}
+credit_predictors <- names(credit)
+credit_predictors <- credit_predictors[credit_predictors != "Balance"]
+
+credit_model_subsets <- tibble(
+  n_preds = 1:10,
+  predictors = map(n_preds,
+                   ~ utils::combn(credit_predictors, .x, simplify = FALSE))
+) %>%
+  unnest(predictors) %>%
+  mutate(
+    model_formula = map(predictors,
+                        ~ as.formula(paste("Balance ~", paste(.x, collapse = "+"))))
+  )
+  # # Manually add the null model
+  # bind_rows(
+  #   tibble(n_preds = 0, model_formula = list(as.formula("Balance ~ 1")))
+  # )
+
+tic()
+credit_model_subsets <- credit_model_subsets %>%
+  mutate(
+    model_fit = map(model_formula, ~ lm(.x, data = credit)),
+    RSS = map_dbl(model_fit, ~ sum(.x$residuals^2)),
+    R2 = map_dbl(model_fit, ~ summary(.x)$r.squared),
+    # Because of one of the categorical variables (Region) having three levels,
+    # some models will have +1 dummy variable predictor, which I can calculate
+    # from the number of coefficients returned from the fit
+    n_preds_adj = map_int(model_fit, ~ length(.x$coefficients) - 1L)
+  )
+toc()
+
+credit_model_subsets %>%
+  pivot_longer(cols = c(RSS, R2), names_to = "metric", values_to = "value") %>%
+  mutate(metric = factor(metric, levels = c("RSS", "R2"))) %>%
+  group_by(n_preds_adj, metric) %>%
+  mutate(
+    best_model = (metric == "RSS" & value == min(value)) |
+      (metric == "R2" & value == max(value))
+  ) %>%
+  ungroup() %>%
+  ggplot(aes(x = n_preds_adj, y = value)) +
+  geom_line(data = . %>% filter(best_model), color = "red", size = 1) +
+  geom_jitter(width = 0.05, height = 0, alpha = 0.3,
+              color = td_colors$nice$opera_mauve) +
+  facet_wrap(~ metric, ncol = 2, scales = "free_y") +
+  scale_x_continuous("Number of predictors", breaks = seq(2, 10, 2))
+```
+
+### Stepwise Selection
+
+### Choosing the Optimal Model
+
+## Shrinkage Methods
+
+### Ridge Regression
+
+### The Lasso
+
+### Selecting the Tuning Parameter
+
+## Dimension Reduction Methods
+
+### Principal Components Regression
+
+### Partial Least Squares
+
+## Considerations in High Dimensions
+
+### High-Dimensional Data
+
+### What Goes Wrong in High Dimensions?
+
+### Regression in High Dimensions
+
+### Interpreting Results in High Dimensions
+
+## Lab: Linear Models and Regularization Methods
+
+### Subset Selection Methods
+
+### Ridge Regression and the Lasso
+
+### PCR and PLS Regression
+
+## Exercises
+
+
+## Reproducibility {-}
+
+```{r}
+Sys.time()
+```
+
+```{r}
+if ("git2r" %in% installed.packages()) {
+  if (git2r::in_repository()) {
+    git2r::repository()
+  }
+}
+```
+
+```{r}
+sessioninfo::session_info()
+```
