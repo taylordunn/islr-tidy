@@ -88,6 +88,7 @@ Here are some resources on this topic:
 * [Frank Harrell comments.](https://www.stata.com/support/faqs/statistics/stepwise-regression-problems/)
 
 Regardless, I will still work through the examples in the text as a programming exercise.
+However, `tidymodels` does not have the functionality for subset/stepwise selection, so I will 
 
 ### Best Subset Selection
 
@@ -101,13 +102,21 @@ Then we select the model that is best, usually following these steps
     * Pick the best among these ${p \choose k}$ models, and call it $\mathcal{M}_k$. Here, *best* is defined as having the smallest RSS, or equivalently the largest $R^2$.
 3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
 
-Step 2 identified the best model (on the training data) for each subset size, in order to reduce the problem from $2^p$ to $p + 1$ possible models.
+Step 2 identifies the best model (on the training data) for each subset size, in order to reduce the problem from $2^p$ to $p + 1$ possible models.
+Choosing the single best model from the $p + 1$ options must be done with care, because the RSS of these models decreases monotonically, and the $R^2$ increases monotonically, as the number of predictors increases.
+A model that minimizes these metrics will have a low *training error*, but not necessarily a low *test error*, as we saw in Chapter 2 in Figures 2.9-2.11.
+Therefore, in step 3, we use a cross-validated prediction error $C_p$, BIC, or adjusted $R^2$ in order to select the best model.
+
+Figure 6.1 includes many least squares regression models predicting `Balance`, and fit using a different subsets of 10 predictors.
+Load the `credit` data set:
 
 ```{r}
 credit <- ISLR2::Credit
 glimpse(credit)
 ```
 
+For $p = 10$ predictors, there are $2^{10} = 1024$ possible combinations for models (including the null model, but this example doesn't include it).
+To get every combination, I'll use the `utils::combn()` function:
 
 ```{r}
 credit_predictors <- names(credit)
@@ -123,12 +132,21 @@ credit_model_subsets <- tibble(
     model_formula = map(predictors,
                         ~ as.formula(paste("Balance ~", paste(.x, collapse = "+"))))
   )
-  # # Manually add the null model
-  # bind_rows(
-  #   tibble(n_preds = 0, model_formula = list(as.formula("Balance ~ 1")))
-  # )
 
-tic()
+glimpse(credit_model_subsets)
+```
+
+For differing numbers of predictors $k = 1, 2, \dots, p$, we should have ${p \choose k}$ models:
+
+```{r}
+credit_model_subsets %>%
+  count(n_preds) %>%
+  mutate(p_choose_k = choose(10, n_preds))
+```
+
+Fit all of the models and extract RSS and $R^2$ metrics:
+
+```{r}
 credit_model_subsets <- credit_model_subsets %>%
   mutate(
     model_fit = map(model_formula, ~ lm(.x, data = credit)),
@@ -139,14 +157,19 @@ credit_model_subsets <- credit_model_subsets %>%
     # from the number of coefficients returned from the fit
     n_preds_adj = map_int(model_fit, ~ length(.x$coefficients) - 1L)
   )
-toc()
+```
 
+Figure 6.1:
+
+```{r figure6.1}
 credit_model_subsets %>%
   pivot_longer(cols = c(RSS, R2), names_to = "metric", values_to = "value") %>%
   mutate(metric = factor(metric, levels = c("RSS", "R2"))) %>%
   group_by(n_preds_adj, metric) %>%
   mutate(
+    # The "best" model has the lowest value by RSS...
     best_model = (metric == "RSS" & value == min(value)) |
+      # ... and the highest value by R2
       (metric == "R2" & value == max(value))
   ) %>%
   ungroup() %>%
@@ -158,9 +181,358 @@ credit_model_subsets %>%
   scale_x_continuous("Number of predictors", breaks = seq(2, 10, 2))
 ```
 
+As expected, the values are monotonically decreasing (RSS) and increasing ($R^2$) with number of predictors.
+There is little improvement past 3 predictors, however.
+
+>
+Although we have presented best subset selection here for least squares
+regression, the same ideas apply to other types of models, such as logistic
+regression. In the case of logistic regression, instead of ordering models by
+RSS in Step 2 of Algorithm 6.1, we instead use the *deviance*, a measure
+that plays the role of RSS for a broader class of models. The deviance is
+negative two times the maximized log-likelihood; the smaller the deviance,
+the better the fit.
+
+Because it scales as $2^p$ models, best subset selection can quickly become computationally expensive.
+The next sections explore computationally efficient alternatives.
+
 ### Stepwise Selection
 
+#### Forward Stepwise Selection {-}
+
+Forward stepwise selection begins with a model containing no predictors, and then adds predictors to the model, one-at-a-time, until all predictors are in the model.
+
+1. Let $\mathcal{M}_0$ denote the *null model*, which contains no predictors.
+2. For $k = 0, 1, \dots, p-1$:
+    * Consider all $p - k$ models that augment the predictors in $\mathcal{M}_k$ with one additional predictor.
+    * Choose the best among these $p - k$ models, and call it $\mathcal{M}_{k+1}$. Here, *best* is defined as having smallest RSS or highest $R^2$.
+3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
+
+Step 2 is similar to step 2 in best subset selection, in that we simply choose the model with the lowest RSS or highest $R^2$.
+Step 3 is more tricky, and is discussed in Section 6.1.3.
+
+Though much more computationally efficient, it is not guaranteed to find the best possible model (via best subset selection) out of all $2^p$ possible models.
+As a comparison, the example in the text involves performing four forward steps to find the best predictors.
+The `MASS` package has an `addTerm()` function for taking a single step:
+
+```{r}
+# Model with no predictors
+balance_null <- lm(Balance ~ 1, data = credit)
+# Model with all predictors
+balance_full <- lm(Balance ~ ., data = credit)
+
+MASS::addterm(balance_null, scope = balance_full, sorted = TRUE)
+```
+
+Here, the `Rating` variable offers the best improvement over the null model (by both RSS and AIC).
+To run this four times, I'll use a for loop:
+
+```{r}
+balance_preds <- c("1")
+for (forward_step in 1:4) {
+  balance_formula <- as.formula(
+    paste("Balance ~", str_replace_all(balance_preds[forward_step], ",", "+"))
+  )
+  balance_model <- lm(balance_formula, data = credit)
+  
+  # Find the next predictor by RSS
+  new_predictor <- MASS::addterm(balance_model, scope = balance_full) %>%
+    broom::tidy() %>%
+    filter(rss == min(rss)) %>%
+    pull(term)
+  
+  balance_preds <- append(balance_preds,
+                          paste(balance_preds[forward_step], new_predictor,
+                                sep = ", "))
+}
+balance_preds
+```
+
+Now re-create Table 6.1:
+
+```{r}
+bind_cols(
+  credit_model_subsets %>%
+    filter(n_preds_adj <= 4) %>%
+    group_by(n_preds_adj) %>%
+    filter(RSS == min(RSS)) %>%
+    ungroup() %>%
+    transmute(
+      `# variables` = n_preds_adj,
+      `Best subset` = map_chr(predictors, str_c, collapse = ", ")
+    ),
+  `Forward stepwise` = balance_preds[2:5] %>% str_remove("1, ")
+) %>%
+  gt(rowname_col = "# variables")
+```
+
+#### Backward Stepwise Selection {-}
+
+Backwards stepwise selection begins with the full model containing all $p$ predictors, and then iteratively removes the least useful predictor.
+
+1. Let $\mathcal{M}_p$ denote the *full model*, which contains all $p$ predictors.
+2. For $k = p, p-1, \dots, 1$:
+    * Consider all $k$ models that contain all but one of the predictors in $\mathcal{M}_k$ for a total of $k - 1$ predictors.
+    * Choose the best among these $k$ models, and call it $\mathcal{M}_{k-1}$. Here, *best* is defined as having smallest RSS or highest $R^2$.
+3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
+
+>
+Like forward stepwise selection, the backward selection approach searches
+through only $1+p(p+1)/2$ models, and so can be applied in settings where
+$p$ is too large to apply best subset selection. Also like forward stepwise
+selection, backward stepwise selection is not guaranteed to yield the best
+model containing a subset of the $p$ predictors.
+
+Backward selection requires that the number of samples $n$ is larger than
+the number of variables $p$ (so that the full model can be fit). In contrast,
+forward stepwise can be used even when $n < p$, and so is the only viable
+subset method when $p$ is very large.
+
+#### Hybrid Approaches {-}
+
+>
+The best subset, forward stepwise, and backward stepwise selection approaches generally give similar but not identical models. As another al-
+ternative, hybrid versions of forward and backward stepwise selection are
+available, in which variables are added to the model sequentially, in analogy
+to forward selection. However, after adding each new variable, the method
+may also remove any variables that no longer provide an improvement in
+the model fit. Such an approach attempts to more closely mimic best subset selection while retaining the computational advantages of forward and
+backward stepwise selection.
+
 ### Choosing the Optimal Model
+
+To apply these subset selection methods, we need to determine which model is *best*.
+Since more predictors will always lead to smaller RSS and larger $R^2$ (training error), we nee to estimate the test error.
+There are two common approaches:
+
+1. We can indirectly estimate test error by making an adjustment to the
+training error to account for the bias due to overfitting.
+2. We can directly estimate the test error, using either a validation set
+approach or a cross-validation approach, as discussed in Chapter 5.
+
+#### $C_p$, AIC, BIC, and Adjusted $R^2$ {-}
+
+These techniques involve *adjusting* the training error to select among a set a models with different numbers of variables.
+
+For a fitted least squares model containg $d$ predictors, the $C_p$ estimate of test MSE is computed as:
+
+$$
+C_p = \frac{1}{n} (\text{RSS} + 2d \hat{\sigma}^2),
+$$
+
+where $\hat{\sigma}^2$ is an estimate of the variance of the error $\epsilon$ associated with each response measurement.
+Typically, this is estimated using the full model containing all predictors.
+
+>
+Essentially, the $C_p$ statistic adds a penalty
+of $2d\hat{\sigma}^2$ to the training RSS in order to adjust for the fact that the training
+error tends to underestimate the test error. Clearly, the penalty increases as
+the number of predictors in the model increases; this is intended to adjust
+for the corresponding decrease in training RSS. Though it is beyond the
+scope of this book, one can show that if $\hat{\sigma}^2$ is an unbiased estimate of $\hat{\sigma}^2$ in
+(6.2), then $C_p$ is an unbiased estimate of test MSE. As a consequence, the
+$C_p$ statistic tends to take on a small value for models with a low test error,
+so when determining which of a set of models is best, we choose the model
+with the lowest $C_p$ value.
+
+Compute $\hat{\sigma}$ and $C_p$ for the best model at the different numbers of predictors:
+
+```{r}
+# Get the estimated variance of the error for calculating C_p
+sigma_hat <- summary(balance_full)$sigma
+credit_model_best <- credit_model_subsets %>%
+  group_by(n_preds_adj) %>%
+  filter(RSS == min(RSS)) %>%
+  ungroup() %>%
+  mutate(
+    `C_p` = (1 / nrow(credit)) * (RSS + 2 * n_preds_adj * sigma_hat^2)
+  )
+```
+
+>
+The AIC criterion is defined for a large class of models fit by maximum
+likelihood. In the case of the model (6.1) with Gaussian errors, maximum
+likelihood and least squares are the same thing. In this case AIC is given by
+
+$$
+\text{AIC} = \frac{1}{n} (\text{RSS} + 2 d \hat{\sigma}^2),
+$$
+
+>
+where, for simplicity, we have omitted irrelevant constants. Hence for least
+squares models, $C_p$ and AIC are proportional to each other, and so only
+$C_p$ is displayed in Figure 6.2.
+
+BIC is derived from a Bayesian point of view, and looks similar to the AIC/$C_p$:
+
+$$
+\text{BIC} = \frac{1}{n} (\text{RSS} + \log (n) d \hat{\sigma}^2),
+$$
+
+where irrelevant constants were excluded.
+Here, the factor of 2 in the AIC/$C_p$ is replaced with $\log (n)$.
+Since $\log n > 2$ for any $n > 7$, the BIC statistic generally penalized more heavily models with many variables.
+
+```{r}
+credit_model_best <- credit_model_best %>%
+  mutate(
+    BIC = (1 / nrow(credit)) *
+      (RSS + log(nrow(credit)) * n_preds_adj * sigma_hat^2)
+  )
+```
+Recall that the usual $R^2$ is defined as 1 - RSS/TSS, where TSS = $\sum (y_i - \bar{y})^2$ is the total sum of squares for the response.
+The adjusted $R^2$ statistic is calculated as
+
+$$
+\text{Adjusted } R^2 = 1 - \frac{\text{RSS}/(n - d - 1)}{\text{TSS}/(n - 1)}
+$$
+
+Unlike $C_p$, AIC, and BIC, for which a smaller value indicates a lower test error, a larger value of adjusted $R^2$ indicates smaller test error.
+
+>
+The intuition behind the adjusted $R^2$ is that once all of the correct
+variables have been included in the model, adding additional noise variables
+will lead to only a very small decrease in RSS. Since adding noise variables
+leads to an increase in $d$, such variables will lead to an increase in $\text{RSS}/(n−d−1)$,
+and consequently a decrease in the adjusted $R^2$. Therefore, in theory, the
+model with the largest adjusted $R^2$ will have only correct variables and
+no noise variables. Unlike the $R^2$ statistic, the adjusted $R^2$ statistic pays
+a price for the inclusion of unnecessary variables in the model.
+
+A model's $R^2$ value can be obtained directly from the `lm` object, so I don't need to manually compute it:
+
+```{r}
+credit_model_best <- credit_model_best %>%
+  mutate(
+    `Adjusted R2` = map_dbl(model_fit, ~ summary(.x)$adj.r.squared)
+  )
+```
+
+```{r figure6.2}
+credit_model_best %>%
+  pivot_longer(cols = c("C_p", "BIC", "Adjusted R2"),
+               names_to = "metric", values_to = "value") %>%
+  group_by(metric) %>%
+  mutate(
+    best_model = ifelse(metric == "Adjusted R2",
+                        value == max(value),
+                        value == min(value))
+  ) %>%
+  ungroup() %>%
+  mutate(metric = factor(metric, levels = c("C_p", "BIC", "Adjusted R2"))) %>%
+  filter(n_preds_adj >= 2) %>%
+  ggplot(aes(x = n_preds_adj, y = value)) +
+  geom_point(color = td_colors$nice$spanish_blue) +
+  geom_line(color = td_colors$nice$opera_mauve) +
+  geom_point(data = . %>% filter(best_model), size = 5, shape = 4,
+             color = td_colors$nice$spanish_blue) +
+  facet_wrap(~ metric, nrow = 1, scales = "free_y") +
+  scale_x_continuous("Number of predictors", breaks = seq(2, 10, 2))
+```
+
+
+>
+$C_p$, AIC, and BIC all have rigorous theoretical justifications that are
+beyond the scope of this book. These justifications rely on asymptotic arguments
+(scenarios where the sample size $n$ is very large). Despite its popularity,
+and even though it is quite intuitive, the adjusted $R^2$ is not as well
+motivated in statistical theory as AIC, BIC, and $C_p$. All of these measures
+are simple to use and compute. Here we have presented their formulas in
+the case of a linear model fit using least squares; however, AIC and BIC
+can also be defined for more general types of models.
+
+#### Validation and Cross-validation {-}
+
+Validation and cross-validation from Chapter 5 provide an advantage over AIC, BIC, $C_p$ and adjusted $R^2$, in that they provide a direct estimate of the test error, and make fewer assumptions about the true underlying model.
+It can also be used in a wider ranger of model selection tasks, including scenarios where the model degrees of freedom (e.g. the number of predictors) or error variance $\sigma^2$ are hard to estimate.
+
+To re-create Figure 6.3, I'll use the `tidymodels` approach with `rsample` to make the validation set and cross-validation splits:
+
+```{r credit_model_best, cache=TRUE}
+set.seed(499)
+tic()
+credit_model_best <- credit_model_best %>%
+  mutate(
+    validation_set_error = map(
+      model_formula,
+      function(model_formula) {
+        workflow() %>%
+          add_model(linear_reg()) %>%
+          add_recipe(recipe(model_formula, credit)) %>%
+          fit_resamples(validation_split(credit, prop = 0.75)) %>%
+          collect_metrics() %>%
+          filter(.metric == "rmse") %>%
+          select(`Validation set error` = mean, validation_std_err = std_err)
+      }
+    ),
+    cross_validation_error = map(
+      model_formula,
+      function(model_formula) {
+        workflow() %>%
+          add_model(linear_reg()) %>%
+          add_recipe(recipe(model_formula, credit)) %>%
+          fit_resamples(vfold_cv(credit, v = 10)) %>%
+          collect_metrics() %>%
+          filter(.metric == "rmse") %>%
+          select(`Cross-validation error` = mean, cv_std_err = std_err)
+      }
+    ),
+    `Square root of BIC` = sqrt(BIC)
+  ) %>%
+  unnest(c(validation_set_error, cross_validation_error))
+toc()
+```
+
+
+```{r figure6.3}
+credit_model_best %>%
+  pivot_longer(cols = c("Validation set error", "Cross-validation error",
+                        "Square root of BIC"),
+               names_to = "metric", values_to = "value") %>%
+  group_by(metric) %>%
+  mutate(best_model = value == min(value)) %>%
+  ungroup() %>%
+  mutate(
+    metric = factor(metric,
+                    levels = c("Square root of BIC", "Validation set error",
+                               "Cross-validation error"))
+  ) %>%
+  ggplot(aes(x = n_preds_adj, y = value)) +
+  geom_point(color = td_colors$nice$spanish_blue) +
+  geom_line(color = td_colors$nice$opera_mauve) +
+  geom_point(data = . %>% filter(best_model), size = 5, shape = 4,
+             color = td_colors$nice$spanish_blue) +
+  facet_wrap(~ metric, nrow = 1, scales = "free_y") +
+  scale_x_continuous("Number of predictors", breaks = seq(2, 10, 2))
+```
+
+Because the randomness associated with splitting the data in the validation set and cross-validation approaches, we will likely find a different best model with different splits.
+In this case, we can select a model using the *one-standard-error rule*, where we calculate the standard error of the test MSE for each model, and then select the smallest model for which the estimated test error is within one standard error of the lowest test error.
+
+```{r}
+credit_model_best %>%
+  transmute(
+    `# predictors` = n_preds_adj, `Cross-validation error`, cv_std_err,
+    lowest_error = min(`Cross-validation error`),
+    lowest_std_error = cv_std_err[`Cross-validation error` == lowest_error],
+    # The best model is the minimum `n_preds_adj` (number of predictors) for
+    # which the CV test error is within the standard error of the lowest error
+    best_model = n_preds_adj == min(n_preds_adj[`Cross-validation error` < lowest_error + lowest_std_error])
+  ) %>%
+  gt() %>%
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_body(rows = best_model))
+```
+
+>
+The rationale here is that
+if a set of models appear to be more or less equally good, then we might
+as well choose the simplest model—that is, the model with the smallest
+number of predictors. In this case, applying the one-standard-error rule
+to the validation set or cross-validation approach leads to selection of the
+three-variable model.
+
+Here, the four-variable model was selected, but I would chalk that up to the random seed.
 
 ## Shrinkage Methods
 

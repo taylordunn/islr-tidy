@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>6 Linear Model Selection and Regularization | An Introduction to Statistical Learning with the tidyverse</title>
+  <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="6 Linear Model Selection and Regularization | An Introduction to Statistical Learning with the tidyverse" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="github-repo" content="taylordunn/islr-tidy" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="6 Linear Model Selection and Regularization | An Introduction to Statistical Learning with the tidyverse" />
+  
+  <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  
+
+<meta name="author" content="Taylor Dunn" />
+
+
+<meta name="date" content="2022-02-18" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="resampling-methods.html"/>
+
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Who, what, and why?</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#an-overview-of-statistical-learning"><i class="fa fa-check"></i>An Overview of Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#wage-data"><i class="fa fa-check"></i>Wage Data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#a-brief-history-of-statistical-learning"><i class="fa fa-check"></i>A Brief History of Statistical Learning</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#this-book"><i class="fa fa-check"></i>This Book</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="statistical-learning.html"><a href="statistical-learning.html"><i class="fa fa-check"></i><b>2</b> Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#what-is-statistical-learning"><i class="fa fa-check"></i><b>2.1</b> What Is Statistical Learning?</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="statistical-learning.html"><a href="statistical-learning.html#why-estimate-f"><i class="fa fa-check"></i><b>2.1.1</b> Why Estimate <span class="math inline">\(f\)</span>?</a></li>
+<li class="chapter" data-level="2.1.2" data-path="statistical-learning.html"><a href="statistical-learning.html#how-do-we-estimate-f"><i class="fa fa-check"></i><b>2.1.2</b> How Do We Estimate f?</a></li>
+<li class="chapter" data-level="2.1.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-trade-off-between-prediction-accuracy-and-model-interpretability"><i class="fa fa-check"></i><b>2.1.3</b> The Trade-Off Between Prediction Accuracy and Model Interpretability</a></li>
+<li class="chapter" data-level="2.1.4" data-path="statistical-learning.html"><a href="statistical-learning.html#supervised-versus-unsupervised-learning"><i class="fa fa-check"></i><b>2.1.4</b> Supervised Versus Unsupervised Learning</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#assessing-model-accuracy"><i class="fa fa-check"></i><b>2.2</b> Assessing Model Accuracy</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#measuring-the-quality-of-fit"><i class="fa fa-check"></i><b>2.2.1</b> Measuring the Quality of Fit</a></li>
+<li class="chapter" data-level="2.2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#the-bias-variance-trade-off"><i class="fa fa-check"></i><b>2.2.2</b> The Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="2.2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-classification-setting"><i class="fa fa-check"></i><b>2.2.3</b> The Classification Setting</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#lab-introduction-to-r"><i class="fa fa-check"></i><b>2.3</b> Lab: Introduction to R</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="linear-regression.html"><a href="linear-regression.html"><i class="fa fa-check"></i><b>3</b> Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression"><i class="fa fa-check"></i><b>3.1</b> Simple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-coefficients"><i class="fa fa-check"></i><b>3.1.1</b> Estimating the Coefficients</a></li>
+<li class="chapter" data-level="3.1.2" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-coefficient-estimates"><i class="fa fa-check"></i><b>3.1.2</b> Assessing the Accuracy of the Coefficient Estimates</a></li>
+<li class="chapter" data-level="3.1.3" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-model"><i class="fa fa-check"></i><b>3.1.3</b> Assessing the Accuracy of the Model</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression"><i class="fa fa-check"></i><b>3.2</b> Multiple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-regression-coefficients"><i class="fa fa-check"></i><b>3.2.1</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="3.2.2" data-path="linear-regression.html"><a href="linear-regression.html#some-important-questions"><i class="fa fa-check"></i><b>3.2.2</b> Some Important Questions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="linear-regression.html"><a href="linear-regression.html#other-considerations-in-the-regression-model"><i class="fa fa-check"></i><b>3.3</b> Other Considerations in the Regression Model</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors"><i class="fa fa-check"></i><b>3.3.1</b> Qualitative Predictors</a></li>
+<li class="chapter" data-level="3.3.2" data-path="linear-regression.html"><a href="linear-regression.html#extensions-of-the-linear-model"><i class="fa fa-check"></i><b>3.3.2</b> Extensions of the Linear Model</a></li>
+<li class="chapter" data-level="3.3.3" data-path="linear-regression.html"><a href="linear-regression.html#potential-problems"><i class="fa fa-check"></i><b>3.3.3</b> Potential Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="linear-regression.html"><a href="linear-regression.html#the-marketing-plan"><i class="fa fa-check"></i><b>3.4</b> The Marketing Plan</a></li>
+<li class="chapter" data-level="3.5" data-path="linear-regression.html"><a href="linear-regression.html#comparison-of-linear-regression-with-k-nearest-neighbors"><i class="fa fa-check"></i><b>3.5</b> Comparison of Linear Regression with <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="3.6" data-path="linear-regression.html"><a href="linear-regression.html#lab-linear-regression"><i class="fa fa-check"></i><b>3.6</b> Lab: Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="linear-regression.html"><a href="linear-regression.html#libraries"><i class="fa fa-check"></i><b>3.6.1</b> Libraries</a></li>
+<li class="chapter" data-level="3.6.2" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.2</b> Simple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.3" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.3</b> Multiple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.4" data-path="linear-regression.html"><a href="linear-regression.html#interaction-terms"><i class="fa fa-check"></i><b>3.6.4</b> Interaction Terms</a></li>
+<li class="chapter" data-level="3.6.5" data-path="linear-regression.html"><a href="linear-regression.html#non-linear-transformations-of-the-predictors"><i class="fa fa-check"></i><b>3.6.5</b> Non-linear Transformations of the Predictors</a></li>
+<li class="chapter" data-level="3.6.6" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors-1"><i class="fa fa-check"></i><b>3.6.6</b> Qualitative Predictors</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="linear-regression.html"><a href="linear-regression.html#exercises"><i class="fa fa-check"></i><b>3.7</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#applied"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#reproducibility"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>4</b> Classification</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="classification.html"><a href="classification.html#an-overview-of-classification"><i class="fa fa-check"></i><b>4.1</b> An Overview of Classification</a></li>
+<li class="chapter" data-level="4.2" data-path="classification.html"><a href="classification.html#why-not-linear-regression"><i class="fa fa-check"></i><b>4.2</b> Why Not Linear Regression?</a></li>
+<li class="chapter" data-level="4.3" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>4.3</b> Logistic Regression</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="classification.html"><a href="classification.html#the-logistic-model"><i class="fa fa-check"></i><b>4.3.1</b> The Logistic Model</a></li>
+<li class="chapter" data-level="4.3.2" data-path="classification.html"><a href="classification.html#estimating-the-regression-coefficients-1"><i class="fa fa-check"></i><b>4.3.2</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="4.3.3" data-path="classification.html"><a href="classification.html#making-predictions"><i class="fa fa-check"></i><b>4.3.3</b> Making Predictions</a></li>
+<li class="chapter" data-level="4.3.4" data-path="classification.html"><a href="classification.html#multiple-logistic-regression"><i class="fa fa-check"></i><b>4.3.4</b> Multiple Logistic Regression</a></li>
+<li class="chapter" data-level="4.3.5" data-path="classification.html"><a href="classification.html#multinomial-logistic-regression"><i class="fa fa-check"></i><b>4.3.5</b> Multinomial Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="classification.html"><a href="classification.html#generative-models-for-classification"><i class="fa fa-check"></i><b>4.4</b> Generative Models for Classification</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1"><i class="fa fa-check"></i><b>4.4.1</b> Linear Discriminant Analysis for <span class="math inline">\(p = 1\)</span></a></li>
+<li class="chapter" data-level="4.4.2" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1-1"><i class="fa fa-check"></i><b>4.4.2</b> Linear Discriminant Analysis for <span class="math inline">\(p &gt; 1\)</span></a></li>
+<li class="chapter" data-level="4.4.3" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis"><i class="fa fa-check"></i><b>4.4.3</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.4.4" data-path="classification.html"><a href="classification.html#naive-bayes"><i class="fa fa-check"></i><b>4.4.4</b> Naive Bayes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="classification.html"><a href="classification.html#a-comparison-of-classification-methods"><i class="fa fa-check"></i><b>4.5</b> A Comparison of Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="classification.html"><a href="classification.html#an-analytical-comparison"><i class="fa fa-check"></i><b>4.5.1</b> An Analytical Comparison</a></li>
+<li class="chapter" data-level="4.5.2" data-path="classification.html"><a href="classification.html#an-empirical-comparison"><i class="fa fa-check"></i><b>4.5.2</b> An Empirical Comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="classification.html"><a href="classification.html#generalized-linear-models"><i class="fa fa-check"></i><b>4.6</b> Generalized Linear Models</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="classification.html"><a href="classification.html#linear-regression-on-the-bikeshare-data"><i class="fa fa-check"></i><b>4.6.1</b> Linear Regression on the Bikeshare Data</a></li>
+<li class="chapter" data-level="4.6.2" data-path="classification.html"><a href="classification.html#poisson-regression-on-bikeshare-data"><i class="fa fa-check"></i><b>4.6.2</b> Poisson Regression on Bikeshare Data</a></li>
+<li class="chapter" data-level="4.6.3" data-path="classification.html"><a href="classification.html#generalized-linear-models-in-greater-generality"><i class="fa fa-check"></i><b>4.6.3</b> Generalized Linear Models in Greater Generality</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="classification.html"><a href="classification.html#lab-classification-methods"><i class="fa fa-check"></i><b>4.7</b> Lab: Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="classification.html"><a href="classification.html#the-stock-market-data"><i class="fa fa-check"></i><b>4.7.1</b> The Stock Market Data</a></li>
+<li class="chapter" data-level="4.7.2" data-path="classification.html"><a href="classification.html#logistic-regression-1"><i class="fa fa-check"></i><b>4.7.2</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.7.3" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis"><i class="fa fa-check"></i><b>4.7.3</b> Linear Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.7.4" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis-1"><i class="fa fa-check"></i><b>4.7.4</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.7.5" data-path="classification.html"><a href="classification.html#naive-bayes-1"><i class="fa fa-check"></i><b>4.7.5</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.7.6" data-path="classification.html"><a href="classification.html#k-nearest-neighbors-1"><i class="fa fa-check"></i><b>4.7.6</b> <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="4.7.7" data-path="classification.html"><a href="classification.html#poisson-regression"><i class="fa fa-check"></i><b>4.7.7</b> Poisson Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="classification.html"><a href="classification.html#exercises-1"><i class="fa fa-check"></i><b>4.8</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#applied-1"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#reproducibility-1"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="resampling-methods.html"><a href="resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross Validation</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="resampling-methods.html"><a href="resampling-methods.html#validation-set"><i class="fa fa-check"></i><b>5.1.1</b> The Validation Set Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="resampling-methods.html"><a href="resampling-methods.html#loocv"><i class="fa fa-check"></i><b>5.1.2</b> Leave-One-Out Cross Validation</a></li>
+<li class="chapter" data-level="5.1.3" data-path="resampling-methods.html"><a href="resampling-methods.html#kfoldcv"><i class="fa fa-check"></i><b>5.1.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bias-variance-trade-off-for-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Bias-Variance Trade-Off for <span class="math inline">\(k\)</span>-Fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation-on-classification-problems"><i class="fa fa-check"></i><b>5.1.5</b> Cross-Validation on Classification Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap-lab"><i class="fa fa-check"></i><b>5.2</b> The Bootstrap</a></li>
+<li class="chapter" data-level="5.3" data-path="resampling-methods.html"><a href="resampling-methods.html#lab-cross-validation-and-the-bootstrap"><i class="fa fa-check"></i><b>5.3</b> Lab: Cross-Validation and the Bootstrap</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="resampling-methods.html"><a href="resampling-methods.html#the-validation-set-approach"><i class="fa fa-check"></i><b>5.3.1</b> The Validation Set Approach</a></li>
+<li class="chapter" data-level="5.3.2" data-path="resampling-methods.html"><a href="resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3.2</b> Leave-One-Out Cross-Validation</a></li>
+<li class="chapter" data-level="5.3.3" data-path="resampling-methods.html"><a href="resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.3.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.3.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap"><i class="fa fa-check"></i><b>5.3.4</b> The Bootstrap</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="resampling-methods.html"><a href="resampling-methods.html#exercises-2"><i class="fa fa-check"></i><b>5.4</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#applied-2"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#reproducibility-2"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Linear Model Selection and Regularization</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#subset-selection"><i class="fa fa-check"></i><b>6.1</b> Subset Selection</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#best-subset-selection"><i class="fa fa-check"></i><b>6.1.1</b> Best Subset Selection</a></li>
+<li class="chapter" data-level="6.1.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#stepwise-selection"><i class="fa fa-check"></i><b>6.1.2</b> Stepwise Selection</a></li>
+<li class="chapter" data-level="6.1.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#choosing-the-optimal-model"><i class="fa fa-check"></i><b>6.1.3</b> Choosing the Optimal Model</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#shrinkage-methods"><i class="fa fa-check"></i><b>6.2</b> Shrinkage Methods</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression"><i class="fa fa-check"></i><b>6.2.1</b> Ridge Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#the-lasso"><i class="fa fa-check"></i><b>6.2.2</b> The Lasso</a></li>
+<li class="chapter" data-level="6.2.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#selecting-the-tuning-parameter"><i class="fa fa-check"></i><b>6.2.3</b> Selecting the Tuning Parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#dimension-reduction-methods"><i class="fa fa-check"></i><b>6.3</b> Dimension Reduction Methods</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#principal-components-regression"><i class="fa fa-check"></i><b>6.3.1</b> Principal Components Regression</a></li>
+<li class="chapter" data-level="6.3.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#partial-least-squares"><i class="fa fa-check"></i><b>6.3.2</b> Partial Least Squares</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#considerations-in-high-dimensions"><i class="fa fa-check"></i><b>6.4</b> Considerations in High Dimensions</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#high-dimensional-data"><i class="fa fa-check"></i><b>6.4.1</b> High-Dimensional Data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#what-goes-wrong-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.2</b> What Goes Wrong in High Dimensions?</a></li>
+<li class="chapter" data-level="6.4.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#regression-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.3</b> Regression in High Dimensions</a></li>
+<li class="chapter" data-level="6.4.4" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#interpreting-results-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.4</b> Interpreting Results in High Dimensions</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#lab-linear-models-and-regularization-methods"><i class="fa fa-check"></i><b>6.5</b> Lab: Linear Models and Regularization Methods</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#subset-selection-methods"><i class="fa fa-check"></i><b>6.5.1</b> Subset Selection Methods</a></li>
+<li class="chapter" data-level="6.5.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression-and-the-lasso"><i class="fa fa-check"></i><b>6.5.2</b> Ridge Regression and the Lasso</a></li>
+<li class="chapter" data-level="6.5.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#pcr-and-pls-regression"><i class="fa fa-check"></i><b>6.5.3</b> PCR and PLS Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a></li>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#reproducibility-3"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="linear-model-selection-and-regularization" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Linear Model Selection and Regularization</h1>
+<p>Load the packages used in this chapter:</p>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="linear-model-selection-and-regularization.html#cb477-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb477-2"><a href="linear-model-selection-and-regularization.html#cb477-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb477-3"><a href="linear-model-selection-and-regularization.html#cb477-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb477-4"><a href="linear-model-selection-and-regularization.html#cb477-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb477-5"><a href="linear-model-selection-and-regularization.html#cb477-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb477-6"><a href="linear-model-selection-and-regularization.html#cb477-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb477-7"><a href="linear-model-selection-and-regularization.html#cb477-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb477-8"><a href="linear-model-selection-and-regularization.html#cb477-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb477-9"><a href="linear-model-selection-and-regularization.html#cb477-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb477-10"><a href="linear-model-selection-and-regularization.html#cb477-10" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb477-11"><a href="linear-model-selection-and-regularization.html#cb477-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
+<span id="cb477-12"><a href="linear-model-selection-and-regularization.html#cb477-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb477-13"><a href="linear-model-selection-and-regularization.html#cb477-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
+<p>Before discussing non-linear models in Chapters 7, 8 and 10, this chapter discusses some ways in which the simple linear model can be improved by replacing the familiar least squares fitting with some alternative fitting procedures.
+These alternatives can sometimes yield better <em>prediction accuracy</em> and <em>model interpretability</em>.</p>
+<blockquote>
+<p>Prediction Accuracy: Provided that the true relationship between the
+response and the predictors is approximately linear, the least squares
+estimates will have low bias. If <span class="math inline">\(n &gt;&gt; p\)</span>—that is, if <span class="math inline">\(n\)</span>, the number of
+observations, is much larger than <span class="math inline">\(p\)</span>, the number of variables—then the
+least squares estimates tend to also have low variance, and hence will
+perform well on test observations. However, if <span class="math inline">\(n\)</span> is not much larger
+than <span class="math inline">\(p\)</span>, then there can be a lot of variability in the least squares fit,
+resulting in overfitting and consequently poor predictions on future
+observations not used in model training. And if <span class="math inline">\(p &gt; n\)</span>, then there
+is no longer a unique least squares coefficient estimate: the variance
+is infinite so the method cannot be used at all. By constraining or
+shrinking the estimated coefficients, we can often substantially reduce
+the variance at the cost of a negligible increase in bias. This can
+lead to substantial improvements in the accuracy with which we can
+predict the response for observations not used in model training.</p>
+</blockquote>
+<blockquote>
+<p>Model Interpretability: It is often the case that some or many of the
+variables used in a multiple regression model are in fact not associated with the response. Including such irrelevant variables leads to
+unnecessary complexity in the resulting model. By removing these
+variables—that is, by setting the corresponding coefficient estimates
+to zero—we can obtain a model that is more easily interpreted. Now
+least squares is extremely unlikely to yield any coefficient estimates
+that are exactly zero. In this chapter, we see some approaches for au-
+tomatically performing feature selection or variable selection—that is, feature
+for excluding irrelevant variables from a multiple regression model.</p>
+</blockquote>
+<p>In this chapter, we discuss three important classes of methods:</p>
+<blockquote>
+<p>Subset Selection. This approach involves identifying a subset of the <span class="math inline">\(p\)</span>
+predictors that we believe to be related to the response. We then fit
+a model using least squares on the reduced set of variables.</p>
+<p>Shrinkage. This approach involves fitting a model involving all <span class="math inline">\(p\)</span> predictors. However, the estimated coefficients are shrunken towards zero
+relative to the least squares estimates. This shrinkage (also known as
+regularization) has the effect of reducing variance. Depending on what
+type of shrinkage is performed, some of the coefficients may be esti-
+mated to be exactly zero. Hence, shrinkage methods can also perform
+variable selection.</p>
+<p>Dimension Reduction. This approach involves projecting the <span class="math inline">\(p\)</span> predictors into an <span class="math inline">\(M\)</span>-dimensional subspace, where <span class="math inline">\(M &lt; p\)</span>. This is achieved
+by computing <span class="math inline">\(M\)</span> different linear combinations, or projections, of the
+variables. Then these <span class="math inline">\(M\)</span> projections are used as predictors to fit a
+linear regression model by least squares.</p>
+</blockquote>
+<p>Although this chapter is specifically about extensions to the linear model for regression, the same concepts apply to other methods, such as the classification models in Chapter 4.</p>
+<div id="subset-selection" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Subset Selection</h2>
+<p>Disclaimer at the top: as mentioned in section 3.1, there are a lot of reasons to avoid subset and stepwise model selection.
+Here are some resources on this topic:</p>
+<ul>
+<li><ol class="example" style="list-style-type: decimal">
+<li></li>
+</ol></li>
+<li><a href="https://stats.stackexchange.com/questions/20836/algorithms-for-automatic-model-selection/20856#20856">A Stack Overflow response.</a></li>
+<li><a href="https://www.stata.com/support/faqs/statistics/stepwise-regression-problems/">Frank Harrell comments.</a></li>
+</ul>
+<p>Regardless, I will still work through the examples in the text as a programming exercise.
+However, <code>tidymodels</code> does not have the functionality for subset/stepwise selection, so I will</p>
+<div id="best-subset-selection" class="section level3" number="6.1.1">
+<h3><span class="header-section-number">6.1.1</span> Best Subset Selection</h3>
+<p>To perform <em>best subset selection</em>, we fit <span class="math inline">\(p\)</span> models that contain exactly one predictor, <span class="math inline">\({p \choose 2} = p(p-1)/2\)</span> models that contain exactly two predictors, and so on.
+In total, this involves fitting <span class="math inline">\(2^p\)</span> models.
+Then we select the model that is best, usually following these steps</p>
+<ol style="list-style-type: decimal">
+<li>Let <span class="math inline">\(\mathcal{M}_0\)</span> denote the <em>null model</em>, which contains no predictors. This model simply predictors the sample mean for each observation.</li>
+<li>For <span class="math inline">\(k = 1, 2, \dots, p\)</span>:
+<ul>
+<li>Fit all <span class="math inline">\({p \choose k}\)</span> models that contain exactly <span class="math inline">\(k\)</span> predictors.</li>
+<li>Pick the best among these <span class="math inline">\({p \choose k}\)</span> models, and call it <span class="math inline">\(\mathcal{M}_k\)</span>. Here, <em>best</em> is defined as having the smallest RSS, or equivalently the largest <span class="math inline">\(R^2\)</span>.</li>
+</ul></li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated predictor error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+</ol>
+<p>Step 2 identifies the best model (on the training data) for each subset size, in order to reduce the problem from <span class="math inline">\(2^p\)</span> to <span class="math inline">\(p + 1\)</span> possible models.
+Choosing the single best model from the <span class="math inline">\(p + 1\)</span> options must be done with care, because the RSS of these models decreases monotonically, and the <span class="math inline">\(R^2\)</span> increases monotonically, as the number of predictors increases.
+A model that minimizes these metrics will have a low <em>training error</em>, but not necessarily a low <em>test error</em>, as we saw in Chapter 2 in Figures 2.9-2.11.
+Therefore, in step 3, we use a cross-validated prediction error <span class="math inline">\(C_p\)</span>, BIC, or adjusted <span class="math inline">\(R^2\)</span> in order to select the best model.</p>
+<p>Figure 6.1 includes many least squares regression models predicting <code>Balance</code>, and fit using a different subsets of 10 predictors.
+Load the <code>credit</code> data set:</p>
+<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb478-1"><a href="linear-model-selection-and-regularization.html#cb478-1" aria-hidden="true" tabindex="-1"></a>credit <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Credit</span>
+<span id="cb478-2"><a href="linear-model-selection-and-regularization.html#cb478-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(credit)</span></code></pre></div>
+<pre><code>## Rows: 400
+## Columns: 11
+## $ Income    &lt;dbl&gt; 14.891, 106.025, 104.593, 148.924, 55.882, 80.180, 20.996, 7~
+## $ Limit     &lt;dbl&gt; 3606, 6645, 7075, 9504, 4897, 8047, 3388, 7114, 3300, 6819, ~
+## $ Rating    &lt;dbl&gt; 283, 483, 514, 681, 357, 569, 259, 512, 266, 491, 589, 138, ~
+## $ Cards     &lt;dbl&gt; 2, 3, 4, 3, 2, 4, 2, 2, 5, 3, 4, 3, 1, 1, 2, 3, 3, 3, 1, 2, ~
+## $ Age       &lt;dbl&gt; 34, 82, 71, 36, 68, 77, 37, 87, 66, 41, 30, 64, 57, 49, 75, ~
+## $ Education &lt;dbl&gt; 11, 15, 11, 11, 16, 10, 12, 9, 13, 19, 14, 16, 7, 9, 13, 15,~
+## $ Own       &lt;fct&gt; No, Yes, No, Yes, No, No, Yes, No, Yes, Yes, No, No, Yes, No~
+## $ Student   &lt;fct&gt; No, Yes, No, No, No, No, No, No, No, Yes, No, No, No, No, No~
+## $ Married   &lt;fct&gt; Yes, Yes, No, No, Yes, No, No, No, No, Yes, Yes, No, Yes, Ye~
+## $ Region    &lt;fct&gt; South, West, West, West, South, South, East, West, South, Ea~
+## $ Balance   &lt;dbl&gt; 333, 903, 580, 964, 331, 1151, 203, 872, 279, 1350, 1407, 0,~</code></pre>
+<p>For <span class="math inline">\(p = 10\)</span> predictors, there are <span class="math inline">\(2^10 = 1024\)</span> possible combinations for models (including the null model, but this example doesn’t include it).
+To get every combination, I’ll use the <code>utils::combn()</code> function:</p>
+<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb480-1"><a href="linear-model-selection-and-regularization.html#cb480-1" aria-hidden="true" tabindex="-1"></a>credit_predictors <span class="ot">&lt;-</span> <span class="fu">names</span>(credit)</span>
+<span id="cb480-2"><a href="linear-model-selection-and-regularization.html#cb480-2" aria-hidden="true" tabindex="-1"></a>credit_predictors <span class="ot">&lt;-</span> credit_predictors[credit_predictors <span class="sc">!=</span> <span class="st">&quot;Balance&quot;</span>]</span>
+<span id="cb480-3"><a href="linear-model-selection-and-regularization.html#cb480-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb480-4"><a href="linear-model-selection-and-regularization.html#cb480-4" aria-hidden="true" tabindex="-1"></a>credit_model_subsets <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb480-5"><a href="linear-model-selection-and-regularization.html#cb480-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_preds =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,</span>
+<span id="cb480-6"><a href="linear-model-selection-and-regularization.html#cb480-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">predictors =</span> <span class="fu">map</span>(n_preds,</span>
+<span id="cb480-7"><a href="linear-model-selection-and-regularization.html#cb480-7" aria-hidden="true" tabindex="-1"></a>                   <span class="sc">~</span> utils<span class="sc">::</span><span class="fu">combn</span>(credit_predictors, .x, <span class="at">simplify =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb480-8"><a href="linear-model-selection-and-regularization.html#cb480-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb480-9"><a href="linear-model-selection-and-regularization.html#cb480-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(predictors) <span class="sc">%&gt;%</span></span>
+<span id="cb480-10"><a href="linear-model-selection-and-regularization.html#cb480-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb480-11"><a href="linear-model-selection-and-regularization.html#cb480-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_formula =</span> <span class="fu">map</span>(predictors,</span>
+<span id="cb480-12"><a href="linear-model-selection-and-regularization.html#cb480-12" aria-hidden="true" tabindex="-1"></a>                        <span class="sc">~</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(<span class="st">&quot;Balance ~&quot;</span>, <span class="fu">paste</span>(.x, <span class="at">collapse =</span> <span class="st">&quot;+&quot;</span>))))</span>
+<span id="cb480-13"><a href="linear-model-selection-and-regularization.html#cb480-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb480-14"><a href="linear-model-selection-and-regularization.html#cb480-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb480-15"><a href="linear-model-selection-and-regularization.html#cb480-15" aria-hidden="true" tabindex="-1"></a>credit_model_subsets</span></code></pre></div>
+<pre><code>## # A tibble: 1,023 x 3
+##    n_preds predictors model_formula
+##      &lt;int&gt; &lt;list&gt;     &lt;list&gt;       
+##  1       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  2       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  3       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  4       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  5       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  6       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  7       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  8       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+##  9       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+## 10       1 &lt;chr [1]&gt;  &lt;formula&gt;    
+## # ... with 1,013 more rows</code></pre>
+<p>For differing numbers of predictors <span class="math inline">\(k = 1, 2, \dots, p\)</span>, we should have <span class="math inline">\({p \choose k}\)</span> models:</p>
+<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb482-1"><a href="linear-model-selection-and-regularization.html#cb482-1" aria-hidden="true" tabindex="-1"></a>credit_model_subsets <span class="sc">%&gt;%</span></span>
+<span id="cb482-2"><a href="linear-model-selection-and-regularization.html#cb482-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(n_preds) <span class="sc">%&gt;%</span></span>
+<span id="cb482-3"><a href="linear-model-selection-and-regularization.html#cb482-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_choose_k =</span> <span class="fu">choose</span>(<span class="dv">10</span>, n_preds))</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 3
+##    n_preds     n p_choose_k
+##      &lt;int&gt; &lt;int&gt;      &lt;dbl&gt;
+##  1       1    10         10
+##  2       2    45         45
+##  3       3   120        120
+##  4       4   210        210
+##  5       5   252        252
+##  6       6   210        210
+##  7       7   120        120
+##  8       8    45         45
+##  9       9    10         10
+## 10      10     1          1</code></pre>
+<p>Fit all of the models and extract RSS and <span class="math inline">\(R^2\)</span> metrics:</p>
+<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="linear-model-selection-and-regularization.html#cb484-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb484-2"><a href="linear-model-selection-and-regularization.html#cb484-2" aria-hidden="true" tabindex="-1"></a>credit_model_subsets <span class="ot">&lt;-</span> credit_model_subsets <span class="sc">%&gt;%</span></span>
+<span id="cb484-3"><a href="linear-model-selection-and-regularization.html#cb484-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb484-4"><a href="linear-model-selection-and-regularization.html#cb484-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">model_fit =</span> <span class="fu">map</span>(model_formula, <span class="sc">~</span> <span class="fu">lm</span>(.x, <span class="at">data =</span> credit)),</span>
+<span id="cb484-5"><a href="linear-model-selection-and-regularization.html#cb484-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">RSS =</span> <span class="fu">map_dbl</span>(model_fit, <span class="sc">~</span> <span class="fu">sum</span>(.x<span class="sc">$</span>residuals<span class="sc">^</span><span class="dv">2</span>)),</span>
+<span id="cb484-6"><a href="linear-model-selection-and-regularization.html#cb484-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">R2 =</span> <span class="fu">map_dbl</span>(model_fit, <span class="sc">~</span> <span class="fu">summary</span>(.x)<span class="sc">$</span>r.squared),</span>
+<span id="cb484-7"><a href="linear-model-selection-and-regularization.html#cb484-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Because of one of the categorical variables (Region) having three levels,</span></span>
+<span id="cb484-8"><a href="linear-model-selection-and-regularization.html#cb484-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># some models will have +1 dummy variable predictor, which I can calculate</span></span>
+<span id="cb484-9"><a href="linear-model-selection-and-regularization.html#cb484-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># from the number of coefficients returned from the fit</span></span>
+<span id="cb484-10"><a href="linear-model-selection-and-regularization.html#cb484-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_preds_adj =</span> <span class="fu">map_int</span>(model_fit, <span class="sc">~</span> <span class="fu">length</span>(.x<span class="sc">$</span>coefficients) <span class="sc">-</span> 1L)</span>
+<span id="cb484-11"><a href="linear-model-selection-and-regularization.html#cb484-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb484-12"><a href="linear-model-selection-and-regularization.html#cb484-12" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 1.56 sec elapsed</code></pre>
+<p>Finally, Figure 6.1:</p>
+<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="linear-model-selection-and-regularization.html#cb486-1" aria-hidden="true" tabindex="-1"></a>credit_model_subsets <span class="sc">%&gt;%</span></span>
+<span id="cb486-2"><a href="linear-model-selection-and-regularization.html#cb486-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(RSS, R2), <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb486-3"><a href="linear-model-selection-and-regularization.html#cb486-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="fu">factor</span>(metric, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;RSS&quot;</span>, <span class="st">&quot;R2&quot;</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb486-4"><a href="linear-model-selection-and-regularization.html#cb486-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(n_preds_adj, metric) <span class="sc">%&gt;%</span></span>
+<span id="cb486-5"><a href="linear-model-selection-and-regularization.html#cb486-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb486-6"><a href="linear-model-selection-and-regularization.html#cb486-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The &quot;best&quot; model has the lowest value by RSS...</span></span>
+<span id="cb486-7"><a href="linear-model-selection-and-regularization.html#cb486-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">best_model =</span> (metric <span class="sc">==</span> <span class="st">&quot;RSS&quot;</span> <span class="sc">&amp;</span> value <span class="sc">==</span> <span class="fu">min</span>(value)) <span class="sc">|</span></span>
+<span id="cb486-8"><a href="linear-model-selection-and-regularization.html#cb486-8" aria-hidden="true" tabindex="-1"></a>      <span class="co"># ... and the highest value by R2</span></span>
+<span id="cb486-9"><a href="linear-model-selection-and-regularization.html#cb486-9" aria-hidden="true" tabindex="-1"></a>      (metric <span class="sc">==</span> <span class="st">&quot;R2&quot;</span> <span class="sc">&amp;</span> value <span class="sc">==</span> <span class="fu">max</span>(value))</span>
+<span id="cb486-10"><a href="linear-model-selection-and-regularization.html#cb486-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb486-11"><a href="linear-model-selection-and-regularization.html#cb486-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb486-12"><a href="linear-model-selection-and-regularization.html#cb486-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n_preds_adj, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb486-13"><a href="linear-model-selection-and-regularization.html#cb486-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> . <span class="sc">%&gt;%</span> <span class="fu">filter</span>(best_model), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb486-14"><a href="linear-model-selection-and-regularization.html#cb486-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.05</span>, <span class="at">height =</span> <span class="dv">0</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>,</span>
+<span id="cb486-15"><a href="linear-model-selection-and-regularization.html#cb486-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve) <span class="sc">+</span></span>
+<span id="cb486-16"><a href="linear-model-selection-and-regularization.html#cb486-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> metric, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb486-17"><a href="linear-model-selection-and-regularization.html#cb486-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Number of predictors&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure6.1-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>As expected, the values are monotonically decreasing (RSS) and increasing (<span class="math inline">\(R^2\)</span>) with number of predictors.
+There is little improvement past 3 predictors, however.</p>
+<blockquote>
+<p>Although we have presented best subset selection here for least squares
+regression, the same ideas apply to other types of models, such as logistic
+regression. In the case of logistic regression, instead of ordering models by
+RSS in Step 2 of Algorithm 6.1, we instead use the <em>deviance</em>, a measure
+that plays the role of RSS for a broader class of models. The deviance is
+negative two times the maximized log-likelihood; the smaller the deviance,
+the better the fit.</p>
+</blockquote>
+<p>Because it scales as <span class="math inline">\(2^p\)</span> models, best subset selection can quickly become computationally expensive.
+The next sections explore computationally efficient alternatives.</p>
+</div>
+<div id="stepwise-selection" class="section level3" number="6.1.2">
+<h3><span class="header-section-number">6.1.2</span> Stepwise Selection</h3>
+<div id="forward-stepwise-selection" class="section level4 unnumbered">
+<h4>Forward Stepwise Selection</h4>
+<p>Forward stepwise selection begins with a model containing no predictors, and then adds predictors to the model, one-at-a-time, until all predictors are in the model.</p>
+<ol style="list-style-type: decimal">
+<li>Let <span class="math inline">\(\mathcal{M}_0\)</span> denote the <em>null model</em>, which contains no predictors.</li>
+<li>For <span class="math inline">\(k = 0, 1, \dots, p-1\)</span>:
+<ul>
+<li>Consider all <span class="math inline">\(p - k\)</span> models that augment the predictors in <span class="math inline">\(\mathcal{M}_k\)</span> with one additional predictor.</li>
+<li>Choose the best among these <span class="math inline">\(p - k\)</span> models, and call it <span class="math inline">\(\mathcal{M}_{k+1}\)</span>. Here, <em>best</em> is defined as having smallest RSS or highest <span class="math inline">\(R^2\)</span>.</li>
+</ul></li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated predictor error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+</ol>
+<p>Step 2 is similar to step 2 in best subset selection, in that we simply choose the model with the lowest RSS or highest <span class="math inline">\(R^2\)</span>.
+Step 3 is more tricky, and is discussed in Section 6.1.3.</p>
+<p>Though much more computationally efficient, it is not guaranteed to find the best possible model (via best subset selection) out of all <span class="math inline">\(2^p\)</span> possible models.
+As a comparison, the example in the text involves performing four forward steps to find the best predictors.
+The <code>MASS</code> package has an <code>addTerm()</code> function for taking a single step:</p>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="linear-model-selection-and-regularization.html#cb487-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Model with no predictors</span></span>
+<span id="cb487-2"><a href="linear-model-selection-and-regularization.html#cb487-2" aria-hidden="true" tabindex="-1"></a>balance_null <span class="ot">&lt;-</span> <span class="fu">lm</span>(Balance <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> credit)</span>
+<span id="cb487-3"><a href="linear-model-selection-and-regularization.html#cb487-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Model with all predictors</span></span>
+<span id="cb487-4"><a href="linear-model-selection-and-regularization.html#cb487-4" aria-hidden="true" tabindex="-1"></a>balance_full <span class="ot">&lt;-</span> <span class="fu">lm</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit)</span>
+<span id="cb487-5"><a href="linear-model-selection-and-regularization.html#cb487-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb487-6"><a href="linear-model-selection-and-regularization.html#cb487-6" aria-hidden="true" tabindex="-1"></a>MASS<span class="sc">::</span><span class="fu">addterm</span>(balance_null, <span class="at">scope =</span> balance_full, <span class="at">sorted =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## Single term additions
+## 
+## Model:
+## Balance ~ 1
+##           Df Sum of Sq      RSS    AIC
+## Rating     1  62904790 21435122 4359.6
+## Limit      1  62624255 21715657 4364.8
+## Income     1  18131167 66208745 4810.7
+## Student    1   5658372 78681540 4879.8
+## Cards      1    630416 83709496 4904.6
+## &lt;none&gt;                 84339912 4905.6
+## Own        1     38892 84301020 4907.4
+## Education  1      5481 84334431 4907.5
+## Married    1      2715 84337197 4907.5
+## Age        1       284 84339628 4907.6
+## Region     2     18454 84321458 4909.5</code></pre>
+<p>Here, the <code>Rating</code> variable offers the best improvement over the null model (by both RSS and AIC).
+To run this four times, I’ll use a for loop:</p>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb489-1"><a href="linear-model-selection-and-regularization.html#cb489-1" aria-hidden="true" tabindex="-1"></a>balance_preds <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>)</span>
+<span id="cb489-2"><a href="linear-model-selection-and-regularization.html#cb489-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (forward_step <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>) {</span>
+<span id="cb489-3"><a href="linear-model-selection-and-regularization.html#cb489-3" aria-hidden="true" tabindex="-1"></a>  balance_formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(</span>
+<span id="cb489-4"><a href="linear-model-selection-and-regularization.html#cb489-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(<span class="st">&quot;Balance ~&quot;</span>, <span class="fu">str_replace_all</span>(balance_preds[forward_step], <span class="st">&quot;,&quot;</span>, <span class="st">&quot;+&quot;</span>))</span>
+<span id="cb489-5"><a href="linear-model-selection-and-regularization.html#cb489-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb489-6"><a href="linear-model-selection-and-regularization.html#cb489-6" aria-hidden="true" tabindex="-1"></a>  balance_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(balance_formula, <span class="at">data =</span> credit)</span>
+<span id="cb489-7"><a href="linear-model-selection-and-regularization.html#cb489-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb489-8"><a href="linear-model-selection-and-regularization.html#cb489-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Find the next predictor by RSS</span></span>
+<span id="cb489-9"><a href="linear-model-selection-and-regularization.html#cb489-9" aria-hidden="true" tabindex="-1"></a>  new_predictor <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">addterm</span>(balance_model, <span class="at">scope =</span> balance_full) <span class="sc">%&gt;%</span></span>
+<span id="cb489-10"><a href="linear-model-selection-and-regularization.html#cb489-10" aria-hidden="true" tabindex="-1"></a>    broom<span class="sc">::</span><span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb489-11"><a href="linear-model-selection-and-regularization.html#cb489-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(rss <span class="sc">==</span> <span class="fu">min</span>(rss)) <span class="sc">%&gt;%</span></span>
+<span id="cb489-12"><a href="linear-model-selection-and-regularization.html#cb489-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(term)</span>
+<span id="cb489-13"><a href="linear-model-selection-and-regularization.html#cb489-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb489-14"><a href="linear-model-selection-and-regularization.html#cb489-14" aria-hidden="true" tabindex="-1"></a>  balance_preds <span class="ot">&lt;-</span> <span class="fu">append</span>(balance_preds,</span>
+<span id="cb489-15"><a href="linear-model-selection-and-regularization.html#cb489-15" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">paste</span>(balance_preds[forward_step], new_predictor,</span>
+<span id="cb489-16"><a href="linear-model-selection-and-regularization.html#cb489-16" aria-hidden="true" tabindex="-1"></a>                                <span class="at">sep =</span> <span class="st">&quot;, &quot;</span>))</span>
+<span id="cb489-17"><a href="linear-model-selection-and-regularization.html#cb489-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb489-18"><a href="linear-model-selection-and-regularization.html#cb489-18" aria-hidden="true" tabindex="-1"></a>balance_preds</span></code></pre></div>
+<pre><code>## [1] &quot;1&quot;                                 &quot;1, Rating&quot;                        
+## [3] &quot;1, Rating, Income&quot;                 &quot;1, Rating, Income, Student&quot;       
+## [5] &quot;1, Rating, Income, Student, Limit&quot;</code></pre>
+<p>Now re-create Table 6.1:</p>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb491-1"><a href="linear-model-selection-and-regularization.html#cb491-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_cols</span>(</span>
+<span id="cb491-2"><a href="linear-model-selection-and-regularization.html#cb491-2" aria-hidden="true" tabindex="-1"></a>  credit_model_subsets <span class="sc">%&gt;%</span></span>
+<span id="cb491-3"><a href="linear-model-selection-and-regularization.html#cb491-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(n_preds_adj <span class="sc">&lt;=</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb491-4"><a href="linear-model-selection-and-regularization.html#cb491-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(n_preds_adj) <span class="sc">%&gt;%</span></span>
+<span id="cb491-5"><a href="linear-model-selection-and-regularization.html#cb491-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(RSS <span class="sc">==</span> <span class="fu">min</span>(RSS)) <span class="sc">%&gt;%</span></span>
+<span id="cb491-6"><a href="linear-model-selection-and-regularization.html#cb491-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb491-7"><a href="linear-model-selection-and-regularization.html#cb491-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb491-8"><a href="linear-model-selection-and-regularization.html#cb491-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at"># variables</span><span class="st">`</span> <span class="ot">=</span> n_preds_adj,</span>
+<span id="cb491-9"><a href="linear-model-selection-and-regularization.html#cb491-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Best subset</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">map_chr</span>(predictors, str_c, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>)</span>
+<span id="cb491-10"><a href="linear-model-selection-and-regularization.html#cb491-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb491-11"><a href="linear-model-selection-and-regularization.html#cb491-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Forward stepwise</span><span class="st">`</span> <span class="ot">=</span> balance_preds[<span class="dv">2</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;1, &quot;</span>)</span>
+<span id="cb491-12"><a href="linear-model-selection-and-regularization.html#cb491-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb491-13"><a href="linear-model-selection-and-regularization.html#cb491-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">&quot;# variables&quot;</span>)</span></code></pre></div>
+<div id="gehakohhxl" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#gehakohhxl .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#gehakohhxl .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#gehakohhxl .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#gehakohhxl .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#gehakohhxl .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#gehakohhxl .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#gehakohhxl .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#gehakohhxl .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#gehakohhxl .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#gehakohhxl .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#gehakohhxl .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#gehakohhxl .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#gehakohhxl .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#gehakohhxl .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gehakohhxl .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#gehakohhxl .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#gehakohhxl .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#gehakohhxl .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#gehakohhxl .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#gehakohhxl .gt_left {
+  text-align: left;
+}
+
+#gehakohhxl .gt_center {
+  text-align: center;
+}
+
+#gehakohhxl .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#gehakohhxl .gt_font_normal {
+  font-weight: normal;
+}
+
+#gehakohhxl .gt_font_bold {
+  font-weight: bold;
+}
+
+#gehakohhxl .gt_font_italic {
+  font-style: italic;
+}
+
+#gehakohhxl .gt_super {
+  font-size: 65%;
+}
+
+#gehakohhxl .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Best subset</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Forward stepwise</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left gt_stub">1</td>
+<td class="gt_row gt_left">Rating</td>
+<td class="gt_row gt_left">Rating</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">2</td>
+<td class="gt_row gt_left">Income, Rating</td>
+<td class="gt_row gt_left">Rating, Income</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">3</td>
+<td class="gt_row gt_left">Income, Rating, Student</td>
+<td class="gt_row gt_left">Rating, Income, Student</td></tr>
+    <tr><td class="gt_row gt_left gt_stub">4</td>
+<td class="gt_row gt_left">Income, Limit, Cards, Student</td>
+<td class="gt_row gt_left">Rating, Income, Student, Limit</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+</div>
+<div id="backward-stepwise-selection" class="section level4 unnumbered">
+<h4>Backward Stepwise Selection</h4>
+<p>Backwards stepwise selection begins with the full model containing all <span class="math inline">\(p\)</span> predictors, and then iteratively removes the least useful predictor.</p>
+<ol style="list-style-type: decimal">
+<li>Let <span class="math inline">\(\mathcal{M}_p\)</span> denote the <em>full model</em>, which contains all <span class="math inline">\(p\)</span> predictors.</li>
+<li>For <span class="math inline">\(k = p, p-1, \dots, 1\)</span>:
+<ul>
+<li>Consider all <span class="math inline">\(k\)</span> models that contain all but one of the predictors in <span class="math inline">\(\mathcal{M}_k\)</span> for a total of <span class="math inline">\(k - 1\)</span> predictors.</li>
+<li>Choose the best among these <span class="math inline">\(k\)</span> models, and call it <span class="math inline">\(\mathcal{M}_{k-1}\)</span>. Here, <em>best</em> is defined as having smallest RSS or highest <span class="math inline">\(R^2\)</span>.</li>
+</ul></li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated predictor error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+</ol>
+<blockquote>
+<p>Like forward stepwise selection, the backward selection approach searches
+through only <span class="math inline">\(1+p(p+1)/2\)</span> models, and so can be applied in settings where
+<span class="math inline">\(p\)</span> is too large to apply best subset selection. Also like forward stepwise
+selection, backward stepwise selection is not guaranteed to yield the best
+model containing a subset of the <span class="math inline">\(p\)</span> predictors.</p>
+</blockquote>
+<p>Backward selection requires that the number of samples <span class="math inline">\(n\)</span> is larger than
+the number of variables <span class="math inline">\(p\)</span> (so that the full model can be fit). In contrast,
+forward stepwise can be used even when <span class="math inline">\(n &lt; p\)</span>, and so is the only viable
+subset method when <span class="math inline">\(p\)</span> is very large.</p>
+</div>
+<div id="hybrid-approaches" class="section level4 unnumbered">
+<h4>Hybrid Approaches</h4>
+<blockquote>
+<p>The best subset, forward stepwise, and backward stepwise selection ap-
+proaches generally give similar but not identical models. As another al-
+ternative, hybrid versions of forward and backward stepwise selection are
+available, in which variables are added to the model sequentially, in analogy
+to forward selection. However, after adding each new variable, the method
+may also remove any variables that no longer provide an improvement in
+the model fit. Such an approach attempts to more closely mimic best sub-
+set selection while retaining the computational advantages of forward and
+backward stepwise selection.</p>
+</blockquote>
+</div>
+</div>
+<div id="choosing-the-optimal-model" class="section level3" number="6.1.3">
+<h3><span class="header-section-number">6.1.3</span> Choosing the Optimal Model</h3>
+<p>To apply these subset selection methods, we need to determine which model is &amp;best&amp;.
+Since more predictors will always lead to smaller RSS and larger <span class="math inline">\(R^2\)</span> (training error), we nee to estimate the test error.
+There are two common approaches:</p>
+<ol style="list-style-type: decimal">
+<li>We can indirectly estimate test error by making an adjustment to the
+training error to account for the bias due to overfitting.</li>
+<li>We can directly estimate the test error, using either a validation set
+approach or a cross-validation approach, as discussed in Chapter 5.</li>
+</ol>
+<div id="c_p-aic-bic-and-adjusted-r2" class="section level4 unnumbered">
+<h4><span class="math inline">\(C_p\)</span>, AIC, BIC, and Adjusted <span class="math inline">\(R^2\)</span></h4>
+<p>These techniques involve <em>adjusting</em> the training error to select among a set a models with different numbers of variables.</p>
+<p>For a fitted least squares model containg <span class="math inline">\(d\)</span> predictors, the <span class="math inline">\(C_p\)</span> estimate of test MSE is computed as:</p>
+<p><span class="math display">\[
+C_p = \frac{1}{n} (\text{RSS} + 2d \hat{\sigma}^2),
+\]</span></p>
+<p>where <span class="math inline">\(\hat{\sigma}^2\)</span> is an estimate of the variance of the error <span class="math inline">\(\epsilon\)</span> associated with each response measurement.
+Typically, this is estimated using the full model containing all predictors.</p>
+<blockquote>
+<p>Essentially, the <span class="math inline">\(C_p\)</span> statistic adds a penalty
+of <span class="math inline">\(2d\hat{\sigma}^2\)</span> to the training RSS in order to adjust for the fact that the training
+error tends to underestimate the test error. Clearly, the penalty increases as
+the number of predictors in the model increases; this is intended to adjust
+for the corresponding decrease in training RSS. Though it is beyond the
+scope of this book, one can show that if <span class="math inline">\(\hat{\sigma}^2\)</span> is an unbiased estimate of <span class="math inline">\(\hat{\sigma}^2\)</span> in
+(6.2), then <span class="math inline">\(C_p\)</span> is an unbiased estimate of test MSE. As a consequence, the
+<span class="math inline">\(C_p\)</span> statistic tends to take on a small value for models with a low test error,
+so when determining which of a set of models is best, we choose the model
+with the lowest <span class="math inline">\(C_p\)</span> value.</p>
+</blockquote>
+<p>Compute <span class="math inline">\(\hat{\sigma}\)</span> and <span class="math inline">\(C_p\)</span> for the best model at the different numbers of predictors:</p>
+<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="linear-model-selection-and-regularization.html#cb492-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the estimated variance of the error for calculating C_p</span></span>
+<span id="cb492-2"><a href="linear-model-selection-and-regularization.html#cb492-2" aria-hidden="true" tabindex="-1"></a>sigma_hat <span class="ot">&lt;-</span> <span class="fu">summary</span>(balance_full)<span class="sc">$</span>sigma</span>
+<span id="cb492-3"><a href="linear-model-selection-and-regularization.html#cb492-3" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="ot">&lt;-</span> credit_model_subsets <span class="sc">%&gt;%</span></span>
+<span id="cb492-4"><a href="linear-model-selection-and-regularization.html#cb492-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(n_preds_adj) <span class="sc">%&gt;%</span></span>
+<span id="cb492-5"><a href="linear-model-selection-and-regularization.html#cb492-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(RSS <span class="sc">==</span> <span class="fu">min</span>(RSS)) <span class="sc">%&gt;%</span></span>
+<span id="cb492-6"><a href="linear-model-selection-and-regularization.html#cb492-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb492-7"><a href="linear-model-selection-and-regularization.html#cb492-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb492-8"><a href="linear-model-selection-and-regularization.html#cb492-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">C_p</span><span class="st">`</span> <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">/</span> <span class="fu">nrow</span>(credit)) <span class="sc">*</span> (RSS <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> n_preds_adj <span class="sc">*</span> sigma_hat<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb492-9"><a href="linear-model-selection-and-regularization.html#cb492-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<blockquote>
+<p>The AIC criterion is defined for a large class of models fit by maximum
+likelihood. In the case of the model (6.1) with Gaussian errors, maximum
+likelihood and least squares are the same thing. In this case AIC is given by</p>
+</blockquote>
+<p><span class="math display">\[
+\text{AIC} = \frac{1}{n} (\text{RSS} + 2 d \hat{\sigma}^2),
+\]</span></p>
+<blockquote>
+<p>where, for simplicity, we have omitted irrelevant constants. Hence for least
+squares models, <span class="math inline">\(C_p\)</span> and AIC are proportional to each other, and so only
+<span class="math inline">\(C_p\)</span> is displayed in Figure 6.2.</p>
+</blockquote>
+<p>BIC is derived from a Bayesian point of view, and looks similar to the AIC/<span class="math inline">\(C_p\)</span>:</p>
+<p><span class="math display">\[
+\text{BIC} = \frac{1}{n} (\text{RSS} + \log (n) d \hat{\sigma}^2),
+\]</span></p>
+<p>where irrelevant constants were excluded.
+Here, the factor of 2 in the AIC/<span class="math inline">\(C_p\)</span> is replaced with <span class="math inline">\(\log (n)\)</span>.
+Since <span class="math inline">\(\log n &gt; 2\)</span> for any <span class="math inline">\(n &gt; 7\)</span>, the BIC statistic generally penalized more heavily models with many variables.</p>
+<div class="sourceCode" id="cb493"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb493-1"><a href="linear-model-selection-and-regularization.html#cb493-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="ot">&lt;-</span> credit_model_best <span class="sc">%&gt;%</span></span>
+<span id="cb493-2"><a href="linear-model-selection-and-regularization.html#cb493-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb493-3"><a href="linear-model-selection-and-regularization.html#cb493-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">BIC =</span> (<span class="dv">1</span> <span class="sc">/</span> <span class="fu">nrow</span>(credit)) <span class="sc">*</span></span>
+<span id="cb493-4"><a href="linear-model-selection-and-regularization.html#cb493-4" aria-hidden="true" tabindex="-1"></a>      (RSS <span class="sc">+</span> <span class="fu">log</span>(<span class="fu">nrow</span>(credit)) <span class="sc">*</span> n_preds_adj <span class="sc">*</span> sigma_hat<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb493-5"><a href="linear-model-selection-and-regularization.html#cb493-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Recall that the usual <span class="math inline">\(R^2\)</span> is defined as 1 - RSS/TSS, where TSS = <span class="math inline">\(\sum (y_i - \bar{y})^2\)</span> is the total sum of squares for the response.
+The adjusted <span class="math inline">\(R^2\)</span> statistic is calculated as</p>
+<p><span class="math display">\[
+\text{Adjusted } R^2 = 1 - \frac{\text{RSS}/(n - d - 1)}{\text{TSS}/(n - 1)}
+\]</span></p>
+<p>Unlike <span class="math inline">\(C_p\)</span>, AIC, and BIC, for which a smaller value indicates a lower test error, a larger value of adjusted <span class="math inline">\(R^2\)</span> indicates smaller test error.</p>
+<blockquote>
+<p>The intuition behind the adjusted <span class="math inline">\(R^2\)</span> is that once all of the correct
+variables have been included in the model, adding additional noise variables
+will lead to only a very small decrease in RSS. Since adding noise variables
+leads to an increase in <span class="math inline">\(d\)</span>, such variables will lead to an increase in <span class="math inline">\(\text{RSS}/(n−d−1)\)</span>,
+and consequently a decrease in the adjusted <span class="math inline">\(R^2\)</span>. Therefore, in theory, the
+model with the largest adjusted <span class="math inline">\(R^2\)</span> will have only correct variables and
+no noise variables. Unlike the <span class="math inline">\(R^2\)</span> statistic, the adjusted <span class="math inline">\(R^2\)</span> statistic pays
+a price for the inclusion of unnecessary variables in the model.</p>
+</blockquote>
+<p>A model’s <span class="math inline">\(R^2\)</span> value can be obtained directly from the <code>lm</code> object, so I don’t need to manually compute it:</p>
+<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb494-1"><a href="linear-model-selection-and-regularization.html#cb494-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="ot">&lt;-</span> credit_model_best <span class="sc">%&gt;%</span></span>
+<span id="cb494-2"><a href="linear-model-selection-and-regularization.html#cb494-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb494-3"><a href="linear-model-selection-and-regularization.html#cb494-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Adjusted R2</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">map_dbl</span>(model_fit, <span class="sc">~</span> <span class="fu">summary</span>(.x)<span class="sc">$</span>adj.r.squared)</span>
+<span id="cb494-4"><a href="linear-model-selection-and-regularization.html#cb494-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb495"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb495-1"><a href="linear-model-selection-and-regularization.html#cb495-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="sc">%&gt;%</span></span>
+<span id="cb495-2"><a href="linear-model-selection-and-regularization.html#cb495-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">&quot;C_p&quot;</span>, <span class="st">&quot;BIC&quot;</span>, <span class="st">&quot;Adjusted R2&quot;</span>),</span>
+<span id="cb495-3"><a href="linear-model-selection-and-regularization.html#cb495-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb495-4"><a href="linear-model-selection-and-regularization.html#cb495-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(metric) <span class="sc">%&gt;%</span></span>
+<span id="cb495-5"><a href="linear-model-selection-and-regularization.html#cb495-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb495-6"><a href="linear-model-selection-and-regularization.html#cb495-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">best_model =</span> <span class="fu">ifelse</span>(metric <span class="sc">==</span> <span class="st">&quot;Adjusted R2&quot;</span>,</span>
+<span id="cb495-7"><a href="linear-model-selection-and-regularization.html#cb495-7" aria-hidden="true" tabindex="-1"></a>                        value <span class="sc">==</span> <span class="fu">max</span>(value),</span>
+<span id="cb495-8"><a href="linear-model-selection-and-regularization.html#cb495-8" aria-hidden="true" tabindex="-1"></a>                        value <span class="sc">==</span> <span class="fu">min</span>(value))</span>
+<span id="cb495-9"><a href="linear-model-selection-and-regularization.html#cb495-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb495-10"><a href="linear-model-selection-and-regularization.html#cb495-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb495-11"><a href="linear-model-selection-and-regularization.html#cb495-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">metric =</span> <span class="fu">factor</span>(metric, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;C_p&quot;</span>, <span class="st">&quot;BIC&quot;</span>, <span class="st">&quot;Adjusted R2&quot;</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb495-12"><a href="linear-model-selection-and-regularization.html#cb495-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_preds_adj <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb495-13"><a href="linear-model-selection-and-regularization.html#cb495-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n_preds_adj, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb495-14"><a href="linear-model-selection-and-regularization.html#cb495-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue) <span class="sc">+</span></span>
+<span id="cb495-15"><a href="linear-model-selection-and-regularization.html#cb495-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve) <span class="sc">+</span></span>
+<span id="cb495-16"><a href="linear-model-selection-and-regularization.html#cb495-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> . <span class="sc">%&gt;%</span> <span class="fu">filter</span>(best_model), <span class="at">size =</span> <span class="dv">5</span>, <span class="at">shape =</span> <span class="dv">4</span>,</span>
+<span id="cb495-17"><a href="linear-model-selection-and-regularization.html#cb495-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue) <span class="sc">+</span></span>
+<span id="cb495-18"><a href="linear-model-selection-and-regularization.html#cb495-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> metric, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb495-19"><a href="linear-model-selection-and-regularization.html#cb495-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Number of predictors&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure6.2-1.png" width="576" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p><span class="math inline">\(C_p\)</span>, AIC, and BIC all have rigorous theoretical justifications that are
+beyond the scope of this book. These justifications rely on asymptotic arguments
+(scenarios where the sample size <span class="math inline">\(n\)</span> is very large). Despite its popularity,
+and even though it is quite intuitive, the adjusted <span class="math inline">\(R^2\)</span> is not as well
+motivated in statistical theory as AIC, BIC, and <span class="math inline">\(C_p\)</span>. All of these measures
+are simple to use and compute. Here we have presented their formulas in
+the case of a linear model fit using least squares; however, AIC and BIC
+can also be defined for more general types of models.</p>
+</blockquote>
+</div>
+<div id="validation-and-cross-validation" class="section level4 unnumbered">
+<h4>Validation and Cross-validation</h4>
+<p>Validation and cross-validation from Chapter 5 provide an advantage over AIC, BIC, <span class="math inline">\(C_p\)</span> and adjusted <span class="math inline">\(R^2\)</span>, in that they provide a direct estimate of the test error, and make fewer assumptions about the true underlying model.
+It can also be used in a wider ranger of model selection tasks, including scenarios where the model degrees of freedom (e.g. the number of predictors) or error variance <span class="math inline">\(\sigma^2\)</span> are hard to estimate.</p>
+<p>To re-create Figure 6.3, I’ll use the <code>tidymodels</code> approach with <code>rsample</code> to make the validation set and cross-validation splits:</p>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb496-1"><a href="linear-model-selection-and-regularization.html#cb496-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">499</span>)</span>
+<span id="cb496-2"><a href="linear-model-selection-and-regularization.html#cb496-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb496-3"><a href="linear-model-selection-and-regularization.html#cb496-3" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="ot">&lt;-</span> credit_model_best <span class="sc">%&gt;%</span></span>
+<span id="cb496-4"><a href="linear-model-selection-and-regularization.html#cb496-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb496-5"><a href="linear-model-selection-and-regularization.html#cb496-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">validation_set_error =</span> <span class="fu">map</span>(</span>
+<span id="cb496-6"><a href="linear-model-selection-and-regularization.html#cb496-6" aria-hidden="true" tabindex="-1"></a>      model_formula,</span>
+<span id="cb496-7"><a href="linear-model-selection-and-regularization.html#cb496-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">function</span>(model_formula) {</span>
+<span id="cb496-8"><a href="linear-model-selection-and-regularization.html#cb496-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb496-9"><a href="linear-model-selection-and-regularization.html#cb496-9" aria-hidden="true" tabindex="-1"></a>          <span class="fu">add_model</span>(<span class="fu">linear_reg</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb496-10"><a href="linear-model-selection-and-regularization.html#cb496-10" aria-hidden="true" tabindex="-1"></a>          <span class="fu">add_recipe</span>(<span class="fu">recipe</span>(model_formula, credit)) <span class="sc">%&gt;%</span></span>
+<span id="cb496-11"><a href="linear-model-selection-and-regularization.html#cb496-11" aria-hidden="true" tabindex="-1"></a>          <span class="fu">fit_resamples</span>(<span class="fu">validation_split</span>(credit, <span class="at">prop =</span> <span class="fl">0.75</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb496-12"><a href="linear-model-selection-and-regularization.html#cb496-12" aria-hidden="true" tabindex="-1"></a>          <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb496-13"><a href="linear-model-selection-and-regularization.html#cb496-13" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb496-14"><a href="linear-model-selection-and-regularization.html#cb496-14" aria-hidden="true" tabindex="-1"></a>          <span class="fu">select</span>(<span class="st">`</span><span class="at">Validation set error</span><span class="st">`</span> <span class="ot">=</span> mean, <span class="at">validation_std_err =</span> std_err)</span>
+<span id="cb496-15"><a href="linear-model-selection-and-regularization.html#cb496-15" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb496-16"><a href="linear-model-selection-and-regularization.html#cb496-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb496-17"><a href="linear-model-selection-and-regularization.html#cb496-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">cross_validation_error =</span> <span class="fu">map</span>(</span>
+<span id="cb496-18"><a href="linear-model-selection-and-regularization.html#cb496-18" aria-hidden="true" tabindex="-1"></a>      model_formula,</span>
+<span id="cb496-19"><a href="linear-model-selection-and-regularization.html#cb496-19" aria-hidden="true" tabindex="-1"></a>      <span class="cf">function</span>(model_formula) {</span>
+<span id="cb496-20"><a href="linear-model-selection-and-regularization.html#cb496-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb496-21"><a href="linear-model-selection-and-regularization.html#cb496-21" aria-hidden="true" tabindex="-1"></a>          <span class="fu">add_model</span>(<span class="fu">linear_reg</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb496-22"><a href="linear-model-selection-and-regularization.html#cb496-22" aria-hidden="true" tabindex="-1"></a>          <span class="fu">add_recipe</span>(<span class="fu">recipe</span>(model_formula, credit)) <span class="sc">%&gt;%</span></span>
+<span id="cb496-23"><a href="linear-model-selection-and-regularization.html#cb496-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">fit_resamples</span>(<span class="fu">vfold_cv</span>(credit, <span class="at">v =</span> <span class="dv">10</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb496-24"><a href="linear-model-selection-and-regularization.html#cb496-24" aria-hidden="true" tabindex="-1"></a>          <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb496-25"><a href="linear-model-selection-and-regularization.html#cb496-25" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb496-26"><a href="linear-model-selection-and-regularization.html#cb496-26" aria-hidden="true" tabindex="-1"></a>          <span class="fu">select</span>(<span class="st">`</span><span class="at">Cross-validation error</span><span class="st">`</span> <span class="ot">=</span> mean, <span class="at">cv_std_err =</span> std_err)</span>
+<span id="cb496-27"><a href="linear-model-selection-and-regularization.html#cb496-27" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb496-28"><a href="linear-model-selection-and-regularization.html#cb496-28" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb496-29"><a href="linear-model-selection-and-regularization.html#cb496-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Square root of BIC</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sqrt</span>(BIC)</span>
+<span id="cb496-30"><a href="linear-model-selection-and-regularization.html#cb496-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb496-31"><a href="linear-model-selection-and-regularization.html#cb496-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="fu">c</span>(validation_set_error, cross_validation_error))</span>
+<span id="cb496-32"><a href="linear-model-selection-and-regularization.html#cb496-32" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 13.95 sec elapsed</code></pre>
+<div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="linear-model-selection-and-regularization.html#cb498-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="sc">%&gt;%</span></span>
+<span id="cb498-2"><a href="linear-model-selection-and-regularization.html#cb498-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">&quot;Validation set error&quot;</span>, <span class="st">&quot;Cross-validation error&quot;</span>,</span>
+<span id="cb498-3"><a href="linear-model-selection-and-regularization.html#cb498-3" aria-hidden="true" tabindex="-1"></a>                        <span class="st">&quot;Square root of BIC&quot;</span>),</span>
+<span id="cb498-4"><a href="linear-model-selection-and-regularization.html#cb498-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb498-5"><a href="linear-model-selection-and-regularization.html#cb498-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(metric) <span class="sc">%&gt;%</span></span>
+<span id="cb498-6"><a href="linear-model-selection-and-regularization.html#cb498-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">best_model =</span> value <span class="sc">==</span> <span class="fu">min</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb498-7"><a href="linear-model-selection-and-regularization.html#cb498-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb498-8"><a href="linear-model-selection-and-regularization.html#cb498-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb498-9"><a href="linear-model-selection-and-regularization.html#cb498-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">metric =</span> <span class="fu">factor</span>(metric,</span>
+<span id="cb498-10"><a href="linear-model-selection-and-regularization.html#cb498-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Square root of BIC&quot;</span>, <span class="st">&quot;Validation set error&quot;</span>,</span>
+<span id="cb498-11"><a href="linear-model-selection-and-regularization.html#cb498-11" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;Cross-validation error&quot;</span>))</span>
+<span id="cb498-12"><a href="linear-model-selection-and-regularization.html#cb498-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb498-13"><a href="linear-model-selection-and-regularization.html#cb498-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n_preds_adj, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb498-14"><a href="linear-model-selection-and-regularization.html#cb498-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue) <span class="sc">+</span></span>
+<span id="cb498-15"><a href="linear-model-selection-and-regularization.html#cb498-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>opera_mauve) <span class="sc">+</span></span>
+<span id="cb498-16"><a href="linear-model-selection-and-regularization.html#cb498-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> . <span class="sc">%&gt;%</span> <span class="fu">filter</span>(best_model), <span class="at">size =</span> <span class="dv">5</span>, <span class="at">shape =</span> <span class="dv">4</span>,</span>
+<span id="cb498-17"><a href="linear-model-selection-and-regularization.html#cb498-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue) <span class="sc">+</span></span>
+<span id="cb498-18"><a href="linear-model-selection-and-regularization.html#cb498-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> metric, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb498-19"><a href="linear-model-selection-and-regularization.html#cb498-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Number of predictors&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure6.3-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>Because the randomness associated with splitting the data in validation set and cross-validation approach, we will likely find a different best model with a different split.
+In this case, we can select a model using the <em>one-standard-error rule</em>, where we calculate the standard error of the test MSE for each model, and then select the smallest model for which the estimated test error is within one standard error of the lowest test error.</p>
+<div class="sourceCode" id="cb499"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb499-1"><a href="linear-model-selection-and-regularization.html#cb499-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="sc">%&gt;%</span></span>
+<span id="cb499-2"><a href="linear-model-selection-and-regularization.html#cb499-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb499-3"><a href="linear-model-selection-and-regularization.html#cb499-3" aria-hidden="true" tabindex="-1"></a>    n_preds_adj, <span class="st">`</span><span class="at">Cross-validation error</span><span class="st">`</span>, cv_std_err,</span>
+<span id="cb499-4"><a href="linear-model-selection-and-regularization.html#cb499-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">lowest_error =</span> <span class="fu">min</span>(<span class="st">`</span><span class="at">Cross-validation error</span><span class="st">`</span>),</span>
+<span id="cb499-5"><a href="linear-model-selection-and-regularization.html#cb499-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">lowest_std_error =</span> cv_std_err[<span class="st">`</span><span class="at">Cross-validation error</span><span class="st">`</span> <span class="sc">==</span> lowest_error],</span>
+<span id="cb499-6"><a href="linear-model-selection-and-regularization.html#cb499-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The best model is the minimum `n_preds_adj` (number of predictors) for</span></span>
+<span id="cb499-7"><a href="linear-model-selection-and-regularization.html#cb499-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># which the CV test error is within the standard error of the lowest error</span></span>
+<span id="cb499-8"><a href="linear-model-selection-and-regularization.html#cb499-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">best_model =</span> n_preds_adj <span class="sc">==</span> <span class="fu">min</span>(n_preds_adj[<span class="st">`</span><span class="at">Cross-validation error</span><span class="st">`</span> <span class="sc">&lt;</span> lowest_error <span class="sc">+</span> lowest_std_error])</span>
+<span id="cb499-9"><a href="linear-model-selection-and-regularization.html#cb499-9" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 11 x 6
+##    n_preds_adj `Cross-validation error` cv_std_err lowest_error lowest_std_error
+##          &lt;int&gt;                    &lt;dbl&gt;      &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;
+##  1           1                    230.       12.7          98.7             3.41
+##  2           2                    161.        8.89         98.7             3.41
+##  3           3                    104.        2.46         98.7             3.41
+##  4           4                     99.2       4.54         98.7             3.41
+##  5           5                     99.3       3.23         98.7             3.41
+##  6           6                     99.0       4.15         98.7             3.41
+##  7           7                     98.7       3.41         98.7             3.41
+##  8           8                     99.7       2.94         98.7             3.41
+##  9           9                     99.6       4.11         98.7             3.41
+## 10          10                     99.7       3.29         98.7             3.41
+## 11          11                    100.        3.08         98.7             3.41
+## # ... with 1 more variable: best_model &lt;lgl&gt;</code></pre>
+<blockquote>
+<p>The rationale here is that
+if a set of models appear to be more or less equally good, then we might
+as well choose the simplest model—that is, the model with the smallest
+number of predictors. In this case, applying the one-standard-error rule
+to the validation set or cross-validation approach leads to selection of the
+three-variable model.</p>
+</blockquote>
+<p>Here, the four-variable model was selected, but I would chalk that up to the random seed.</p>
+</div>
+</div>
+</div>
+<div id="shrinkage-methods" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Shrinkage Methods</h2>
+<div id="ridge-regression" class="section level3" number="6.2.1">
+<h3><span class="header-section-number">6.2.1</span> Ridge Regression</h3>
+</div>
+<div id="the-lasso" class="section level3" number="6.2.2">
+<h3><span class="header-section-number">6.2.2</span> The Lasso</h3>
+</div>
+<div id="selecting-the-tuning-parameter" class="section level3" number="6.2.3">
+<h3><span class="header-section-number">6.2.3</span> Selecting the Tuning Parameter</h3>
+</div>
+</div>
+<div id="dimension-reduction-methods" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Dimension Reduction Methods</h2>
+<div id="principal-components-regression" class="section level3" number="6.3.1">
+<h3><span class="header-section-number">6.3.1</span> Principal Components Regression</h3>
+</div>
+<div id="partial-least-squares" class="section level3" number="6.3.2">
+<h3><span class="header-section-number">6.3.2</span> Partial Least Squares</h3>
+</div>
+</div>
+<div id="considerations-in-high-dimensions" class="section level2" number="6.4">
+<h2><span class="header-section-number">6.4</span> Considerations in High Dimensions</h2>
+<div id="high-dimensional-data" class="section level3" number="6.4.1">
+<h3><span class="header-section-number">6.4.1</span> High-Dimensional Data</h3>
+</div>
+<div id="what-goes-wrong-in-high-dimensions" class="section level3" number="6.4.2">
+<h3><span class="header-section-number">6.4.2</span> What Goes Wrong in High Dimensions?</h3>
+</div>
+<div id="regression-in-high-dimensions" class="section level3" number="6.4.3">
+<h3><span class="header-section-number">6.4.3</span> Regression in High Dimensions</h3>
+</div>
+<div id="interpreting-results-in-high-dimensions" class="section level3" number="6.4.4">
+<h3><span class="header-section-number">6.4.4</span> Interpreting Results in High Dimensions</h3>
+</div>
+</div>
+<div id="lab-linear-models-and-regularization-methods" class="section level2" number="6.5">
+<h2><span class="header-section-number">6.5</span> Lab: Linear Models and Regularization Methods</h2>
+<div id="subset-selection-methods" class="section level3" number="6.5.1">
+<h3><span class="header-section-number">6.5.1</span> Subset Selection Methods</h3>
+</div>
+<div id="ridge-regression-and-the-lasso" class="section level3" number="6.5.2">
+<h3><span class="header-section-number">6.5.2</span> Ridge Regression and the Lasso</h3>
+</div>
+<div id="pcr-and-pls-regression" class="section level3" number="6.5.3">
+<h3><span class="header-section-number">6.5.3</span> PCR and PLS Regression</h3>
+</div>
+</div>
+<div id="exercises-3" class="section level2" number="6.6">
+<h2><span class="header-section-number">6.6</span> Exercises</h2>
+</div>
+<div id="reproducibility-3" class="section level2 unnumbered">
+<h2>Reproducibility</h2>
+<div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="linear-model-selection-and-regularization.html#cb501-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2022-02-18 00:08:47 AST&quot;</code></pre>
+<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="linear-model-selection-and-regularization.html#cb503-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
+<span id="cb503-2"><a href="linear-model-selection-and-regularization.html#cb503-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
+<span id="cb503-3"><a href="linear-model-selection-and-regularization.html#cb503-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
+<span id="cb503-4"><a href="linear-model-selection-and-regularization.html#cb503-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb503-5"><a href="linear-model-selection-and-regularization.html#cb503-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
+## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
+## Head:     [db46952] 2022-02-17: Started chapter 6 up to Figure 6.1</code></pre>
+<div class="sourceCode" id="cb505"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb505-1"><a href="linear-model-selection-and-regularization.html#cb505-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
+<pre><code>## - Session info ---------------------------------------------------------------
+##  setting  value                       
+##  version  R version 4.1.2 (2021-11-01)
+##  os       Windows 10 x64              
+##  system   x86_64, mingw32             
+##  ui       RTerm                       
+##  language (EN)                        
+##  collate  English_Canada.1252         
+##  ctype    English_Canada.1252         
+##  tz       America/Curacao             
+##  date     2022-02-18                  
+## 
+## - Packages -------------------------------------------------------------------
+##  package        * version    date       lib source                           
+##  abind            1.4-5      2016-07-21 [1] CRAN (R 4.1.1)                   
+##  assertthat       0.2.1      2019-03-21 [1] CRAN (R 4.1.0)                   
+##  backports        1.2.1      2020-12-09 [1] CRAN (R 4.1.0)                   
+##  base64enc        0.1-3      2015-07-28 [1] CRAN (R 4.1.0)                   
+##  bayestestR       0.10.5     2021-07-26 [1] CRAN (R 4.1.0)                   
+##  bit              4.0.4      2020-08-04 [1] CRAN (R 4.1.2)                   
+##  bit64            4.0.5      2020-08-30 [1] CRAN (R 4.1.2)                   
+##  bookdown         0.24       2021-09-02 [1] CRAN (R 4.1.1)                   
+##  boot             1.3-28     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  broom          * 0.7.10     2021-10-31 [1] CRAN (R 4.1.2)                   
+##  bslib            0.2.5.1    2021-05-18 [1] CRAN (R 4.1.0)                   
+##  cachem           1.0.6      2021-08-19 [1] CRAN (R 4.1.1)                   
+##  car              3.0-12     2021-11-06 [1] CRAN (R 4.1.2)                   
+##  carData          3.0-4      2020-05-22 [1] CRAN (R 4.1.1)                   
+##  cellranger       1.1.0      2016-07-27 [1] CRAN (R 4.1.0)                   
+##  checkmate        2.0.0      2020-02-06 [1] CRAN (R 4.1.0)                   
+##  class            7.3-19     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  cli              3.1.1      2022-01-20 [1] CRAN (R 4.1.2)                   
+##  coda             0.19-4     2020-09-30 [1] CRAN (R 4.1.0)                   
+##  codetools        0.2-18     2020-11-04 [2] CRAN (R 4.1.2)                   
+##  colorspace       2.0-2      2021-06-24 [1] CRAN (R 4.1.0)                   
+##  combinat         0.0-8      2012-10-29 [1] CRAN (R 4.1.1)                   
+##  corrr          * 0.4.3      2020-11-24 [1] CRAN (R 4.1.0)                   
+##  crayon           1.4.2      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  datawizard       0.1.0      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  DBI              1.1.2      2021-12-20 [1] CRAN (R 4.1.2)                   
+##  dbplyr           2.1.1      2021-04-06 [1] CRAN (R 4.1.0)                   
+##  DEoptimR         1.0-9      2021-05-24 [1] CRAN (R 4.1.0)                   
+##  dials          * 0.0.10     2021-09-10 [1] CRAN (R 4.1.1)                   
+##  DiceDesign       1.9        2021-02-13 [1] CRAN (R 4.1.0)                   
+##  digest           0.6.29     2021-12-01 [1] CRAN (R 4.1.2)                   
+##  discrim        * 0.1.3      2021-07-21 [1] CRAN (R 4.1.2)                   
+##  distill          1.3        2021-10-13 [1] CRAN (R 4.1.2)                   
+##  distributional   0.2.2      2021-02-02 [1] CRAN (R 4.1.2)                   
+##  doParallel     * 1.0.16     2020-10-16 [1] CRAN (R 4.1.1)                   
+##  downlit          0.4.0      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  dplyr          * 1.0.7      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  dunnr          * 0.2.5      2022-01-15 [1] Github (taylordunn/dunnr@c83b30e)
+##  effectsize       0.4.5      2021-05-25 [1] CRAN (R 4.1.0)                   
+##  ellipsis         0.3.2      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  emmeans          1.7.0      2021-09-29 [1] CRAN (R 4.1.2)                   
+##  equatiomatic     0.2.0      2021-01-30 [1] CRAN (R 4.1.0)                   
+##  estimability     1.3        2018-02-11 [1] CRAN (R 4.1.1)                   
+##  evaluate         0.14       2019-05-28 [1] CRAN (R 4.1.0)                   
+##  extrafont        0.17       2014-12-08 [1] CRAN (R 4.1.0)                   
+##  extrafontdb      1.0        2012-06-11 [1] CRAN (R 4.1.0)                   
+##  fansi            1.0.2      2022-01-14 [1] CRAN (R 4.1.2)                   
+##  farver           2.1.0      2021-02-28 [1] CRAN (R 4.1.0)                   
+##  fastmap          1.1.0      2021-01-25 [1] CRAN (R 4.1.0)                   
+##  forcats        * 0.5.1      2021-01-27 [1] CRAN (R 4.1.0)                   
+##  foreach        * 1.5.1      2020-10-15 [1] CRAN (R 4.1.0)                   
+##  fs               1.5.2      2021-12-08 [1] CRAN (R 4.1.2)                   
+##  furrr            0.2.3      2021-06-25 [1] CRAN (R 4.1.2)                   
+##  future         * 1.23.0     2021-10-31 [1] CRAN (R 4.1.2)                   
+##  generics         0.1.1      2021-10-25 [1] CRAN (R 4.1.1)                   
+##  GGally           2.1.2      2021-06-21 [1] CRAN (R 4.1.0)                   
+##  ggdist         * 3.0.0      2021-07-19 [1] CRAN (R 4.1.2)                   
+##  ggplot2        * 3.3.5      2021-06-25 [1] CRAN (R 4.1.0)                   
+##  ggrepel          0.9.1      2021-01-15 [1] CRAN (R 4.1.0)                   
+##  ggridges         0.5.3      2021-01-08 [1] CRAN (R 4.1.0)                   
+##  git2r            0.28.0     2021-01-10 [1] CRAN (R 4.1.0)                   
+##  globals          0.14.0     2020-11-22 [1] CRAN (R 4.1.0)                   
+##  glue             1.6.0      2021-12-17 [1] CRAN (R 4.1.2)                   
+##  gower            0.2.2      2020-06-23 [1] CRAN (R 4.1.0)                   
+##  GPfit            1.0-8      2019-02-08 [1] CRAN (R 4.1.0)                   
+##  gridExtra        2.3        2017-09-09 [1] CRAN (R 4.1.0)                   
+##  gt             * 0.3.1      2021-08-07 [1] CRAN (R 4.1.2)                   
+##  gtable           0.3.0      2019-03-25 [1] CRAN (R 4.1.0)                   
+##  hardhat          0.1.6      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  haven            2.4.1      2021-04-23 [1] CRAN (R 4.1.0)                   
+##  here           * 1.0.1      2020-12-13 [1] CRAN (R 4.1.0)                   
+##  highr            0.9        2021-04-16 [1] CRAN (R 4.1.0)                   
+##  hms              1.1.1      2021-09-26 [1] CRAN (R 4.1.2)                   
+##  htmltools        0.5.2      2021-08-25 [1] CRAN (R 4.1.1)                   
+##  httpuv           1.6.5      2022-01-05 [1] CRAN (R 4.1.2)                   
+##  httr             1.4.2      2020-07-20 [1] CRAN (R 4.1.0)                   
+##  igraph           1.2.6      2020-10-06 [1] CRAN (R 4.1.0)                   
+##  infer          * 1.0.0      2021-08-13 [1] CRAN (R 4.1.1)                   
+##  insight          0.14.2     2021-06-22 [1] CRAN (R 4.1.0)                   
+##  ipred            0.9-12     2021-09-15 [1] CRAN (R 4.1.1)                   
+##  ISLR2          * 1.3-1      2022-01-10 [1] CRAN (R 4.1.2)                   
+##  iterators      * 1.0.13     2020-10-15 [1] CRAN (R 4.1.0)                   
+##  jquerylib        0.1.4      2021-04-26 [1] CRAN (R 4.1.0)                   
+##  jsonlite         1.7.3      2022-01-17 [1] CRAN (R 4.1.2)                   
+##  kknn             1.3.1      2016-03-26 [1] CRAN (R 4.1.2)                   
+##  klaR             0.6-15     2020-02-19 [1] CRAN (R 4.1.2)                   
+##  knitr            1.37       2021-12-16 [1] CRAN (R 4.1.2)                   
+##  labeling         0.4.2      2020-10-20 [1] CRAN (R 4.1.0)                   
+##  labelled         2.8.0      2021-03-08 [1] CRAN (R 4.1.0)                   
+##  later            1.3.0      2021-08-18 [1] CRAN (R 4.1.2)                   
+##  lattice          0.20-45    2021-09-22 [2] CRAN (R 4.1.2)                   
+##  lava             1.6.9      2021-03-11 [1] CRAN (R 4.1.0)                   
+##  lhs              1.1.1      2020-10-05 [1] CRAN (R 4.1.0)                   
+##  lifecycle        1.0.1      2021-09-24 [1] CRAN (R 4.1.1)                   
+##  listenv          0.8.0      2019-12-05 [1] CRAN (R 4.1.0)                   
+##  lubridate        1.8.0      2021-10-07 [1] CRAN (R 4.1.1)                   
+##  magrittr         2.0.1      2020-11-17 [1] CRAN (R 4.1.0)                   
+##  MASS             7.3-54     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  Matrix           1.3-4      2021-06-01 [2] CRAN (R 4.1.2)                   
+##  memoise          2.0.1      2021-11-26 [1] CRAN (R 4.1.2)                   
+##  MetBrewer        0.1.0      2022-01-05 [1] CRAN (R 4.1.2)                   
+##  mgcv             1.8-38     2021-10-06 [2] CRAN (R 4.1.2)                   
+##  mime             0.12       2021-09-28 [1] CRAN (R 4.1.1)                   
+##  miniUI           0.1.1.1    2018-05-18 [1] CRAN (R 4.1.1)                   
+##  modeldata      * 0.1.1      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  modelr           0.1.8      2020-05-19 [1] CRAN (R 4.1.0)                   
+##  munsell          0.5.0      2018-06-12 [1] CRAN (R 4.1.0)                   
+##  mvtnorm        * 1.1-3      2021-10-08 [1] CRAN (R 4.1.1)                   
+##  nlme             3.1-153    2021-09-07 [2] CRAN (R 4.1.2)                   
+##  nnet             7.3-16     2021-05-03 [2] CRAN (R 4.1.2)                   
+##  parallelly       1.27.0     2021-07-19 [1] CRAN (R 4.1.0)                   
+##  parameters       0.14.0     2021-05-29 [1] CRAN (R 4.1.0)                   
+##  parsnip        * 0.1.7      2021-07-21 [1] CRAN (R 4.1.0)                   
+##  patchwork      * 1.1.1      2020-12-17 [1] CRAN (R 4.1.0)                   
+##  performance      0.7.3      2021-07-21 [1] CRAN (R 4.1.1)                   
+##  pillar           1.7.0      2022-02-01 [1] CRAN (R 4.1.2)                   
+##  pkgconfig        2.0.3      2019-09-22 [1] CRAN (R 4.1.0)                   
+##  plyr             1.8.6      2020-03-03 [1] CRAN (R 4.1.0)                   
+##  poissonreg     * 0.1.1      2021-08-07 [1] CRAN (R 4.1.2)                   
+##  prettyunits      1.1.1      2020-01-24 [1] CRAN (R 4.1.0)                   
+##  pROC             1.17.0.1   2021-01-13 [1] CRAN (R 4.1.0)                   
+##  prodlim          2019.11.13 2019-11-17 [1] CRAN (R 4.1.0)                   
+##  promises         1.2.0.1    2021-02-11 [1] CRAN (R 4.1.0)                   
+##  purrr          * 0.3.4      2020-04-17 [1] CRAN (R 4.1.2)                   
+##  qqplotr          0.0.5      2021-04-23 [1] CRAN (R 4.1.0)                   
+##  questionr        0.7.5      2021-10-06 [1] CRAN (R 4.1.2)                   
+##  R6               2.5.1      2021-08-19 [1] CRAN (R 4.1.1)                   
+##  RColorBrewer     1.1-2      2014-12-07 [1] CRAN (R 4.1.0)                   
+##  Rcpp             1.0.8      2022-01-13 [1] CRAN (R 4.1.2)                   
+##  readr          * 2.1.1      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  readxl           1.3.1      2019-03-13 [1] CRAN (R 4.1.0)                   
+##  recipes        * 0.1.17     2021-09-27 [1] CRAN (R 4.1.1)                   
+##  repr             1.1.3      2021-01-21 [1] CRAN (R 4.1.1)                   
+##  reprex           2.0.0      2021-04-02 [1] CRAN (R 4.1.0)                   
+##  reshape          0.8.8      2018-10-23 [1] CRAN (R 4.1.0)                   
+##  rlang          * 0.4.12     2021-10-18 [1] CRAN (R 4.1.1)                   
+##  rmarkdown        2.11       2021-09-14 [1] CRAN (R 4.1.1)                   
+##  robustbase       0.93-8     2021-06-02 [1] CRAN (R 4.1.0)                   
+##  rpart            4.1-15     2019-04-12 [2] CRAN (R 4.1.2)                   
+##  rprojroot        2.0.2      2020-11-15 [1] CRAN (R 4.1.0)                   
+##  rsample        * 0.1.0      2021-05-08 [1] CRAN (R 4.1.0)                   
+##  rstudioapi       0.13       2020-11-12 [1] CRAN (R 4.1.0)                   
+##  Rttf2pt1         1.3.8      2020-01-10 [1] CRAN (R 4.1.1)                   
+##  rvest            1.0.0      2021-03-09 [1] CRAN (R 4.1.0)                   
+##  sass             0.4.0      2021-05-12 [1] CRAN (R 4.1.0)                   
+##  scales         * 1.1.1      2020-05-11 [1] CRAN (R 4.1.0)                   
+##  see              0.6.4      2021-05-29 [1] CRAN (R 4.1.0)                   
+##  sessioninfo      1.1.1      2018-11-05 [1] CRAN (R 4.1.0)                   
+##  shiny            1.6.0      2021-01-25 [1] CRAN (R 4.1.0)                   
+##  skimr            2.1.3      2021-03-07 [1] CRAN (R 4.1.1)                   
+##  stringi          1.7.6      2021-11-29 [1] CRAN (R 4.1.2)                   
+##  stringr        * 1.4.0      2019-02-10 [1] CRAN (R 4.1.0)                   
+##  survival         3.2-13     2021-08-24 [2] CRAN (R 4.1.2)                   
+##  tibble         * 3.1.6      2021-11-07 [1] CRAN (R 4.1.1)                   
+##  tictoc         * 1.0.1      2021-04-19 [1] CRAN (R 4.1.1)                   
+##  tidymodels     * 0.1.4      2021-10-01 [1] CRAN (R 4.1.1)                   
+##  tidyr          * 1.1.4      2021-09-27 [1] CRAN (R 4.1.1)                   
+##  tidyselect       1.1.1      2021-04-30 [1] CRAN (R 4.1.0)                   
+##  tidyverse      * 1.3.1      2021-04-15 [1] CRAN (R 4.1.2)                   
+##  timeDate         3043.102   2018-02-21 [1] CRAN (R 4.1.0)                   
+##  tune           * 0.1.6      2021-07-21 [1] CRAN (R 4.1.0)                   
+##  tzdb             0.2.0      2021-10-27 [1] CRAN (R 4.1.2)                   
+##  usethis          2.1.5      2021-12-09 [1] CRAN (R 4.1.2)                   
+##  utf8             1.2.2      2021-07-24 [1] CRAN (R 4.1.0)                   
+##  vctrs          * 0.3.8      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  vroom            1.5.7      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  withr            2.4.3      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  workflows      * 0.2.3      2021-07-16 [1] CRAN (R 4.1.0)                   
+##  workflowsets   * 0.1.0      2021-07-22 [1] CRAN (R 4.1.0)                   
+##  xfun             0.29       2021-12-14 [1] CRAN (R 4.1.2)                   
+##  xml2             1.3.3      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  xtable           1.8-4      2019-04-21 [1] CRAN (R 4.1.0)                   
+##  yaml             2.2.1      2020-02-01 [1] CRAN (R 4.1.0)                   
+##  yardstick      * 0.0.8      2021-03-28 [1] CRAN (R 4.1.0)                   
+## 
+## [1] C:/Users/tdunn/Documents/R/win-library/4.1
+## [2] C:/Program Files/R/R-4.1.2/library</code></pre>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="resampling-methods.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
