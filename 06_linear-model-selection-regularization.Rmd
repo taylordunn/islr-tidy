@@ -83,12 +83,12 @@ Although this chapter is specifically about extensions to the linear model for r
 Disclaimer at the top: as mentioned in section 3.1, there are a lot of reasons to avoid subset and stepwise model selection.
 Here are some resources on this topic:
 
-* @Smith2018.
+* The 2018 paper by @Smith2018.
 * [A Stack Overflow response.](https://stats.stackexchange.com/questions/20836/algorithms-for-automatic-model-selection/20856#20856)
 * [Frank Harrell comments.](https://www.stata.com/support/faqs/statistics/stepwise-regression-problems/)
 
 Regardless, I will still work through the examples in the text as a programming exercise.
-However, `tidymodels` does not have the functionality for subset/stepwise selection, so I will 
+However, `tidymodels` does not have the functionality for subset/stepwise selection, so I will be using alternatives.
 
 ### Best Subset Selection
 
@@ -96,11 +96,11 @@ To perform *best subset selection*, we fit $p$ models that contain exactly one p
 In total, this involves fitting $2^p$ models.
 Then we select the model that is best, usually following these steps
 
-1. Let $\mathcal{M}_0$ denote the *null model*, which contains no predictors. This model simply predictors the sample mean for each observation.
+1. Let $\mathcal{M}_0$ denote the *null model*, which contains no predictors. This model simply predicts the sample mean.
 2. For $k = 1, 2, \dots, p$:
     * Fit all ${p \choose k}$ models that contain exactly $k$ predictors.
     * Pick the best among these ${p \choose k}$ models, and call it $\mathcal{M}_k$. Here, *best* is defined as having the smallest RSS, or equivalently the largest $R^2$.
-3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
+3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated prediction error $C_p$ (AIC), BIC, or adjusted $R^2$.
 
 Step 2 identifies the best model (on the training data) for each subset size, in order to reduce the problem from $2^p$ to $p + 1$ possible models.
 Choosing the single best model from the $p + 1$ options must be done with care, because the RSS of these models decreases monotonically, and the $R^2$ increases monotonically, as the number of predictors increases.
@@ -206,7 +206,7 @@ Forward stepwise selection begins with a model containing no predictors, and the
 2. For $k = 0, 1, \dots, p-1$:
     * Consider all $p - k$ models that augment the predictors in $\mathcal{M}_k$ with one additional predictor.
     * Choose the best among these $p - k$ models, and call it $\mathcal{M}_{k+1}$. Here, *best* is defined as having smallest RSS or highest $R^2$.
-3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
+3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated prediction error $C_p$ (AIC), BIC, or adjusted $R^2$.
 
 Step 2 is similar to step 2 in best subset selection, in that we simply choose the model with the lowest RSS or highest $R^2$.
 Step 3 is more tricky, and is discussed in Section 6.1.3.
@@ -274,7 +274,7 @@ Backwards stepwise selection begins with the full model containing all $p$ predi
 2. For $k = p, p-1, \dots, 1$:
     * Consider all $k$ models that contain all but one of the predictors in $\mathcal{M}_k$ for a total of $k - 1$ predictors.
     * Choose the best among these $k$ models, and call it $\mathcal{M}_{k-1}$. Here, *best* is defined as having smallest RSS or highest $R^2$.
-3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated predictor error $C_p$ (AIC), BIC, or adjusted $R^2$.
+3. Select a single best model from among $\mathcal{M}_0, \dots, \mathcal{M}_p$ using cross-validated prediction error $C_p$ (AIC), BIC, or adjusted $R^2$.
 
 >
 Like forward stepwise selection, the backward selection approach searches
@@ -302,7 +302,7 @@ backward stepwise selection.
 ### Choosing the Optimal Model
 
 To apply these subset selection methods, we need to determine which model is *best*.
-Since more predictors will always lead to smaller RSS and larger $R^2$ (training error), we nee to estimate the test error.
+Since more predictors will always lead to smaller RSS and larger $R^2$ (training error), we need to estimate the test error.
 There are two common approaches:
 
 1. We can indirectly estimate test error by making an adjustment to the
@@ -371,7 +371,7 @@ $$
 
 where irrelevant constants were excluded.
 Here, the factor of 2 in the AIC/$C_p$ is replaced with $\log (n)$.
-Since $\log n > 2$ for any $n > 7$, the BIC statistic generally penalized more heavily models with many variables.
+Since $\log n > 2$ for any $n > 7$, the BIC statistic generally penalizes models with many variables more heavily.
 
 ```{r}
 credit_model_best <- credit_model_best %>%
@@ -407,6 +407,8 @@ credit_model_best <- credit_model_best %>%
     `Adjusted R2` = map_dbl(model_fit, ~ summary(.x)$adj.r.squared)
   )
 ```
+
+Figure 6.2:
 
 ```{r figure6.2}
 credit_model_best %>%
@@ -532,13 +534,322 @@ number of predictors. In this case, applying the one-standard-error rule
 to the validation set or cross-validation approach leads to selection of the
 three-variable model.
 
-Here, the four-variable model was selected, but I would chalk that up to the random seed.
+Here, the four-variable model was selected, but I would chalk that up to the random sampling.
 
 ## Shrinkage Methods
 
+As already discussed, subset selection has a lot of issues.
+A much better alternative is use a technique that *contrains* or *regularizes* or *shrinks* the coefficient estimates towards zero in a model fit with all $p$ predictors.
+It turns out that shrinking the coefficient estimates can significantly reduce the variance.
+
 ### Ridge Regression
 
+Recall from Chapter 3 that the least squares fitting procedure involves estimating $\beta_0, \beta_1, \dots, \beta_p$ by minimizing the RSS:
+
+$$
+\text{RSS} = \sum_{i=1}^n \left(y_i - \hat{y}_i \right)^2 = \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2.
+$$
+
+*Ridge regression* is very similar to least squares, except the quantity minimized is slightly different:
+
+$$
+\sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^p \beta_j^2 = \text{RSS} + \lambda \sum_{j=1}^p \beta_j^2,
+$$
+
+
+where $\lambda \geq 0$ is a *tuning parameter*, to be determined separately.
+The second term above, called a *shrinkage penalty* is small when the coefficients are close to zero, and so has the effect of shrinking the estimates $\beta_j$ towards zero.
+The tuning parameter $\lambda$ serves to control the relative impact of these two terms on the regression coefficient estimates.
+When $\lambda = 0$, the penalty term has no effect, and ridge regression will produce the same least squares estimates.
+Unlike least squares, which generates only one set of coefficient estimates (the "best fit"), ridge regression will produce a different set of coefficient estimates $\hat{\beta}_{\lambda}^R$ for each value $\lambda$.
+Selecting a good value for $\lambda$ is critical.
+
+Note that the shrinkage penalty is not applied to the intercept $\beta_0$, which is simply a measure of the mean value of the response when all predictors are zero ($x_{i1} = x_{i2} = \dots = 0$)
+
+#### An Application to the Credit Data {-}
+
+In `tidymodels`, regularized least squares is done with the `glmnet` engine.
+(See [this article for a list of models available in `parnsip`](https://www.tidymodels.org/find/parsnip/) and [this article for examples using `glmnet`](https://parsnip.tidymodels.org/reference/details_linear_reg_glmnet.html).)
+
+Specify the model:
+
+```{r}
+ridge_spec <- linear_reg(penalty = 0, mixture = 0) %>%
+  set_engine("glmnet")
+# The `parnship::translate()` function is a helpful way to "decode" a model spec
+ridge_spec %>% translate()
+```
+
+The `penalty` argument above refers to the $\lambda$ tuning parameter.
+The `mixture` variable ranges from 0 to 1, with 0 corresponding to ridge regression, 1 corresponding to lasso regression, and values between using a mixture of both.
+
+Fit `Balance` to all the predictors:
+
+```{r message=FALSE}
+credit_ridge_fit <- fit(ridge_spec, Balance ~ ., data = credit)
+tidy(credit_ridge_fit)
+```
+
+Because our `ridge_spec` had `penalty = 0`, the coefficients here correspond to no penalty, but the `glmnet::glmnet()` function fits a range of `penalty` values all at once, which we can extract with `broom::tidy` like so:
+
+```{r}
+tidy(credit_ridge_fit, penalty = 100)
+```
+
+To re-create Figure 6.4, I'll first re-fit the data on *standardized data* (continuous variables re-scaled to have mean of 0, standard deviation of 1):
+
+```{r}
+credit_recipe <- recipe(Balance ~ ., data = credit) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_predictors())
+credit_ridge_workflow <- workflow() %>%
+  add_recipe(credit_recipe) %>%
+  add_model(ridge_spec)
+credit_ridge_fit <- fit(credit_ridge_workflow, data = credit)
+```
+
+Then I'll compile coefficient estimates for a wide range of $\lambda$ values with `purrr::map_dfr()`:
+
+```{r figure6.4_incorrect}
+map_dfr(seq(-2, 5, 0.1),
+        ~ tidy(credit_ridge_fit, penalty = 10^.x)) %>%
+  filter(term != "(Intercept)") %>%
+  mutate(
+    term_highlight = fct_other(
+      term, keep = c("Income", "Limit", "Rating", "Student_Yes")
+    )
+  ) %>%
+  ggplot(aes(x = penalty, y = estimate)) +
+  geom_line(aes(group = term, color = term_highlight), size = 1) +
+  scale_x_log10(breaks = 10^c(-2, 0, 2, 4)) +
+  geom_vline(xintercept = 40, lty = 2, size = 1) +
+  labs(x = expression(lambda), y = "Standardized coefficients", color = NULL) +
+  scale_color_manual(values = c(td_colors$pastel6[1:4], "grey80")) +
+  theme(legend.position = c(0.8, 0.8))
+```
+
+From this figure, it is clear that the fitting procedure is truncated at a penalty values of $\lambda$ = 40 (the vertical line above).
+This has to do with the *regularization path* chosen by `glmnet`.
+We can see from the grid of values for $\lambda$ that the minimum value is 40:
+
+```{r}
+extract_fit_engine(credit_ridge_fit)$lambda
+```
+
+The regularization path can be set manually using the `path_values` argument (see [this article for more details](https://parsnip.tidymodels.org/reference/glmnet-details.html)):
+
+```{r}
+coef_path_values <- 10^seq(-2, 5, 0.1)
+
+ridge_spec_path <- linear_reg(penalty = 0, mixture = 0) %>%
+  set_engine("glmnet", path_values = coef_path_values)
+credit_ridge_workflow_path <- workflow() %>%
+  add_recipe(credit_recipe) %>%
+  add_model(ridge_spec_path)
+
+credit_ridge_fit <- fit(credit_ridge_workflow_path, data = credit)
+```
+
+Now with the full range of $\lambda$ values, I can re-create the figure properly:
+
+```{r figure6.4, fig.width=7}
+# Compute the l2 norm for the least squares model
+credit_lm_fit <- lm(Balance ~ ., data = credit)
+credit_lm_fit_l2_norm <- sum(credit_lm_fit$coefficients[-1]^2)
+
+d <- map_dfr(seq(-2, 5, 0.1),
+        ~ tidy(credit_ridge_fit, penalty = 10^.x)) %>%
+  filter(term != "(Intercept)") %>%
+  group_by(penalty) %>%
+  mutate(l2_norm = sum(estimate^2),
+         l2_norm_ratio = l2_norm / credit_lm_fit_l2_norm) %>%
+  ungroup() %>%
+  mutate(
+    term_highlight = fct_other(
+      term, keep = c("Income", "Limit", "Rating", "Student_Yes")
+    )
+  )
+
+p1 <- d %>%
+  ggplot(aes(x = penalty, y = estimate)) +
+  geom_line(aes(group = term, color = term_highlight), size = 1) +
+  scale_x_log10(breaks = 10^c(-2, 0, 2, 4)) +
+  labs(x = expression(lambda), y = "Standardized coefficients", color = NULL) +
+  scale_color_manual(values = c(td_colors$pastel6[1:4], "grey80")) +
+  theme(legend.position = c(0.7, 0.8))
+p2 <- d %>%
+  ggplot(aes(x = l2_norm_ratio, y = estimate)) +
+  geom_line(aes(group = term, color = term_highlight), size = 1) +
+  labs(
+    x = expression(paste("||", hat(beta[lambda]), "||2 / ||", hat(beta), "||2")),
+    y = NULL, color = NULL
+  ) +
+  scale_color_manual(values = c(td_colors$pastel6[1:4], "grey80")) +
+  theme(legend.position = "none")
+p1 | p2
+```
+
+
+On the subject of standardizing predictors:
+
+>
+The standard least squares coefficient estimates discussed in Chapter 3
+are scale equivariant: multiplying $X_j$ by a constant $c$ simply leads to a
+scaling of the least squares coefficient estimates by a factor of $1/c$. In other
+words, regardless of how the $j$th predictor is scaled, $X_j \hat{\beta}_j$ will remain the
+same. In contrast, the ridge regression coefficient estimates can change substantially when multiplying a given predictor by a constant. For instance,
+consider the income variable, which is measured in dollars. One could reasonably have measured income in thousands of dollars, which would result
+in a reduction in the observed values of income by a factor of 1,000. Now due
+to the sum of squared coefficients term in the ridge regression formulation
+(6.5), such a change in scale will not simply cause the ridge regression coefficient estimate for income to change by a factor of 1,000. In other words,
+$X_j \hat{\beta}^R_{j,λ}$ will depend not only on the value of $\lambda$, but also on the scaling of the
+$j$th predictor. In fact, the value of $X_j \hat{\beta}^R_{j, \lambda}$
+may even depend on the scaling
+of the other predictors! Therefore, it is best to apply ridge regression after
+standardizing the predictors, ... so that they are all on the same scale.
+
+#### Why Does Ridge Regression Improve Over Least Squares? {-}
+
+Ridge regression's advantage over least squares has to do with the *bias-variance trade-off*.
+As $\lambda$ increases, the flexibility of the fit decreases, leading to decreased variance but increased bias.
+So ridge regression works best in situations where the least squares estimates have high variance, like when the number of variables $p$ is almost as large as the number of observations $n$ (as in Figure 6.5).
+
+>
+Ridge regression also has substantial computational advantages over best
+subset selection, which requires searching through $2p$ models. As we discussed previously, even for moderate values of $p$, such a search can be
+computationally infeasible. In contrast, for any fixed value of $\lambda$, ridge regression only fits a single model, and the model-fitting procedure can be
+performed quite quickly. In fact, one can show that the computations required to solve (6.5), simultaneously for all values of $\lambda$, are almost identical to those for fitting a model using least squares.
+
 ### The Lasso
+
+Ridge regression will shrink all coefficients towards zero, but will not set them to exactly zero (unless $\lambda = \infty$).
+This doesn't affect prediction accuracy, but may cause challenges in model interpretation for large numbers of variables $p$.
+
+The *lasso* is a relatively recent alternative to ridge regression with a similar formulation as ridge regression.
+The coefficients $\hat{\beta}_{\lambda}^L$ minimize the quantity:
+
+$$
+\sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^p | \beta_j | = \text{RSS} + \lambda \sum_{j=1}^p | \beta_j |.
+$$
+
+>
+The only difference is that the $\beta_j^2$ term in the ridge
+regression penalty (6.5) has been replaced by $|\beta_j|$ in the lasso penalty (6.7).
+In statistical parlance, the lasso uses an $\mathcal{l}_1$ (pronounced “ell 1”) penalty
+instead of an $\mathcal{l}_2$ penalty. The $\mathcal{l}_1$ norm of a coefficient vector $\beta$ is given by $||\beta||_1 = \sum |\beta_j|$.
+
+The $\mathcal{l}_1$ penalty has the effect of forcing some of the coefficient estimates to be exactly equal to zero for sufficiently large $\lambda$.
+Functionally, this is a form of automatic *variable selection* like the best subset techniques.
+We say that the lasso yields *sparse* models which only involve a subset of the variables.
+This makes lasso models much easier to interpret than those produced by ridge regression.
+
+Fit the `credit` model with lasso regression:
+
+```{r}
+lasso_spec <- linear_reg(penalty = 20, mixture = 1) %>%
+  set_engine("glmnet")
+credit_lasso_workflow <- workflow() %>%
+  add_recipe(credit_recipe) %>%
+  add_model(lasso_spec)
+
+credit_lasso_fit <- fit(credit_lasso_workflow, data = credit)
+```
+
+
+```{r figure6.6, fig.width=7}
+# Compute the l1 norm for the least squares model
+credit_lm_fit_l1_norm <- sum(abs(credit_lm_fit$coefficients[-1]))
+
+d <- map_dfr(seq(-1, 3, 0.1),
+             ~ tidy(credit_lasso_fit, penalty = 10^.x)) %>%
+  filter(term != "(Intercept)") %>%
+  group_by(penalty) %>%
+  mutate(l1_norm = sum(abs(estimate)),
+         l1_norm_ratio = l1_norm / credit_lm_fit_l1_norm) %>%
+  ungroup() %>%
+  mutate(
+    term_highlight = fct_other(
+      term, keep = c("Income", "Limit", "Rating", "Student_Yes")
+    )
+  )
+
+p1 <- d %>%
+  ggplot(aes(x = penalty, y = estimate)) +
+  geom_line(aes(group = term, color = term_highlight), size = 1) +
+  scale_x_log10() +
+  labs(x = expression(lambda), y = "Standardized coefficients", color = NULL) +
+  scale_color_manual(values = c(td_colors$pastel6[1:4], "grey80")) +
+  theme(legend.position = c(0.7, 0.2))
+p2 <- d %>%
+  ggplot(aes(x = l1_norm_ratio, y = estimate)) +
+  geom_line(aes(group = term, color = term_highlight), size = 1) +
+  labs(
+    x = expression(paste("||", hat(beta[lambda]), "||1 / ||", hat(beta), "||1")),
+    y = NULL, color = NULL
+  ) +
+  scale_color_manual(values = c(td_colors$pastel6[1:4], "grey80")) +
+  theme(legend.position = "none")
+p1 | p2
+```
+
+The shapes of the curves are right, but the scale of the $\lambda$ parameter in the left panel is much different -- not sure what happened there.
+
+#### Another Formulation for Ridge Regression and the Lasso {-}
+
+One can show that the lasso and ridge regression coefficient estimates solve the problems:
+
+$$
+\begin{align}
+&\text{minimize } \beta \left[ \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 \right] \text{ subject to } \sum_{j=1}^p |\beta_j| \leq s \\
+&\text{minimize } \beta \left[ \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 \right] \text{ subject to } \sum_{j=1}^p \beta_j^2 \leq s,
+\end{align}
+$$
+
+respectively.
+In other words, for every value of $\lambda$, there is some $s$ associated with the lasso/ridge coefficient estimates.
+For $p = 2$, then the lasso coefficient estimates have the smallest RSS out of all points that lie within the diamond defined by $|\beta_1| + |\beta_2| \leq s$;
+likewise, the circle $\beta_1^2 + \beta_2^2 \leq s$ for ridge regression.
+
+This formulation with $s$ can be though of in terms of a *budget* of coefficient size:
+
+>
+When we perform the lasso we are trying
+to find the set of coefficient estimates that lead to the smallest RSS, subject
+to the constraint that there is a budget $s$ for how large $\sum_{j=1}^p |\beta_j|$ can be.
+When $s$ is extremely large, then this budget is not very restrictive, and so the coefficient estimates can be large. In fact, if $s$ is large enough that the least squares solution falls within the budget, then (6.8) will simply yield the least squares solution. In contrast, if $s$ is small, then $\sum_{j=1}^p |\beta_j|$ must be
+small in order to avoid violating the budget. Similarly, (6.9) indicates that
+when we perform ridge regression, we seek a set of coefficient estimates
+such that the RSS is as small as possible, subject to the requirement that
+\sum^p_{j=1} \beta_j^2$ does not exceed the budget $s$.
+
+This formulation also allows us to see the close connection between lasso, ridge and best subset selection.
+Best subset selection is the minimization problem:
+
+$$
+\text{minimize } \beta \left[ \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 \right] \text{ subject to } \sum_{j=1}^p I(\beta_j \neq 0) \leq s.
+$$
+
+#### The Variable Selection Property of the Lasso {-}
+
+To understand why the lasso can remove predictors by shrinking coefficients to exactly zero, we can think of the shapes of the constraint functions, and the contours of RSS around the least squares estimate
+(see Figure 6.7 in the book for a visualization).
+For $p = 2$, this is a circle ($\beta_1^2 + \beta_2^2 \leq s$) for ridge, and square ($|\beta_1| + |\beta_2| \leq s$) for lasso regression.
+
+>
+Each of the ellipses centered around $\hat{\beta}$ represents a contour: this means that all of the points on a particular ellipse have the same RSS value.
+As the ellipses expand away from the least squares coefficient estimates, the
+RSS increases. Equations (6.8) and (6.9) indicate that the lasso and ridge
+regression coefficient estimates are given by the first point at which an
+ellipse contacts the constraint region. Since ridge regression has a circular
+constraint with no sharp points, this intersection will not generally occur on
+an axis, and so the ridge regression coefficient estimates will be exclusively
+non-zero. However, the lasso constraint has corners at each of the axes, and
+so the ellipse will often intersect the constraint region at an axis. When this
+occurs, one of the coefficients will equal zero. In higher dimensions, many of
+the coefficient estimates may equal zero simultaneously. In Figure 6.7, the
+intersection occurs at $\beta_1 = 0$, and so the resulting model will only include $\beta_2$.
+
+This key idea holds for large dimension $p > 2$ -- the lasso constraint will always have sharp corners, and the ridge contstraint will not.
 
 ### Selecting the Tuning Parameter
 
@@ -559,6 +870,12 @@ Here, the four-variable model was selected, but I would chalk that up to the ran
 ### Interpreting Results in High Dimensions
 
 ## Lab: Linear Models and Regularization Methods
+
+```{r}
+hitters <- as_tibble(ISLR2::Hitters) %>%
+  filter(!is.na(Salary))
+```
+
 
 ### Subset Selection Methods
 

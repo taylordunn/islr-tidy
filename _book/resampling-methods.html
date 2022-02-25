@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-02-18" />
+<meta name="date" content="2022-02-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -2493,7 +2493,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 <span id="cb401-8"><a href="resampling-methods.html#cb401-8" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_parsnip</span>(default_fit)</span></code></pre></div>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  11ms 
+## Fit time:  31ms 
 ## 
 ## Call:  stats::glm(formula = ..y ~ ., family = stats::binomial, data = data)
 ## 
@@ -5965,7 +5965,7 @@ median using the bootstrap.</li>
 <div id="reproducibility-2" class="section level2 unnumbered">
 <h2>Reproducibility</h2>
 <div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="resampling-methods.html#cb471-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-02-18 00:08:15 AST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-02-24 20:16:01 AST&quot;</code></pre>
 <div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="resampling-methods.html#cb473-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
 <span id="cb473-2"><a href="resampling-methods.html#cb473-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
 <span id="cb473-3"><a href="resampling-methods.html#cb473-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
@@ -5973,7 +5973,7 @@ median using the bootstrap.</li>
 <span id="cb473-5"><a href="resampling-methods.html#cb473-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [db46952] 2022-02-17: Started chapter 6 up to Figure 6.1</code></pre>
+## Head:     [d5fc7f2] 2022-02-18: Finished section 6.1</code></pre>
 <div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="resampling-methods.html#cb475-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## - Session info ---------------------------------------------------------------
 ##  setting  value                       
@@ -5985,7 +5985,7 @@ median using the bootstrap.</li>
 ##  collate  English_Canada.1252         
 ##  ctype    English_Canada.1252         
 ##  tz       America/Curacao             
-##  date     2022-02-18                  
+##  date     2022-02-24                  
 ## 
 ## - Packages -------------------------------------------------------------------
 ##  package        * version    date       lib source                           
