@@ -849,9 +849,183 @@ occurs, one of the coefficients will equal zero. In higher dimensions, many of
 the coefficient estimates may equal zero simultaneously. In Figure 6.7, the
 intersection occurs at $\beta_1 = 0$, and so the resulting model will only include $\beta_2$.
 
-This key idea holds for large dimension $p > 2$ -- the lasso constraint will always have sharp corners, and the ridge contstraint will not.
+This key idea holds for large dimension $p > 2$ -- the lasso constraint will always have sharp corners, and the ridge constraint will not.
+
+#### Comparing the Lasso and Ridge Regression {-}
+
+Generally, the lasso leads to qualitatively similar behavior to ridge regression, in that a larger $\lambda$ increases bias and decreases variance.
+A helpful way to compare models with different types of regularization is to plot $R^2$ as in Figure 6.8 comparing lasso and ridge MSE.
+In this example, the results are almost identical, with a slight edge to the ridge regression due to lower variance.
+This advantage is due to the fact that the simulated data consisted of 45 predictors, that were all related to the response -- that is, none of the true coefficients equaled zero.
+Lasso implicitly assumes that a number of the coefficients are truly zero, so it is not surprising it performs slightly worse on this example.
+By contrast, the example in Figure 6.9 was simulated so that only 2 out of 45 predictors were related to the response.
+In this case, the lasso tends to outperform ridge regression in terms of bias, variance and MSE.
+
+>
+These two examples illustrate that neither ridge regression nor the lasso
+will universally dominate the other. In general, one might expect the lasso
+to perform better in a setting where a relatively small number of predictors
+have substantial coefficients, and the remaining predictors have coefficients
+that are very small or that equal zero. Ridge regression will perform better
+when the response is a function of many predictors, all with coefficients of
+roughly equal size. However, the number of predictors that is related to the
+response is never known a priori for real data sets. A technique such as
+cross-validation can be used in order to determine which approach is better
+on a particular data set.
+>
+As with ridge regression, when the least squares estimates have exces-
+sively high variance, the lasso solution can yield a reduction in variance
+at the expense of a small increase in bias, and consequently can gener-
+ate more accurate predictions. Unlike ridge regression, the lasso performs
+variable selection, and hence results in models that are easier to interpret.
+>
+There are very efficient algorithms for fitting both ridge and lasso models;
+in both cases the entire coefficient paths can be computed with about the
+same amount of work as a single least squares fit.
+
+#### A Simple Special Case for Ridge Regression and the Lasso
+
+Consider a simple case with $n = p$ and a diagonal matrix $\bf{X}$ with 1's on the diagonal and 0's in all off-diagonal elements.
+To simplify further, assume that we are performing regression without an intercept.
+Then the usual least squares problem involves minimizing:
+
+$$
+\sum_{j=1}^p (y_j - \beta_j)^2.
+$$
+
+Which has the solution $\hat{\beta}_j = y_j$.
+In ridge and lasso regression, the following are minimized:
+
+$$
+\begin{align}
+&\sum_{j=1}^p (y_j - \beta_j)^2 + \lambda \sum_{j=1}^p \beta_j^2 \\
+&\sum_{j=1}^p (y_j - \beta_j)^2 + \lambda \sum_{j=1}^p |\beta_j|.
+\end{align}
+$$
+
+One can show that the ridge regression estimates take the form
+
+$$
+\hat{\beta}_j^R = y_j / (1 + \lambda)
+$$
+
+and the lasso estimates take the form
+
+$$
+\hat{\beta}_j^L = \left\{\begin{array}{lr}
+y_j - \lambda / 2, &\text{if } y_j > \lambda / 2 \\
+y_j + \lambda / 2, &\text{if } y_j < - \lambda / 2 \\
+0, &\text{if } |y_j| \leq \lambda / 2
+\end{array}\right.
+$$
+
+The coefficient estimates are shown in Figure 6.10.
+The ridge regression estimates are all shrunken towards zero by the same proportion, while the lasso shrinks each coefficient by the same amount and values less than $\lambda / 2$ are shrunken to exactly zero.
+This latter type of shrinkage is known as *soft-thresholding*, and is how lasso performs feature selection.
+
+>
+...ridge regression more or less shrinks every dimension
+of the data by the same proportion, whereas the lasso more or less shrinks
+all coefficients toward zero by a similar amount, and sufficiently small coefficients are shrunken all the way to zero.
+
+#### Bayesian Interpretation for Ridge Regression and the Lasso {0}
+
+A Bayesian viewpoint for regression assumes that the vector of coefficients $\beta$ has some *prior* distribution $p(\beta)$, where $\beta = (\beta_0, \dots , \beta_p)^T$.
+The likelihood of the data is then $f(Y|X,\beta)$.
+Multiplying the prior by the likelihood gives us (up to a proportionality constant) the *posterior distribution* from Bayes' theorem:
+
+$$
+p (\beta|X, Y) \propto f(Y|X,\beta) p(\beta|X) = f(Y|X,\beta) p(\beta).
+$$
+
+If we assume
+
+* the usual linear model $Y = \beta_0 + X_1 \beta_1 + \dots X_p \beta_p + \epsilon$,
+* the errors are independent and drawn from a normal distribution,
+* that $p(\beta) = \Pi_{j=1}^p g(\beta_j)$ for some density function $g$.
+
+It turns out that ridge and lasso follow naturally from two special cases of $g$:
+
+* If $g$ is a Gaussian distribution with mean zero and standard deviation a function of $\lambda$, then it follow that the *posterior mode* for $\beta$ -- that is, the most likely value for $\beta$, given the data -- is given by the ridge regression solution. (In fact, the ridge regression solution is also the posterior mean.)
+* If $g$ is a double-exponential (Laplace) distribution with mean zero and scale parameter a function of $\lambda$, then it follow that the posterior mode for $\beta$ is the lasso solution. (However, the lasso solution is *not* the posterior mean, and in fact, the posterior mean does not yield a spare coefficient vector).
+
+>
+The Gaussian and double-exponential priors are displayed in Figure 6.11.
+Therefore, from a Bayesian viewpoint, ridge regression and the lasso follow
+directly from assuming the usual linear model with normal errors, together
+with a simple prior distribution for β. Notice that the lasso prior is steeply
+peaked at zero, while the Gaussian is flatter and fatter at zero. Hence, the
+lasso expects a priori that many of the coefficients are (exactly) zero, while
+ridge assumes the coefficients are randomly distributed about zero.
 
 ### Selecting the Tuning Parameter
+
+Just like subset selection requires a method to determine which models are best, these regularization methods require a method for selecting a value for the tuning parameter $\lambda$ (or constraint $s$).
+Cross-validation is the simple way to tackle this.
+We choose a grid of $\lambda$ values, and compute CV error for each value of $\lambda$, and select the value for which error is smallest.
+The model is then re-fit using all available observations that the selected tuning parameter $\lambda$.
+
+As [explained previously](resampling-methods.html#loocv), the `tidydmodels` framework does not allow fitting by LOOCV.
+
+```{r}
+credit_splits <- vfold_cv(credit, v = nrow(credit))
+credit_splits <- vfold_cv(credit, v = 10)
+```
+
+Then the recipe (nothing new here):
+
+```{r}
+credit_ridge_recipe <- recipe(Balance ~ ., data = credit) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_predictors())
+```
+
+In the model specification, I set `mixture = 0` for ridge regression, and set `penalty = tune()` to indicate it as a tunable parameter:
+
+```{r}
+ridge_spec <- linear_reg(mixture = 0, penalty = tune()) %>%
+  set_engine("glmnet")
+ridge_spec
+```
+
+Combine into a `workflow`:
+
+```{r}
+credit_ridge_workflow <- workflow() %>%
+  add_recipe(credit_ridge_recipe) %>%
+  add_model(ridge_spec)
+credit_ridge_workflow
+```
+
+Lastly, because we are tuning `penalty` ($\lambda$), we need to define a grid of values to try when fitting the model.
+The `dials` package provides many tools for tuning in `tidymodels`.
+`grid_regular()` creates a grid of evenly spaced points.
+As the first argument, I provide a `penalty()` with argument `range` that takes minimum and maximum values on a log scale:
+
+```{r}
+penalty_grid <- grid_regular(penalty(range = c(-4, 0)), levels = 10)
+penalty_grid
+```
+
+To fit the models using this grid of values, we use `tune_grid`:
+
+```{r}
+tic()
+credit_ridge_tune <- tune_grid(
+  credit_ridge_workflow,
+  resamples = credit_splits,
+  grid = penalty_grid
+)
+toc()
+credit_ridge_tune %>%
+  autoplot()
+```
+
+```{r}
+credit_ridge_tune %>% collect_metrics()
+```
+
+
 
 ## Dimension Reduction Methods
 
