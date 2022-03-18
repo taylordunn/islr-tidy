@@ -86,6 +86,8 @@ choosing-the-optimal-model
 shrinkage-methods
 ridge-regression
 the-lasso
+a-simple-special-case-for-ridge-regression-and-the-lasso
+bayesian-interpretation-for-ridge-regression-and-the-lasso-0
 selecting-the-tuning-parameter
 dimension-reduction-methods
 principal-components-regression

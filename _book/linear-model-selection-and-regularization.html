@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-02-24" />
+<meta name="date" content="2022-03-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -408,27 +408,25 @@ linear regression model by least squares.</p>
 <p>Disclaimer at the top: as mentioned in section 3.1, there are a lot of reasons to avoid subset and stepwise model selection.
 Here are some resources on this topic:</p>
 <ul>
-<li><ol class="example" style="list-style-type: decimal">
-<li></li>
-</ol></li>
+<li>The 2018 paper by <span class="citation"><a href="#ref-Smith2018" role="doc-biblioref">Smith</a> (<a href="#ref-Smith2018" role="doc-biblioref">2018</a>)</span>.</li>
 <li><a href="https://stats.stackexchange.com/questions/20836/algorithms-for-automatic-model-selection/20856#20856">A Stack Overflow response.</a></li>
 <li><a href="https://www.stata.com/support/faqs/statistics/stepwise-regression-problems/">Frank Harrell comments.</a></li>
 </ul>
 <p>Regardless, I will still work through the examples in the text as a programming exercise.
-However, <code>tidymodels</code> does not have the functionality for subset/stepwise selection, so I will</p>
+However, <code>tidymodels</code> does not have the functionality for subset/stepwise selection, so I will be using alternatives.</p>
 <div id="best-subset-selection" class="section level3" number="6.1.1">
 <h3><span class="header-section-number">6.1.1</span> Best Subset Selection</h3>
 <p>To perform <em>best subset selection</em>, we fit <span class="math inline">\(p\)</span> models that contain exactly one predictor, <span class="math inline">\({p \choose 2} = p(p-1)/2\)</span> models that contain exactly two predictors, and so on.
 In total, this involves fitting <span class="math inline">\(2^p\)</span> models.
 Then we select the model that is best, usually following these steps</p>
 <ol style="list-style-type: decimal">
-<li>Let <span class="math inline">\(\mathcal{M}_0\)</span> denote the <em>null model</em>, which contains no predictors. This model simply predictors the sample mean for each observation.</li>
+<li>Let <span class="math inline">\(\mathcal{M}_0\)</span> denote the <em>null model</em>, which contains no predictors. This model simply predicts the sample mean.</li>
 <li>For <span class="math inline">\(k = 1, 2, \dots, p\)</span>:
 <ul>
 <li>Fit all <span class="math inline">\({p \choose k}\)</span> models that contain exactly <span class="math inline">\(k\)</span> predictors.</li>
 <li>Pick the best among these <span class="math inline">\({p \choose k}\)</span> models, and call it <span class="math inline">\(\mathcal{M}_k\)</span>. Here, <em>best</em> is defined as having the smallest RSS, or equivalently the largest <span class="math inline">\(R^2\)</span>.</li>
 </ul></li>
-<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated predictor error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated prediction error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
 </ol>
 <p>Step 2 identifies the best model (on the training data) for each subset size, in order to reduce the problem from <span class="math inline">\(2^p\)</span> to <span class="math inline">\(p + 1\)</span> possible models.
 Choosing the single best model from the <span class="math inline">\(p + 1\)</span> options must be done with care, because the RSS of these models decreases monotonically, and the <span class="math inline">\(R^2\)</span> increases monotonically, as the number of predictors increases.
@@ -546,7 +544,7 @@ The next sections explore computationally efficient alternatives.</p>
 <li>Consider all <span class="math inline">\(p - k\)</span> models that augment the predictors in <span class="math inline">\(\mathcal{M}_k\)</span> with one additional predictor.</li>
 <li>Choose the best among these <span class="math inline">\(p - k\)</span> models, and call it <span class="math inline">\(\mathcal{M}_{k+1}\)</span>. Here, <em>best</em> is defined as having smallest RSS or highest <span class="math inline">\(R^2\)</span>.</li>
 </ul></li>
-<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated predictor error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated prediction error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
 </ol>
 <p>Step 2 is similar to step 2 in best subset selection, in that we simply choose the model with the lowest RSS or highest <span class="math inline">\(R^2\)</span>.
 Step 3 is more tricky, and is discussed in Section 6.1.3.</p>
@@ -988,7 +986,7 @@ To run this four times, I’ll use a for loop:</p>
 <li>Consider all <span class="math inline">\(k\)</span> models that contain all but one of the predictors in <span class="math inline">\(\mathcal{M}_k\)</span> for a total of <span class="math inline">\(k - 1\)</span> predictors.</li>
 <li>Choose the best among these <span class="math inline">\(k\)</span> models, and call it <span class="math inline">\(\mathcal{M}_{k-1}\)</span>. Here, <em>best</em> is defined as having smallest RSS or highest <span class="math inline">\(R^2\)</span>.</li>
 </ul></li>
-<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated predictor error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
+<li>Select a single best model from among <span class="math inline">\(\mathcal{M}_0, \dots, \mathcal{M}_p\)</span> using cross-validated prediction error <span class="math inline">\(C_p\)</span> (AIC), BIC, or adjusted <span class="math inline">\(R^2\)</span>.</li>
 </ol>
 <blockquote>
 <p>Like forward stepwise selection, the backward selection approach searches
@@ -1018,7 +1016,7 @@ backward stepwise selection.</p>
 <div id="choosing-the-optimal-model" class="section level3" number="6.1.3">
 <h3><span class="header-section-number">6.1.3</span> Choosing the Optimal Model</h3>
 <p>To apply these subset selection methods, we need to determine which model is <em>best</em>.
-Since more predictors will always lead to smaller RSS and larger <span class="math inline">\(R^2\)</span> (training error), we nee to estimate the test error.
+Since more predictors will always lead to smaller RSS and larger <span class="math inline">\(R^2\)</span> (training error), we need to estimate the test error.
 There are two common approaches:</p>
 <ol style="list-style-type: decimal">
 <li>We can indirectly estimate test error by making an adjustment to the
@@ -1076,7 +1074,7 @@ squares models, <span class="math inline">\(C_p\)</span> and AIC are proportiona
 \]</span></p>
 <p>where irrelevant constants were excluded.
 Here, the factor of 2 in the AIC/<span class="math inline">\(C_p\)</span> is replaced with <span class="math inline">\(\log (n)\)</span>.
-Since <span class="math inline">\(\log n &gt; 2\)</span> for any <span class="math inline">\(n &gt; 7\)</span>, the BIC statistic generally penalized more heavily models with many variables.</p>
+Since <span class="math inline">\(\log n &gt; 2\)</span> for any <span class="math inline">\(n &gt; 7\)</span>, the BIC statistic generally penalizes models with many variables more heavily.</p>
 <div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="linear-model-selection-and-regularization.html#cb492-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="ot">&lt;-</span> credit_model_best <span class="sc">%&gt;%</span></span>
 <span id="cb492-2"><a href="linear-model-selection-and-regularization.html#cb492-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb492-3"><a href="linear-model-selection-and-regularization.html#cb492-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">BIC =</span> (<span class="dv">1</span> <span class="sc">/</span> <span class="fu">nrow</span>(credit)) <span class="sc">*</span></span>
@@ -1103,6 +1101,7 @@ a price for the inclusion of unnecessary variables in the model.</p>
 <span id="cb493-2"><a href="linear-model-selection-and-regularization.html#cb493-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb493-3"><a href="linear-model-selection-and-regularization.html#cb493-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Adjusted R2</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">map_dbl</span>(model_fit, <span class="sc">~</span> <span class="fu">summary</span>(.x)<span class="sc">$</span>adj.r.squared)</span>
 <span id="cb493-4"><a href="linear-model-selection-and-regularization.html#cb493-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Figure 6.2:</p>
 <div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb494-1"><a href="linear-model-selection-and-regularization.html#cb494-1" aria-hidden="true" tabindex="-1"></a>credit_model_best <span class="sc">%&gt;%</span></span>
 <span id="cb494-2"><a href="linear-model-selection-and-regularization.html#cb494-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="st">&quot;C_p&quot;</span>, <span class="st">&quot;BIC&quot;</span>, <span class="st">&quot;Adjusted R2&quot;</span>),</span>
 <span id="cb494-3"><a href="linear-model-selection-and-regularization.html#cb494-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">%&gt;%</span></span>
@@ -1647,7 +1646,7 @@ A much better alternative is use a technique that <em>contrains</em> or <em>regu
 It turns out that shrinking the coefficient estimates can significantly reduce the variance.</p>
 <div id="ridge-regression" class="section level3" number="6.2.1">
 <h3><span class="header-section-number">6.2.1</span> Ridge Regression</h3>
-<p>Recall from Chapter 3 that the least squares fitting procedure involves estimating <span class="math inline">\(\beta_0, \beta_1, \dots, \beta_p\)</span> minimizing the RSS:</p>
+<p>Recall from Chapter 3 that the least squares fitting procedure involves estimating <span class="math inline">\(\beta_0, \beta_1, \dots, \beta_p\)</span> by minimizing the RSS:</p>
 <p><span class="math display">\[
 \text{RSS} = \sum_{i=1}^n \left(y_i - \hat{y}_i \right)^2 = \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2.
 \]</span></p>
@@ -1661,12 +1660,12 @@ The tuning parameter <span class="math inline">\(\lambda\)</span> serves to cont
 When <span class="math inline">\(\lambda = 0\)</span>, the penalty term has no effect, and ridge regression will produce the same least squares estimates.
 Unlike least squares, which generates only one set of coefficient estimates (the “best fit”), ridge regression will produce a different set of coefficient estimates <span class="math inline">\(\hat{\beta}_{\lambda}^R\)</span> for each value <span class="math inline">\(\lambda\)</span>.
 Selecting a good value for <span class="math inline">\(\lambda\)</span> is critical.</p>
-<p>Note that the shrinkage penalty is not applied to the intercept <span class="math inline">\(\beta_0\)</span>, which is simlpy a measure of the mean value of the response when all predictors are zero (<span class="math inline">\(x_{i1} = x_{i2} = \dots = 0\)</span>)</p>
+<p>Note that the shrinkage penalty is not applied to the intercept <span class="math inline">\(\beta_0\)</span>, which is simply a measure of the mean value of the response when all predictors are zero (<span class="math inline">\(x_{i1} = x_{i2} = \dots = 0\)</span>)</p>
 <div id="an-application-to-the-credit-data" class="section level4 unnumbered">
 <h4>An Application to the Credit Data</h4>
 <p>In <code>tidymodels</code>, regularized least squares is done with the <code>glmnet</code> engine.
-(See <a href="https://www.tidymodels.org/find/parsnip/">this article for a list of models available in <code>parnsip</code></a> and <a href="https://parsnip.tidymodels.org/reference/details_linear_reg_glmnet.html">this article for examples using <code>glmnet</code></a>.)
-Define the specification:</p>
+(See <a href="https://www.tidymodels.org/find/parsnip/">this article for a list of models available in <code>parnsip</code></a> and <a href="https://parsnip.tidymodels.org/reference/details_linear_reg_glmnet.html">this article for examples using <code>glmnet</code></a>.)</p>
+<p>Specify the model:</p>
 <div class="sourceCode" id="cb499"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb499-1"><a href="linear-model-selection-and-regularization.html#cb499-1" aria-hidden="true" tabindex="-1"></a>ridge_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="dv">0</span>, <span class="at">mixture =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb499-2"><a href="linear-model-selection-and-regularization.html#cb499-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
 <span id="cb499-3"><a href="linear-model-selection-and-regularization.html#cb499-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The `parnship::translate()` function is a helpful way to &quot;decode&quot; a model spec</span></span>
@@ -1687,13 +1686,6 @@ The <code>mixture</code> variable ranges from 0 to 1, with 0 corresponding to ri
 <p>Fit <code>Balance</code> to all the predictors:</p>
 <div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="linear-model-selection-and-regularization.html#cb501-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(ridge_spec, Balance <span class="sc">~</span> ., <span class="at">data =</span> credit)</span>
 <span id="cb501-2"><a href="linear-model-selection-and-regularization.html#cb501-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(credit_ridge_fit)</span></code></pre></div>
-<pre><code>## Loading required package: Matrix</code></pre>
-<pre><code>## 
-## Attaching package: &#39;Matrix&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:tidyr&#39;:
-## 
-##     expand, pack, unpack</code></pre>
-<pre><code>## Loaded glmnet 4.1-3</code></pre>
 <pre><code>## # A tibble: 12 x 3
 ##    term        estimate penalty
 ##    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;
@@ -1709,8 +1701,8 @@ The <code>mixture</code> variable ranges from 0 to 1, with 0 corresponding to ri
 ## 10 MarriedYes   -12.1         0
 ## 11 RegionSouth    9.11        0
 ## 12 RegionWest    13.1         0</code></pre>
-<p>Because our <code>ridge_spec</code> set <code>penalty = 0</code>, the coefficients here correspond to no penalty, but the <code>glmnet::glmnet()</code> function fits all values of <code>penalty</code> at once, which we can extract with <code>broom::tidy</code> like so:</p>
-<div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb507-1"><a href="linear-model-selection-and-regularization.html#cb507-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(credit_ridge_fit, <span class="at">penalty =</span> <span class="dv">100</span>)</span></code></pre></div>
+<p>Because our <code>ridge_spec</code> had <code>penalty = 0</code>, the coefficients here correspond to no penalty, but the <code>glmnet::glmnet()</code> function fits a range of <code>penalty</code> values all at once, which we can extract with <code>broom::tidy</code> like so:</p>
+<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="linear-model-selection-and-regularization.html#cb503-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(credit_ridge_fit, <span class="at">penalty =</span> <span class="dv">100</span>)</span></code></pre></div>
 <pre><code>## # A tibble: 12 x 3
 ##    term         estimate penalty
 ##    &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt;
@@ -1727,183 +1719,99 @@ The <code>mixture</code> variable ranges from 0 to 1, with 0 corresponding to ri
 ## 11 RegionSouth    7.45       100
 ## 12 RegionWest     8.79       100</code></pre>
 <p>To re-create Figure 6.4, I’ll first re-fit the data on <em>standardized data</em> (continuous variables re-scaled to have mean of 0, standard deviation of 1):</p>
-<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb509-1"><a href="linear-model-selection-and-regularization.html#cb509-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit) <span class="sc">%&gt;%</span></span>
-<span id="cb509-2"><a href="linear-model-selection-and-regularization.html#cb509-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb509-3"><a href="linear-model-selection-and-regularization.html#cb509-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
-<span id="cb509-4"><a href="linear-model-selection-and-regularization.html#cb509-4" aria-hidden="true" tabindex="-1"></a>credit_ridge_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb509-5"><a href="linear-model-selection-and-regularization.html#cb509-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_ridge_recipe) <span class="sc">%&gt;%</span></span>
-<span id="cb509-6"><a href="linear-model-selection-and-regularization.html#cb509-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_spec)</span>
-<span id="cb509-7"><a href="linear-model-selection-and-regularization.html#cb509-7" aria-hidden="true" tabindex="-1"></a>credit_ridge_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(credit_ridge_workflow, <span class="at">data =</span> credit)</span></code></pre></div>
-<p>I’ll compile coefficient estimates for a wide range of <span class="math inline">\(\lambda\)</span> values with <code>purrr::map_dfr()</code>:</p>
-<div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb510-1"><a href="linear-model-selection-and-regularization.html#cb510-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="fl">0.1</span>),</span>
-<span id="cb510-2"><a href="linear-model-selection-and-regularization.html#cb510-2" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">tidy</span>(credit_ridge_fit, <span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span>.x)) <span class="sc">%&gt;%</span></span>
-<span id="cb510-3"><a href="linear-model-selection-and-regularization.html#cb510-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb510-4"><a href="linear-model-selection-and-regularization.html#cb510-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb510-5"><a href="linear-model-selection-and-regularization.html#cb510-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_highlight =</span> <span class="fu">fct_other</span>(</span>
-<span id="cb510-6"><a href="linear-model-selection-and-regularization.html#cb510-6" aria-hidden="true" tabindex="-1"></a>      term, <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;Income&quot;</span>, <span class="st">&quot;Limit&quot;</span>, <span class="st">&quot;Rating&quot;</span>, <span class="st">&quot;Student_Yes&quot;</span>)</span>
-<span id="cb510-7"><a href="linear-model-selection-and-regularization.html#cb510-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb510-8"><a href="linear-model-selection-and-regularization.html#cb510-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb510-9"><a href="linear-model-selection-and-regularization.html#cb510-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb510-10"><a href="linear-model-selection-and-regularization.html#cb510-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb510-11"><a href="linear-model-selection-and-regularization.html#cb510-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">breaks =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
-<span id="cb510-12"><a href="linear-model-selection-and-regularization.html#cb510-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">40</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb510-13"><a href="linear-model-selection-and-regularization.html#cb510-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(lambda), <span class="at">y =</span> <span class="st">&quot;Standardized coefficients&quot;</span>, <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb510-14"><a href="linear-model-selection-and-regularization.html#cb510-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb510-15"><a href="linear-model-selection-and-regularization.html#cb510-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.2</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb505"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb505-1"><a href="linear-model-selection-and-regularization.html#cb505-1" aria-hidden="true" tabindex="-1"></a>credit_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit) <span class="sc">%&gt;%</span></span>
+<span id="cb505-2"><a href="linear-model-selection-and-regularization.html#cb505-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb505-3"><a href="linear-model-selection-and-regularization.html#cb505-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb505-4"><a href="linear-model-selection-and-regularization.html#cb505-4" aria-hidden="true" tabindex="-1"></a>credit_ridge_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb505-5"><a href="linear-model-selection-and-regularization.html#cb505-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb505-6"><a href="linear-model-selection-and-regularization.html#cb505-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_spec)</span>
+<span id="cb505-7"><a href="linear-model-selection-and-regularization.html#cb505-7" aria-hidden="true" tabindex="-1"></a>credit_ridge_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(credit_ridge_workflow, <span class="at">data =</span> credit)</span></code></pre></div>
+<p>Then I’ll compile coefficient estimates for a wide range of <span class="math inline">\(\lambda\)</span> values with <code>purrr::map_dfr()</code>:</p>
+<div class="sourceCode" id="cb506"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb506-1"><a href="linear-model-selection-and-regularization.html#cb506-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dfr</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="fl">0.1</span>),</span>
+<span id="cb506-2"><a href="linear-model-selection-and-regularization.html#cb506-2" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">tidy</span>(credit_ridge_fit, <span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span>.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb506-3"><a href="linear-model-selection-and-regularization.html#cb506-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb506-4"><a href="linear-model-selection-and-regularization.html#cb506-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb506-5"><a href="linear-model-selection-and-regularization.html#cb506-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_highlight =</span> <span class="fu">fct_other</span>(</span>
+<span id="cb506-6"><a href="linear-model-selection-and-regularization.html#cb506-6" aria-hidden="true" tabindex="-1"></a>      term, <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;Income&quot;</span>, <span class="st">&quot;Limit&quot;</span>, <span class="st">&quot;Rating&quot;</span>, <span class="st">&quot;Student_Yes&quot;</span>)</span>
+<span id="cb506-7"><a href="linear-model-selection-and-regularization.html#cb506-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb506-8"><a href="linear-model-selection-and-regularization.html#cb506-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb506-9"><a href="linear-model-selection-and-regularization.html#cb506-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb506-10"><a href="linear-model-selection-and-regularization.html#cb506-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb506-11"><a href="linear-model-selection-and-regularization.html#cb506-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">breaks =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
+<span id="cb506-12"><a href="linear-model-selection-and-regularization.html#cb506-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">40</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb506-13"><a href="linear-model-selection-and-regularization.html#cb506-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(lambda), <span class="at">y =</span> <span class="st">&quot;Standardized coefficients&quot;</span>, <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb506-14"><a href="linear-model-selection-and-regularization.html#cb506-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb506-15"><a href="linear-model-selection-and-regularization.html#cb506-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.8</span>))</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure6.4_incorrect-1.png" width="576" style="display: block; margin: auto;" /></p>
-<p>The fitting procedure is truncated at a penalty values of <span class="math inline">\(\lambda\)</span> = 40 (the vertical line above).
+<p>From this figure, it is clear that the fitting procedure is truncated at a penalty values of <span class="math inline">\(\lambda\)</span> = 40 (the vertical line above).
 This has to do with the <em>regularization path</em> chosen by <code>glmnet</code>.
 We can see from the grid of values for <span class="math inline">\(\lambda\)</span> that the minimum value is 40:</p>
-<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="linear-model-selection-and-regularization.html#cb511-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_fit <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>()</span></code></pre></div>
-<pre><code>## 
-## Call:  glmnet::glmnet(x = maybe_matrix(x), y = y, family = &quot;gaussian&quot;,      alpha = ~0) 
-## 
-##     Df  %Dev Lambda
-## 1   11  0.00 396600
-## 2   11  0.45 361300
-## 3   11  0.49 329200
-## 4   11  0.54 300000
-## 5   11  0.59 273300
-## 6   11  0.65 249100
-## 7   11  0.71 226900
-## 8   11  0.78 206800
-## 9   11  0.86 188400
-## 10  11  0.94 171700
-## 11  11  1.03 156400
-## 12  11  1.13 142500
-## 13  11  1.24 129900
-## 14  11  1.36 118300
-## 15  11  1.49 107800
-## 16  11  1.63  98230
-## 17  11  1.79  89500
-## 18  11  1.96  81550
-## 19  11  2.15  74310
-## 20  11  2.35  67710
-## 21  11  2.57  61690
-## 22  11  2.82  56210
-## 23  11  3.08  51220
-## 24  11  3.37  46670
-## 25  11  3.69  42520
-## 26  11  4.03  38740
-## 27  11  4.41  35300
-## 28  11  4.81  32170
-## 29  11  5.26  29310
-## 30  11  5.74  26710
-## 31  11  6.26  24330
-## 32  11  6.82  22170
-## 33  11  7.44  20200
-## 34  11  8.10  18410
-## 35  11  8.81  16770
-## 36  11  9.58  15280
-## 37  11 10.41  13920
-## 38  11 11.30  12690
-## 39  11 12.25  11560
-## 40  11 13.27  10530
-## 41  11 14.36   9597
-## 42  11 15.53   8745
-## 43  11 16.76   7968
-## 44  11 18.07   7260
-## 45  11 19.45   6615
-## 46  11 20.91   6027
-## 47  11 22.45   5492
-## 48  11 24.05   5004
-## 49  11 25.73   4560
-## 50  11 27.47   4154
-## 51  11 29.28   3785
-## 52  11 31.14   3449
-## 53  11 33.06   3143
-## 54  11 35.02   2864
-## 55  11 37.02   2609
-## 56  11 39.05   2377
-## 57  11 41.10   2166
-## 58  11 43.17   1974
-## 59  11 45.24   1798
-## 60  11 47.30   1639
-## 61  11 49.35   1493
-## 62  11 51.38   1360
-## 63  11 53.39   1240
-## 64  11 55.35   1129
-## 65  11 57.28   1029
-## 66  11 59.17    938
-## 67  11 61.00    854
-## 68  11 62.79    778
-## 69  11 64.52    709
-## 70  11 66.20    646
-## 71  11 67.83    589
-## 72  11 69.40    537
-## 73  11 70.92    489
-## 74  11 72.38    446
-## 75  11 73.80    406
-## 76  11 75.16    370
-## 77  11 76.48    337
-## 78  11 77.75    307
-## 79  11 78.97    280
-## 80  11 80.14    255
-## 81  11 81.27    232
-## 82  11 82.35    212
-## 83  11 83.39    193
-## 84  11 84.37    176
-## 85  11 85.31    160
-## 86  11 86.20    146
-## 87  11 87.04    133
-## 88  11 87.84    121
-## 89  11 88.58    110
-## 90  11 89.27    100
-## 91  11 89.92     92
-## 92  11 90.52     83
-## 93  11 91.06     76
-## 94  11 91.56     69
-## 95  11 92.02     63
-## 96  11 92.44     58
-## 97  11 92.81     52
-## 98  11 93.15     48
-## 99  11 93.45     44
-## 100 11 93.71     40</code></pre>
-<p>The regularization path can be set manually using the <code>path_values</code> arguemnt (see <a href="https://parsnip.tidymodels.org/reference/glmnet-details.html">this article for more details</a>):</p>
-<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="linear-model-selection-and-regularization.html#cb513-1" aria-hidden="true" tabindex="-1"></a>coef_path_values <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="fl">0.1</span>))</span>
-<span id="cb513-2"><a href="linear-model-selection-and-regularization.html#cb513-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb513-3"><a href="linear-model-selection-and-regularization.html#cb513-3" aria-hidden="true" tabindex="-1"></a>ridge_spec_path <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="dv">0</span>, <span class="at">mixture =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb513-4"><a href="linear-model-selection-and-regularization.html#cb513-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>, <span class="at">path_values =</span> coef_path_values)</span>
-<span id="cb513-5"><a href="linear-model-selection-and-regularization.html#cb513-5" aria-hidden="true" tabindex="-1"></a>credit_ridge_workflow_path <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb513-6"><a href="linear-model-selection-and-regularization.html#cb513-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_ridge_recipe) <span class="sc">%&gt;%</span></span>
-<span id="cb513-7"><a href="linear-model-selection-and-regularization.html#cb513-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_spec_path)</span>
-<span id="cb513-8"><a href="linear-model-selection-and-regularization.html#cb513-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb513-9"><a href="linear-model-selection-and-regularization.html#cb513-9" aria-hidden="true" tabindex="-1"></a>credit_ridge_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(credit_ridge_workflow_path, <span class="at">data =</span> credit)</span></code></pre></div>
+<div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb507-1"><a href="linear-model-selection-and-regularization.html#cb507-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_engine</span>(credit_ridge_fit)<span class="sc">$</span>lambda</span></code></pre></div>
+<pre><code>##   [1] 396562.69957 361333.16232 329233.32005 299985.13930 273335.28632
+##   [6] 249052.93283 226927.75669 206768.12023 188399.41030 171662.52594
+##  [11] 156412.50026 142517.24483 129856.40559 118320.32042 107809.06926
+##  [16]  98231.60868  89504.98330  81553.60727  74308.60957  67707.23750
+##  [21]  61692.31313  56211.73806  51218.04218  46667.97247  42522.11842
+##  [26]  38744.57062  35302.60975  32166.42320  29308.84681  26705.12964
+##  [31]  24332.71953  22171.06779  20201.45123  18406.80998  16771.59971
+##  [36]  15281.65702  13924.07673  12687.10013  11560.01312  10533.05342
+##  [41]   9597.32598   8744.72599   7967.86864   7260.02515   6615.06452
+##  [46]   6027.40042   5491.94278   5004.05372   4559.50738   4154.45331
+##  [51]   3785.38313   3449.10012   3142.69158   2863.50352   2609.11776
+##  [56]   2377.33093   2166.13540   1973.70190   1798.36366   1638.60199
+##  [61]   1493.03311   1360.39616   1239.54232   1129.42479   1029.08981
+##  [66]    937.66830    854.36844    778.46870    709.31169    646.29839
+##  [71]    588.88302    536.56828    488.90103    445.46841    405.89423
+##  [76]    369.83570    336.98052    307.04410    279.76714    254.91340
+##  [81]    232.26760    211.63359    192.83264    175.70192    160.09305
+##  [86]    145.87082    132.91206    121.10452    110.34593    100.54310
+##  [91]     91.61113     83.47265     76.05717     69.30046     63.14400
+##  [96]     57.53446     52.42326     47.76612     43.52271     39.65627</code></pre>
+<p>The regularization path can be set manually using the <code>path_values</code> argument (see <a href="https://parsnip.tidymodels.org/reference/glmnet-details.html">this article for more details</a>):</p>
+<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb509-1"><a href="linear-model-selection-and-regularization.html#cb509-1" aria-hidden="true" tabindex="-1"></a>coef_path_values <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="fl">0.1</span>)</span>
+<span id="cb509-2"><a href="linear-model-selection-and-regularization.html#cb509-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb509-3"><a href="linear-model-selection-and-regularization.html#cb509-3" aria-hidden="true" tabindex="-1"></a>ridge_spec_path <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="dv">0</span>, <span class="at">mixture =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb509-4"><a href="linear-model-selection-and-regularization.html#cb509-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>, <span class="at">path_values =</span> coef_path_values)</span>
+<span id="cb509-5"><a href="linear-model-selection-and-regularization.html#cb509-5" aria-hidden="true" tabindex="-1"></a>credit_ridge_workflow_path <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb509-6"><a href="linear-model-selection-and-regularization.html#cb509-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb509-7"><a href="linear-model-selection-and-regularization.html#cb509-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_spec_path)</span>
+<span id="cb509-8"><a href="linear-model-selection-and-regularization.html#cb509-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb509-9"><a href="linear-model-selection-and-regularization.html#cb509-9" aria-hidden="true" tabindex="-1"></a>credit_ridge_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(credit_ridge_workflow_path, <span class="at">data =</span> credit)</span></code></pre></div>
 <p>Now with the full range of <span class="math inline">\(\lambda\)</span> values, I can re-create the figure properly:</p>
-<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb514-1"><a href="linear-model-selection-and-regularization.html#cb514-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the l2 norm for the least squares model</span></span>
-<span id="cb514-2"><a href="linear-model-selection-and-regularization.html#cb514-2" aria-hidden="true" tabindex="-1"></a>credit_lm_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit)</span>
-<span id="cb514-3"><a href="linear-model-selection-and-regularization.html#cb514-3" aria-hidden="true" tabindex="-1"></a>credit_lm_fit_l2_norm <span class="ot">&lt;-</span> <span class="fu">sum</span>(credit_lm_fit<span class="sc">$</span>coefficients[<span class="sc">-</span><span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb514-4"><a href="linear-model-selection-and-regularization.html#cb514-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-5"><a href="linear-model-selection-and-regularization.html#cb514-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="fl">0.1</span>),</span>
-<span id="cb514-6"><a href="linear-model-selection-and-regularization.html#cb514-6" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">tidy</span>(credit_ridge_fit, <span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span>.x)) <span class="sc">%&gt;%</span></span>
-<span id="cb514-7"><a href="linear-model-selection-and-regularization.html#cb514-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb514-8"><a href="linear-model-selection-and-regularization.html#cb514-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(penalty) <span class="sc">%&gt;%</span></span>
-<span id="cb514-9"><a href="linear-model-selection-and-regularization.html#cb514-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">l2_norm =</span> <span class="fu">sum</span>(estimate<span class="sc">^</span><span class="dv">2</span>),</span>
-<span id="cb514-10"><a href="linear-model-selection-and-regularization.html#cb514-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">l2_norm_ratio =</span> l2_norm <span class="sc">/</span> credit_lm_fit_l2_norm) <span class="sc">%&gt;%</span></span>
-<span id="cb514-11"><a href="linear-model-selection-and-regularization.html#cb514-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb514-12"><a href="linear-model-selection-and-regularization.html#cb514-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb514-13"><a href="linear-model-selection-and-regularization.html#cb514-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_highlight =</span> <span class="fu">fct_other</span>(</span>
-<span id="cb514-14"><a href="linear-model-selection-and-regularization.html#cb514-14" aria-hidden="true" tabindex="-1"></a>      term, <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;Income&quot;</span>, <span class="st">&quot;Limit&quot;</span>, <span class="st">&quot;Rating&quot;</span>, <span class="st">&quot;Student_Yes&quot;</span>)</span>
-<span id="cb514-15"><a href="linear-model-selection-and-regularization.html#cb514-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb514-16"><a href="linear-model-selection-and-regularization.html#cb514-16" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb514-17"><a href="linear-model-selection-and-regularization.html#cb514-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb514-18"><a href="linear-model-selection-and-regularization.html#cb514-18" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb514-19"><a href="linear-model-selection-and-regularization.html#cb514-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb514-20"><a href="linear-model-selection-and-regularization.html#cb514-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb514-21"><a href="linear-model-selection-and-regularization.html#cb514-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">breaks =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
-<span id="cb514-22"><a href="linear-model-selection-and-regularization.html#cb514-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(lambda), <span class="at">y =</span> <span class="st">&quot;Standardized coefficients&quot;</span>, <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb514-23"><a href="linear-model-selection-and-regularization.html#cb514-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb514-24"><a href="linear-model-selection-and-regularization.html#cb514-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.8</span>))</span>
-<span id="cb514-25"><a href="linear-model-selection-and-regularization.html#cb514-25" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
-<span id="cb514-26"><a href="linear-model-selection-and-regularization.html#cb514-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> l2_norm_ratio, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
-<span id="cb514-27"><a href="linear-model-selection-and-regularization.html#cb514-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb514-28"><a href="linear-model-selection-and-regularization.html#cb514-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb514-29"><a href="linear-model-selection-and-regularization.html#cb514-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;||&quot;</span>, <span class="fu">hat</span>(beta[lambda]), <span class="st">&quot;|| / ||&quot;</span>, <span class="fu">hat</span>(beta), <span class="st">&quot;||&quot;</span>)),</span>
-<span id="cb514-30"><a href="linear-model-selection-and-regularization.html#cb514-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">color =</span> <span class="cn">NULL</span></span>
-<span id="cb514-31"><a href="linear-model-selection-and-regularization.html#cb514-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb514-32"><a href="linear-model-selection-and-regularization.html#cb514-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb514-33"><a href="linear-model-selection-and-regularization.html#cb514-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
-<span id="cb514-34"><a href="linear-model-selection-and-regularization.html#cb514-34" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb510-1"><a href="linear-model-selection-and-regularization.html#cb510-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the l2 norm for the least squares model</span></span>
+<span id="cb510-2"><a href="linear-model-selection-and-regularization.html#cb510-2" aria-hidden="true" tabindex="-1"></a>credit_lm_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit)</span>
+<span id="cb510-3"><a href="linear-model-selection-and-regularization.html#cb510-3" aria-hidden="true" tabindex="-1"></a>credit_lm_fit_l2_norm <span class="ot">&lt;-</span> <span class="fu">sum</span>(credit_lm_fit<span class="sc">$</span>coefficients[<span class="sc">-</span><span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb510-4"><a href="linear-model-selection-and-regularization.html#cb510-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb510-5"><a href="linear-model-selection-and-regularization.html#cb510-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="fl">0.1</span>),</span>
+<span id="cb510-6"><a href="linear-model-selection-and-regularization.html#cb510-6" aria-hidden="true" tabindex="-1"></a>        <span class="sc">~</span> <span class="fu">tidy</span>(credit_ridge_fit, <span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span>.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb510-7"><a href="linear-model-selection-and-regularization.html#cb510-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb510-8"><a href="linear-model-selection-and-regularization.html#cb510-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(penalty) <span class="sc">%&gt;%</span></span>
+<span id="cb510-9"><a href="linear-model-selection-and-regularization.html#cb510-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">l2_norm =</span> <span class="fu">sum</span>(estimate<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb510-10"><a href="linear-model-selection-and-regularization.html#cb510-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">l2_norm_ratio =</span> l2_norm <span class="sc">/</span> credit_lm_fit_l2_norm) <span class="sc">%&gt;%</span></span>
+<span id="cb510-11"><a href="linear-model-selection-and-regularization.html#cb510-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb510-12"><a href="linear-model-selection-and-regularization.html#cb510-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb510-13"><a href="linear-model-selection-and-regularization.html#cb510-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_highlight =</span> <span class="fu">fct_other</span>(</span>
+<span id="cb510-14"><a href="linear-model-selection-and-regularization.html#cb510-14" aria-hidden="true" tabindex="-1"></a>      term, <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;Income&quot;</span>, <span class="st">&quot;Limit&quot;</span>, <span class="st">&quot;Rating&quot;</span>, <span class="st">&quot;Student_Yes&quot;</span>)</span>
+<span id="cb510-15"><a href="linear-model-selection-and-regularization.html#cb510-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb510-16"><a href="linear-model-selection-and-regularization.html#cb510-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb510-17"><a href="linear-model-selection-and-regularization.html#cb510-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb510-18"><a href="linear-model-selection-and-regularization.html#cb510-18" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb510-19"><a href="linear-model-selection-and-regularization.html#cb510-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb510-20"><a href="linear-model-selection-and-regularization.html#cb510-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb510-21"><a href="linear-model-selection-and-regularization.html#cb510-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">breaks =</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
+<span id="cb510-22"><a href="linear-model-selection-and-regularization.html#cb510-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(lambda), <span class="at">y =</span> <span class="st">&quot;Standardized coefficients&quot;</span>, <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb510-23"><a href="linear-model-selection-and-regularization.html#cb510-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb510-24"><a href="linear-model-selection-and-regularization.html#cb510-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.8</span>))</span>
+<span id="cb510-25"><a href="linear-model-selection-and-regularization.html#cb510-25" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb510-26"><a href="linear-model-selection-and-regularization.html#cb510-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> l2_norm_ratio, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb510-27"><a href="linear-model-selection-and-regularization.html#cb510-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb510-28"><a href="linear-model-selection-and-regularization.html#cb510-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb510-29"><a href="linear-model-selection-and-regularization.html#cb510-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;||&quot;</span>, <span class="fu">hat</span>(beta[lambda]), <span class="st">&quot;||2 / ||&quot;</span>, <span class="fu">hat</span>(beta), <span class="st">&quot;||2&quot;</span>)),</span>
+<span id="cb510-30"><a href="linear-model-selection-and-regularization.html#cb510-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">color =</span> <span class="cn">NULL</span></span>
+<span id="cb510-31"><a href="linear-model-selection-and-regularization.html#cb510-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb510-32"><a href="linear-model-selection-and-regularization.html#cb510-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb510-33"><a href="linear-model-selection-and-regularization.html#cb510-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb510-34"><a href="linear-model-selection-and-regularization.html#cb510-34" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
 <p><img src="_main_files/figure-html/figure6.4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>On the subject of standardizing predictors:</p>
 <blockquote>
@@ -1916,7 +1824,7 @@ consider the income variable, which is measured in dollars. One could reasonably
 in a reduction in the observed values of income by a factor of 1,000. Now due
 to the sum of squared coefficients term in the ridge regression formulation
 (6.5), such a change in scale will not simply cause the ridge regression coefficient estimate for income to change by a factor of 1,000. In other words,
-$X_j ^R_{j,λ} will depend not only on the value of <span class="math inline">\(\lambda\)</span>, but also on the scaling of the
+<span class="math inline">\(X_j \hat{\beta}^R_{j,λ}\)</span> will depend not only on the value of <span class="math inline">\(\lambda\)</span>, but also on the scaling of the
 <span class="math inline">\(j\)</span>th predictor. In fact, the value of <span class="math inline">\(X_j \hat{\beta}^R_{j, \lambda}\)</span>
 may even depend on the scaling
 of the other predictors! Therefore, it is best to apply ridge regression after
@@ -1926,23 +1834,501 @@ standardizing the predictors, … so that they are all on the same scale.</p>
 <div id="why-does-ridge-regression-improve-over-least-squares" class="section level4 unnumbered">
 <h4>Why Does Ridge Regression Improve Over Least Squares?</h4>
 <p>Ridge regression’s advantage over least squares has to do with the <em>bias-variance trade-off</em>.
-As <span class="math inline">\(\lambda\)</span> increases, the flexibility of the fit decreases, leading to decreased variance but increased bias.</p>
+As <span class="math inline">\(\lambda\)</span> increases, the flexibility of the fit decreases, leading to decreased variance but increased bias.
+So ridge regression works best in situations where the least squares estimates have high variance, like when the number of variables <span class="math inline">\(p\)</span> is almost as large as the number of observations <span class="math inline">\(n\)</span> (as in Figure 6.5).</p>
+<blockquote>
+<p>Ridge regression also has substantial computational advantages over best
+subset selection, which requires searching through <span class="math inline">\(2p\)</span> models. As we discussed previously, even for moderate values of <span class="math inline">\(p\)</span>, such a search can be
+computationally infeasible. In contrast, for any fixed value of <span class="math inline">\(\lambda\)</span>, ridge regression only fits a single model, and the model-fitting procedure can be
+performed quite quickly. In fact, one can show that the computations required to solve (6.5), simultaneously for all values of <span class="math inline">\(\lambda\)</span>, are almost identical to those for fitting a model using least squares.</p>
+</blockquote>
 </div>
 </div>
 <div id="the-lasso" class="section level3" number="6.2.2">
 <h3><span class="header-section-number">6.2.2</span> The Lasso</h3>
+<p>Ridge regression will shrink all coefficients towards zero, but will not set them to exactly zero (unless <span class="math inline">\(\lambda = \infty\)</span>).
+This doesn’t affect prediction accuracy, but may cause challenges in model interpretation for large numbers of variables <span class="math inline">\(p\)</span>.</p>
+<p>The <em>lasso</em> is a relatively recent alternative to ridge regression with a similar formulation as ridge regression.
+The coefficients <span class="math inline">\(\hat{\beta}_{\lambda}^L\)</span> minimize the quantity:</p>
+<p><span class="math display">\[
+\sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 + \lambda \sum_{j=1}^p | \beta_j | = \text{RSS} + \lambda \sum_{j=1}^p | \beta_j |.
+\]</span></p>
+<blockquote>
+<p>The only difference is that the <span class="math inline">\(\beta_j^2\)</span> term in the ridge
+regression penalty (6.5) has been replaced by <span class="math inline">\(|\beta_j|\)</span> in the lasso penalty (6.7).
+In statistical parlance, the lasso uses an <span class="math inline">\(\mathcal{l}_1\)</span> (pronounced “ell 1”) penalty
+instead of an <span class="math inline">\(\mathcal{l}_2\)</span> penalty. The <span class="math inline">\(\mathcal{l}_1\)</span> norm of a coefficient vector <span class="math inline">\(\beta\)</span> is given by <span class="math inline">\(||\beta||_1 = \sum |\beta_j|\)</span>.</p>
+</blockquote>
+<p>The <span class="math inline">\(\mathcal{l}_1\)</span> penalty has the effect of forcing some of the coefficient estimates to be exactly equal to zero for sufficiently large <span class="math inline">\(\lambda\)</span>.
+Functionally, this is a form of automatic <em>variable selection</em> like the best subset techniques.
+We say that the lasso yields <em>sparse</em> models which only involve a subset of the variables.
+This makes lasso models much easier to interpret than those produced by ridge regression.</p>
+<p>Fit the <code>credit</code> model with lasso regression:</p>
+<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="linear-model-selection-and-regularization.html#cb511-1" aria-hidden="true" tabindex="-1"></a>lasso_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="dv">20</span>, <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb511-2"><a href="linear-model-selection-and-regularization.html#cb511-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb511-3"><a href="linear-model-selection-and-regularization.html#cb511-3" aria-hidden="true" tabindex="-1"></a>credit_lasso_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb511-4"><a href="linear-model-selection-and-regularization.html#cb511-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb511-5"><a href="linear-model-selection-and-regularization.html#cb511-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_spec)</span>
+<span id="cb511-6"><a href="linear-model-selection-and-regularization.html#cb511-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb511-7"><a href="linear-model-selection-and-regularization.html#cb511-7" aria-hidden="true" tabindex="-1"></a>credit_lasso_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(credit_lasso_workflow, <span class="at">data =</span> credit)</span></code></pre></div>
+<div class="sourceCode" id="cb512"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb512-1"><a href="linear-model-selection-and-regularization.html#cb512-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the l1 norm for the least squares model</span></span>
+<span id="cb512-2"><a href="linear-model-selection-and-regularization.html#cb512-2" aria-hidden="true" tabindex="-1"></a>credit_lm_fit_l1_norm <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">abs</span>(credit_lm_fit<span class="sc">$</span>coefficients[<span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb512-3"><a href="linear-model-selection-and-regularization.html#cb512-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb512-4"><a href="linear-model-selection-and-regularization.html#cb512-4" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">3</span>, <span class="fl">0.1</span>),</span>
+<span id="cb512-5"><a href="linear-model-selection-and-regularization.html#cb512-5" aria-hidden="true" tabindex="-1"></a>             <span class="sc">~</span> <span class="fu">tidy</span>(credit_lasso_fit, <span class="at">penalty =</span> <span class="dv">10</span><span class="sc">^</span>.x)) <span class="sc">%&gt;%</span></span>
+<span id="cb512-6"><a href="linear-model-selection-and-regularization.html#cb512-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb512-7"><a href="linear-model-selection-and-regularization.html#cb512-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(penalty) <span class="sc">%&gt;%</span></span>
+<span id="cb512-8"><a href="linear-model-selection-and-regularization.html#cb512-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">l1_norm =</span> <span class="fu">sum</span>(<span class="fu">abs</span>(estimate)),</span>
+<span id="cb512-9"><a href="linear-model-selection-and-regularization.html#cb512-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">l1_norm_ratio =</span> l1_norm <span class="sc">/</span> credit_lm_fit_l1_norm) <span class="sc">%&gt;%</span></span>
+<span id="cb512-10"><a href="linear-model-selection-and-regularization.html#cb512-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb512-11"><a href="linear-model-selection-and-regularization.html#cb512-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb512-12"><a href="linear-model-selection-and-regularization.html#cb512-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_highlight =</span> <span class="fu">fct_other</span>(</span>
+<span id="cb512-13"><a href="linear-model-selection-and-regularization.html#cb512-13" aria-hidden="true" tabindex="-1"></a>      term, <span class="at">keep =</span> <span class="fu">c</span>(<span class="st">&quot;Income&quot;</span>, <span class="st">&quot;Limit&quot;</span>, <span class="st">&quot;Rating&quot;</span>, <span class="st">&quot;Student_Yes&quot;</span>)</span>
+<span id="cb512-14"><a href="linear-model-selection-and-regularization.html#cb512-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb512-15"><a href="linear-model-selection-and-regularization.html#cb512-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb512-16"><a href="linear-model-selection-and-regularization.html#cb512-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb512-17"><a href="linear-model-selection-and-regularization.html#cb512-17" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb512-18"><a href="linear-model-selection-and-regularization.html#cb512-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb512-19"><a href="linear-model-selection-and-regularization.html#cb512-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb512-20"><a href="linear-model-selection-and-regularization.html#cb512-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb512-21"><a href="linear-model-selection-and-regularization.html#cb512-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="fu">expression</span>(lambda), <span class="at">y =</span> <span class="st">&quot;Standardized coefficients&quot;</span>, <span class="at">color =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb512-22"><a href="linear-model-selection-and-regularization.html#cb512-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb512-23"><a href="linear-model-selection-and-regularization.html#cb512-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.2</span>))</span>
+<span id="cb512-24"><a href="linear-model-selection-and-regularization.html#cb512-24" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span></span>
+<span id="cb512-25"><a href="linear-model-selection-and-regularization.html#cb512-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> l1_norm_ratio, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb512-26"><a href="linear-model-selection-and-regularization.html#cb512-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> term, <span class="at">color =</span> term_highlight), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb512-27"><a href="linear-model-selection-and-regularization.html#cb512-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb512-28"><a href="linear-model-selection-and-regularization.html#cb512-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;||&quot;</span>, <span class="fu">hat</span>(beta[lambda]), <span class="st">&quot;||1 / ||&quot;</span>, <span class="fu">hat</span>(beta), <span class="st">&quot;||1&quot;</span>)),</span>
+<span id="cb512-29"><a href="linear-model-selection-and-regularization.html#cb512-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">color =</span> <span class="cn">NULL</span></span>
+<span id="cb512-30"><a href="linear-model-selection-and-regularization.html#cb512-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb512-31"><a href="linear-model-selection-and-regularization.html#cb512-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(td_colors<span class="sc">$</span>pastel6[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="st">&quot;grey80&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb512-32"><a href="linear-model-selection-and-regularization.html#cb512-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb512-33"><a href="linear-model-selection-and-regularization.html#cb512-33" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">|</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure6.6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The shapes of the curves are right, but the scale of the <span class="math inline">\(\lambda\)</span> parameter in the left panel is much different – not sure what happened there.</p>
+<div id="another-formulation-for-ridge-regression-and-the-lasso" class="section level4 unnumbered">
+<h4>Another Formulation for Ridge Regression and the Lasso</h4>
+<p>One can show that the lasso and ridge regression coefficient estimates solve the problems:</p>
+<p><span class="math display">\[
+\begin{align}
+&amp;\text{minimize } \beta \left[ \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 \right] \text{ subject to } \sum_{j=1}^p |\beta_j| \leq s \\
+&amp;\text{minimize } \beta \left[ \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 \right] \text{ subject to } \sum_{j=1}^p \beta_j^2 \leq s,
+\end{align}
+\]</span></p>
+<p>respectively.
+In other words, for every value of <span class="math inline">\(\lambda\)</span>, there is some <span class="math inline">\(s\)</span> associated with the lasso/ridge coefficient estimates.
+For <span class="math inline">\(p = 2\)</span>, then the lasso coefficient estimates have the smallest RSS out of all points that lie within the diamond defined by <span class="math inline">\(|\beta_1| + |\beta_2| \leq s\)</span>;
+likewise, the circle <span class="math inline">\(\beta_1^2 + \beta_2^2 \leq s\)</span> for ridge regression.</p>
+<p>This formulation with <span class="math inline">\(s\)</span> can be though of in terms of a <em>budget</em> of coefficient size:</p>
+<blockquote>
+<p>When we perform the lasso we are trying
+to find the set of coefficient estimates that lead to the smallest RSS, subject
+to the constraint that there is a budget <span class="math inline">\(s\)</span> for how large <span class="math inline">\(\sum_{j=1}^p |\beta_j|\)</span> can be.
+When <span class="math inline">\(s\)</span> is extremely large, then this budget is not very restrictive, and so the coefficient estimates can be large. In fact, if <span class="math inline">\(s\)</span> is large enough that the least squares solution falls within the budget, then (6.8) will simply yield the least squares solution. In contrast, if <span class="math inline">\(s\)</span> is small, then <span class="math inline">\(\sum_{j=1}^p |\beta_j|\)</span> must be
+small in order to avoid violating the budget. Similarly, (6.9) indicates that
+when we perform ridge regression, we seek a set of coefficient estimates
+such that the RSS is as small as possible, subject to the requirement that
+^p_{j=1} _j^2$ does not exceed the budget <span class="math inline">\(s\)</span>.</p>
+</blockquote>
+<p>This formulation also allows us to see the close connection between lasso, ridge and best subset selection.
+Best subset selection is the minimization problem:</p>
+<p><span class="math display">\[
+\text{minimize } \beta \left[ \sum_{i=1}^n \left(y_i - \beta_0 - \sum_{j=1}^p \beta_j x_{ij} \right)^2 \right] \text{ subject to } \sum_{j=1}^p I(\beta_j \neq 0) \leq s.
+\]</span></p>
+</div>
+<div id="the-variable-selection-property-of-the-lasso" class="section level4 unnumbered">
+<h4>The Variable Selection Property of the Lasso</h4>
+<p>To understand why the lasso can remove predictors by shrinking coefficients to exactly zero, we can think of the shapes of the constraint functions, and the contours of RSS around the least squares estimate
+(see Figure 6.7 in the book for a visualization).
+For <span class="math inline">\(p = 2\)</span>, this is a circle (<span class="math inline">\(\beta_1^2 + \beta_2^2 \leq s\)</span>) for ridge, and square (<span class="math inline">\(|\beta_1| + |\beta_2| \leq s\)</span>) for lasso regression.</p>
+<blockquote>
+<p>Each of the ellipses centered around <span class="math inline">\(\hat{\beta}\)</span> represents a contour: this means that all of the points on a particular ellipse have the same RSS value.
+As the ellipses expand away from the least squares coefficient estimates, the
+RSS increases. Equations (6.8) and (6.9) indicate that the lasso and ridge
+regression coefficient estimates are given by the first point at which an
+ellipse contacts the constraint region. Since ridge regression has a circular
+constraint with no sharp points, this intersection will not generally occur on
+an axis, and so the ridge regression coefficient estimates will be exclusively
+non-zero. However, the lasso constraint has corners at each of the axes, and
+so the ellipse will often intersect the constraint region at an axis. When this
+occurs, one of the coefficients will equal zero. In higher dimensions, many of
+the coefficient estimates may equal zero simultaneously. In Figure 6.7, the
+intersection occurs at <span class="math inline">\(\beta_1 = 0\)</span>, and so the resulting model will only include <span class="math inline">\(\beta_2\)</span>.</p>
+</blockquote>
+<p>This key idea holds for large dimension <span class="math inline">\(p &gt; 2\)</span> – the lasso constraint will always have sharp corners, and the ridge constraint will not.</p>
+</div>
+<div id="comparing-the-lasso-and-ridge-regression" class="section level4 unnumbered">
+<h4>Comparing the Lasso and Ridge Regression</h4>
+<p>Generally, the lasso leads to qualitatively similar behavior to ridge regression, in that a larger <span class="math inline">\(\lambda\)</span> increases bias and decreases variance.
+A helpful way to compare models with different types of regularization is to plot <span class="math inline">\(R^2\)</span> as in Figure 6.8 comparing lasso and ridge MSE.
+In this example, the results are almost identical, with a slight edge to the ridge regression due to lower variance.
+This advantage is due to the fact that the simulated data consisted of 45 predictors, that were all related to the response – that is, none of the true coefficients equaled zero.
+Lasso implicitly assumes that a number of the coefficients are truly zero, so it is not surprising it performs slightly worse on this example.
+By contrast, the example in Figure 6.9 was simulated so that only 2 out of 45 predictors were related to the response.
+In this case, the lasso tends to outperform ridge regression in terms of bias, variance and MSE.</p>
+<blockquote>
+<p>These two examples illustrate that neither ridge regression nor the lasso
+will universally dominate the other. In general, one might expect the lasso
+to perform better in a setting where a relatively small number of predictors
+have substantial coefficients, and the remaining predictors have coefficients
+that are very small or that equal zero. Ridge regression will perform better
+when the response is a function of many predictors, all with coefficients of
+roughly equal size. However, the number of predictors that is related to the
+response is never known a priori for real data sets. A technique such as
+cross-validation can be used in order to determine which approach is better
+on a particular data set.</p>
+<p>As with ridge regression, when the least squares estimates have exces-
+sively high variance, the lasso solution can yield a reduction in variance
+at the expense of a small increase in bias, and consequently can gener-
+ate more accurate predictions. Unlike ridge regression, the lasso performs
+variable selection, and hence results in models that are easier to interpret.</p>
+<p>There are very efficient algorithms for fitting both ridge and lasso models;
+in both cases the entire coefficient paths can be computed with about the
+same amount of work as a single least squares fit.</p>
+</blockquote>
+</div>
+<div id="a-simple-special-case-for-ridge-regression-and-the-lasso" class="section level4" number="6.2.2.1">
+<h4><span class="header-section-number">6.2.2.1</span> A Simple Special Case for Ridge Regression and the Lasso</h4>
+<p>Consider a simple case with <span class="math inline">\(n = p\)</span> and a diagonal matrix <span class="math inline">\(\bf{X}\)</span> with 1’s on the diagonal and 0’s in all off-diagonal elements.
+To simplify further, assume that we are performing regression without an intercept.
+Then the usual least squares problem involves minimizing:</p>
+<p><span class="math display">\[
+\sum_{j=1}^p (y_j - \beta_j)^2.
+\]</span></p>
+<p>Which has the solution <span class="math inline">\(\hat{\beta}_j = y_j\)</span>.
+In ridge and lasso regression, the following are minimized:</p>
+<p><span class="math display">\[
+\begin{align}
+&amp;\sum_{j=1}^p (y_j - \beta_j)^2 + \lambda \sum_{j=1}^p \beta_j^2 \\
+&amp;\sum_{j=1}^p (y_j - \beta_j)^2 + \lambda \sum_{j=1}^p |\beta_j|.
+\end{align}
+\]</span></p>
+<p>One can show that the ridge regression estimates take the form</p>
+<p><span class="math display">\[
+\hat{\beta}_j^R = y_j / (1 + \lambda)
+\]</span></p>
+<p>and the lasso estimates take the form</p>
+<p><span class="math display">\[
+\hat{\beta}_j^L = \left\{\begin{array}{lr}
+y_j - \lambda / 2, &amp;\text{if } y_j &gt; \lambda / 2 \\
+y_j + \lambda / 2, &amp;\text{if } y_j &lt; - \lambda / 2 \\
+0, &amp;\text{if } |y_j| \leq \lambda / 2
+\end{array}\right.
+\]</span></p>
+<p>The coefficient estimates are shown in Figure 6.10.
+The ridge regression estimates are all shrunken towards zero by the same proportion, while the lasso shrinks each coefficient by the same amount and values less than <span class="math inline">\(\lambda / 2\)</span> are shrunken to exactly zero.
+This latter type of shrinkage is known as <em>soft-thresholding</em>, and is how lasso performs feature selection.</p>
+<blockquote>
+<p>…ridge regression more or less shrinks every dimension
+of the data by the same proportion, whereas the lasso more or less shrinks
+all coefficients toward zero by a similar amount, and sufficiently small coefficients are shrunken all the way to zero.</p>
+</blockquote>
+</div>
+<div id="bayesian-interpretation-for-ridge-regression-and-the-lasso-0" class="section level4" number="6.2.2.2">
+<h4><span class="header-section-number">6.2.2.2</span> Bayesian Interpretation for Ridge Regression and the Lasso {0}</h4>
+<p>A Bayesian viewpoint for regression assumes that the vector of coefficients <span class="math inline">\(\beta\)</span> has some <em>prior</em> distribution <span class="math inline">\(p(\beta)\)</span>, where <span class="math inline">\(\beta = (\beta_0, \dots , \beta_p)^T\)</span>.
+The likelihood of the data is then <span class="math inline">\(f(Y|X,\beta)\)</span>.
+Multiplying the prior by the likelihood gives us (up to a proportionality constant) the <em>posterior distribution</em> from Bayes’ theorem:</p>
+<p><span class="math display">\[
+p (\beta|X, Y) \propto f(Y|X,\beta) p(\beta|X) = f(Y|X,\beta) p(\beta).
+\]</span></p>
+<p>If we assume</p>
+<ul>
+<li>the usual linear model <span class="math inline">\(Y = \beta_0 + X_1 \beta_1 + \dots X_p \beta_p + \epsilon\)</span>,</li>
+<li>the errors are independent and drawn from a normal distribution,</li>
+<li>that <span class="math inline">\(p(\beta) = \Pi_{j=1}^p g(\beta_j)\)</span> for some density function <span class="math inline">\(g\)</span>.</li>
+</ul>
+<p>It turns out that ridge and lasso follow naturally from two special cases of <span class="math inline">\(g\)</span>:</p>
+<ul>
+<li>If <span class="math inline">\(g\)</span> is a Gaussian distribution with mean zero and standard deviation a function of <span class="math inline">\(\lambda\)</span>, then it follow that the <em>posterior mode</em> for <span class="math inline">\(\beta\)</span> – that is, the most likely value for <span class="math inline">\(\beta\)</span>, given the data – is given by the ridge regression solution. (In fact, the ridge regression solution is also the posterior mean.)</li>
+<li>If <span class="math inline">\(g\)</span> is a double-exponential (Laplace) distribution with mean zero and scale parameter a function of <span class="math inline">\(\lambda\)</span>, then it follow that the posterior mode for <span class="math inline">\(\beta\)</span> is the lasso solution. (However, the lasso solution is <em>not</em> the posterior mean, and in fact, the posterior mean does not yield a spare coefficient vector).</li>
+</ul>
+<blockquote>
+<p>The Gaussian and double-exponential priors are displayed in Figure 6.11.
+Therefore, from a Bayesian viewpoint, ridge regression and the lasso follow
+directly from assuming the usual linear model with normal errors, together
+with a simple prior distribution for <span class="math inline">\(β\)</span>. Notice that the lasso prior is steeply
+peaked at zero, while the Gaussian is flatter and fatter at zero. Hence, the
+lasso expects a priori that many of the coefficients are (exactly) zero, while
+ridge assumes the coefficients are randomly distributed about zero.</p>
+</blockquote>
+</div>
 </div>
 <div id="selecting-the-tuning-parameter" class="section level3" number="6.2.3">
 <h3><span class="header-section-number">6.2.3</span> Selecting the Tuning Parameter</h3>
+<p>Just like subset selection requires a method to determine which models are best, these regularization methods require a method for selecting a value for the tuning parameter <span class="math inline">\(\lambda\)</span> (or constraint <span class="math inline">\(s\)</span>).
+Cross-validation is the simple way to tackle this.
+We choose a grid of <span class="math inline">\(\lambda\)</span> values, and compute CV error for each value of <span class="math inline">\(\lambda\)</span>, and select the value for which error is smallest.
+The model is then re-fit using all available observations with the selected tuning parameter <span class="math inline">\(\lambda\)</span>.</p>
+<p>As <a href="resampling-methods.html#loocv">explained previously</a>, the <code>tidydmodels</code> framework does not allow fitting by LOOCV.</p>
+<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="linear-model-selection-and-regularization.html#cb513-1" aria-hidden="true" tabindex="-1"></a>credit_splits <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(credit, <span class="at">v =</span> <span class="fu">nrow</span>(credit))</span>
+<span id="cb513-2"><a href="linear-model-selection-and-regularization.html#cb513-2" aria-hidden="true" tabindex="-1"></a>credit_splits <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(credit, <span class="at">v =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p>Then the recipe (nothing new here):</p>
+<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb514-1"><a href="linear-model-selection-and-regularization.html#cb514-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit) <span class="sc">%&gt;%</span></span>
+<span id="cb514-2"><a href="linear-model-selection-and-regularization.html#cb514-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb514-3"><a href="linear-model-selection-and-regularization.html#cb514-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span></code></pre></div>
+<p>In the model specification, I set <code>mixture = 0</code> for ridge regression, and set <code>penalty = tune()</code> to indicate it as a tunable parameter:</p>
+<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="linear-model-selection-and-regularization.html#cb515-1" aria-hidden="true" tabindex="-1"></a>ridge_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">mixture =</span> <span class="dv">0</span>, <span class="at">penalty =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb515-2"><a href="linear-model-selection-and-regularization.html#cb515-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>)</span>
+<span id="cb515-3"><a href="linear-model-selection-and-regularization.html#cb515-3" aria-hidden="true" tabindex="-1"></a>ridge_spec</span></code></pre></div>
+<pre><code>## Linear Regression Model Specification (regression)
+## 
+## Main Arguments:
+##   penalty = tune()
+##   mixture = 0
+## 
+## Computational engine: glmnet</code></pre>
+<p>Combine into a <code>workflow</code>:</p>
+<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="linear-model-selection-and-regularization.html#cb517-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb517-2"><a href="linear-model-selection-and-regularization.html#cb517-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_ridge_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb517-3"><a href="linear-model-selection-and-regularization.html#cb517-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_spec)</span>
+<span id="cb517-4"><a href="linear-model-selection-and-regularization.html#cb517-4" aria-hidden="true" tabindex="-1"></a>credit_ridge_workflow</span></code></pre></div>
+<pre><code>## == Workflow ====================================================================
+## Preprocessor: Recipe
+## Model: linear_reg()
+## 
+## -- Preprocessor ----------------------------------------------------------------
+## 2 Recipe Steps
+## 
+## * step_dummy()
+## * step_normalize()
+## 
+## -- Model -----------------------------------------------------------------------
+## Linear Regression Model Specification (regression)
+## 
+## Main Arguments:
+##   penalty = tune()
+##   mixture = 0
+## 
+## Computational engine: glmnet</code></pre>
+<p>Lastly, because we are tuning <code>penalty</code> (<span class="math inline">\(\lambda\)</span>), we need to define a grid of values to try when fitting the model.
+The <code>dials</code> package provides many tools for tuning in <code>tidymodels</code>.
+<code>grid_regular()</code> creates a grid of evenly spaced points.
+As the first argument, I provide a <code>penalty()</code> with argument <code>range</code> that takes minimum and maximum values on a log scale:</p>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="linear-model-selection-and-regularization.html#cb519-1" aria-hidden="true" tabindex="-1"></a>penalty_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">4</span>)), <span class="at">levels =</span> <span class="dv">10</span>)</span>
+<span id="cb519-2"><a href="linear-model-selection-and-regularization.html#cb519-2" aria-hidden="true" tabindex="-1"></a>penalty_grid</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 1
+##       penalty
+##         &lt;dbl&gt;
+##  1     0.01  
+##  2     0.0464
+##  3     0.215 
+##  4     1     
+##  5     4.64  
+##  6    21.5   
+##  7   100     
+##  8   464.    
+##  9  2154.    
+## 10 10000</code></pre>
+<p>To fit the models using this grid of values, we use <code>tune_grid</code>:</p>
+<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="linear-model-selection-and-regularization.html#cb521-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb521-2"><a href="linear-model-selection-and-regularization.html#cb521-2" aria-hidden="true" tabindex="-1"></a>credit_ridge_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb521-3"><a href="linear-model-selection-and-regularization.html#cb521-3" aria-hidden="true" tabindex="-1"></a>  credit_ridge_workflow,</span>
+<span id="cb521-4"><a href="linear-model-selection-and-regularization.html#cb521-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> credit_splits,</span>
+<span id="cb521-5"><a href="linear-model-selection-and-regularization.html#cb521-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> penalty_grid</span>
+<span id="cb521-6"><a href="linear-model-selection-and-regularization.html#cb521-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb521-7"><a href="linear-model-selection-and-regularization.html#cb521-7" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<pre><code>## 1.36 sec elapsed</code></pre>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="linear-model-selection-and-regularization.html#cb523-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_tune <span class="sc">%&gt;%</span></span>
+<span id="cb523-2"><a href="linear-model-selection-and-regularization.html#cb523-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-283-1.png" width="576" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="linear-model-selection-and-regularization.html#cb524-1" aria-hidden="true" tabindex="-1"></a>credit_ridge_tune <span class="sc">%&gt;%</span> <span class="fu">collect_metrics</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 20 x 7
+##       penalty .metric .estimator    mean     n  std_err .config              
+##         &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;                
+##  1     0.01   rmse    standard   118.       10  3.42    Preprocessor1_Model01
+##  2     0.01   rsq     standard     0.940    10  0.00413 Preprocessor1_Model01
+##  3     0.0464 rmse    standard   118.       10  3.42    Preprocessor1_Model02
+##  4     0.0464 rsq     standard     0.940    10  0.00413 Preprocessor1_Model02
+##  5     0.215  rmse    standard   118.       10  3.42    Preprocessor1_Model03
+##  6     0.215  rsq     standard     0.940    10  0.00413 Preprocessor1_Model03
+##  7     1      rmse    standard   118.       10  3.42    Preprocessor1_Model04
+##  8     1      rsq     standard     0.940    10  0.00413 Preprocessor1_Model04
+##  9     4.64   rmse    standard   118.       10  3.42    Preprocessor1_Model05
+## 10     4.64   rsq     standard     0.940    10  0.00413 Preprocessor1_Model05
+## 11    21.5    rmse    standard   118.       10  3.42    Preprocessor1_Model06
+## 12    21.5    rsq     standard     0.940    10  0.00413 Preprocessor1_Model06
+## 13   100      rmse    standard   154.       10  4.83    Preprocessor1_Model07
+## 14   100      rsq     standard     0.912    10  0.00619 Preprocessor1_Model07
+## 15   464.     rmse    standard   248.       10  8.42    Preprocessor1_Model08
+## 16   464.     rsq     standard     0.815    10  0.0141  Preprocessor1_Model08
+## 17  2154.     rmse    standard   354.       10 11.2     Preprocessor1_Model09
+## 18  2154.     rsq     standard     0.740    10  0.0193  Preprocessor1_Model09
+## 19 10000      rmse    standard   426.       10 12.6     Preprocessor1_Model10
+## 20 10000      rsq     standard     0.714    10  0.0212  Preprocessor1_Model10</code></pre>
 </div>
 </div>
 <div id="dimension-reduction-methods" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Dimension Reduction Methods</h2>
+<blockquote>
+<p>The methods that we have discussed so far in this chapter have controlled
+variance in two different ways, either by using a subset of the original variables, or by shrinking their coefficients toward zero. All of these methods
+are defined using the original predictors, <span class="math inline">\(X_1, X_2, \dots , X_p\)</span>. We now explore
+a class of approaches that <em>transform</em> the predictors and then fit a least
+squares model using the transformed variables. We will refer to these techniques as <em>dimension reduction methods</em>.</p>
+</blockquote>
+<p>We represent our original <span class="math inline">\(p\)</span> predictors <span class="math inline">\(X_j\)</span> as <span class="math inline">\(M\)</span> (<span class="math inline">\(&lt; p\)</span>) linear combinations:</p>
+<p><span class="math display">\[
+Z_m = \sum_{j=1}^p \phi_{jm} X_j
+\]</span></p>
+<p>for some constants <span class="math inline">\(\phi_{1m}, \phi_{2m}, \dots \phi_{pm}\)</span> , <span class="math inline">\(m = 1, \dots, M\)</span>.
+We can then fit a linear regression model:</p>
+<p><span class="math display">\[
+y_i = \theta_0 + \sum_{m=1}^M \theta_m z_{im} + \epsilon_i, \ \ \ \ i = 1, \dots, n,
+\]</span></p>
+<p>using least squares.
+Note that the regression coefficients here are represented by <span class="math inline">\(\theta_0, \theta_1, \dots, \theta_M\)</span>.</p>
+<blockquote>
+<p>If the constants <span class="math inline">\(\phi_{1m}, \phi_{2m}, \dots , \phi_{pm}\)</span> are chosen wisely, then
+such dimension reduction approaches can often outperform least squares
+regression.</p>
+</blockquote>
+<p>This method is called <em>dimension reduction</em> because it involves reducing the <span class="math inline">\(p+1\)</span> coefficients (<span class="math inline">\(\beta_0, \dots, \beta_p\)</span>) down to <span class="math inline">\(M + 1\)</span> coefficients <span class="math inline">\(\theta_0, \dots, \theta_M\)</span> (<span class="math inline">\(M &lt; p\)</span>).</p>
+<p>Notice that the models are numerically equivalent:</p>
+<p><span class="math display">\[
+\sum_{m=1}^M \theta_m z_{im} = \sum_{m=1}^M \theta_m \sum_{j=1}^p \phi_{jm} x_{ij} =
+\sum_{j=1}^p \sum_{m=1}^M \theta_m \phi_{jm} x_{ij} = \sum_{j=1}^p \beta_j x_{ij},
+\]</span></p>
+<p>where</p>
+<p><span class="math display">\[
+\beta_j = \sum_{m=1}^M \theta_m \phi_{jm}.
+\]</span></p>
+<p>Hence, this can be thought of as a special case of the original linear regression model.
+Dimension reduction serves to constraint the estimated <span class="math inline">\(\beta_j\)</span> coefficients to the above form, which has the potential to bias the estimates.
+However, in situations where <span class="math inline">\(p\)</span> is large relative to <span class="math inline">\(n\)</span>, selecting a value of <span class="math inline">\(M \ll p\)</span> can significantly reduce the variance of the fitted coefficients.</p>
+<blockquote>
+<p>All dimension reduction methods work in two steps. First, the transformed predictors <span class="math inline">\(Z_1, Z_2, \dots Z_M\)</span> are obtained. Second, the model is fit
+using these <span class="math inline">\(M\)</span> predictors. However, the choice of <span class="math inline">\(Z_1, Z_2, \dots Z_M\)</span>, or equivalently, the selection of the <span class="math inline">\(\phi_{jm}\)</span>’s, can be achieved in different ways. In this
+chapter, we will consider two approaches for this task: <em>principal components</em>
+and <em>partial least squares</em>.</p>
+</blockquote>
 <div id="principal-components-regression" class="section level3" number="6.3.1">
 <h3><span class="header-section-number">6.3.1</span> Principal Components Regression</h3>
+<div id="an-overview-of-principal-components-analysis" class="section level4 unnumbered">
+<h4>An Overview of Principal Components Analysis</h4>
+<p>Principal components analysis (PCA) is a technique for reducing the dimension of an <span class="math inline">\(n \times p\)</span> data matrix <span class="math inline">\(\textbf{X}\)</span>.
+The <em>first principal component</em> direction of the data is that along which the observations <em>vary the most</em>.
+If the observations were to be projected onto the line definition this principal component, then the resulting projected observations would have the largest possible variance.
+Alternatively: the first principal component defines the line that is as close as possible to the data.
+The principal component can be summarized mathematically as a linear combination of the variables, <span class="math inline">\(Z_1\)</span>.</p>
+<p>The second principal component <span class="math inline">\(Z_2\)</span> is a linear combination of the variables that is uncorrelated with <span class="math inline">\(Z_1\)</span>, and has the largest variance subject to this constraint.
+Visually, the direction of this line must be perpendicular or orthogonal to the first principal component.</p>
+<p>Up to <span class="math inline">\(p\)</span> distinct principal components can be constructed, but the first component will contain the most information.
+Each component successively maximizes variance, subject to the constraint of being uncorrelated with the previous components.</p>
+</div>
+<div id="the-principal-components-regression-approach" class="section level4 unnumbered">
+<h4>The Principal Components Regression Approach</h4>
+<blockquote>
+<p>The principal components regression (PCR) approach involves constructing
+the first <span class="math inline">\(M\)</span> principal components, <span class="math inline">\(Z_1, \dots, Z_M\)</span>, and then using these
+components as the predictors in a linear regression model that is fit using
+least squares. The key idea is that often a small number of principal
+components suffice to explain most of the variability in the data, as well
+as the relationship with the response. In other words, we assume that the
+directions in which <span class="math inline">\(X_1, \dots, X_p\)</span> show the most variation are the directions
+that are associated with <span class="math inline">\(Y\)</span>. While this assumption is not guaranteed to be
+true, it often turns out to be a reasonable enough approximation to give
+good results.</p>
+<p>If the assumption underlying PCR holds, then fitting a least squares
+model to <span class="math inline">\(Z_1,\dots, Z_M\)</span> will lead to better results than fitting a least squares
+model to <span class="math inline">\(X_1,\dots,X_p\)</span>, since most or all of the information in the data that
+relates to the response is contained in <span class="math inline">\(Z_1,\dots,Z_M\)</span>, and by estimating only
+<span class="math inline">\(M ≪ p\)</span> coefficients we can mitigate overfitting</p>
+</blockquote>
+<p>It is important to note that, although PCR offers a simple way to perform regression using a smaller number of predictors (<span class="math inline">\(M &lt; p\)</span>), it is <em>not</em> a feature selection method.
+The <span class="math inline">\(M\)</span> principal components used in the regression is a linear combination of all <span class="math inline">\(p\)</span> of the <em>original</em> features.
+In this sense, PCR is more closely related to ridge regression than the lasso (because the lasso shrinks coefficients to exactly zero, essentially removing them).
+In fact, ridge regression can be considered a continuous version of PCR.</p>
+<p>In <code>tidymodels</code>, principal components are extracted in pre-processing via <code>recipes::step_pca()</code>.
+Here is the workflow applied to the <code>credit</code> data set with a linear model:</p>
+<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="linear-model-selection-and-regularization.html#cb526-1" aria-hidden="true" tabindex="-1"></a>lm_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">set_engine</span>(<span class="st">&quot;lm&quot;</span>)</span>
+<span id="cb526-2"><a href="linear-model-selection-and-regularization.html#cb526-2" aria-hidden="true" tabindex="-1"></a>credit_splits <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(credit, <span class="at">v =</span> <span class="dv">10</span>)</span>
+<span id="cb526-3"><a href="linear-model-selection-and-regularization.html#cb526-3" aria-hidden="true" tabindex="-1"></a>credit_pca_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Balance <span class="sc">~</span> ., <span class="at">data =</span> credit) <span class="sc">%&gt;%</span></span>
+<span id="cb526-4"><a href="linear-model-selection-and-regularization.html#cb526-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb526-5"><a href="linear-model-selection-and-regularization.html#cb526-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb526-6"><a href="linear-model-selection-and-regularization.html#cb526-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_pca</span>(<span class="fu">all_predictors</span>(), <span class="at">num_comp =</span> <span class="fu">tune</span>())</span>
+<span id="cb526-7"><a href="linear-model-selection-and-regularization.html#cb526-7" aria-hidden="true" tabindex="-1"></a>credit_pca_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb526-8"><a href="linear-model-selection-and-regularization.html#cb526-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(credit_pca_recipe) <span class="sc">%&gt;%</span></span>
+<span id="cb526-9"><a href="linear-model-selection-and-regularization.html#cb526-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_spec)</span></code></pre></div>
+<p>The <code>num_comp = tune()</code> argument to <code>step_pca()</code> allows variation in the number of principal components <span class="math inline">\(M\)</span>.
+To <code>tune_grid()</code>, I only need to provide is a data frame of possible <code>num_comp</code> values, but here is the <code>dials::grid_regular()</code> approach to doing that:</p>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="linear-model-selection-and-regularization.html#cb527-1" aria-hidden="true" tabindex="-1"></a>pca_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">num_comp</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">11</span>)), <span class="at">levels =</span> <span class="dv">11</span>)</span>
+<span id="cb527-2"><a href="linear-model-selection-and-regularization.html#cb527-2" aria-hidden="true" tabindex="-1"></a>pca_grid</span></code></pre></div>
+<pre><code>## # A tibble: 11 x 1
+##    num_comp
+##       &lt;int&gt;
+##  1        1
+##  2        2
+##  3        3
+##  4        4
+##  5        5
+##  6        6
+##  7        7
+##  8        8
+##  9        9
+## 10       10
+## 11       11</code></pre>
+<p>Perform 10 fold cross-validation for PCR with 1 to 11 components:</p>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="linear-model-selection-and-regularization.html#cb529-1" aria-hidden="true" tabindex="-1"></a>credit_pca_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb529-2"><a href="linear-model-selection-and-regularization.html#cb529-2" aria-hidden="true" tabindex="-1"></a>  credit_pca_workflow,</span>
+<span id="cb529-3"><a href="linear-model-selection-and-regularization.html#cb529-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> credit_splits, <span class="at">grid =</span> pca_grid,</span>
+<span id="cb529-4"><a href="linear-model-selection-and-regularization.html#cb529-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># This option extracts the model fits, which are otherwise discarded</span></span>
+<span id="cb529-5"><a href="linear-model-selection-and-regularization.html#cb529-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">extract =</span> <span class="cf">function</span>(m) <span class="fu">extract_fit_engine</span>(m))</span>
+<span id="cb529-6"><a href="linear-model-selection-and-regularization.html#cb529-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>And re-create the right panel of Figure 6.20:</p>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="linear-model-selection-and-regularization.html#cb530-1" aria-hidden="true" tabindex="-1"></a>credit_pca_tune <span class="sc">%&gt;%</span></span>
+<span id="cb530-2"><a href="linear-model-selection-and-regularization.html#cb530-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb530-3"><a href="linear-model-selection-and-regularization.html#cb530-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb530-4"><a href="linear-model-selection-and-regularization.html#cb530-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> mean<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb530-5"><a href="linear-model-selection-and-regularization.html#cb530-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> num_comp, <span class="at">y =</span> mse)) <span class="sc">+</span></span>
+<span id="cb530-6"><a href="linear-model-selection-and-regularization.html#cb530-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb530-7"><a href="linear-model-selection-and-regularization.html#cb530-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> <span class="dv">3</span>,</span>
+<span id="cb530-8"><a href="linear-model-selection-and-regularization.html#cb530-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>spanish_blue, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
+<span id="cb530-9"><a href="linear-model-selection-and-regularization.html#cb530-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">&quot;Cross-validation MSE&quot;</span>,</span>
+<span id="cb530-10"><a href="linear-model-selection-and-regularization.html#cb530-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20000</span>, <span class="dv">40000</span>, <span class="dv">60000</span>, <span class="dv">80000</span>)) <span class="sc">+</span></span>
+<span id="cb530-11"><a href="linear-model-selection-and-regularization.html#cb530-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Number of components&quot;</span>, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">10</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure6.20-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>By MSE, the best performing models are <span class="math inline">\(M\)</span> = 10 and 11 principal components, which mean that dimension reduction is not needed here because <span class="math inline">\(p = 11\)</span>.</p>
+<p>Note the <code>step_normalize()</code> function in the recipe used here.
+This is important when performing PCR:</p>
+<blockquote>
+<p>We generally recommend standardizing each predictor, using (6.6), prior to generating the principal components. This standardization ensures that all variables are on the same scale. In the absence
+of standardization, the high-variance variables will tend to play a larger
+role in the principal components obtained, and the scale on which the variables are measured will ultimately have an effect on the final PCR model.
+However, if the variables are all measured in the same units (say, kilograms,
+or inches), then one might choose not to standardize them.</p>
+</blockquote>
+</div>
 </div>
 <div id="partial-least-squares" class="section level3" number="6.3.2">
 <h3><span class="header-section-number">6.3.2</span> Partial Least Squares</h3>
+<blockquote>
+<p>The PCR approach that we just described involves identifying linear combinations, or directions, that best represent the predictors <span class="math inline">\(X1,\dots,X_p\)</span>. These
+directions are identified in an unsupervised way, since the response <span class="math inline">\(Y\)</span> is not
+used to help determine the principal component directions. That is, the
+response does not supervise the identification of the principal components.
+Consequently, PCR suffers from a drawback: there is no guarantee that the
+directions that best explain the predictors will also be the best directions
+to use for predicting the response. Unsupervised methods are discussed
+further in Chapter 12.</p>
+</blockquote>
+<p>Like PCR, <em>partial least squares</em> (PLS) is a dimension reduction method which identifies a set of features <span class="math inline">\(Z_1, \dots, Z_M\)</span> that are linear combinations of the <span class="math inline">\(p\)</span> original predictors.
+Unlike PCR, PLS identifies the new features which are <em>related to the response</em> <span class="math inline">\(Y\)</span>.
+In this way, PLS is a supervised alternative to PCR.
+Roughly speaking, the PLS approach attempts to find directions that help explain both the response and the predictors.</p>
+<p>After standardizing the <span class="math inline">\(p\)</span> predictors, the first PLS direction <span class="math inline">\(Z_1 = \sum_{j=1}^p \phi_{j1} X_j\)</span> is found from the simple linear regression of <span class="math inline">\(Y\)</span> onto <span class="math inline">\(X_j\)</span>.
+This means that PLS places the highest weight on the variables that are most strongly related to the response.
+For the second PLS direction, each of the variables is <em>adjusted</em> by regression on <span class="math inline">\(Z_1\)</span> and taking residuals.
+These residuals can be interpreted as the remanining information that has not been explained by the first PLS direction.
+<span class="math inline">\(Z_2\)</span> is then computed using this <em>orthogonalized</em> data in the same way as <span class="math inline">\(Z_1\)</span> was computed on the original data.
+This iterative approach is repeated <span class="math inline">\(M\)</span> times, and the final step is to fit the linear model to predict <span class="math inline">\(Y\)</span> using <span class="math inline">\(Z_1, \dots, Z_M\)</span> in exactly the same way as for PCR&gt;</p>
+<blockquote>
+<p>As with PCR, the number <span class="math inline">\(M\)</span> of partial least squares directions used in
+PLS is a tuning parameter that is typically chosen by cross-validation. We
+generally standardize the predictors and response before performing PLS.</p>
+</blockquote>
+<p>In practice, PLS often performs no better than ridge regression or PCR.
+It can often reduce bias, but it also has the potential to increase variance, so it evens out relative to other methods.</p>
 </div>
 </div>
 <div id="considerations-in-high-dimensions" class="section level2" number="6.4">
@@ -1962,8 +2348,8 @@ As <span class="math inline">\(\lambda\)</span> increases, the flexibility of th
 </div>
 <div id="lab-linear-models-and-regularization-methods" class="section level2" number="6.5">
 <h2><span class="header-section-number">6.5</span> Lab: Linear Models and Regularization Methods</h2>
-<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="linear-model-selection-and-regularization.html#cb515-1" aria-hidden="true" tabindex="-1"></a>hitters <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(ISLR2<span class="sc">::</span>Hitters) <span class="sc">%&gt;%</span></span>
-<span id="cb515-2"><a href="linear-model-selection-and-regularization.html#cb515-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary))</span></code></pre></div>
+<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="linear-model-selection-and-regularization.html#cb531-1" aria-hidden="true" tabindex="-1"></a>hitters <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(ISLR2<span class="sc">::</span>Hitters) <span class="sc">%&gt;%</span></span>
+<span id="cb531-2"><a href="linear-model-selection-and-regularization.html#cb531-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary))</span></code></pre></div>
 <div id="subset-selection-methods" class="section level3" number="6.5.1">
 <h3><span class="header-section-number">6.5.1</span> Subset Selection Methods</h3>
 </div>
@@ -1979,17 +2365,17 @@ As <span class="math inline">\(\lambda\)</span> increases, the flexibility of th
 </div>
 <div id="reproducibility-3" class="section level2 unnumbered">
 <h2>Reproducibility</h2>
-<div class="sourceCode" id="cb516"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb516-1"><a href="linear-model-selection-and-regularization.html#cb516-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-02-24 20:16:10 AST&quot;</code></pre>
-<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb518-1"><a href="linear-model-selection-and-regularization.html#cb518-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
-<span id="cb518-2"><a href="linear-model-selection-and-regularization.html#cb518-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
-<span id="cb518-3"><a href="linear-model-selection-and-regularization.html#cb518-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
-<span id="cb518-4"><a href="linear-model-selection-and-regularization.html#cb518-4" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb518-5"><a href="linear-model-selection-and-regularization.html#cb518-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="linear-model-selection-and-regularization.html#cb532-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2022-03-18 16:39:15 AST&quot;</code></pre>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="linear-model-selection-and-regularization.html#cb534-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
+<span id="cb534-2"><a href="linear-model-selection-and-regularization.html#cb534-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
+<span id="cb534-3"><a href="linear-model-selection-and-regularization.html#cb534-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
+<span id="cb534-4"><a href="linear-model-selection-and-regularization.html#cb534-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb534-5"><a href="linear-model-selection-and-regularization.html#cb534-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [d5fc7f2] 2022-02-18: Finished section 6.1</code></pre>
-<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="linear-model-selection-and-regularization.html#cb520-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
+## Head:     [071b6fe] 2022-03-01: Working on section 6.2.3</code></pre>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="linear-model-selection-and-regularization.html#cb536-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## - Session info ---------------------------------------------------------------
 ##  setting  value                       
 ##  version  R version 4.1.2 (2021-11-01)
@@ -2000,7 +2386,7 @@ As <span class="math inline">\(\lambda\)</span> increases, the flexibility of th
 ##  collate  English_Canada.1252         
 ##  ctype    English_Canada.1252         
 ##  tz       America/Curacao             
-##  date     2022-02-24                  
+##  date     2022-03-18                  
 ## 
 ## - Packages -------------------------------------------------------------------
 ##  package        * version    date       lib source                           
@@ -2188,9 +2574,12 @@ As <span class="math inline">\(\lambda\)</span> increases, the flexibility of th
 <div class="csl-entry">
 Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
 </div>
+<div class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
 </div>
 </div>
 </div>
+</div>
 
 
 
@@ -2199,6 +2588,12 @@ Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="n
 
 
 
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Smith2018" class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
+</div>
+</div>
             </section>
 
           </div>
