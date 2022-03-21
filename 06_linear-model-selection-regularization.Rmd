@@ -1204,7 +1204,7 @@ This means that PLS places the highest weight on the variables that are most str
 For the second PLS direction, each of the variables is *adjusted* by regression on $Z_1$ and taking residuals.
 These residuals can be interpreted as the remanining information that has not been explained by the first PLS direction.
 $Z_2$ is then computed using this *orthogonalized* data in the same way as $Z_1$ was computed on the original data.
-This iterative approach is repeated $M$ times, and the final step is to fit the linear model to predict $Y$ using $Z_1, \dots, Z_M$ in exactly the same way as for PCR>
+This iterative approach is repeated $M$ times, and the final step is to fit the linear model to predict $Y$ using $Z_1, \dots, Z_M$ in exactly the same way as for PCR.
 
 >
 As with PCR, the number $M$ of partial least squares directions used in
@@ -1218,13 +1218,100 @@ It can often reduce bias, but it also has the potential to increase variance, so
 
 ### High-Dimensional Data
 
+>
+Most traditional statistical techniques for regression and classification are
+intended for the *low-dimensional* setting in which $n$, the number of observations, is much greater than $p$, the number of features. This is due in
+part to the fact that throughout most of the field’s history, the bulk of scientific problems requiring the use of statistics have been low-dimensional.
+
+To be clear, by dimension, we are referring to the size of $p$.
+
+>
+In the past 20 years, new technologies have changed the way that data
+are collected in fields as diverse as finance, marketing, and medicine. It is
+now commonplace to collect an almost unlimited number of feature measurements ($p$ very large). While $p$ can be extremely large, the number of
+observations $n$ is often limited due to cost, sample availability, or other
+considerations.
+
+These *high-dimensional* problems, in which the number of features $p$ is larger than observations $n$, are becoming more commonplace.
+
 ### What Goes Wrong in High Dimensions?
+
+To illustrate the $p > n$ issue, we examine least squares regression (but the same concepts apply to logistic regression, linear discriminant analysis and others).
+Least squares cannot be (or rather *should not*) be performed in this setting because it will yield coefficient estimates that perfectly fit the data, such that the residuals are zero.
+
+```{r figure6.22}
+tibble(n_obs = c(2, 20)) %>%
+  mutate(x = map(n_obs, rnorm)) %>%
+  unnest(x) %>%
+  mutate(y = 5 * x + rnorm(n(), 0, 3)) %>%
+  ggplot(aes(x, y)) +
+  geom_point(color = "red", size = 3) +
+  geom_smooth(method = "lm", formula = "y ~ x", color = "black") +
+  facet_wrap(~ fct_rev(paste0("n = ", as.character(n_obs)))) +
+  add_facet_borders()
+```
+
+Note the warning returned by `geom_smooth` (NaNs and Infs produced) and the lack of errors around the best fit line in the right panel.
+
+>
+On the
+other hand, when there are only two observations, then regardless of the
+values of those observations, the regression line will fit the data exactly.
+This is problematic because this perfect fit will almost certainly lead to
+overfitting of the data. In other words, though it is possible to perfectly fit
+the training data in the high-dimensional setting, the resulting linear model
+will perform extremely poorly on an independent test set, and therefore
+does not constitute a useful model. In fact, we can see that this happened
+in Figure 6.22: the least squares line obtained in the right-hand panel will
+perform very poorly on a test set comprised of the observations in the lefth-and panel.
+The problem is simple: when $p>n$ or $p \approx n$, a simple least
+squares regression line is too flexible and hence overfits the data.
+
+Previously we saw a number of approaches for adjusting the training set error to account for the number of variables used to fit a least squares model.
+Unfortunately, the $C_p$, AIC, and BIC approaches are not appropriate in this setting, because estimating $\hat{\sigma}^2$ is problematic).
+Similarly, a model can easily obtain an adjusted $R^2$ value of 1.
+Clearly, alternative approaches that are better-suited to the high-dimensional setting are required.
 
 ### Regression in High Dimensions
 
+The methods learned in this chapter -- stepwise selection, ridge and lasso regression, and principal components regression -- are useful for performing regression in the high-dimensional setting because they are *less flexible* fitting procedures.
+
+The lasso example in Figure 6.24 highlights three important points:
+
+1. regularlization or shrinkage plays a key role in high-dimensional problems,
+2. appropriate tuning parameter selection is crucial for good predictive performance, and
+3. the test error tends to increase as the dimensionality of the problem (i.e. the number of feature or predictors) increases, unless those additional features are truly associated with the response.
+
+The third point is known as *the curve of dimensionality*.
+In general, adding additional signal features that are truly associated with the response will improve the fitted model (and a reduction in test set error).
+However, adding noise features that are not truly associated with teh response will lead to a worse fitted model (and an increase in test set error).
+
+>
+Thus, we see that new technologies that allow for the collection
+of measurements for thousands or millions of features are a double-edged
+sword: they can lead to improved predictive models if these features are in
+fact relevant to the problem at hand, but will lead to worse results if the
+features are not relevant. Even if they are relevant, the variance incurred
+in fitting their coefficients may outweigh the reduction in bias that they
+bring.
+
 ### Interpreting Results in High Dimensions
 
+When performing lasso, ridge or other regression in the high-dimensional setting, *multicollinearity* (where variables in a regression are correlated with each other) can be a big problem.
+Any variable in the model can be written as a linear combination of all other variables in the model,
+so we can never know exactly which variables (if any) truly are predictive of the outcome, and can never identify the *best* coefficients for use in regression.
+A model like this can still have very high predictive value, but we must be careful not to overstate the results and make it clear that we have identified *one of many possible models* for predicting the outcome, and that is must be further validated on independent data sets.
+It is also important to be careful in reporting errors.
+We have seen in the example that when $p > n$, it is easy to obtain a useful model that has zero residuals.
+In this case, traditional measures of model fit (e.g. $R^2$) are misleading; instead, models should be assessed on an independent test set or cross-validation errors.
+
 ## Lab: Linear Models and Regularization Methods
+
+### Subset Selection Methods
+
+#### Best Subset Selection
+
+Here, we aim to predict a baseball player's `Salary` from performance statistics in the previous year:
 
 ```{r}
 hitters <- as_tibble(ISLR2::Hitters) %>%
