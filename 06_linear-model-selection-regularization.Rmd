@@ -746,6 +746,12 @@ This makes lasso models much easier to interpret than those produced by ridge re
 Fit the `credit` model with lasso regression:
 
 ```{r}
+credit_recipe <- recipe(Balance ~ ., data = credit) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_predictors())
+```
+
+```{r}
 lasso_spec <- linear_reg(penalty = 20, mixture = 1) %>%
   set_engine("glmnet")
 credit_lasso_workflow <- workflow() %>%
@@ -964,65 +970,58 @@ Cross-validation is the simple way to tackle this.
 We choose a grid of $\lambda$ values, and compute CV error for each value of $\lambda$, and select the value for which error is smallest.
 The model is then re-fit using all available observations with the selected tuning parameter $\lambda$.
 
-<!-- As [explained previously](resampling-methods.html#loocv), the `tidydmodels` framework does not allow fitting by LOOCV. -->
+As [explained previously](resampling-methods.html#loocv), the `tidydmodels` framework does not allow fitting by LOOCV.
 
-<!-- ```{r} -->
-<!-- credit_splits <- vfold_cv(credit, v = nrow(credit)) -->
-<!-- credit_splits <- vfold_cv(credit, v = 10) -->
-<!-- ``` -->
+```{r}
+credit_splits <- vfold_cv(credit, v = 10)
+```
 
-<!-- Then the recipe (nothing new here): -->
+Then the recipe (nothing new here):
 
-<!-- ```{r} -->
-<!-- credit_ridge_recipe <- recipe(Balance ~ ., data = credit) %>% -->
-<!--   step_dummy(all_nominal_predictors()) %>% -->
-<!--   step_normalize(all_predictors()) -->
-<!-- ``` -->
+```{r}
+credit_ridge_recipe <- recipe(Balance ~ ., data = credit) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_predictors())
+```
 
-<!-- In the model specification, I set `mixture = 0` for ridge regression, and set `penalty = tune()` to indicate it as a tunable parameter: -->
+In the model specification, I set `mixture = 0` for ridge regression, and set `penalty = tune()` to indicate it as a tunable parameter:
 
-<!-- ```{r} -->
-<!-- ridge_spec <- linear_reg(mixture = 0, penalty = tune()) %>% -->
-<!--   set_engine("glmnet") -->
-<!-- ridge_spec -->
-<!-- ``` -->
+```{r}
+ridge_spec <- linear_reg(mixture = 0, penalty = tune()) %>%
+  set_engine("glmnet")
+```
 
-<!-- Combine into a `workflow`: -->
+Combine into a `workflow`:
 
-<!-- ```{r} -->
-<!-- credit_ridge_workflow <- workflow() %>% -->
-<!--   add_recipe(credit_ridge_recipe) %>% -->
-<!--   add_model(ridge_spec) -->
-<!-- credit_ridge_workflow -->
-<!-- ``` -->
+```{r}
+credit_ridge_workflow <- workflow() %>%
+  add_recipe(credit_ridge_recipe) %>%
+  add_model(ridge_spec)
+credit_ridge_workflow
+```
 
-<!-- Lastly, because we are tuning `penalty` ($\lambda$), we need to define a grid of values to try when fitting the model. -->
-<!-- The `dials` package provides many tools for tuning in `tidymodels`. -->
-<!-- `grid_regular()` creates a grid of evenly spaced points. -->
-<!-- As the first argument, I provide a `penalty()` with argument `range` that takes minimum and maximum values on a log scale: -->
+Lastly, because we are tuning `penalty` ($\lambda$), we need to define a grid of values to try when fitting the model.
+The `dials` package provides many tools for tuning in `tidymodels`.
+`grid_regular()` creates a grid of evenly spaced points.
+As the first argument, I provide a `penalty()` with argument `range` that takes minimum and maximum values on a log scale:
 
-<!-- ```{r} -->
-<!-- penalty_grid <- grid_regular(penalty(range = c(-2, 4)), levels = 10) -->
-<!-- penalty_grid -->
-<!-- ``` -->
+```{r}
+penalty_grid <- grid_regular(penalty(range = c(-2, 4)), levels = 10)
+penalty_grid
+```
 
-<!-- To fit the models using this grid of values, we use `tune_grid`: -->
+To fit the models using this grid of values, we use `tune_grid()`:
 
-<!-- ```{r} -->
-<!-- tic() -->
-<!-- credit_ridge_tune <- tune_grid( -->
-<!--   credit_ridge_workflow, -->
-<!--   resamples = credit_splits, -->
-<!--   grid = penalty_grid -->
-<!-- ) -->
-<!-- toc() -->
-<!-- credit_ridge_tune %>% -->
-<!--   autoplot() -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- credit_ridge_tune %>% collect_metrics() -->
-<!-- ``` -->
+```{r}
+tic()
+credit_ridge_tune <- tune_grid(
+  credit_ridge_workflow,
+  resamples = credit_splits,
+  grid = penalty_grid
+)
+toc()
+credit_ridge_tune %>% autoplot()
+```
 
 ## Dimension Reduction Methods
 
@@ -1309,19 +1308,391 @@ In this case, traditional measures of model fit (e.g. $R^2$) are misleading; ins
 
 ### Subset Selection Methods
 
-#### Best Subset Selection
+#### Best Subset Selection {-}
 
 Here, we aim to predict a baseball player's `Salary` from performance statistics in the previous year:
 
 ```{r}
 hitters <- as_tibble(ISLR2::Hitters) %>%
   filter(!is.na(Salary))
+glimpse(hitters)
 ```
 
+As in the text, I'll use the `leaps` package to perform best subset selection via RSS.
 
-### Subset Selection Methods
+```{r}
+library(leaps)
+regsubsets_hitters_salary <- regsubsets(Salary ~ ., data = hitters)
+summary(regsubsets_hitters_salary)
+```
+
+An asterisk indicates the variable is included in the model, so the best variables in the three-predictor model are `Hits`, `CRBI` and `PutOuts`.
+Note that there is a `broom::tidy()` function available for these objects:
+
+```{r}
+broom::tidy(regsubsets_hitters_salary) %>%
+  glimpse()
+```
+
+Instead of a formatted table of asterisks, this gives us a `tibble` of booleans which are nice to work with for producing custom outputs like:
+
+```{r}
+broom::tidy(regsubsets_hitters_salary) %>%
+  select(-`(Intercept)`) %>%
+  add_rownames(var = "n_vars") %>%
+  gt(rowname_col = "n_vars") %>%
+  gt::data_color(
+    columns = AtBat:NewLeagueN,
+    colors = col_numeric(
+      palette = c(td_colors$nice$soft_orange, td_colors$nice$lime_green),
+      domain = c(0, 1))
+  ) %>%
+  gt::fmt_number(r.squared:mallows_cp, n_sigfig = 4)
+```
+
+Note that, by default, `regsubsets()` fits models with up to 8 predictors, this can be adjusted with the `nvmax` argument:
+
+```{r}
+regsubsets_hitters_salary <- regsubsets(Salary ~ ., data = hitters, nvmax = 19)
+```
+
+To help choose the best model, plot $R^2$, adjusted $R^2$, $C_p$ and BIC versus number of predictors for all the models:
+
+```{r}
+tidy(regsubsets_hitters_salary) %>%
+  select(r.squared:mallows_cp) %>%
+  mutate(n_vars = 1:n()) %>%
+  pivot_longer(cols = -n_vars, names_to = "metric") %>%
+  ggplot(aes(x = n_vars, y = value)) +
+  geom_point() +
+  geom_line() +
+  geom_vline(
+    data = . %>%
+      group_by(metric) %>%
+      filter(value == ifelse(str_detect(metric, "r.squared"),
+                             max(value), min(value))),
+    aes(xintercept = n_vars), size = 1
+  ) +
+  facet_wrap(~ metric, scales = "free_y")
+```
+
+As expected, $R^2$ increases monotonically.
+The best number of variables by adjusted $R^2$, $C_p$ and BIC are 11, 6 and 10, respectively.
+We can use `coef()` to get the coefficient estimates associated with the model with a specified number of variables:
+
+```{r}
+coef(regsubsets_hitters_salary, 6)
+```
+
+#### Forward and Backward Stepwise Selection {-}
+
+Forward and backward stepwise selection can be performed with the `method = "forward"` and `"backward"` arguments:
+
+```{r}
+regsubsets_hitters_salary_forward <- regsubsets(Salary ~ ., data = hitters,
+                                                nvmax = 19, method = "forward")
+regsubsets_hitters_salary_backward <- regsubsets(Salary ~ ., data = hitters,
+                                                 nvmax = 19, method = "backward")
+```
+
+#### Choosing Among Models Using the Validation-Set Approach and Cross-Validation
+
+Use `rsample` to perform a 50-50 split into training and testing data:
+
+```{r}
+set.seed(8)
+hitters_split <- initial_split(hitters, prop = 0.5)
+hitters_train <- training(hitters_split)
+hitters_test <- testing(hitters_split)
+
+hitters_train_best <- regsubsets(Salary ~ ., data = hitters_train, nvmax = 19)
+```
+
+I'll use a different approach to extracting model coefficients from the `regsubsets` object and getting MSE from the testing set:
+
+```{r}
+hitters_test_mse <- tibble(n_vars = 1:19) %>%
+  mutate(
+    model_coefs = map(
+      n_vars,
+      ~ names(coef(hitters_train_best, i = .x)) %>%
+        # Annoyingly, need to rename the categorical coefficients
+        str_replace("NewLeagueN", "NewLeague") %>%
+        str_replace("DivisionW", "Division") %>%
+        str_replace("LeagueN", "League")
+    ),
+    model_formula = map(
+      model_coefs,
+      ~ formula(paste0("Salary ~ ", paste(.x[-1], collapse = "+")))
+    ),
+    model_fit = map(model_formula, ~ lm(.x, data = hitters_test)),
+    mse = map_dbl(model_fit, ~ mean(.x$residuals^2))
+  )
+hitters_test_mse %>%
+  select(n_vars, model_coefs, mse) %>%
+  gt() %>%
+  data_color(columns = mse,
+             colors = c(td_colors$nice$charcoal, td_colors$nice$lime_green))
+```
 
 ### Ridge Regression and the Lasso
+
+#### Ridge Regression {-}
+
+The `glmnet::glmnet()` function uses a different syntax for fitting models:
+
+```{r}
+x <- model.matrix(Salary ~ ., hitters)[, -1]
+y <- hitters$Salary
+
+lambda_grid <- 10^seq(10, -2, length = 100)
+ridge_salary <- glmnet::glmnet(x, y, alpha = 0, lambda = lambda_grid)
+```
+
+And the results are also output in a vary particular way.
+Here are the coefficients associated with the 50th $\lambda$ value (= `r ridge_salary$lambda[50]`) and the 60th (= `r ridge_salary$lambda[60]`):
+
+```{r}
+coef(ridge_salary)[, 50]; coef(ridge_salary)[, 60]
+```
+
+The coefficients in the first model are much smaller compared to the second, as expected.
+This can also be seen with the $\mathcal{l}_2$ norm:
+
+```{r}
+sqrt(sum(coef(ridge_salary)[-1, 50]^2)); sqrt(sum(coef(ridge_salary)[-1, 60]^2))
+```
+
+Part of the reason I really like `tidymodels` (and [one of the reasons it was created in the first place](https://youtu.be/kAZe9UpMx_s?t=235)) is the consistency.
+It provides a unified interface for fitting models from many different packages.
+Without ISLR walking me through the steps, it would take me a long time to learn the syntax of `glmnet` and how to extract the results I want.
+The `tidymodels` implementation of this workflow might be longer, but it is standardized -- these are lines of code I've written variations of hundreds of times now.
+
+```{r}
+ridge_spec <- linear_reg(penalty = 0, mixture = 0) %>%
+  set_engine("glmnet", path_values = lambda_grid)
+
+hitters_ridge_fit <- fit(ridge_spec, Salary ~ ., data = hitters)
+
+tidy(hitters_ridge_fit, penalty = lambda_grid[50])
+tidy(hitters_ridge_fit, penalty = lambda_grid[60])
+```
+
+Visualize coefficient estimates:
+
+```{r fig.width=7, fig.height=6}
+map_dfr(lambda_grid,
+        ~ tidy(hitters_ridge_fit, penalty = .x)) %>%
+  filter(term != "(Intercept)") %>%
+  ggplot(aes(x = penalty, y = estimate)) +
+  geom_point() +
+  scale_x_log10(breaks = 10^seq(-2, 10, 4),
+                labels = c("1e-2", "1e2", "1e6", "1e10")) +
+  facet_wrap(~ term, scales = "free_y", ncol = 5) +
+  add_facet_borders()
+```
+
+The `predict()` function also takes a `penalty` argument:
+
+```{r}
+predict(hitters_ridge_fit, penalty = 50, new_data = hitters)
+```
+
+Split the data and fit to the training set:
+
+```{r}
+set.seed(10)
+hitters_split <- initial_split(hitters, prop = 0.5)
+hitters_train <- training(hitters_split)
+hitters_test <- testing(hitters_split)
+
+hitters_ridge_fit <- fit(ridge_spec, Salary ~ ., data = hitters_train)
+tidy(hitters_ridge_fit, penalty = 4)
+```
+
+Now fit to the testing set and get MSE for $\lambda$ = 4:
+
+```{r}
+# Note that `broom::augment()` is not implemented for glmnet models, so need to
+#  use `predict()` with `penalty` argument
+bind_cols(
+  hitters_test,
+  predict(hitters_ridge_fit, new_data = hitters_test, penalty = 4)
+) %>%
+  summarise(mse = mean((Salary - .pred)^2))
+```
+
+Aside: here is a shortcut with `yardstick::rmse()`:
+
+```{r}
+bind_cols(
+  hitters_test,
+  predict(hitters_ridge_fit, new_data = hitters_test, penalty = 4)
+) %>%
+  yardstick::rmse(Salary, .pred) %>%
+  mutate(mse = .estimate^2)
+```
+
+We should find that the null model (just an intercept, so each test observation is predicted to be the mean of the training) gives the same fit as a ridge regression model with a very large $\lambda$ penalty:
+
+```{r}
+hitters_lm_null_fit <- lm(Salary ~ 1, data = hitters_train)
+
+bind_cols(
+  hitters_test,
+  predict(hitters_ridge_fit, new_data = hitters_test, penalty = 1e10),
+  .lm_pred = predict(hitters_lm_null_fit, newdata = hitters_test)
+) %>%
+  summarise(
+    mse_ridge = mean((Salary - .pred)^2),
+    mse_null = mean((Salary - .lm_pred)^2)
+  )
+```
+
+Likewise, compare a penalty of 0 to least squares regression with all predictors:
+
+```{r}
+hitters_lm_fit <- lm(Salary ~ ., data = hitters_train)
+
+bind_cols(
+  hitters_test,
+  predict(hitters_ridge_fit, new_data = hitters_test, penalty = 0),
+  .lm_pred = predict(hitters_lm_fit, newdata = hitters_test)
+) %>%
+  summarise(
+    mse_ridge = mean((Salary - .pred)^2),
+    mse_lm = mean((Salary - .lm_pred)^2)
+  )
+```
+
+Close, but not exactly the same MSE.
+Reading the footnote in the text (page 279), it appears to be due to a numerical approximation on the part of `glmnet()`.
+
+Instead of arbitrarily choosing $\lambda$ = 4, let's use 10-fold cross-validation:
+
+```{r}
+hitters_recipe <- recipe(Salary ~ ., data = hitters_train) %>%
+  step_dummy(all_nominal_predictors())
+ridge_spec <- linear_reg(penalty = tune(), mixture = 0) %>%
+  set_engine("glmnet")
+hitters_ridge_workflow <- workflow() %>%
+  add_model(ridge_spec) %>%
+  add_recipe(hitters_recipe)
+
+set.seed(291)
+hitters_resamples <- vfold_cv(hitters_train, v = 10)
+
+# Same values as previously
+lambda_grid <- grid_regular(penalty(range = c(-2, 10)), levels = 100)
+hitters_ridge_tune <- tune_grid(
+  hitters_ridge_workflow, resamples = hitters_resamples,
+  grid = lambda_grid
+)
+```
+
+The warnings here are coming from the `rsq` metric blowing up at large penalty values, which I can quickly visualize with `autoplot()`:
+
+```{r}
+autoplot(hitters_ridge_tune)
+```
+
+The full list of metrics can be collected like this:
+
+```{r}
+collect_metrics(hitters_ridge_tune)
+```
+
+Or find the best fit directly:
+
+```{r}
+select_best(hitters_ridge_tune, metric = "rmse")
+```
+
+With this penalty selected, finalize the workflow and perform the final fit:
+
+```{r}
+hitters_ridge_workflow_final <- hitters_ridge_workflow %>%
+  finalize_workflow(select_best(hitters_ridge_tune, metric = "rmse"))
+hitters_ridge_fit_final <- fit(hitters_ridge_workflow_final,
+                               data = hitters_train)
+
+# Note that `augment()` works here because the fit is finalized, with a single
+#  `penalty` value -- previously I had to use `bind_cols(predict(...))`
+augment(hitters_ridge_fit_final, new_data = hitters_test) %>%
+  rmse(Salary, .pred) %>%
+  transmute(rmse = .estimate, mse = rmse^2)
+```
+
+It's pretty marginal, but this is an improvement over the MSE we got using $\lambda$ = 4.
+Lastly, here are the coefficient estimates of the final fit, none of which are exactly zero, as expected:
+
+```{r}
+tidy(hitters_ridge_fit_final)
+```
+
+#### The Lasso {-}
+
+Before performing cross-validation, plot coefficient estimates for a range of $\lambda$ values:
+
+```{r fig.width=7, fig.height=6}
+lasso_spec <- linear_reg(penalty = 0, mixture = 1) %>%
+  set_engine("glmnet", path_values = lambda_grid$penalty)
+
+hitters_lasso_fit <- fit(lasso_spec, Salary ~ ., data = hitters)
+
+map_dfr(lambda_grid$penalty,
+        ~ tidy(hitters_lasso_fit, penalty = .x)) %>%
+  filter(term != "(Intercept)") %>%
+  ggplot(aes(x = penalty, y = estimate)) +
+  geom_point() +
+  scale_x_log10(breaks = 10^seq(-2, 10, 4),
+                labels = c("1e-2", "1e2", "1e6", "1e10")) +
+  facet_wrap(~ term, scales = "free_y", ncol = 5) +
+  add_facet_borders()
+```
+
+All of the coefficients quickly go to zero.
+Knowing this, I'm going to constrain `penalty_grid` to a smaller range.
+
+Now follow the same procedure as the ridge regression model to find the best choice of $\lambda$:
+
+```{r}
+lasso_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+hitters_lasso_workflow <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(hitters_recipe)
+
+lambda_grid <- grid_regular(penalty(range = c(-2, 2)), levels = 50)
+
+hitters_lasso_tune <- tune_grid(
+  hitters_lasso_workflow, resamples = hitters_resamples,
+  grid = lambda_grid
+)
+
+autoplot(hitters_lasso_tune)
+```
+
+```{r}
+select_best(hitters_lasso_tune, metric = "rmse")
+
+hitters_lasso_workflow_final <- hitters_lasso_workflow %>%
+  finalize_workflow(select_best(hitters_lasso_tune, metric = "rmse"))
+hitters_lasso_fit_final <- fit(hitters_lasso_workflow_final,
+                               data = hitters_train)
+
+augment(hitters_lasso_fit_final, new_data = hitters_test) %>%
+  rmse(Salary, .pred) %>%
+  transmute(rmse = .estimate, mse = rmse^2)
+```
+
+This is essentially the same performance as the ridge regression model.
+The advantage is that the lasso has performed variable selection for us bty setting some to exactly zero:
+
+```{r}
+tidy(hitters_lasso_fit_final) %>%
+  arrange(estimate)
+```
 
 ### PCR and PLS Regression
 
