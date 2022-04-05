@@ -1204,7 +1204,7 @@ summary(lm_mpg_hp_fit_engine)
 (a) Observations on the model:
 
 * There is a relationship between `mpg` and `horsepower`.
-* Is is highly significant ($p$ `r scales::pvalue(tidy(lm_mpg_hp_fit)$p.value[[2]])`) with $R^2 = $ `r summary(lm_mpg_hp_fit_engine)$r.squared %>% round(2)`
+* Is is highly significant ($p$ `r scales::pvalue(tidy(lm_mpg_hp_fit)$p.value[[2]])`) with $R^2$ = `r summary(lm_mpg_hp_fit_engine)$r.squared %>% round(2)`
 * The relationship is negative. Every unit of horsepower is associated with a `r tidy(lm_mpg_hp_fit)$estimate[[2]] %>% round(2)` reduction in miles per gallon.
 * The confidence and prediction intervals of predicted `mpg` given `horsepower` = 98:
 
@@ -1546,7 +1546,7 @@ $$
 Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \epsilon
 $$
 
-$\beta_0$ = 2, $\beta_1 = 2$, and $\beta_2 = 0.3$.
+$\beta_0$ = 2, $\beta_1$ = 2, and $\beta_2$ = 0.3.
 
 (b) Correlation between $X_1$ and $X_2$.
 

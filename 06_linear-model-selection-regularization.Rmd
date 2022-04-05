@@ -1084,7 +1084,7 @@ and *partial least squares*.
 
 Principal components analysis (PCA) is a technique for reducing the dimension of an $n \times p$ data matrix $\textbf{X}$.
 The *first principal component* direction of the data is that along which the observations *vary the most*.
-If the observations were to be projected onto the line definition this principal component, then the resulting projected observations would have the largest possible variance.
+If the observations were to be projected onto the line defined by this principal component, then the resulting projected observations would have the largest possible variance.
 Alternatively: the first principal component defines the line that is as close as possible to the data.
 The principal component can be summarized mathematically as a linear combination of the variables, $Z_1$.
 
@@ -1301,7 +1301,7 @@ Any variable in the model can be written as a linear combination of all other va
 so we can never know exactly which variables (if any) truly are predictive of the outcome, and can never identify the *best* coefficients for use in regression.
 A model like this can still have very high predictive value, but we must be careful not to overstate the results and make it clear that we have identified *one of many possible models* for predicting the outcome, and that is must be further validated on independent data sets.
 It is also important to be careful in reporting errors.
-We have seen in the example that when $p > n$, it is easy to obtain a useful model that has zero residuals.
+We have seen in the example that when $p > n$, it is easy to obtain a useless model that has zero residuals.
 In this case, traditional measures of model fit (e.g. $R^2$) are misleading; instead, models should be assessed on an independent test set or cross-validation errors.
 
 ## Lab: Linear Models and Regularization Methods
@@ -1339,7 +1339,7 @@ Instead of a formatted table of asterisks, this gives us a `tibble` of booleans 
 ```{r}
 broom::tidy(regsubsets_hitters_salary) %>%
   select(-`(Intercept)`) %>%
-  add_rownames(var = "n_vars") %>%
+  rownames_to_column(var = "n_vars") %>%
   gt(rowname_col = "n_vars") %>%
   gt::data_color(
     columns = AtBat:NewLeagueN,
@@ -1364,20 +1364,20 @@ tidy(regsubsets_hitters_salary) %>%
   mutate(n_vars = 1:n()) %>%
   pivot_longer(cols = -n_vars, names_to = "metric") %>%
   ggplot(aes(x = n_vars, y = value)) +
-  geom_point() +
-  geom_line() +
+  geom_point(size = 2) +
+  geom_line(size = 1) +
   geom_vline(
     data = . %>%
       group_by(metric) %>%
       filter(value == ifelse(str_detect(metric, "r.squared"),
                              max(value), min(value))),
-    aes(xintercept = n_vars), size = 1
+    aes(xintercept = n_vars), lty = 2
   ) +
   facet_wrap(~ metric, scales = "free_y")
 ```
 
 As expected, $R^2$ increases monotonically.
-The best number of variables by adjusted $R^2$, $C_p$ and BIC are 11, 6 and 10, respectively.
+The best number of variables by adjusted $R^2$, $C_p$ and BIC are 11, 10 and 6, respectively.
 We can use `coef()` to get the coefficient estimates associated with the model with a specified number of variables:
 
 ```{r}
@@ -1395,7 +1395,7 @@ regsubsets_hitters_salary_backward <- regsubsets(Salary ~ ., data = hitters,
                                                  nvmax = 19, method = "backward")
 ```
 
-#### Choosing Among Models Using the Validation-Set Approach and Cross-Validation
+#### Choosing Among Models Using the Validation-Set Approach and Cross-Validation {-}
 
 Use `rsample` to perform a 50-50 split into training and testing data:
 
@@ -1449,14 +1449,14 @@ lambda_grid <- 10^seq(10, -2, length = 100)
 ridge_salary <- glmnet::glmnet(x, y, alpha = 0, lambda = lambda_grid)
 ```
 
-And the results are also output in a vary particular way.
-Here are the coefficients associated with the 50th $\lambda$ value (= `r ridge_salary$lambda[50]`) and the 60th (= `r ridge_salary$lambda[60]`):
+And the results are also extracted in a particular way.
+Here are the coefficients associated with the 50th $\lambda$ value (= `r as.character(round(ridge_salary$lambda[50]))`) and the 60th (= `r as.character(round(ridge_salary$lambda[60]))`):
 
 ```{r}
 coef(ridge_salary)[, 50]; coef(ridge_salary)[, 60]
 ```
 
-The coefficients in the first model are much smaller compared to the second, as expected.
+The coefficients in the first model are smaller compared to the second, as expected.
 This can also be seen with the $\mathcal{l}_2$ norm:
 
 ```{r}
@@ -1464,7 +1464,7 @@ sqrt(sum(coef(ridge_salary)[-1, 50]^2)); sqrt(sum(coef(ridge_salary)[-1, 60]^2))
 ```
 
 Part of the reason I really like `tidymodels` (and [one of the reasons it was created in the first place](https://youtu.be/kAZe9UpMx_s?t=235)) is the consistency.
-It provides a unified interface for fitting models from many different packages.
+It provides a unified interface and syntax for working with models from many different packages.
 Without ISLR walking me through the steps, it would take me a long time to learn the syntax of `glmnet` and how to extract the results I want.
 The `tidymodels` implementation of this workflow might be longer, but it is standardized -- these are lines of code I've written variations of hundreds of times now.
 
@@ -1582,7 +1582,7 @@ hitters_ridge_workflow <- workflow() %>%
 set.seed(291)
 hitters_resamples <- vfold_cv(hitters_train, v = 10)
 
-# Same values as previously
+# Same values as previously, just showing the `dials` functionality
 lambda_grid <- grid_regular(penalty(range = c(-2, 10)), levels = 100)
 hitters_ridge_tune <- tune_grid(
   hitters_ridge_workflow, resamples = hitters_resamples,
@@ -1590,11 +1590,14 @@ hitters_ridge_tune <- tune_grid(
 )
 ```
 
-The warnings here are coming from the `rsq` metric blowing up at large penalty values, which I can quickly visualize with `autoplot()`:
+The returned a bunch of warnings saying that "A correlation computation is required, but `estimate` is constant and has 0 standard deviation, resulting in a divide by 0 error. `NA` will be returned."
+I can quickly see what values of the $\lambda$ penalty are causing this with `autoplot()`:
 
 ```{r}
 autoplot(hitters_ridge_tune)
 ```
+
+So large values of regularization are causing the `rsq` metric to blow up.
 
 The full list of metrics can be collected like this:
 
@@ -1616,8 +1619,9 @@ hitters_ridge_workflow_final <- hitters_ridge_workflow %>%
 hitters_ridge_fit_final <- fit(hitters_ridge_workflow_final,
                                data = hitters_train)
 
-# Note that `augment()` works here because the fit is finalized, with a single
-#  `penalty` value -- previously I had to use `bind_cols(predict(...))`
+# Note that `broom::augment()` works here because the fit is finalized with a
+#  single `penalty` value -- previously I had to use `bind_cols(predict(...))`
+#  with an explicit `penalty`
 augment(hitters_ridge_fit_final, new_data = hitters_test) %>%
   rmse(Salary, .pred) %>%
   transmute(rmse = .estimate, mse = rmse^2)
@@ -1652,7 +1656,7 @@ map_dfr(lambda_grid$penalty,
 ```
 
 All of the coefficients quickly go to zero.
-Knowing this, I'm going to constrain `penalty_grid` to a smaller range.
+Knowing this, and seeing how `rsq` blew up in the ridge example, I'm going to constrain `penalty_grid` to a smaller range.
 
 Now follow the same procedure as the ridge regression model to find the best choice of $\lambda$:
 
@@ -1687,7 +1691,7 @@ augment(hitters_lasso_fit_final, new_data = hitters_test) %>%
 ```
 
 This is essentially the same performance as the ridge regression model.
-The advantage is that the lasso has performed variable selection for us bty setting some to exactly zero:
+The advantage is that the lasso has performed variable selection for us by setting some coefficients to exactly zero:
 
 ```{r}
 tidy(hitters_lasso_fit_final) %>%
@@ -1696,7 +1700,336 @@ tidy(hitters_lasso_fit_final) %>%
 
 ### PCR and PLS Regression
 
+#### Principal Components Regression
+
+In the text, they use the `pcr()` function from the `pls` library to perform PCR.
+The syntax is the same as `lm()`, and it had `scale` and `validation` parameters for standardizing predictors and performing cross-validation.
+
+```{r}
+library(pls)
+
+set.seed(1)
+hitters_pcr_fit <- pcr(Salary ~ ., data = hitters,
+                       scale = TRUE, validation = "CV")
+summary(hitters_pcr_fit)
+```
+
+This `summary()` shows the RMSE and percentage variance in the predictors (`X`) and outcome (`Salary`) explained for different numbers of components.
+Note how 100% of the variance in predictors is explained with 19 components, because these is the number of predictors.
+
+The `pls` package includes a function for plotting prediction MSE vs number of components:
+
+```{r}
+validationplot(hitters_pcr_fit, val.type = "MSEP")
+```
+
+Here is the `tidymodels` approach:
+
+```{r}
+set.seed(994)
+lm_spec <- linear_reg() %>% set_engine("lm")
+hitters_resamples <- vfold_cv(hitters, v = 10)
+hitters_pca_recipe <- recipe(Salary ~ ., data = hitters) %>%
+  step_dummy(all_nominal()) %>%
+  step_normalize(all_predictors()) %>%
+  step_pca(all_predictors(), num_comp = tune())
+hitters_pca_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(hitters_pca_recipe)
+num_comp_grid <- grid_regular(num_comp(range = c(0, 19)), levels = 19)
+
+hitters_pca_tune <- tune_grid(hitters_pca_workflow,
+                              resamples = hitters_resamples,
+                              grid = num_comp_grid)
+```
+
+```{r include=FALSE}
+autoplot(hitters_pca_tune)
+```
+
+And here is that procedure applied to the training data and evaluated on the test set:
+
+```{r}
+set.seed(87)
+hitters_resamples <- vfold_cv(hitters_train, v = 10)
+
+hitters_pca_tune <- tune_grid(hitters_pca_workflow,
+                              resamples = hitters_resamples,
+                              grid = num_comp_grid)
+
+hitters_pca_workflow_final <-
+  finalize_workflow(hitters_pca_workflow,
+                    select_best(hitters_pca_tune, metric = "rmse"))
+
+# Apply the workflow to the full training set, then evaluate on testing
+hitters_pca_fit_final <- last_fit(hitters_pca_workflow_final,
+                                  hitters_split)
+hitters_pca_fit_final %>% collect_metrics()
+```
+
+
+#### Partial least squares {-}
+
+For PLS, there is the `pls::plsr()` function with the same syntax:
+
+```{r}
+set.seed(1)
+pls_fit <- plsr(Salary ~ ., data = hitters_train,
+                scale = TRUE, validation = "CV")
+summary(pls_fit)
+```
+
+```{r}
+pls_pred <- predict(pls_fit, hitters_test, ncomp = 1)
+mean((pls_pred - hitters_test$Salary)^2)
+```
+PLS in `tidymodels` is done with `step_pls()`.
+An issue I ran into for the below code is that the `mixOmics` package is required for PLS, which has a `tune()` function that masks the `tidymodels` `tune()`.
+There is a nice helper function to deal with name conflicts like this:
+
+```{r}
+tidymodels_prefer(quiet = FALSE)
+```
+
+Now back to the model:
+
+```{r}
+set.seed(220)
+hitters_resamples <- vfold_cv(hitters_train, v = 10)
+
+hitters_pls_recipe <- recipe(Salary ~ ., data = hitters_train) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_predictors()) %>%
+  step_pls(all_predictors(), outcome = "Salary", num_comp = tune())
+
+hitters_pls_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(hitters_pls_recipe)
+
+hitters_pls_tune <- tune_grid(hitters_pls_workflow,
+                              resamples = hitters_resamples,
+                              grid = num_comp_grid)
+```
+
+```{r}
+autoplot(hitters_pls_tune)
+```
+
+Finalize the workflow and fit to the test data:
+
+```{r}
+hitters_pls_workflow_final <- finalize_workflow(
+  hitters_pls_workflow, select_best(hitters_pls_tune, metric = "rmse")
+)
+
+hitters_pls_fit_testing <- last_fit(
+  hitters_pls_workflow_final, split = hitters_split, metrics = metric_set(rmse)
+)
+hitters_pls_fit_testing %>%
+  collect_metrics() %>%
+  transmute(rmse = .estimate, mse = rmse^2)
+```
+
+And, as in the text, one last fit to the full data set:
+
+```{r}
+hitters_pls_fit_full <- fit(hitters_pls_workflow_final, data = hitters)
+augment(hitters_pls_fit_full, new_data = hitters) %>%
+  rmse(truth = Salary, estimate = .pred) %>%
+  transmute(rmse = .estimate, mse = rmse^2)
+```
+
+```{r include=FALSE, eval=FALSE}
+# I can't seem to figure out how to get % variance explained from the recipe
+# My haphazard attempts below
+hitters_recipe_full <-
+  finalize_recipe(hitters_pls_recipe,
+                  select_best(hitters_pls_tune, metric = "rmse")) %>%
+  prep(training = hitters)
+
+test <- extract_recipe(hitters_pls_fit_full)
+test$steps[[3]]
+
+tidy(hitters_recipe_full, 3)
+pls_step <- hitters_recipe_full$steps[[3]]
+pls_step$res$sd^2
+pls_step$res$sd
+```
+
+I'm not sure how to get the percent variance explained from the trained recipe, so here it is via `plsr`:
+
+```{r}
+plsr(Salary ~ ., data = hitters, scale = TRUE, ncomp = 1) %>%
+  summary()
+```
+
 ## Exercises
+
+### Applied {-}
+
+#### 8. Best subset selection on simulated data {-}
+
+(a) and (b) Simulate the data.
+
+```{r}
+set.seed(2997)
+
+# Randomly choose some regression coefficients
+# Range 1-4...
+betas <- runif(4, min = 2, max = 10) *
+  # ... but make some negative
+  sample(c(-1, 1), size = 4, replace = TRUE)
+
+d <- tibble(x = rnorm(100), epsilon = rnorm(100)) %>%
+  mutate(
+    y = betas[1] + betas[2] * x + betas[3] * x^2 + betas[4] * x^3 + epsilon
+  )
+betas; glimpse(d)
+```
+
+(c) Perform best subset selection with predictors $X, \dots, X^10$.
+
+```{r}
+# Note we have to use `raw = TRUE`, otherwise the orthogonalized polynomials
+#  are used, which are hard to interpret (and compare to our simulated values)
+d_regsubsets <- regsubsets(y ~ poly(x, degree = 10, raw = TRUE), data = d,
+                           nvmax = 10)
+tidy(d_regsubsets) %>%
+  transmute(n_vars = 1:n(), adj.r.squared, BIC, mallows_cp) %>%
+  pivot_longer(cols = -n_vars, names_to = "metric") %>%
+  group_by(metric) %>%
+  mutate(
+    best = ifelse(metric == "adj.r.squared",
+                  value == max(value), value == min(value))
+  ) %>%
+  ungroup() %>%
+  ggplot(aes(x = n_vars, y = value)) +
+  geom_line(size = 1) +
+  geom_point(aes(color = best), size = 3) +
+  scale_x_continuous(breaks = 1:10) +
+  facet_wrap(~ metric, ncol = 1, scales = "free_y") +
+  theme(legend.position = "none")
+```
+
+The best model is one with 3 predictors (by adjusted $R^2$, it is marginally 5 predictors).
+The coefficients match the simulation pretty well:
+
+```{r}
+coef(d_regsubsets, id = 3)
+```
+
+(d) Compare to forward and backward selection.
+
+```{r}
+d_regsubsets_forward <- regsubsets(y ~ poly(x, degree = 10, raw = TRUE),
+                                   data = d, nvmax = 10, method = "forward")
+d_regsubsets_backward <- regsubsets(y ~ poly(x, degree = 10, raw = TRUE),
+                                    data = d, nvmax = 10, method = "backward")
+bind_rows(
+  tidy(d_regsubsets) %>%
+    transmute(n_vars = 1:n(), adj.r.squared, BIC, mallows_cp,
+              method = "best subset"),
+  tidy(d_regsubsets_forward) %>%
+    transmute(n_vars = 1:n(), adj.r.squared, BIC, mallows_cp,
+              method = "forward"),
+  tidy(d_regsubsets_backward) %>%
+    transmute(n_vars = 1:n(), adj.r.squared, BIC, mallows_cp,
+              method = "backward")
+) %>%
+  pivot_longer(cols = -c(n_vars, method), names_to = "metric") %>%
+  group_by(method, metric) %>%
+  filter(
+    value == ifelse(metric == "adj.r.squared", max(value), min(value))
+  ) %>%
+  group_by(method) %>%
+  gt()
+```
+
+The results from all three methods are nearly the same -- forward selection chooses the 3 predictor model by adjusted $R^2$.
+
+(e) Fit a lasso model with cross-validation.
+
+```{r}
+lasso_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+d_recipe <- recipe(y ~ x, data = d) %>%
+  # `raw = TRUE` gives weird results, might try to fix this later
+  step_poly(x, degree = 10, options = list(raw = FALSE)) %>%
+  step_normalize(all_predictors())
+d_workflow <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(d_recipe)
+
+set.seed(5)
+d_resamples <- vfold_cv(d, v = 10)
+
+d_tune_res <-
+  tune_grid(d_workflow, resamples = d_resamples,
+            grid = grid_regular(penalty(range = c(-5, 1)), levels = 50))
+autoplot(d_tune_res)
+```
+
+Take the best $\lambda$ value by RMSE, fit it to the data, and get the selected coefficients (those > 0):
+
+```{r}
+d_workflow_final <-
+  finalize_workflow(d_workflow, select_best(d_tune_res, metric = "rmse"))
+fit(d_workflow_final, data = d) %>%
+  tidy() %>%
+  filter(estimate != 0)
+```
+
+The lasso model selected the 3 predictors, but coefficient estimates are much different because orthogonalized polynomials were used in `step_poly()`.
+
+(f) Perform an alternate simulation and repeat.
+
+```{r}
+d <- d %>% mutate(y = betas[1] + betas[4] * x^7 + epsilon)
+
+d_regsubsets <- regsubsets(y ~ poly(x, degree = 10, raw = TRUE), data = d,
+                           nvmax = 10)
+tidy(d_regsubsets) %>%
+  transmute(n_vars = 1:n(), adj.r.squared, BIC, mallows_cp) %>%
+  pivot_longer(cols = -n_vars, names_to = "metric") %>%
+  group_by(metric) %>%
+  mutate(
+    best = ifelse(metric == "adj.r.squared",
+                  value == max(value), value == min(value))
+  ) %>%
+  ungroup() %>%
+  ggplot(aes(x = n_vars, y = value)) +
+  geom_line(size = 1) +
+  geom_point(aes(color = best), size = 3) +
+  scale_x_continuous(breaks = 1:10) +
+  facet_wrap(~ metric, ncol = 1, scales = "free_y") +
+  theme(legend.position = "none")
+```
+
+```{r}
+coef(d_regsubsets, 1)
+```
+
+```{r}
+d_recipe <- recipe(y ~ x, data = d) %>%
+  step_poly(x, degree = 10, options = list(raw = TRUE)) %>%
+  step_normalize(all_predictors())
+d_workflow <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(d_recipe)
+
+d_tune_res <-
+  tune_grid(d_workflow, resamples = d_resamples,
+            grid = grid_regular(penalty(range = c(-3, 1)), levels = 50))
+autoplot(d_tune_res)
+```
+
+```{r}
+finalize_workflow(d_workflow, select_best(d_tune_res, metric = "rmse")) %>%
+  fit(data = d) %>%
+  tidy() %>%
+  filter(estimate != 0)
+```
+
 
 
 ## Reproducibility {-}
