@@ -1983,6 +1983,12 @@ The lasso model selected the 3 predictors, but coefficient estimates are much di
 
 (f) Perform an alternate simulation and repeat.
 
+I'll use the following values for $\beta_0$ and $\beta_7$:
+
+```{r}
+betas[1]; betas[4]
+```
+
 ```{r}
 d <- d %>% mutate(y = betas[1] + betas[4] * x^7 + epsilon)
 
@@ -2005,9 +2011,13 @@ tidy(d_regsubsets) %>%
   theme(legend.position = "none")
 ```
 
+Just the correct coefficient was selected, with correct estimates:
+
 ```{r}
 coef(d_regsubsets, 1)
 ```
+
+Now the lasso model:
 
 ```{r}
 d_recipe <- recipe(y ~ x, data = d) %>%
@@ -2030,6 +2040,78 @@ finalize_workflow(d_workflow, select_best(d_tune_res, metric = "rmse")) %>%
   filter(estimate != 0)
 ```
 
+Lasso also selects the 7th order coefficient, but the estimates are much different, I think due to `poly()`?
+
+#### 9. Predict applications with `College`
+
+```{r}
+college <- ISLR2::College %>% janitor::clean_names()
+glimpse(college)
+```
+
+(a) Split the data.
+
+I'll use a 75-25 split:
+
+```{r}
+set.seed(4912)
+college_splits <- initial_split(college, prop = 0.8)
+college_train <- training(college_splits)
+college_test <- testing(college_splits)
+```
+
+(b) Fit a linear model using least squares.
+
+```{r}
+lm_spec <- linear_reg()
+college_lm_fit <- lm_spec %>%
+  fit(apps ~ ., data = college_train)
+
+bind_rows(
+  training = augment(college_lm_fit, new_data = college_train) %>%
+    rmse(apps, .pred),
+  testing = augment(college_lm_fit, new_data = college_test) %>%
+    rmse(apps, .pred),
+  .id = "data_set"
+)
+```
+
+(c) Fit a ridge regression model, with $\lambda$ chosen by cross-validation.
+
+```{r}
+college_recipe <- recipe(apps ~ ., data = college_train) %>%
+  step_novel(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors()) %>%
+  step_normalize(all_predictors())
+
+ridge_spec <- linear_reg(penalty = tune(), mixture = 0) %>%
+  set_engine("glmnet")
+
+college_ridge_workflow <- workflow() %>%
+  add_recipe(college_recipe) %>%
+  add_model(ridge_spec)
+
+college_resamples <- vfold_cv(college_train, v = 5)
+
+lambda_grid <- grid_regular(penalty(range = c(-5, 3)), levels = 50)
+
+college_ridge_tune <- tune_grid(
+  college_ridge_workflow,
+  resamples = college_resamples, grid = lambda_grid
+)
+
+autoplot(college_ridge_tune)
+```
+```{r}
+
+
+```
+
+
+```{r}
+usemodels::use_glmnet(apps ~ ., data = college_train)
+```
 
 
 ## Reproducibility {-}
