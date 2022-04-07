@@ -2055,9 +2055,9 @@ I'll use a 75-25 split:
 
 ```{r}
 set.seed(4912)
-college_splits <- initial_split(college, prop = 0.8)
-college_train <- training(college_splits)
-college_test <- testing(college_splits)
+college_split <- initial_split(college, prop = 0.8)
+college_train <- training(college_split)
+college_test <- testing(college_split)
 ```
 
 (b) Fit a linear model using least squares.
@@ -2100,17 +2100,79 @@ college_ridge_tune <- tune_grid(
   college_ridge_workflow,
   resamples = college_resamples, grid = lambda_grid
 )
-
-autoplot(college_ridge_tune)
-```
-```{r}
-
-
 ```
 
+```{r}
+college_ridge_workflow_final <- finalize_workflow(
+  college_ridge_workflow,
+  select_best(college_ridge_tune, metric = "rmse")
+)
+
+college_ridge_last_fit <- last_fit(college_ridge_workflow_final, college_split)
+college_ridge_last_fit %>%
+  collect_metrics()
+```
+
+The `tune::last_fit()` function I used above a nice shortcut to fitting the final model to the full training data and then evaluating it on the test set.
+Here's the `fit()` and `augment()` way:
 
 ```{r}
-usemodels::use_glmnet(apps ~ ., data = college_train)
+fit(college_ridge_workflow_final, data = college_train) %>%
+  augment(new_data = college_test) %>%
+  rmse(apps, .pred)
+```
+
+(c) Fit a lasso regression model, with $\lambda$ chosen by cross-validation.
+
+```{r}
+lasso_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
+  set_engine("glmnet")
+
+college_lasso_workflow <- workflow() %>%
+  add_recipe(college_recipe) %>%
+  add_model(lasso_spec)
+
+college_lasso_tune <- tune_grid(
+  college_lasso_workflow,
+  resamples = college_resamples,
+  grid = lambda_grid
+)
+
+college_lasso_workflow_final <- finalize_workflow(
+  college_lasso_workflow,
+  select_best(college_lasso_tune, metric = "rmse")
+)
+college_lasso_last_fit <- last_fit(
+  college_lasso_workflow_final, split = college_split
+)
+college_lasso_last_fit %>% collect_metrics()
+```
+
+The lasso model performed slightly better than least squares, but worse than ridge.
+
+
+
+```{r}
+college_lasso_last_fit %>%
+  str(max.level = 2)
+college_lasso_last_fit$.predictions
+collect_predictions(college_lasso_last_fit)
+```
+
+
+```{r}
+bind_rows(
+  lm = augment(college_lm_fit, college_test),
+  ridge = collect_predictions(college_ridge_last_fit),
+  lasso = collect_predictions(college_lasso_last_fit),
+  .id = "model"
+) %>%
+  mutate(model = factor(model, c("lm", "ridge", "lasso"))) %>%
+  ggplot(aes(x = apps, y = .pred)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = "y ~ x") +
+  facet_wrap(~ model, nrow = 1) +
+  add_facet_borders()
 ```
 
 
