@@ -1783,6 +1783,7 @@ summary(pls_fit)
 pls_pred <- predict(pls_fit, hitters_test, ncomp = 1)
 mean((pls_pred - hitters_test$Salary)^2)
 ```
+
 PLS in `tidymodels` is done with `step_pls()`.
 An issue I ran into for the below code is that the `mixOmics` package is required for PLS, which has a `tune()` function that masks the `tidymodels` `tune()`.
 There is a nice helper function to deal with name conflicts like this:
@@ -2122,7 +2123,7 @@ fit(college_ridge_workflow_final, data = college_train) %>%
   rmse(apps, .pred)
 ```
 
-(c) Fit a lasso regression model, with $\lambda$ chosen by cross-validation.
+(d) Fit a lasso regression model, with $\lambda$ chosen by cross-validation.
 
 ```{r}
 lasso_spec <- linear_reg(penalty = tune(), mixture = 1) %>%
@@ -2150,29 +2151,295 @@ college_lasso_last_fit %>% collect_metrics()
 
 The lasso model performed slightly better than least squares, but worse than ridge.
 
-
+(e) Fit a PCR model, with $M$ chosen by cross-validation.
 
 ```{r}
-college_lasso_last_fit %>%
-  str(max.level = 2)
-college_lasso_last_fit$.predictions
-collect_predictions(college_lasso_last_fit)
+college_pcr_recipe <- recipe(apps ~ ., data = college_train) %>%
+  step_novel(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors()) %>%
+  step_normalize(all_predictors()) %>%
+  step_pca(all_predictors(), num_comp = tune())
+
+college_pcr_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(college_pcr_recipe)
+
+num_comp_grid <- grid_regular(num_comp(range = c(1, 17)), levels = 17)
+
+college_pcr_tune <- tune_grid(
+  college_pcr_workflow, resamples = college_resamples,
+  grid = num_comp_grid
+)
+
+autoplot(college_pcr_tune) +
+  geom_point(
+    data = . %>%
+      group_by(.metric) %>%
+      filter(
+        (.metric == "rmse" & mean == min(mean)) |
+          (.metric == "rsq") & mean == max(mean)
+      ),
+    color = "red", size = 3
+  )
 ```
 
+The best performing model is for $M$ = 17 components, i.e. no dimensionality reduction since $p$ = 17.
+This should return the exact same model as the least squares in part (b):
+
+```{r}
+college_pcr_workflow_final <- finalize_workflow(
+  college_pcr_workflow,
+  select_best(college_pcr_tune, metric = "rmse")
+)
+college_pcr_last_fit <- last_fit(
+  college_pcr_workflow_final, college_split
+)
+college_pcr_last_fit %>% collect_metrics()
+```
+
+Yes, this is the exact same RMSE.
+
+(f) Fit a PLS model, with $M$ chosen by cross-validation.
+
+```{r}
+college_pls_recipe <- recipe(apps ~ ., data = college_train) %>%
+  step_novel(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors()) %>%
+  step_normalize(all_predictors()) %>%
+  step_pls(all_predictors(), outcome = "apps", num_comp = tune())
+
+college_pls_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(college_pls_recipe)
+
+college_pls_tune <- tune_grid(
+  college_pls_workflow, resamples = college_resamples,
+  grid = num_comp_grid
+)
+
+autoplot(college_pls_tune) +
+  geom_point(
+    data = . %>%
+      group_by(.metric) %>%
+      filter(
+        (.metric == "rmse" & mean == min(mean)) |
+          (.metric == "rsq") & mean == max(mean)
+      ),
+    color = "red", size = 3
+  )
+```
+
+In this case, the best model has 11 components (though it looks to be a pretty marginal improvement over $M$ = 17).
+
+```{r}
+college_pls_workflow_final <- finalize_workflow(
+  college_pls_workflow,
+  select_best(college_pls_tune, metric = "rmse")
+)
+college_pls_last_fit <- last_fit(
+  college_pls_workflow_final, college_split
+)
+college_pls_last_fit %>% collect_metrics()
+```
+
+(g) Comment on the results obtained.
+
+```{r}
+model_rmse <- bind_rows(
+  lm = augment(college_lm_fit, new_data = college_test) %>%
+    rmse(truth = apps, estimate = .pred),
+  ridge = collect_metrics(college_ridge_last_fit),
+  lasso = collect_metrics(college_lasso_last_fit),
+  pcr = collect_metrics(college_pcr_last_fit),
+  pls = collect_metrics(college_pls_last_fit),
+  .id = "model"
+) %>%
+  filter(.metric == "rmse") %>%
+  select(model, RMSE = .estimate)
+
+gt(model_rmse) %>%
+  fmt_number(RMSE, decimals = 1)
+```
+
+Ridge regression is a clear winner here.
+Plot observed vs predicted `apps`:
 
 ```{r}
 bind_rows(
   lm = augment(college_lm_fit, college_test),
   ridge = collect_predictions(college_ridge_last_fit),
   lasso = collect_predictions(college_lasso_last_fit),
+  pcr = collect_predictions(college_pcr_last_fit),
+  pls = collect_predictions(college_pls_last_fit),
   .id = "model"
 ) %>%
-  mutate(model = factor(model, c("lm", "ridge", "lasso"))) %>%
+  mutate(model = factor(model, c("lm", "ridge", "lasso", "pcr", "pls"))) %>%
   ggplot(aes(x = apps, y = .pred)) +
   geom_point() +
   geom_smooth(method = "lm", formula = "y ~ x") +
-  facet_wrap(~ model, nrow = 1) +
+  facet_wrap(~ model, nrow = 2) +
   add_facet_borders()
+```
+
+All of the models do pretty well.
+
+#### 10. Training/testing errror vs features on simulated data {-}
+
+(a) Generate a data set.
+
+```{r}
+set.seed(25)
+betas <- runif(n = 20, min = 0.5, max = 4) *
+  sample(c(-1, 0, 1), size = 20, replace = TRUE,
+         prob = c(1, 2, 1))
+betas
+```
+
+`r sum(betas == 0)` out of 20 $\beta$s were randomly set to 0.
+
+Putting together a data frame like this (with 20 variables, 1000 observations, and a dependent variable) is *much* easier to do with `matrix` compared to `tidyverse`:
+
+```{r message=FALSE}
+x <- matrix(rnorm(n = 1000 * 20), ncol = 20)
+y <- x %*% betas + rnorm(1000, mean = 0, sd = 3)
+d <- as_tibble(x, .name_repair = "unique") %>%
+  setNames(paste0("x", 1:20)) %>%
+  bind_cols(y = as.numeric(y))
+glimpse(d)
+```
+
+Just a few lines.
+For comparison, here is my ugly `tidyverse` code (not run):
+
+```{r eval=FALSE}
+x <- tibble(var = paste0("x", 1:20), beta = betas) %>%
+  rowwise() %>%
+  # For each predictor, generate 1000 normally-distributed random numbers
+  mutate(val = list(rnorm(1000))) %>%
+  ungroup() %>%
+  unnest(val) %>%
+  group_by(var) %>%
+  # Use i to indicate observation number
+  mutate(i = 1:n()) %>%
+  ungroup() %>%
+  # Multiply each predictor value by its coefficient
+  mutate(beta_val = beta * val)
+y <- x %>%
+  select(i, var, beta_val) %>%
+  pivot_wider(names_from = var, values_from = beta_val) %>%
+  # Generate some random noise
+  mutate(epsilon = rnorm(1000)) %>%
+  rowwise() %>%
+  # Sum of the beta*x + epsilon values to get the response y
+  mutate(val = sum(c_across(x1:epsilon))) %>%
+  ungroup()
+# Combine the x and y data frames
+d <- x %>%
+  select(i, var, val) %>%
+  pivot_wider(names_from = var, values_from = val) %>%
+  left_join(y %>% select(i, y = val), by = "i") %>%
+  select(-i)
+glimpse(d)
+```
+
+(b) Split into training and testing set.
+
+```{r}
+d_split <- initial_split(d, prop = 0.9)
+d_train <- training(d_split)
+d_test <- testing(d_split)
+```
+
+(c) Perform best subset selection on the training set. Plot the MSE.
+
+```{r fig.height=3, fig.width=4}
+d_regsubsets <- regsubsets(y ~ ., data = d_train, nvmax = 20)
+
+d_models <- tibble(n_vars = 1:20) %>%
+  mutate(
+    model_formula = map(
+      n_vars,
+      ~ as.formula(
+        paste0(
+          "y ~ ", paste(names(coef(d_regsubsets, .x))[-1], collapse = "+")
+        )
+      )
+    )
+  ) %>%
+  mutate(
+    lm_fit = map(model_formula, ~ lm(.x, data = d_train)),
+    train_mse = map_dbl(lm_fit, ~ mean(resid(.x)^2))
+  )
+
+d_models %>%
+  ggplot(aes(x = n_vars, y = train_mse)) +
+  geom_point() +
+  geom_line() +
+  geom_point(data = . %>% filter(train_mse == min(train_mse)),
+            color = "red", size = 3)
+```
+
+As expected, the training MSE decreases monotonically with the number of variables.
+
+(d) Plot the test set MSE.
+
+```{r fig.height=3, fig.width=4}
+d_models <- d_models %>%
+  mutate(
+    test_mse = map_dbl(
+      lm_fit,
+      ~ mean((predict(.x, newdata = d_test) - d_test$y)^2)
+    )
+  )
+
+d_models %>%
+  ggplot(aes(x = n_vars, y = test_mse)) +
+  geom_point() +
+  geom_line() +
+  geom_point(data = . %>% filter(test_mse == min(test_mse)),
+            color = "red", size = 3)
+```
+
+(e) For which model size does the test set MSE take on its minimum value.
+
+The test MSE is minimized for 5 variables.
+
+(f) How does the best model compare to the true model used to generate the data?
+
+```{r}
+d_models %>%
+  filter(test_mse == min(test_mse)) %>%
+  pull(lm_fit) %>%
+  .[[1]]
+```
+
+These coefficient estimates are very close to the simulated values:
+
+```{r}
+setNames(betas, paste0("x", 1:20))
+```
+
+(g) Create a plot displaying $\sqrt{\sum^p_{j=1} (\beta_j - \hat{\beta}_j^r)^2}$ for a range of values of $r$.
+
+```{r}
+d_models %>%
+  transmute(
+    n_vars, lm_fit_tidy = map(lm_fit, tidy)
+  ) %>%
+  unnest(lm_fit_tidy) %>%
+  filter(term != "(Intercept)") %>%
+  left_join(
+    tibble(term = paste0("x", 1:20), beta = betas),
+    by = "term"
+  ) %>%
+  group_by(n_vars) %>%
+  summarise(coef_diff = sqrt(sum((estimate - beta)^2)),
+            .groups = "drop") %>%
+  ggplot(aes(x = n_vars, y = coef_diff)) +
+  geom_point() +
+  geom_line()
 ```
 
 
