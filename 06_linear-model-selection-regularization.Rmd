@@ -1870,13 +1870,13 @@ plsr(Salary ~ ., data = hitters, scale = TRUE, ncomp = 1) %>%
 
 #### 8. Best subset selection on simulated data {-}
 
-(a) and (b) Simulate the data.
+(a) (and b.) Simulate the data.
 
 ```{r}
 set.seed(2997)
 
 # Randomly choose some regression coefficients
-# Range 1-4...
+# Range 2-10...
 betas <- runif(4, min = 2, max = 10) *
   # ... but make some negative
   sample(c(-1, 1), size = 4, replace = TRUE)
@@ -1888,7 +1888,7 @@ d <- tibble(x = rnorm(100), epsilon = rnorm(100)) %>%
 betas; glimpse(d)
 ```
 
-(c) Perform best subset selection with predictors $X, \dots, X^10$.
+(c) Perform best subset selection with predictors $X, \dots, X^{10}$.
 
 ```{r}
 # Note we have to use `raw = TRUE`, otherwise the orthogonalized polynomials
@@ -2041,9 +2041,9 @@ finalize_workflow(d_workflow, select_best(d_tune_res, metric = "rmse")) %>%
   filter(estimate != 0)
 ```
 
-Lasso also selects the 7th order coefficient, but the estimates are much different, I think due to `poly()`?
+Lasso also selects the 7th order coefficient, but the estimates are much different, I think due to `ste_poly()`.
 
-#### 9. Predict applications with `College`
+#### 9. Predict applications with `College` {-}
 
 ```{r}
 college <- ISLR2::College %>% janitor::clean_names()
@@ -2052,7 +2052,7 @@ glimpse(college)
 
 (a) Split the data.
 
-I'll use a 75-25 split:
+I'll use a 80-20 split:
 
 ```{r}
 set.seed(4912)
@@ -2154,6 +2154,10 @@ The lasso model performed slightly better than least squares, but worse than rid
 (e) Fit a PCR model, with $M$ chosen by cross-validation.
 
 ```{r}
+# Need to import `mixOmics` package, or else I get the error:
+# 'X' must be a numeric matrix (possibly inculding NA's) with finite values
+library(mixOmics)
+
 college_pcr_recipe <- recipe(apps ~ ., data = college_train) %>%
   step_novel(all_nominal_predictors()) %>%
   step_dummy(all_nominal_predictors()) %>%
@@ -2278,20 +2282,22 @@ bind_rows(
   mutate(model = factor(model, c("lm", "ridge", "lasso", "pcr", "pls"))) %>%
   ggplot(aes(x = apps, y = .pred)) +
   geom_point() +
-  geom_smooth(method = "lm", formula = "y ~ x") +
+  geom_abline(slope = 1, intercept = 0,
+              lty = 2, color = td_colors$nice$emerald) +
   facet_wrap(~ model, nrow = 2) +
   add_facet_borders()
 ```
 
 All of the models do pretty well.
 
-#### 10. Training/testing errror vs features on simulated data {-}
+#### 10. Training/testing error vs features on simulated data {-}
 
 (a) Generate a data set.
 
 ```{r}
 set.seed(25)
 betas <- runif(n = 20, min = 0.5, max = 4) *
+  # This randomly sets some to negative, zero, or positive
   sample(c(-1, 0, 1), size = 20, replace = TRUE,
          prob = c(1, 2, 1))
 betas
@@ -2460,7 +2466,7 @@ p <- boston %>%
 p
 ```
 
-It is a very heavy tailed distribution.
+It is a very heavily tailed distribution.
 I might want to predict `log(crim)` instead:
 
 ```{r fig.height=2.5, fig.width=4}
@@ -2589,9 +2595,30 @@ boston_pls_tune <- tune_grid(
   boston_pls_workflow, resamples = boston_resamples,
   grid = num_comp_grid
 )
-(autoplot(boston_pca_tune) + labs(title = "PCA")) |
-  (autoplot(boston_pls_tune) + labs(title = "PLS"))
+
+p1 <- autoplot(boston_pca_tune) +
+  geom_point(
+    data = . %>%
+      group_by(.metric) %>%
+      filter(mean == ifelse(.metric == "rmse", min(mean), max(mean))),
+    color = "red", size = 2
+  ) +
+  labs(title = "PCA") +
+  scale_x_continuous(breaks = 1:12)
+p2 <- autoplot(boston_pls_tune) +
+  geom_point(
+    data = . %>%
+      group_by(.metric) %>%
+      filter(mean == ifelse(.metric == "rmse", min(mean), max(mean))),
+    color = "red", size = 2
+  ) +
+  labs(title = "PLS") +
+  scale_x_continuous(breaks = 1:12)
+
+p1 | p2
 ```
+
+In both cases, dimension reduction doesn't provide a big improvement to the model, although with PLS, the best model has 9 components.
 
 ```{r}
 boston_pca_last_fit <- boston_pca_workflow %>%
@@ -2602,8 +2629,17 @@ boston_pls_last_fit <- boston_pls_workflow %>%
   last_fit(split = boston_split)
 ```
 
+(b) Propose a model or set of models that seem to perform well.
+
 ```{r}
+# For a baseline comparison, use a simple least squares linear model
+boston_lm_metrics <- lm(log(crim) ~ ., data = boston_train) %>%
+  augment(newdata = boston_test) %>%
+  mutate(crim = log(crim)) %>%
+  metrics(truth = crim, estimate = .fitted)
+
 bind_rows(
+  lm = boston_lm_metrics,
   best_subsets = boston_subsets_metrics,
   lasso = collect_metrics(boston_lasso_last_fit),
   ridge = collect_metrics(boston_ridge_last_fit),
@@ -2616,14 +2652,41 @@ bind_rows(
   pivot_wider(names_from = .metric, values_from = .estimate) %>%
   gt() %>%
   data_color(columns = rmse, colors = c("green", "red")) %>%
-  data_color(columns = rsq, colors = c("red", "green"))
+  data_color(columns = rsq, colors = c("red", "green")) %>%
+  fmt_number(c(rmse, rsq), decimals = 3)
 ```
+
+Observations:
+
+* The ridge regression model performed best.
+* The least squares (`lm`) and best subset approach have the same metrics because our best subset tuning included every predictor. Likewise, the PCA approach included all features (no dimensionality reduction) so it is also equivalent.
+* PLS found a very very marginal improvement by reducing from 12 to 9 components.
+* Lasso regression performed the worst.
+
+So the ridge regression is my choice of model for this problem.
+
+(c) Does your chosen model involve all the features in the data set.
+
+It does.
+The coefficient estimates are all non-zero (though some get close):
 
 ```{r}
-tidy(boston_lasso_last_fit$.workflow[[1]])
+extract_workflow(boston_ridge_last_fit) %>%
+  tidy() %>%
+  arrange(desc(abs(estimate))) %>%
+  rmarkdown::paged_table()
 ```
 
+In contrast, the worst-performing lasso regression model:
 
+```{r}
+extract_workflow(boston_lasso_last_fit) %>%
+  tidy() %>%
+  arrange(desc(abs(estimate))) %>%
+  rmarkdown::paged_table()
+```
+
+Five of the coefficients were reduced to exactly zero, but they clearly add some value as we see in the other models.
 
 ## Reproducibility {-}
 
