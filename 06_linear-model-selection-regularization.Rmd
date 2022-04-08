@@ -2442,6 +2442,188 @@ d_models %>%
   geom_line()
 ```
 
+#### 11. Predict crime rate with `Boston` {-}
+
+```{r}
+boston <- as_tibble(ISLR2::Boston)
+glimpse(boston)
+```
+
+Check the distribution of `crim`:
+
+```{r fig.height=2.5, fig.width=4}
+p <- boston %>%
+  ggplot(aes(x = crim)) +
+  geom_boxplot(aes(y = 0), outlier.shape = NA) +
+  geom_jitter(aes(y = 1), alpha = 0.5) +
+  remove_axis("y")
+p
+```
+
+It is a very heavy tailed distribution.
+I might want to predict `log(crim)` instead:
+
+```{r fig.height=2.5, fig.width=4}
+p + scale_x_log10()
+```
+
+(a) Try out some of the regression methods explored in this chapter.
+
+Split into training and testing sets:
+
+```{r}
+set.seed(401)
+boston_split <- initial_split(boston, prop = 0.75)
+boston_train <- training(boston_split)
+boston_test <- testing(boston_split)
+boston_resamples <- vfold_cv(boston_train, v = 10)
+```
+
+Best subset selection:
+
+```{r fig.height=3, fig.width=4}
+boston_subsets <- regsubsets(log(crim) ~ .,
+                             data = boston_train, nvmax = ncol(boston) - 1)
+
+
+boston_subsets_metrics <- tibble(n_vars = 1:(ncol(boston) - 1)) %>%
+  mutate(
+    model_formula = map(
+      n_vars,
+      ~ as.formula(
+        paste0(
+          "log(crim) ~ ",
+          paste(names(coef(boston_subsets, .x))[-1], collapse = "+")
+        )
+      )
+    )
+  ) %>%
+  mutate(
+    lm_fit = map(model_formula, ~ lm(.x, data = boston_train)),
+    train_rmse = map_dbl(lm_fit, ~ sqrt(mean(resid(.x)^2)))
+  )
+boston_subsets_metrics %>%
+  ggplot(aes(x = n_vars, y = train_rmse)) +
+  geom_point() +
+  geom_line() +
+  geom_point(
+    data = . %>% filter(train_rmse == min(train_rmse)), color = "red", size = 3
+  ) +
+  scale_x_continuous(breaks = 1:(ncol(boston) - 1))
+```
+
+The best model includes all the predictors.
+
+```{r}
+boston_subsets_metrics <- boston_subsets_metrics %>%
+  filter(train_rmse == min(train_rmse)) %>%
+  pull(lm_fit) %>%
+  .[[1]] %>%
+  augment(newdata = boston_test) %>%
+  mutate(crim = log(crim)) %>%
+  metrics(truth = crim, estimate = .fitted)
+```
+
+Lasso and ridge regression:
+
+```{r}
+boston_recipe <- recipe(crim ~ ., data = boston_train) %>%
+  step_normalize(all_predictors()) %>%
+  step_zv(all_predictors()) %>%
+  step_log(all_outcomes())
+boston_lasso_workflow <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(boston_recipe)
+boston_ridge_workflow <- workflow() %>%
+  add_model(ridge_spec) %>%
+  add_recipe(boston_recipe)
+
+lambda_grid <- grid_regular(penalty(range = c(-5, 0)), levels = 50)
+
+boston_lasso_tune <- tune_grid(
+  boston_lasso_workflow, resamples = boston_resamples,
+  grid = lambda_grid
+)
+boston_ridge_tune <- tune_grid(
+  boston_ridge_workflow, resamples = boston_resamples,
+  grid = lambda_grid
+)
+
+(autoplot(boston_lasso_tune) + labs(title = "lasso")) |
+  (autoplot(boston_ridge_tune) + labs(title = "ridge"))
+```
+
+Use the minimum RMSE for the chosen $\lambda$ in each:
+
+```{r}
+boston_lasso_last_fit <- boston_lasso_workflow %>%
+  finalize_workflow(select_best(boston_lasso_tune, "rmse")) %>%
+  last_fit(split = boston_split)
+boston_ridge_last_fit <- boston_ridge_workflow %>%
+  finalize_workflow(select_best(boston_ridge_tune, "rmse")) %>%
+  last_fit(split = boston_split)
+```
+
+Principal components and partial least squares regression:
+
+```{r}
+boston_pca_recipe <- boston_recipe %>%
+  step_pca(all_predictors(), num_comp = tune())
+boston_pls_recipe <- boston_recipe %>%
+  step_pls(all_predictors(), num_comp = tune(), outcome = "crim")
+
+boston_pca_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(boston_pca_recipe)
+boston_pls_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(boston_pls_recipe)
+
+num_comp_grid <- grid_regular(num_comp(range = c(1, 12)), levels = 12)
+
+boston_pca_tune <- tune_grid(
+  boston_pca_workflow, resamples = boston_resamples,
+  grid = num_comp_grid
+)
+boston_pls_tune <- tune_grid(
+  boston_pls_workflow, resamples = boston_resamples,
+  grid = num_comp_grid
+)
+(autoplot(boston_pca_tune) + labs(title = "PCA")) |
+  (autoplot(boston_pls_tune) + labs(title = "PLS"))
+```
+
+```{r}
+boston_pca_last_fit <- boston_pca_workflow %>%
+  finalize_workflow(select_best(boston_pca_tune, "rmse")) %>%
+  last_fit(split = boston_split)
+boston_pls_last_fit <- boston_pls_workflow %>%
+  finalize_workflow(select_best(boston_pls_tune, "rmse")) %>%
+  last_fit(split = boston_split)
+```
+
+```{r}
+bind_rows(
+  best_subsets = boston_subsets_metrics,
+  lasso = collect_metrics(boston_lasso_last_fit),
+  ridge = collect_metrics(boston_ridge_last_fit),
+  pca = collect_metrics(boston_pca_last_fit),
+  pls = collect_metrics(boston_pls_last_fit),
+  .id = "model"
+) %>%
+  filter(.metric != "mae") %>%
+  select(model, .metric, .estimate) %>%
+  pivot_wider(names_from = .metric, values_from = .estimate) %>%
+  gt() %>%
+  data_color(columns = rmse, colors = c("green", "red")) %>%
+  data_color(columns = rsq, colors = c("red", "green"))
+```
+
+```{r}
+tidy(boston_lasso_last_fit$.workflow[[1]])
+```
+
+
 
 ## Reproducibility {-}
 
