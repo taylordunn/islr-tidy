@@ -97,9 +97,7 @@ regression-in-high-dimensions
 interpreting-results-in-high-dimensions
 lab-linear-models-and-regularization-methods
 subset-selection-methods
-choosing-among-models-using-the-validation-set-approach-and-cross-validation
 ridge-regression-and-the-lasso
 pcr-and-pls-regression
-exercises-3
 principal-components-regression-1
-predict-applications-with-college
+exercises-3

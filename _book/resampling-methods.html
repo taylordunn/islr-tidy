@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse</title>
+  <title>5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse and tidymodels</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse" />
+  <meta property="og:title" content="5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="taylordunn/islr-tidy" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse" />
+  <meta name="twitter:title" content="5 Resampling Methods | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
   
   <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
   
@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-04-04" />
+<meta name="date" content="2022-04-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,8 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 
 <style type="text/css">
@@ -320,7 +322,10 @@ div.csl-indent {
 <li class="chapter" data-level="6.5.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression-and-the-lasso"><i class="fa fa-check"></i><b>6.5.2</b> Ridge Regression and the Lasso</a></li>
 <li class="chapter" data-level="6.5.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#pcr-and-pls-regression"><i class="fa fa-check"></i><b>6.5.3</b> PCR and PLS Regression</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a></li>
+<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#applied-3"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#reproducibility-3"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
 </ul>
@@ -332,7 +337,7 @@ div.csl-indent {
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse and tidymodels</a>
           </h1>
         </div>
 
@@ -540,9 +545,11 @@ Then the LOOCV estimate of the MSE is the average over all observations:</p>
 <p>392 splits, which is the number of observations, as expected.
 Fit:</p>
 <div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="resampling-methods.html#cb350-1" aria-hidden="true" tabindex="-1"></a>auto_poly_fits_loo_cv <span class="ot">&lt;-</span> <span class="fu">evaluate_poly_fits</span>(auto_splits)</span></code></pre></div>
-<pre><code>## Error: Problem with `mutate()` column `lm_fit`.
-## i `lm_fit = map(lm_rec, ~lm_workflow %&gt;% add_recipe(.x) %&gt;% fit_resamples(auto_splits))`.
-## x Leave-one-out cross-validation is not currently supported with tune.</code></pre>
+<pre><code>## Error in `mutate()`:
+## ! Problem while computing `lm_fit = map(lm_rec, ~lm_workflow %&gt;%
+##   add_recipe(.x) %&gt;% fit_resamples(auto_splits))`.
+## Caused by error:
+## ! Leave-one-out cross-validation is not currently supported with tune.</code></pre>
 <p>As the error says, LOOCV is not supported.
 Here’s an <a href="https://www.tmwr.org/resampling.html#leave-one-out-cross-validation">explanation I found online</a>:</p>
 <blockquote>
@@ -2493,7 +2500,7 @@ Figure 3.8 on page 91 that there is a non-linear relationship in the data, and s
 <span id="cb401-8"><a href="resampling-methods.html#cb401-8" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_parsnip</span>(default_fit)</span></code></pre></div>
 <pre><code>## parsnip model object
 ## 
-## Fit time:  31ms 
+## Fit time:  20ms 
 ## 
 ## Call:  stats::glm(formula = ..y ~ ., family = stats::binomial, data = data)
 ## 
@@ -5965,7 +5972,7 @@ median using the bootstrap.</li>
 <div id="reproducibility-2" class="section level2 unnumbered">
 <h2>Reproducibility</h2>
 <div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="resampling-methods.html#cb471-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-04-04 10:10:18 AST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-04-09 16:10:04 AST&quot;</code></pre>
 <div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="resampling-methods.html#cb473-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
 <span id="cb473-2"><a href="resampling-methods.html#cb473-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
 <span id="cb473-3"><a href="resampling-methods.html#cb473-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
@@ -5973,7 +5980,7 @@ median using the bootstrap.</li>
 <span id="cb473-5"><a href="resampling-methods.html#cb473-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [43905e7] 2022-04-04: Finished section 6.5.2</code></pre>
+## Head:     [00046ed] 2022-04-08: Finished chapter 6</code></pre>
 <div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="resampling-methods.html#cb475-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## - Session info ---------------------------------------------------------------
 ##  setting  value                       
@@ -5985,7 +5992,7 @@ median using the bootstrap.</li>
 ##  collate  English_Canada.1252         
 ##  ctype    English_Canada.1252         
 ##  tz       America/Curacao             
-##  date     2022-04-04                  
+##  date     2022-04-09                  
 ## 
 ## - Packages -------------------------------------------------------------------
 ##  package        * version    date       lib source                           
@@ -6006,13 +6013,13 @@ median using the bootstrap.</li>
 ##  cellranger       1.1.0      2016-07-27 [1] CRAN (R 4.1.0)                   
 ##  checkmate        2.0.0      2020-02-06 [1] CRAN (R 4.1.0)                   
 ##  class            7.3-20     2022-01-16 [2] CRAN (R 4.1.3)                   
-##  cli              3.1.1      2022-01-20 [1] CRAN (R 4.1.2)                   
+##  cli              3.2.0      2022-02-14 [1] CRAN (R 4.1.3)                   
 ##  coda             0.19-4     2020-09-30 [1] CRAN (R 4.1.0)                   
 ##  codetools        0.2-18     2020-11-04 [2] CRAN (R 4.1.3)                   
-##  colorspace       2.0-2      2021-06-24 [1] CRAN (R 4.1.0)                   
+##  colorspace       2.0-3      2022-02-21 [1] CRAN (R 4.1.3)                   
 ##  combinat         0.0-8      2012-10-29 [1] CRAN (R 4.1.1)                   
 ##  corrr          * 0.4.3      2020-11-24 [1] CRAN (R 4.1.0)                   
-##  crayon           1.4.2      2021-10-29 [1] CRAN (R 4.1.1)                   
+##  crayon           1.5.1      2022-03-26 [1] CRAN (R 4.1.3)                   
 ##  datawizard       0.1.0      2021-06-18 [1] CRAN (R 4.1.0)                   
 ##  DBI              1.1.2      2021-12-20 [1] CRAN (R 4.1.2)                   
 ##  dbplyr           2.1.1      2021-04-06 [1] CRAN (R 4.1.0)                   
@@ -6025,7 +6032,7 @@ median using the bootstrap.</li>
 ##  distributional   0.2.2      2021-02-02 [1] CRAN (R 4.1.2)                   
 ##  doParallel     * 1.0.16     2020-10-16 [1] CRAN (R 4.1.1)                   
 ##  downlit          0.4.0      2021-10-29 [1] CRAN (R 4.1.1)                   
-##  dplyr          * 1.0.7      2021-06-18 [1] CRAN (R 4.1.0)                   
+##  dplyr          * 1.0.8      2022-02-08 [1] CRAN (R 4.1.3)                   
 ##  dunnr          * 0.2.5      2022-01-15 [1] Github (taylordunn/dunnr@c83b30e)
 ##  effectsize       0.4.5      2021-05-25 [1] CRAN (R 4.1.0)                   
 ##  ellipsis         0.3.2      2021-04-29 [1] CRAN (R 4.1.0)                   
@@ -6035,15 +6042,16 @@ median using the bootstrap.</li>
 ##  evaluate         0.14       2019-05-28 [1] CRAN (R 4.1.0)                   
 ##  extrafont        0.17       2014-12-08 [1] CRAN (R 4.1.0)                   
 ##  extrafontdb      1.0        2012-06-11 [1] CRAN (R 4.1.0)                   
-##  fansi            1.0.2      2022-01-14 [1] CRAN (R 4.1.2)                   
+##  fansi            1.0.3      2022-03-24 [1] CRAN (R 4.1.3)                   
 ##  farver           2.1.0      2021-02-28 [1] CRAN (R 4.1.0)                   
 ##  fastmap          1.1.0      2021-01-25 [1] CRAN (R 4.1.0)                   
 ##  forcats        * 0.5.1      2021-01-27 [1] CRAN (R 4.1.0)                   
-##  foreach        * 1.5.1      2020-10-15 [1] CRAN (R 4.1.0)                   
+##  foreach        * 1.5.2      2022-02-02 [1] CRAN (R 4.1.3)                   
 ##  fs               1.5.2      2021-12-08 [1] CRAN (R 4.1.2)                   
 ##  furrr            0.2.3      2021-06-25 [1] CRAN (R 4.1.2)                   
-##  future           1.23.0     2021-10-31 [1] CRAN (R 4.1.2)                   
-##  generics         0.1.1      2021-10-25 [1] CRAN (R 4.1.1)                   
+##  future           1.24.0     2022-02-19 [1] CRAN (R 4.1.3)                   
+##  future.apply     1.8.1      2021-08-10 [1] CRAN (R 4.1.3)                   
+##  generics         0.1.2      2022-01-31 [1] CRAN (R 4.1.3)                   
 ##  GGally           2.1.2      2021-06-21 [1] CRAN (R 4.1.0)                   
 ##  ggdist         * 3.0.0      2021-07-19 [1] CRAN (R 4.1.2)                   
 ##  ggplot2        * 3.3.5      2021-06-25 [1] CRAN (R 4.1.0)                   
@@ -6051,13 +6059,13 @@ median using the bootstrap.</li>
 ##  ggridges         0.5.3      2021-01-08 [1] CRAN (R 4.1.0)                   
 ##  git2r            0.28.0     2021-01-10 [1] CRAN (R 4.1.0)                   
 ##  globals          0.14.0     2020-11-22 [1] CRAN (R 4.1.0)                   
-##  glue             1.6.0      2021-12-17 [1] CRAN (R 4.1.2)                   
+##  glue             1.6.2      2022-02-24 [1] CRAN (R 4.1.3)                   
 ##  gower            0.2.2      2020-06-23 [1] CRAN (R 4.1.0)                   
 ##  GPfit            1.0-8      2019-02-08 [1] CRAN (R 4.1.0)                   
 ##  gridExtra        2.3        2017-09-09 [1] CRAN (R 4.1.0)                   
 ##  gt             * 0.3.1      2021-08-07 [1] CRAN (R 4.1.2)                   
 ##  gtable           0.3.0      2019-03-25 [1] CRAN (R 4.1.0)                   
-##  hardhat          0.1.6      2021-07-14 [1] CRAN (R 4.1.0)                   
+##  hardhat          0.2.0      2022-01-24 [1] CRAN (R 4.1.3)                   
 ##  haven            2.4.1      2021-04-23 [1] CRAN (R 4.1.0)                   
 ##  here           * 1.0.1      2020-12-13 [1] CRAN (R 4.1.0)                   
 ##  highr            0.9        2021-04-16 [1] CRAN (R 4.1.0)                   
@@ -6065,12 +6073,12 @@ median using the bootstrap.</li>
 ##  htmltools        0.5.2      2021-08-25 [1] CRAN (R 4.1.1)                   
 ##  httpuv           1.6.5      2022-01-05 [1] CRAN (R 4.1.2)                   
 ##  httr             1.4.2      2020-07-20 [1] CRAN (R 4.1.0)                   
-##  igraph           1.2.6      2020-10-06 [1] CRAN (R 4.1.0)                   
+##  igraph           1.2.11     2022-01-04 [1] CRAN (R 4.1.3)                   
 ##  infer          * 1.0.0      2021-08-13 [1] CRAN (R 4.1.1)                   
 ##  insight          0.14.2     2021-06-22 [1] CRAN (R 4.1.0)                   
 ##  ipred            0.9-12     2021-09-15 [1] CRAN (R 4.1.1)                   
 ##  ISLR2          * 1.3-1      2022-01-10 [1] CRAN (R 4.1.2)                   
-##  iterators      * 1.0.13     2020-10-15 [1] CRAN (R 4.1.0)                   
+##  iterators      * 1.0.14     2022-02-05 [1] CRAN (R 4.1.3)                   
 ##  jquerylib        0.1.4      2021-04-26 [1] CRAN (R 4.1.0)                   
 ##  jsonlite         1.7.3      2022-01-17 [1] CRAN (R 4.1.2)                   
 ##  kknn             1.3.1      2016-03-26 [1] CRAN (R 4.1.2)                   
@@ -6080,12 +6088,12 @@ median using the bootstrap.</li>
 ##  labelled         2.8.0      2021-03-08 [1] CRAN (R 4.1.0)                   
 ##  later            1.3.0      2021-08-18 [1] CRAN (R 4.1.2)                   
 ##  lattice          0.20-45    2021-09-22 [2] CRAN (R 4.1.3)                   
-##  lava             1.6.9      2021-03-11 [1] CRAN (R 4.1.0)                   
+##  lava             1.6.10     2021-09-02 [1] CRAN (R 4.1.3)                   
 ##  lhs              1.1.1      2020-10-05 [1] CRAN (R 4.1.0)                   
 ##  lifecycle        1.0.1      2021-09-24 [1] CRAN (R 4.1.1)                   
 ##  listenv          0.8.0      2019-12-05 [1] CRAN (R 4.1.0)                   
 ##  lubridate        1.8.0      2021-10-07 [1] CRAN (R 4.1.1)                   
-##  magrittr         2.0.1      2020-11-17 [1] CRAN (R 4.1.0)                   
+##  magrittr         2.0.2      2022-01-26 [1] CRAN (R 4.1.3)                   
 ##  MASS             7.3-55     2022-01-16 [2] CRAN (R 4.1.3)                   
 ##  Matrix           1.4-0      2021-12-08 [2] CRAN (R 4.1.3)                   
 ##  memoise          2.0.1      2021-11-26 [1] CRAN (R 4.1.2)                   
@@ -6099,14 +6107,14 @@ median using the bootstrap.</li>
 ##  mvtnorm        * 1.1-3      2021-10-08 [1] CRAN (R 4.1.1)                   
 ##  nlme             3.1-155    2022-01-16 [2] CRAN (R 4.1.3)                   
 ##  nnet             7.3-17     2022-01-16 [2] CRAN (R 4.1.3)                   
-##  parallelly       1.27.0     2021-07-19 [1] CRAN (R 4.1.0)                   
+##  parallelly       1.30.0     2021-12-17 [1] CRAN (R 4.1.2)                   
 ##  parameters       0.14.0     2021-05-29 [1] CRAN (R 4.1.0)                   
 ##  parsnip        * 0.1.7      2021-07-21 [1] CRAN (R 4.1.0)                   
 ##  patchwork      * 1.1.1      2020-12-17 [1] CRAN (R 4.1.0)                   
 ##  performance      0.7.3      2021-07-21 [1] CRAN (R 4.1.1)                   
 ##  pillar           1.7.0      2022-02-01 [1] CRAN (R 4.1.2)                   
 ##  pkgconfig        2.0.3      2019-09-22 [1] CRAN (R 4.1.0)                   
-##  plyr             1.8.6      2020-03-03 [1] CRAN (R 4.1.0)                   
+##  plyr             1.8.7      2022-03-24 [1] CRAN (R 4.1.3)                   
 ##  poissonreg     * 0.1.1      2021-08-07 [1] CRAN (R 4.1.2)                   
 ##  prettyunits      1.1.1      2020-01-24 [1] CRAN (R 4.1.0)                   
 ##  pROC             1.17.0.1   2021-01-13 [1] CRAN (R 4.1.0)                   
@@ -6116,15 +6124,15 @@ median using the bootstrap.</li>
 ##  qqplotr          0.0.5      2021-04-23 [1] CRAN (R 4.1.0)                   
 ##  questionr        0.7.5      2021-10-06 [1] CRAN (R 4.1.2)                   
 ##  R6               2.5.1      2021-08-19 [1] CRAN (R 4.1.1)                   
-##  RColorBrewer     1.1-2      2014-12-07 [1] CRAN (R 4.1.0)                   
-##  Rcpp             1.0.8      2022-01-13 [1] CRAN (R 4.1.2)                   
+##  RColorBrewer     1.1-3      2022-04-03 [1] CRAN (R 4.1.3)                   
+##  Rcpp             1.0.8.3    2022-03-17 [1] CRAN (R 4.1.3)                   
 ##  readr          * 2.1.1      2021-11-30 [1] CRAN (R 4.1.2)                   
 ##  readxl           1.3.1      2019-03-13 [1] CRAN (R 4.1.0)                   
 ##  recipes        * 0.1.17     2021-09-27 [1] CRAN (R 4.1.1)                   
 ##  repr             1.1.3      2021-01-21 [1] CRAN (R 4.1.1)                   
 ##  reprex           2.0.0      2021-04-02 [1] CRAN (R 4.1.0)                   
 ##  reshape          0.8.8      2018-10-23 [1] CRAN (R 4.1.0)                   
-##  rlang          * 0.4.12     2021-10-18 [1] CRAN (R 4.1.1)                   
+##  rlang          * 1.0.2      2022-03-04 [1] CRAN (R 4.1.3)                   
 ##  rmarkdown        2.11       2021-09-14 [1] CRAN (R 4.1.1)                   
 ##  robustbase       0.93-8     2021-06-02 [1] CRAN (R 4.1.0)                   
 ##  rpart            4.1.16     2022-01-24 [2] CRAN (R 4.1.3)                   
@@ -6145,17 +6153,17 @@ median using the bootstrap.</li>
 ##  tibble         * 3.1.6      2021-11-07 [1] CRAN (R 4.1.1)                   
 ##  tictoc         * 1.0.1      2021-04-19 [1] CRAN (R 4.1.1)                   
 ##  tidymodels     * 0.1.4      2021-10-01 [1] CRAN (R 4.1.1)                   
-##  tidyr          * 1.1.4      2021-09-27 [1] CRAN (R 4.1.1)                   
-##  tidyselect       1.1.1      2021-04-30 [1] CRAN (R 4.1.0)                   
-##  tidyverse      * 1.3.1      2021-04-15 [1] CRAN (R 4.1.2)                   
+##  tidyr          * 1.2.0      2022-02-01 [1] CRAN (R 4.1.3)                   
+##  tidyselect       1.1.2      2022-02-21 [1] CRAN (R 4.1.3)                   
+##  tidyverse      * 1.3.1      2021-04-15 [1] CRAN (R 4.1.3)                   
 ##  timeDate         3043.102   2018-02-21 [1] CRAN (R 4.1.0)                   
 ##  tune           * 0.1.6      2021-07-21 [1] CRAN (R 4.1.0)                   
 ##  tzdb             0.2.0      2021-10-27 [1] CRAN (R 4.1.2)                   
 ##  usethis          2.1.5      2021-12-09 [1] CRAN (R 4.1.2)                   
 ##  utf8             1.2.2      2021-07-24 [1] CRAN (R 4.1.0)                   
-##  vctrs          * 0.3.8      2021-04-29 [1] CRAN (R 4.1.0)                   
+##  vctrs          * 0.3.8      2021-04-29 [1] CRAN (R 4.1.3)                   
 ##  vroom            1.5.7      2021-11-30 [1] CRAN (R 4.1.2)                   
-##  withr            2.4.3      2021-11-30 [1] CRAN (R 4.1.2)                   
+##  withr            2.5.0      2022-03-03 [1] CRAN (R 4.1.3)                   
 ##  workflows      * 0.2.3      2021-07-16 [1] CRAN (R 4.1.0)                   
 ##  workflowsets   * 0.1.0      2021-07-22 [1] CRAN (R 4.1.0)                   
 ##  xfun             0.29       2021-12-14 [1] CRAN (R 4.1.2)                   

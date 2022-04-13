@@ -1,0 +1,608 @@
+```{r echo=FALSE}
+knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
+                      fig.width = 6, fig.height = 3,
+                      cache.path = "cache/")
+```
+
+# Moving Beyond Linearity
+
+Load the packages used in this chapter:
+
+```{r message=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(broom)
+library(gt)
+library(patchwork)
+library(tictoc)
+
+# Load my R package and set the ggplot theme
+library(dunnr)
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td())
+set_geom_fonts()
+set_palette()
+```
+
+In the previous chapter, we saw how to improve upon standard least squares linear regression using ridge regression, the lasso, PCA, and other techniques.
+In that setting, the complexity of the linear model is reduced to reduce the variance of the estimates.
+In this chapter, we relax the linearity assumption while still trying to maintain some interpretability, with these methods:
+
+* *Polynomial regression* extends the linear model by adding extra predictors by raising original predictors to a power.
+* *Step functions* cut the range of a variable into $K$ distinct regions to produce a qualitative variable.
+* *Regression splines* are a flexible combination of polynomials and step functions that involve polynomial functions fit to data in $K$ distinct regions.
+* *Smoothing splines* are similar to regression splines but involve a smoothness penalty.
+* *Local regression* is similar to splines but allows smooth overlaps across regions.
+* *Generalized additive models* allows us to extend the above methods to deal with multiple predictors.
+
+## Polynomial Regression
+
+Polynomial regression involves raising one or more predictors to a degree $d$, each with its own coefficient:
+
+$$
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + \dots + \beta_d x_i^4 + \epsilon_i.
+$$
+
+For a large enough degree $d$, polynomial regression can produce an extremely non-linear curve, though it is unusual to use $d$ greater than 3 or 4 because the curve can become overly flexible and produce some strange shapes.
+
+Re-create Figure 7.1 with the `wage` data:
+
+```{r figure7.1, warning=FALSE}
+wage <- ISLR2::Wage
+
+wage_poly_4_linear_fit <- lm(wage ~ poly(age, 4), data = wage)
+wage_poly_4_logistic_fit <- glm(I(wage > 250) ~ poly(age, 4),
+                                data = wage, family = binomial)
+
+# Grid of age values for predictions
+age_grid <- seq(18, 80, length.out = 63)
+
+p1 <- wage_poly_4_linear_fit %>%
+  augment(newdata = tibble(age = age_grid),
+          interval = "confidence", level = 0.50) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted), color = "darkblue", size = 1.5) +
+  geom_line(aes(y = .lower),
+            lty = 2, color = "darkblue", size = 1) +
+  geom_line(aes(y = .upper),
+            lty = 2, color = "darkblue", size = 1) +
+  labs(y = "wage")
+
+p2 <- wage_poly_4_logistic_fit %>%
+  augment(newdata = tibble(age = age_grid),
+          type.predict = "link", se_fit = TRUE) %>%
+  mutate(
+    # Have to compute CIs manually for logistic regression
+    .lower = .fitted - 1.96 * .se.fit,
+    .upper = .fitted + 1.96 * .se.fit,
+    # Convert from log-odds to probability scales
+    across(c(.fitted, .lower, .upper), ~ exp(.x) / (1 + exp(.x)))
+  ) %>%
+  ggplot(aes(x = age)) +
+  geom_rug(data = wage %>% filter(wage > 250),
+           sides = "t", color = "grey50", alpha = 0.5) +
+  geom_rug(data = wage %>% filter(wage <= 250),
+           sides = "b", color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted), color = "darkblue", size = 1.5) +
+  geom_line(aes(y = .lower), lty = 2, color = "darkblue", size = 1) +
+  geom_line(aes(y = .upper), lty = 2, color = "darkblue", size = 1) +
+  coord_cartesian(ylim = c(0, 0.2)) +
+  labs(y = "Pr(wage > 250 | age)")
+
+p1 + p2
+```
+
+## Step Functions
+
+>
+Using polynomial functions of the features as predictors in a linear model
+imposes a global structure on the non-linear function of $X$. We can instead
+use step functions in order to avoid imposing such a global structure. Here
+we break the range of $X$ into *bins*, and fit a different constant in each bin.
+This amounts to converting a continuous variable into an *ordered categorical variable*.
+
+This involves using a set of $K$ cutpoints $c_k$ which corresponds to dummy variables $C_k(X)$:
+
+$$
+\begin{align}
+C_0(X) &= I(X < c_1), \\
+C_1(X) &= I(c_1 \leq X < c_2), \\
+C_2(X) &= I(c_2 \leq X < c_3), \\
+&\vdots \\
+C_{K-1}(X) &= I(c_{K-1} \leq X < c_K), \\
+C_K(X) &= I(c_K \leq X),
+\end{align}
+$$
+
+where $I()$ is an *indicator* function that returns a 1 or 0 if the condition is true or false.
+The least squares linear model is then:
+
+$$
+y_i = \beta_0 + \beta_1 C_1(x_i) + \beta_2 C_2 (x_i) + \dots + \beta_K C_K (x_i) + \epsilon_i.
+$$
+
+To re-create Figure 7.2, I'll use `cut` with 4 breaks to separate the `age` predictor:
+
+```{r warning=FALSE}
+wage_step_linear_fit <- lm(wage ~ cut(age, breaks = 4), data = wage)
+wage_step_logistic_fit <- glm(I(wage > 250) ~ cut(age, breaks = 4),
+                                data = wage, family = binomial)
+p1 <- wage_step_linear_fit %>%
+  augment(newdata = tibble(age = age_grid),
+          interval = "confidence", level = 0.50) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted), color = "darkgreen", size = 1.5) +
+  geom_line(aes(y = .lower),
+            lty = 2, color = "darkgreen", size = 1) +
+  geom_line(aes(y = .upper),
+            lty = 2, color = "darkgreen", size = 1) +
+  labs(y = "wage")
+
+p2 <- wage_step_logistic_fit %>%
+  augment(newdata = tibble(age = age_grid),
+          type.predict = "link", se_fit = TRUE) %>%
+  mutate(
+    .lower = .fitted - 1.96 * .se.fit,
+    .upper = .fitted + 1.96 * .se.fit,
+    across(c(.fitted, .lower, .upper), ~ exp(.x) / (1 + exp(.x)))
+  ) %>%
+  ggplot(aes(x = age)) +
+  geom_rug(data = wage %>% filter(wage > 250),
+           sides = "t", color = "grey50", alpha = 0.5) +
+  geom_rug(data = wage %>% filter(wage <= 250),
+           sides = "b", color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted), color = "darkgreen", size = 1.5) +
+  geom_line(aes(y = .lower), lty = 2, color = "darkgreen", size = 1) +
+  geom_line(aes(y = .upper), lty = 2, color = "darkgreen", size = 1) +
+  coord_cartesian(ylim = c(0, 0.2)) +
+  labs(y = "Pr(wage > 250 | age)")
+
+p1 + p2
+```
+
+>
+Unfortunately, unless there are natural breakpoints in the predictors,
+piecewise-constant functions can miss the action. For example, in the left- hand
+panel of Figure 7.2, the first bin clearly misses the increasing trend
+of `wage` with `age`. Nevertheless, step function approaches are very popular
+in biostatistics and epidemiology, among other disciplines. For example,
+5-year age groups are often used to define the bins.
+
+## Basis Functions
+
+>
+Polynomial and piecewise-constant regression models are in fact special
+cases of a basis function approach. The idea is to have at hand a fam ily of
+functions or transformations that can be applied to a variable $X$:
+$b_1(X), b_2(X), \dots, b_K(X)$. Instead of fitting a linear model in $X$, we fit the
+model
+
+$$
+y_i = \beta_0 + \beta_1 b_1(x_i) + \beta_2 b_2 (x_i) + \dots + \beta_K b_K (x_i) + \epsilon_i.
+$$
+
+In polynomial regression, these basis functions were $b_j(x_i) = x_i^j$.
+In piecewise-constant regression, they were $b_j(x_i) = I(c_j \leq x_i < c_{j+1})$.
+Despite the increased complexity, this still amounts to estimating the unknown regression coefficients $\beta$, for which all the least squares tools and models apply.
+
+## Regression Splines
+
+### Piecewise Polynomials
+
+>
+Instead of fitting a high-degree polynomial over the entire range of $X$, piecewise
+polynomial regression involves fitting separate low-degree polynomials
+over different regions of $X$. For example, a piecewise cubic polynomial works
+by fitting a cubic regression model of the form
+
+$$
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + \epsilon_i.
+$$
+
+>
+where the coefficients $\beta_0, \beta_1, \beta_2,$ and  $\beta_3$ differ in parts of the range of $X$.
+The points where the coefficients change are called *knots*.
+
+With 0 knots, we have the standard cubic polynomial with $d = 3$ as described in section 7.1.
+With a single knot at point $c$, this takes the form:
+
+$$
+\begin{align}
+y_i &= \beta_{01} + \beta_{11} x_i + \beta_{21} x_i^2 + \beta_{31} x_i^3 + \epsilon_i \ \ \ \text{if} \ \  x_i < c \\
+&= \beta_{02} + \beta_{22} x_i + \beta_{22} x_i^2 + \beta_{32} x_i^3 + \epsilon_i \ \ \ \text{if} \ \  x_i \geq c.
+\end{align}
+$$
+
+Functionally, this is essentially fitting two separate regression equations on subsets of $X$, with 8 degrees of freedom for the eight regression coefficients.
+
+### Constraints and Splines
+
+The problem with piecewise polynomials is that the resulting fit can be discontinuous, like in the top left panel of Figure 7.3.
+To remedy this, we can fit a piecewise polynomial under the *constraint* that the fitted curve must be continuous, like in the top right panel.
+The bottom left panel shows the result of two additional constraints: that the first and second derivative are continuous at `age = 50` -- this is called a *cubic spline*, which generally has $K + 4$ degrees of freedom (=5 in this example.
+The lower right panel shows a *linear spline*.
+
+### The Spline Basis Representation
+
+In order to implement the continuity constraints for regression splines, we can use the basis model.
+A cubic spline with $K$ knots can be modeled as
+
+$$
+y_i = \beta_0 + \beta_1 b_1(x_i) + \beta_2 b_2 (x_i) + \dots + \beta_{K+3 b_{K+3} (x_i) + \epsilon_i,
+$$
+
+for an appropriate choice of basis functions $b_1, b_2, \dots, b_{K+3}$.
+The model can then be fit with least squares.
+
+There are many equivalent representations of cubic splines using different basis functions.
+The most direct is to start with the cubic polynomial and then add one *truncated power basis function* per knot:
+
+$$
+\begin{align}
+h(x, \xi) = (x - \xi)^2_+ &= (x - \xi)^3 \ \ \ \text{if} \ \ \ x > \xi \\ 
+&= 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \text{otherwise},
+\end{align}
+$$
+
+where $\xi$ is the knot.
+One can show that adding the term $\beta_4 h(x, \xi)$ to the cubic spline model above will lead to a discontinuity in only the third derivative at $\xi$, but remain continuous in the first and second derivatives.
+
+Unfortunately, these splines have high variance at boundaries of the predictors.
+This can be reduced with *natural splines* which have additional constraints at the boundaries to produce more stable estimates.
+We can show this with confidence intervals of the models fit with cubic and natural cubic splines, as in Figure 7.4:
+
+```{r figure7.4, warning=FALSE}
+library(splines)
+
+# Use just a subset of the data to mimic the figure
+set.seed(20)
+d <- wage %>%
+  filter(wage < 300) %>%
+  slice_sample(n = 500)
+
+wage_bs_linear_fit <- lm(wage ~ bs(age, knots = c(25, 40, 60)), data = d)
+wage_ns_linear_fit <- lm(wage ~ ns(age, knots = c(25, 40, 60)), data = d)
+
+bind_rows(
+  wage_bs_linear_fit %>%
+    augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+    mutate(model = "Cubic spline"),
+  wage_ns_linear_fit %>%
+    augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+    mutate(model = "Natural cubic spline")
+) %>%
+  mutate(model = fct_rev(model)) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = d, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted, color = model), size = 1.5) +
+  geom_line(aes(y = .lower, color = model), lty = 2, size = 1) +
+  geom_line(aes(y = .upper, color = model), lty = 2, size = 1) +
+  geom_vline(xintercept = c(25, 40, 60), lty = 2) +
+  coord_cartesian(ylim = c(40, 300)) +
+  theme(legend.position = c(0.7, 0.9)) +
+  labs(color = NULL)
+```
+
+### Choosing the Number and Locations of the Knots
+
+>
+When we fit a spline, where should we place the knots? The regression
+spline is most flexible in regions that contain a lot of knots, because in
+those regions the polynomial coefficients can change rapidly. Hence, one
+option is to place more knots in places where we feel the function might
+vary most rapidly, and to place fewer knots where it seems more stable.
+While this option can work well, in practice it is common to place knots in
+a uniform fashion. One way to do this is to specify the desired degrees of
+freedom, and then have the software automatically place the corresponding
+number of knots at uniform quantiles of the data.
+
+The `splines::ns()` function, when provided the `df` argument, computes knot locations based on percentiles.
+For the `age` data and `df = 4` (3 knots):
+
+```{r}
+age_ns <- ns(wage$age, df = 4)
+attr(age_ns, "knots")
+```
+
+Fit the model and re-create Figure 7.5:
+
+```{r figure7.5}
+wage_ns_linear_fit <- lm(wage ~ ns(age, df = 4), data = wage)
+wage_ns_logistic_fit <- glm(I(wage > 250) ~ ns(age, df = 4),
+                            data = wage, family = binomial)
+
+p1 <- wage_ns_linear_fit %>%
+  augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted), color = "red", size = 1.5) +
+  geom_line(aes(y = .lower), color = "red", lty = 2, size = 1) +
+  geom_line(aes(y = .upper), color = "red", lty = 2, size = 1) +
+  geom_vline(xintercept = attr(age_ns, "knots"), lty = 2)
+p2 <- wage_ns_logistic_fit %>%
+  augment(newdata = tibble(age = age_grid),
+          type.predict = "link", se_fit = TRUE) %>%
+  mutate(
+    .lower = .fitted - 1.96 * .se.fit,
+    .upper = .fitted + 1.96 * .se.fit,
+    across(c(.fitted, .lower, .upper), ~ exp(.x) / (1 + exp(.x)))
+  ) %>%
+  ggplot(aes(x = age)) +
+  geom_rug(data = wage %>% filter(wage > 250),
+           sides = "t", color = "grey50", alpha = 0.5) +
+  geom_rug(data = wage %>% filter(wage <= 250),
+           sides = "b", color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted), color = "red", size = 1.5) +
+  geom_line(aes(y = .lower), lty = 2, color = "red", size = 1) +
+  geom_line(aes(y = .upper), lty = 2, color = "red", size = 1) +
+  geom_vline(xintercept = attr(age_ns, "knots"), lty = 2) +
+  coord_cartesian(ylim = c(0, 0.2)) +
+  labs(y = "Pr(wage > 250 | age)")
+
+p1 + p2
+```
+
+The automatic choice of knot location is usually sufficient, but how do we decide on the number of knots $K$?
+The same way we've chosen any model hyperparameters: resampling.
+For this, we turn to `tidymodels`, which has `step_bs()` and `step_ns()` function for specifying basis splines and natural basis splines.
+
+```{r}
+set.seed(93)
+wage_resamples <- vfold_cv(wage, v = 10)
+wage_lm_bs_rec <- recipe(wage ~ age, data = wage) %>%
+  step_bs(age, deg_free = tune(), degree = 3)
+lm_spec <- linear_reg(engine = "lm")
+
+wage_lm_bs_workflow <- workflow() %>%
+  add_recipe(wage_lm_bs_rec) %>%
+  add_model(lm_spec)
+
+deg_free_grid <- grid_regular(deg_free(range = c(0, 10)), levels = 11)
+wage_lm_bs_tune <- tune_grid(wage_lm_bs_workflow, resamples = wage_resamples,
+                             grid = deg_free_grid)
+autoplot(wage_lm_bs_tune)
+```
+
+```{r}
+set.seed(33)
+wage_resamples <- vfold_cv(wage, v = 10)
+wage_lm_bs_rec <- recipe(wage ~ age, data = wage) %>%
+  step_bs(age, deg_free = tune(), degree = tune())
+  #step_bs(age, deg_free = 3, degree = tune())
+lm_spec <- linear_reg(engine = "lm")
+
+wage_lm_bs_workflow <- workflow() %>%
+  add_recipe(wage_lm_bs_rec) %>%
+  add_model(lm_spec)
+
+df_grid <-
+  #grid_regular(degree(range = c(1, 3)), levels = 3)
+  grid_regular(deg_free(range = c(1, 10)), degree(range = c(1, 3)),
+               levels = c(deg_free = 10, degree = 3))
+wage_lm_bs_tune <- tune_grid(wage_lm_bs_workflow, resamples = wage_resamples,
+                             grid = df_grid)
+autoplot(wage_lm_bs_tune)
+
+collect_metrics(wage_lm_bs_tune) %>%
+  filter(.metric == "rmse") %>%
+  mutate(mse = mean^2) %>%
+  ggplot(aes(x = deg_free, y = mse)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~ degree)
+```
+
+```{r}
+wage_lm_rec <- recipe(wage ~ age, data = wage) %>%
+  step_poly(age, degree = tune())
+wage_lm_workflow <- workflow() %>%
+  add_recipe(wage_lm_rec) %>%
+  add_model(lm_spec)
+
+degree_grid <- grid_regular(degree(range = c(1, 3)), levels = 3)
+
+
+wage_lm_tune <- tune_grid(wage_lm_workflow, resamples = wage_resamples,
+                          grid = degree_grid)
+collect_metrics(wage_lm_tune)
+autoplot(wage_lm_tune)
+```
+
+
+```{r}
+wage_rec <- recipe(wage ~ age, data = wage)
+test <-  map_dfr(
+  3:10,
+  function(df) {
+    d <- tibble()
+    for (deg in 1:3) {
+      wage_lm_bs_rec <- wage_rec %>%
+        step_bs(age, deg_free = df, degree = deg)
+      
+      wage_lm_bs_fit1 <- workflow() %>%
+        add_recipe(wage_lm_bs_rec) %>%
+        add_model(lm_spec) %>%
+        fit(data = wage)
+      
+      wage_lm_bs_fit2 <- lm(wage ~ bs(age, df = df, degree = deg),
+                            data = wage)
+      
+      d <- d %>%
+        bind_rows(
+          augment(wage_lm_bs_fit1, wage) %>%
+            rmse(truth = wage, estimate = .pred) %>%
+            mutate(deg_free = df, degree = degree, method = "tidymodels"),
+          augment(wage_lm_bs_fit2, wage) %>%
+            rmse(truth = wage, estimate = .fitted) %>%
+            mutate(deg_free = df, degree = degree, method = "lm")
+        )
+    }
+    return(d)
+  }
+)
+wage_lm_bs_fit <- lm(wage ~ bs(age, df = 5, degree = 3), data = wage)
+wage_lm_bs_fit <- lm(wage ~ bs(age, df = 3, degree = 1), data = wage)
+wage_lm_bs_fit
+test
+```
+
+
+
+```{r}
+wage_lm_bs_4_rec <- recipe(wage ~ age, data = wage) %>%
+  step_bs(age, deg_free = 4)
+wage_lm_bs_4_fit <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_lm_bs_4_rec) %>%
+  fit(data = wage)
+
+wage_bs_linear_fit <- lm(wage ~ bs(age, df = 4), data = wage)
+
+bind_rows(
+  augment(wage_lm_bs_4_fit, new_data = tibble(age = age_grid)) %>% mutate(method = "tidymodels"),
+  augment(wage_bs_linear_fit, newdata = tibble(age = age_grid)) %>%
+    mutate(method = "lm") %>% rename(.pred = .fitted)
+) %>%
+  ggplot(aes(x = age)) +
+  geom_line(aes(y = .pred, color = method)) +
+  facet_wrap(~method)
+```
+
+
+```{r}
+wage_bs_linear_fit <- lm(wage ~ bs(age, knots = c(25, 40, 60)), data = wage)
+wage_ns_linear_fit <- lm(wage ~ ns(age, knots = c(25, 40, 60)), data = wage)
+
+wage_bs_rec <- recipe(wage ~ age, data = wage) %>%
+  step_bs(age, deg_free = 6)
+wage_ns_rec <- recipe(wage ~ age, data = wage) %>%
+  #step_ns(age, options = list(knots = c(25, 40, 60)))
+  step_ns(age, deg_free = 6)
+wage_bs_fit <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_bs_rec) %>%
+  fit(data = wage)
+wage_ns_fit <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_ns_rec) %>%
+  fit(data = wage)
+
+bind_rows(
+  bind_rows(
+    wage_bs_linear_fit %>%
+      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Cubic spline"),
+    wage_ns_linear_fit %>%
+      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Natural cubic spline")
+  ) %>%
+    mutate(method = "lm"),
+  bind_rows(
+    wage_bs_fit %>%
+      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Cubic spline"),
+    wage_ns_fit %>%
+      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Natural cubic spline")
+  ) %>%
+    mutate(method = "tidymodels", .fitted = .pred)
+) %>%
+  mutate(model = fct_rev(model)) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted, color = model), size = 1.5) +
+  # geom_line(aes(y = .lower, color = model), lty = 2, size = 1) +
+  # geom_line(aes(y = .upper, color = model), lty = 2, size = 1) +
+  geom_vline(xintercept = c(25, 40, 60), lty = 2) +
+  facet_wrap(~ method) +
+  #coord_cartesian(ylim = c(40, 300)) +
+  theme(legend.position = c(0.7, 0.9)) +
+  labs(color = NULL)
+```
+
+```{r}
+wage_bs_linear_fit <- lm(wage ~ bs(age, df = 6), data = wage)
+wage_ns_linear_fit <- lm(wage ~ ns(age, df = 6), data = wage)
+
+wage_bs_rec <- recipe(wage ~ age, data = wage) %>%
+  step_bs(age, deg_free = 6)
+wage_ns_rec <- recipe(wage ~ age, data = wage) %>%
+  #step_ns(age, options = list(knots = c(25, 40, 60)))
+  step_ns(age, deg_free = 6)
+wage_bs_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_bs_rec)
+wage_bs_fit <- wage_bs_workflow %>% fit(data = wage)
+wage_ns_fit <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_ns_rec) %>%
+  fit(data = wage)
+
+bind_rows(
+  bind_rows(
+    wage_bs_linear_fit %>%
+      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Cubic spline"),
+    wage_ns_linear_fit %>%
+      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Natural cubic spline")
+  ) %>%
+    mutate(method = "lm"),
+  bind_rows(
+    wage_bs_fit %>%
+      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Cubic spline"),
+    wage_ns_fit %>%
+      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
+      mutate(model = "Natural cubic spline")
+  ) %>%
+    mutate(method = "tidymodels", .fitted = .pred)
+) %>%
+  mutate(model = fct_rev(model)) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted, color = model), size = 1.5) +
+  # geom_line(aes(y = .lower, color = model), lty = 2, size = 1) +
+  # geom_line(aes(y = .upper, color = model), lty = 2, size = 1) +
+  geom_vline(xintercept = c(25, 40, 60), lty = 2) +
+  facet_wrap(~ method) +
+  #coord_cartesian(ylim = c(40, 300)) +
+  theme(legend.position = c(0.7, 0.9)) +
+  labs(color = NULL)
+```
+
+```{r}
+extract_fit_engine(wage_bs_fit)
+wage_bs_linear_fit
+```
+
+```{r}
+extract_fit_engine(wage_ns_fit) %>% summary()
+```
+
+
+## Reproducibility {-}
+
+```{r}
+Sys.time()
+```
+
+```{r}
+if ("git2r" %in% installed.packages()) {
+  if (git2r::in_repository()) {
+    git2r::repository()
+  }
+}
+```
+
+```{r}
+sessioninfo::session_info()
+```

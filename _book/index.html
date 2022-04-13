@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>An Introduction to Statistical Learning with the tidyverse</title>
+  <title>An Introduction to Statistical Learning with the tidyverse and tidymodels</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="An Introduction to Statistical Learning with the tidyverse" />
+  <meta property="og:title" content="An Introduction to Statistical Learning with the tidyverse and tidymodels" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   <meta name="github-repo" content="taylordunn/islr-tidy" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="An Introduction to Statistical Learning with the tidyverse" />
+  <meta name="twitter:title" content="An Introduction to Statistical Learning with the tidyverse and tidymodels" />
   
   <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
   
@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-04-04" />
+<meta name="date" content="2022-04-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,6 +53,8 @@
 
 <link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 
 <style type="text/css">
@@ -320,7 +322,10 @@ div.csl-indent {
 <li class="chapter" data-level="6.5.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression-and-the-lasso"><i class="fa fa-check"></i><b>6.5.2</b> Ridge Regression and the Lasso</a></li>
 <li class="chapter" data-level="6.5.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#pcr-and-pls-regression"><i class="fa fa-check"></i><b>6.5.3</b> PCR and PLS Regression</a></li>
 </ul></li>
-<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a></li>
+<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#applied-3"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#reproducibility-3"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
 </ul>
@@ -332,7 +337,7 @@ div.csl-indent {
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse and tidymodels</a>
           </h1>
         </div>
 
@@ -341,9 +346,9 @@ div.csl-indent {
 
             <section class="normal" id="section-">
 <div id="header">
-<h1 class="title">An Introduction to Statistical Learning with the tidyverse</h1>
+<h1 class="title">An Introduction to Statistical Learning with the tidyverse and tidymodels</h1>
 <p class="author"><em>Taylor Dunn</em></p>
-<p class="date"><em>2022-04-04</em></p>
+<p class="date"><em>2022-04-09</em></p>
 </div>
 <div id="who-what-and-why" class="section level1 unnumbered">
 <h1>Who, what, and why?</h1>
@@ -355,6 +360,7 @@ In general, my plan for each chapter/concept is to start with the original model
 For example, I’ll first perform logistic regression with <code>glm()</code>, then use <code>parsnip::logistic_reg()</code> by the end of the chapter.
 I think this will help me better appreciate the unified interface provided with <code>tidymodels</code>, and maybe help me better understand what is going on under the hood.</p>
 <p>I won’t be doing every exercise or section. My main goal for this project is to improve my statistical programming, so I will focus on the applied exercises rather than the conceptual.</p>
+<p>As of 2022-04-09, I’ve completed Chapters 1 through 6.</p>
 
 </div>
             </section>

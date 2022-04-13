@@ -1705,7 +1705,7 @@ tidy(hitters_lasso_fit_final) %>%
 In the text, they use the `pcr()` function from the `pls` library to perform PCR.
 The syntax is the same as `lm()`, and it had `scale` and `validation` parameters for standardizing predictors and performing cross-validation.
 
-```{r}
+```{r message=FALSE}
 library(pls)
 
 set.seed(1)
@@ -2153,11 +2153,14 @@ The lasso model performed slightly better than least squares, but worse than rid
 
 (e) Fit a PCR model, with $M$ chosen by cross-validation.
 
-```{r}
-# Need to import `mixOmics` package, or else I get the error:
+```{r message=FALSE}
+# Need to import `mixOmics` package first, or else I get the error:
 # 'X' must be a numeric matrix (possibly inculding NA's) with finite values
 library(mixOmics)
+```
 
+
+```{r message=FALSE}
 college_pcr_recipe <- recipe(apps ~ ., data = college_train) %>%
   step_novel(all_nominal_predictors()) %>%
   step_dummy(all_nominal_predictors()) %>%
