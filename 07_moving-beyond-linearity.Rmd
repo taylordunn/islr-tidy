@@ -40,7 +40,7 @@ In this chapter, we relax the linearity assumption while still trying to maintai
 Polynomial regression involves raising one or more predictors to a degree $d$, each with its own coefficient:
 
 $$
-y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + \dots + \beta_d x_i^4 + \epsilon_i.
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + \dots + \beta_d x_i^d + \epsilon_i.
 $$
 
 For a large enough degree $d$, polynomial regression can produce an extremely non-linear curve, though it is unusual to use $d$ greater than 3 or 4 because the curve can become overly flexible and produce some strange shapes.
@@ -58,8 +58,7 @@ wage_poly_4_logistic_fit <- glm(I(wage > 250) ~ poly(age, 4),
 age_grid <- seq(18, 80, length.out = 63)
 
 p1 <- wage_poly_4_linear_fit %>%
-  augment(newdata = tibble(age = age_grid),
-          interval = "confidence", level = 0.50) %>%
+  augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
   ggplot(aes(x = age)) +
   geom_point(data = wage, aes(y = wage),
              shape = 21, color = "grey50", alpha = 0.5) +
@@ -223,7 +222,7 @@ Functionally, this is essentially fitting two separate regression equations on s
 
 The problem with piecewise polynomials is that the resulting fit can be discontinuous, like in the top left panel of Figure 7.3.
 To remedy this, we can fit a piecewise polynomial under the *constraint* that the fitted curve must be continuous, like in the top right panel.
-The bottom left panel shows the result of two additional constraints: that the first and second derivative are continuous at `age = 50` -- this is called a *cubic spline*, which generally has $K + 4$ degrees of freedom (=5 in this example.
+The bottom left panel shows the result of two additional constraints: that the first and second derivative are continuous at `age = 50` -- this is called a *cubic spline*, which generally has $K + 4$ degrees of freedom (=5 in this example).
 The lower right panel shows a *linear spline*.
 
 ### The Spline Basis Representation
@@ -232,7 +231,7 @@ In order to implement the continuity constraints for regression splines, we can 
 A cubic spline with $K$ knots can be modeled as
 
 $$
-y_i = \beta_0 + \beta_1 b_1(x_i) + \beta_2 b_2 (x_i) + \dots + \beta_{K+3 b_{K+3} (x_i) + \epsilon_i,
+y_i = \beta_0 + \beta_1 b_1(x_i) + \beta_2 b_2 (x_i) + \dots + \beta_{K+3} b_{K+3} (x_i) + \epsilon_i,
 $$
 
 for an appropriate choice of basis functions $b_1, b_2, \dots, b_{K+3}$.
@@ -311,7 +310,7 @@ attr(age_ns, "knots")
 
 Fit the model and re-create Figure 7.5:
 
-```{r figure7.5}
+```{r figure7.5, warning=FALSE}
 wage_ns_linear_fit <- lm(wage ~ ns(age, df = 4), data = wage)
 wage_ns_logistic_fit <- glm(I(wage > 250) ~ ns(age, df = 4),
                             data = wage, family = binomial)
@@ -355,237 +354,418 @@ For this, we turn to `tidymodels`, which has `step_bs()` and `step_ns()` functio
 ```{r}
 set.seed(93)
 wage_resamples <- vfold_cv(wage, v = 10)
+
 wage_lm_bs_rec <- recipe(wage ~ age, data = wage) %>%
-  step_bs(age, deg_free = tune(), degree = 3)
-lm_spec <- linear_reg(engine = "lm")
+  step_bs(age, deg_free = tune(), degree = tune())
+wage_lm_ns_rec <- recipe(wage ~ age, data = wage) %>%
+  step_ns(age, deg_free = tune())
+lm_spec <- linear_reg()
 
 wage_lm_bs_workflow <- workflow() %>%
-  add_recipe(wage_lm_bs_rec) %>%
-  add_model(lm_spec)
+  add_model(lm_spec) %>%
+  add_recipe(wage_lm_bs_rec)
+wage_lm_ns_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_lm_ns_rec)
+```
 
-deg_free_grid <- grid_regular(deg_free(range = c(0, 10)), levels = 11)
-wage_lm_bs_tune <- tune_grid(wage_lm_bs_workflow, resamples = wage_resamples,
-                             grid = deg_free_grid)
-autoplot(wage_lm_bs_tune)
+If I understand Figure 7.6 correctly, the results being displayed in the right panel aren't all cubic splines because those models can't have <3 degrees of freedom.
+For example, if I set degrees of freedom to `df = 2` and the polynomial degree of freedom to `degree = 3`, then `bs()` will calculate a negative number of knots.
+It will automatically adjust `df` so the number of knots equals 0 and return a warning:
+
+```{r}
+lm(wage ~ bs(age, df = 2, degree = 3), data = wage)
+```
+
+So in choosing the hyperparameters for these models, I will vary both `deg_free` and `degree` so that it fits a linear spline, quadratic spline, and 7 cubic splines (with varying numbers of knots) as follows:
+
+```{r}
+bs_df_grid <- bind_rows(
+  tibble(deg_free = 1:3, degree = 1:3),
+  tibble(deg_free = 4:10, degree = 3)
+)
+bs_df_grid
 ```
 
 ```{r}
-set.seed(33)
-wage_resamples <- vfold_cv(wage, v = 10)
-wage_lm_bs_rec <- recipe(wage ~ age, data = wage) %>%
-  step_bs(age, deg_free = tune(), degree = tune())
-  #step_bs(age, deg_free = 3, degree = tune())
-lm_spec <- linear_reg(engine = "lm")
+wage_lm_bs_tune <- tune_grid(
+  wage_lm_bs_workflow, resamples = wage_resamples,
+  grid = bs_df_grid
+)
+```
 
-wage_lm_bs_workflow <- workflow() %>%
-  add_recipe(wage_lm_bs_rec) %>%
-  add_model(lm_spec)
+The way degrees of freedom work in natural splines doesn't require this adjustment, I can just provide `deg_free = 1:10`:
 
-df_grid <-
-  #grid_regular(degree(range = c(1, 3)), levels = 3)
-  grid_regular(deg_free(range = c(1, 10)), degree(range = c(1, 3)),
-               levels = c(deg_free = 10, degree = 3))
-wage_lm_bs_tune <- tune_grid(wage_lm_bs_workflow, resamples = wage_resamples,
-                             grid = df_grid)
-autoplot(wage_lm_bs_tune)
+```{r}
+wage_lm_ns_tune <- tune_grid(
+  wage_lm_ns_workflow, resamples = wage_resamples,
+  grid = bs_df_grid %>% select(deg_free)
+)
+```
 
-collect_metrics(wage_lm_bs_tune) %>%
+Finally, re-create Figure 7.6:
+
+```{r figure7.6}
+p1 <- collect_metrics(wage_lm_ns_tune) %>%
   filter(.metric == "rmse") %>%
   mutate(mse = mean^2) %>%
   ggplot(aes(x = deg_free, y = mse)) +
-  geom_point() +
+  geom_line(color = "red") +
+  geom_point(fill = "red", color = "white", shape = 21, size = 3) +
+  scale_x_continuous("Degrees of freedom of natural spline",
+                     breaks = seq(2, 10, 2))  +
+  labs(y = "Mean squared error")
+p2 <- collect_metrics(wage_lm_bs_tune) %>%
+  filter(.metric == "rmse") %>%
+  mutate(mse = mean^2) %>%
+  ggplot(aes(x = deg_free, y = mse)) +
+  geom_line(color = "blue") +
+  geom_point(fill = "blue", color = "white", shape = 21, size = 3) +
+  scale_x_continuous("Degrees of freedom of cubic spline",
+                     breaks = seq(2, 10, 2))  +
+  labs(y = NULL)
+p1 + p2
+```
+
+```{r include=FALSE}
+# Proving to myself that the linear model `wage ~ age` is equivalent to...
+lm_linear <- lm(wage ~ age, data = wage)
+# ... the model with a 1-degree spline (0 knots)
+lm_11 <- lm(wage ~ bs(age, df = 1, degree = 1), data = wage)
+
+# Also that quadratic regression is equivalent to...
+lm_quad <- lm(wage ~ poly(age, 2), data = wage)
+# ... the model with a 2-degree spline (0 knots)
+lm_12 <- lm(wage ~ bs(age, df = 1, degree = 2), data = wage)
+
+# And cubic
+lm_cubic <- lm(wage ~ poly(age, 3), data = wage)
+lm_13 <- lm(wage ~ bs(age, df = 1, degree = 3), data = wage)
+
+lm_21 <- lm(wage ~ bs(age, df = 2, degree = 1), data = wage)
+lm_31 <- lm(wage ~ bs(age, df = 3, degree = 1), data = wage)
+lm_22 <- lm(wage ~ bs(age, df = 2, degree = 2), data = wage)
+lm_32 <- lm(wage ~ bs(age, df = 3, degree = 2), data = wage)
+
+bind_rows(
+  augment(lm_linear, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_linear"),
+  augment(lm_11, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_11"),
+  augment(lm_12, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_12"),
+  augment(lm_quad, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_quad"),
+  augment(lm_13, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_13"),
+  augment(lm_cubic, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_cubic")
+) %>%
+  mutate(model = fct_inorder(model)) %>%
+  ggplot(aes(x = age, y = .fitted)) +
   geom_line() +
-  facet_wrap(~ degree)
-```
-
-```{r}
-wage_lm_rec <- recipe(wage ~ age, data = wage) %>%
-  step_poly(age, degree = tune())
-wage_lm_workflow <- workflow() %>%
-  add_recipe(wage_lm_rec) %>%
-  add_model(lm_spec)
-
-degree_grid <- grid_regular(degree(range = c(1, 3)), levels = 3)
-
-
-wage_lm_tune <- tune_grid(wage_lm_workflow, resamples = wage_resamples,
-                          grid = degree_grid)
-collect_metrics(wage_lm_tune)
-autoplot(wage_lm_tune)
+  facet_wrap(~ model, ncol = 2)
 ```
 
 
-```{r}
-wage_rec <- recipe(wage ~ age, data = wage)
-test <-  map_dfr(
-  3:10,
-  function(df) {
-    d <- tibble()
-    for (deg in 1:3) {
-      wage_lm_bs_rec <- wage_rec %>%
-        step_bs(age, deg_free = df, degree = deg)
-      
-      wage_lm_bs_fit1 <- workflow() %>%
-        add_recipe(wage_lm_bs_rec) %>%
-        add_model(lm_spec) %>%
-        fit(data = wage)
-      
-      wage_lm_bs_fit2 <- lm(wage ~ bs(age, df = df, degree = deg),
-                            data = wage)
-      
-      d <- d %>%
-        bind_rows(
-          augment(wage_lm_bs_fit1, wage) %>%
-            rmse(truth = wage, estimate = .pred) %>%
-            mutate(deg_free = df, degree = degree, method = "tidymodels"),
-          augment(wage_lm_bs_fit2, wage) %>%
-            rmse(truth = wage, estimate = .fitted) %>%
-            mutate(deg_free = df, degree = degree, method = "lm")
-        )
-    }
-    return(d)
-  }
+```{r include=FALSE}
+# Playing around with df some more
+
+# Linear spline with a single knot
+lm_21 <- lm(wage ~ bs(age, df = 2, degree = 1), data = wage)
+# Linear spline with two knots
+lm_31 <- lm(wage ~ bs(age, df = 3, degree = 1), data = wage)
+# Quadratic with one knot
+lm_22 <- lm(wage ~ bs(age, df = 2, degree = 2), data = wage)
+# Quadratic with two knot
+lm_32 <- lm(wage ~ bs(age, df = 3, degree = 2), data = wage)
+
+bind_rows(
+  augment(lm_21, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_21"),
+  augment(lm_31, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_31"),
+  augment(lm_22, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_22"),
+  augment(lm_32, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "lm_32")
+) %>%
+  mutate(model = fct_inorder(model)) %>%
+  ggplot(aes(x = age, y = .fitted)) +
+  geom_line() +
+  facet_wrap(~ model, ncol = 2)
+```
+
+### Comparison to Polynomial Regression
+
+Figure 7.7 compares a natural cubic spline with 15 degrees of freedom to a 15-degree polynomial regression on the `wage` data:
+
+```{r figure7.7, warning=FALSE}
+wage_ns_15_fit <- lm(wage ~ ns(age, df = 15), data = wage)
+wage_poly_15_fit <- lm(wage ~ poly(age, degree = 15), data = wage)
+
+bind_rows(
+  wage_ns_15_fit %>%
+    augment(newdata = tibble(age = age_grid)) %>%
+    mutate(model = "Natural cubic spline"),
+  wage_poly_15_fit %>%
+    # Extend the age range a bit to see more of the fit
+    augment(newdata = tibble(age = c(age_grid, 80.5))) %>%
+    mutate(model = "Polynomial")
+) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted, color = model), size = 1.5) +
+  theme(legend.position = c(0.8, 0.8)) +
+  labs(color = NULL)
+```
+
+>
+The extra flexibility in the polynomial produces undesirable results at the boundaries, while the natural
+cubic spline still provides a reasonable fit to the data. Regression splines
+often give superior results to polynomial regression. This is because unlike
+polynomials, which must use a high degree (exponent in the highest monomial term,
+e.g. $X^15$) to produce flexible fits, splines introduce flexibility
+by increasing the number of knots but keeping the degree fixed. Generally,
+this approach produces more stable estimates. Splines also allow us to place
+more knots, and hence flexibility, over regions where the function $f$ seems
+to be changing rapidly, and fewer knots where $f$ appears more stable.
+
+## Smoothing Splines
+
+### An Overview of Smoothing Splines
+
+To fit a curve $g(x)$ to a set of data, we want $\text{RSS} = \sum_{i=1}^n (y_i - g(x_i))^2$ to be small.
+If there are no constraints on $g(x)$, however, then it will simply overfit the data completely for $\text{RSS} = 0$.
+
+There are a number of ways to ensure that $g$ is smooth.
+One way is to find $g$ that minimizes
+
+$$
+\text{RSS} + \lambda \int g'' (t)^2 dt
+$$
+
+where $\lambda$ is a non-negative penalty parameter (that will control the bias-variance trade-off as we've seen before).
+The function $g$ that minimizes the above is known as a *smoothing spline*.
+By placing the constraint on the second derivative $g''$, we encourage $g$ to be smooth.
+
+It turns out that the optimal $g(x)$ is a natural cubic polynomial with knots at unique values of $x$ (and continuous first and second derivatives at each knot).
+However, it is not the same one we would get with the basis function approach in Section 7.4.3 with knots at each value of $x$ -- rather, it is a *shrunken* version of that spline, where $\lambda$ controls the level of shrinkage
+
+### Choosing the Smoothing Parameter $\lambda$
+
+It may seem like a smoothing spline, with knots at every unique value of $x_i$, will have far too many degrees of freedom, but the tuning parameter $\lambda$ controls the *effective degrees of freedom* $df_{\lambda}$.
+The higher $df_{\lambda}$, the more flexible (lower bias, higher variance) the smoothing spline.
+
+Unlike the other spline methods, we do not need to select the number or location of the knots.
+We instead have to choose the value of $\lambda$, usually via cross-validation.
+It turns out that the LOOCV error can be computed very efficiecntly for smoothing splines, with essentially the same cost as computing a single fit, with this formula:
+
+$$
+\text{RSS}_{cv} (\lambda) = \sum_{i=1}^n (y_i - \hat{g}_{\lambda}^{(-i)} (x_i))^2
+= \sum_{i=1}^n \left[\frac{y_i - \hat{g}_{\lambda}(x_i)}{1 - \{\textbf{S}_{\lambda}\}_{ii}}\right].
+$$
+where $\hat{g}_{\lambda}^{(-i)}$ is the fitted value for this smoothing spline evaluated at $x_i$, with the fit using all training observations expert for $(x_i, y_i)$.
+
+>
+In contrast, $\hat{g}_{\lambda}(x_i)$ indicates the smoothing
+spline function fit to all of the training observations and evaluated at $x_i$.
+This remarkable formula says that we can compute each of these leave-
+one-out fits using only $\hat{g}_{\lambda}$, the original fit to all of the data!
+We have
+a very similar formula (5.2) on page 202 in Chapter 5 for least squares
+linear regression. Using (5.2), we can very quickly perform LOOCV for
+the regression splines discussed earlier in this chapter, as well as for least
+squares regression using arbitrary basis functions.
+
+The `smooth.spline()` function fits a cubic smoothing spline to data as follows:
+
+```{r figure7.8}
+wage_smooth_df_16 <- smooth.spline(x = wage$age, y = wage$wage, df = 16)
+wage_smooth_df_16
+
+wage_smooth_cv <- smooth.spline(x = wage$age, y = wage$wage, cv = TRUE)
+wage_smooth_cv
+
+bind_rows(
+  as_tibble(predict(wage_smooth_df_16, age_grid)) %>%
+    mutate(model = "16 degrees of freedom"),
+  as_tibble(predict(wage_smooth_cv, age_grid)) %>%
+    mutate(model = "6.8 degrres of freedom (LOOCV)")
+) %>%
+  ggplot() +
+  geom_point(data = wage, aes(x = age, y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(x = x, y = y, color = model), size = 1.5) +
+  theme(legend.position = c(0.7, 0.7)) +
+  labs(color = NULL)
+```
+
+>
+The red curve indicates the fit obtained from pre-specifying that we
+would like a smoothing spline with 16 effective degrees of freedom. The blue
+curve is the smoothing spline obtained when $\lambda$ is chosen using LOOCV; in
+this case, the value of $\lambda$ chosen results in 6.8 effective degrees of freedom
+(computed using (7.13)). For this data, there is little discernible difference
+between the two smoothing splines, beyond the fact that the one with 16
+degrees of freedom seems slightly wigglier. Since there is little difference
+between the two fits, the smoothing spline fit with 6.8 degrees of freedom
+is preferable, since in general simpler models are better unless the data
+provides evidence in support of a more complex model.
+
+## Local Regression
+
+*Local regression* involves computing the fit at a target point $x_0$ using just the nearby (local) training observations.
+It involves a number of choices, such the weighting function $K$, and whether to fit a linear, constant or quadratic regression.
+The most important choice is the span $s$ which is the proportion of points used to compute the local regression at $x_0$.
+It is analogous to $\lambda$ in smoothing splines: the smaller the value $s$, the more *local* and flexible the fit; the larger the value, the less flexible.
+
+```{r figure7.10, warning=FALSE}
+wage_local_s_0.2 <- loess(wage ~ age, data = wage, span = 0.2)
+wage_local_s_0.7 <- loess(wage ~ age, data = wage, span = 0.7)
+
+wage_local_s_0.2; wage_local_s_0.7
+
+bind_rows(
+  augment(wage_local_s_0.2, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "Span is 0.2 (16.4 degres of freedom)"),
+  augment(wage_local_s_0.7, newdata = tibble(age = age_grid)) %>%
+    mutate(model = "Span is 0.7 (5.3 degres of freedom)")
+) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted, color = model), size = 1.5) +
+  theme(legend.position = c(0.5, 0.7)) +
+  labs(color = NULL)
+```
+
+## Generalized Additive Models
+
+In previous sections, we have presented approaches for flexibly predicting a response $Y$ with a single predictor $X$.
+*Generalized additive models* (GAMs) provide a general framework for extending a standard linear model by allowing non-linear functions of each of the variables, while maintaining *additivity*.
+
+### GAMs for Regression Problems
+
+To extend the multiple linear regression model, we replace the coefficient components $\beta_j x_{ij}$ with smoth non-linear functions $f_j (x_{ij})$:
+
+$$
+y_i = \beta_0 + f_1 (x_{i1}) + f_2 (x_{i2}) + \dots + f_p (x_{ip}) + \epsilon_i.
+$$
+
+Consider the task of fitting the model:
+
+$$
+\texttt{wage} = \beta_0 + f_1(\texttt{year}) + f_2 (\texttt{age}) + f_3 (\texttt{education}) + \epsilon.
+$$
+
+In the example in Figure 7.11, the quantitative variables `year` and `age` are fit using natural splines, and the qualitative variable (with 5 levels) `education` is fit via the usual dummy variable approach.
+
+```{r figure7.11, fig.width=6}
+wage_gam_ns_fit <- lm(wage ~ ns(year, 4) + ns(age, 5) + education, data = wage)
+# Though the model wasn't fit with `gam::gam()`, we can still use the
+#  `gam::plot.Gam()` function on the `lm` object to retrieve the smooth functions
+d <- gam::plot.Gam(wage_gam_ns_fit, se = TRUE, col = "red")
+
+d <- map(
+  d$preplot,
+  ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
+    mutate(y_lower = y - y_se, y_upper = y + y_se)
 )
-wage_lm_bs_fit <- lm(wage ~ bs(age, df = 5, degree = 3), data = wage)
-wage_lm_bs_fit <- lm(wage ~ bs(age, df = 3, degree = 1), data = wage)
-wage_lm_bs_fit
-test
+
+p1 <- d$`ns(year, 4)` %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "red") +
+  geom_line(aes(y = y_lower), lty = 2, color = "red") +
+  geom_line(aes(y = y_upper), lty = 2, color = "red") +
+  labs(x = d$`ns(year, 4)`$xlab, title = d$`ns(year, 4)`$ylab, y = NULL) +
+  ylim(c(-20, 20))
+p2 <- d$`ns(age, 5)` %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "red") +
+  geom_line(aes(y = y_lower), lty = 2, color = "red") +
+  geom_line(aes(y = y_upper), lty = 2, color = "red") +
+  labs(x = d$`ns(age, 5)`$xlab, title = d$`ns(age, 5)`$ylab, y = NULL)
+p3 <- d$education %>%
+  ggplot(aes(x)) +
+  geom_errorbar(aes(y = y, ymin = y_lower, ymax = y_upper)) +
+  labs(x = d$education$xlab, title = d$education$ylab, y = NULL) +
+  theme(axis.text.x = element_text(angle = 45, size = 8, vjust = 0.7))
+p1 + p2 + p3
 ```
 
+For Figure 7.12, we use the `gam` package and specify smoothing splines:
 
+```{r message=FALSE}
+library(gam)
+wage_gam_smooth_fit <-
+  gam(wage ~ s(year, 4) + s(age, 5) + education,
+           data = wage)
+d_gam <- plot(wage_gam_smooth_fit, se = TRUE, col = "blue")
+```
+
+The `tidymodels` implementation of GAMs uses the `mgcv` package the model engine, so I'll use that for this example:
+
+```{r message=FALSE}
+detach("package:gam", unload = TRUE)
+library(mgcv)
+wage_mgcv_smooth_fit <-
+  gam(
+    # With `mgcv::s()`, I need to specify degrees of freedom with `k`, and
+    #  turn off penalization with `fx`
+    wage ~ s(year, k = 5, fx = FALSE, bs = "cr") + s(age, k = 6, fx = FALSE, bs = "cr") +
+      education,
+    data = wage
+  )
+
+#wage_gam_smooth_fit <- mgcv::gam(wage ~ mgcv::s(year, 4), education,
+d_mgcv <- plot(wage_mgcv_smooth_fit, se = TRUE, all.terms = TRUE)
+```
 
 ```{r}
-wage_lm_bs_4_rec <- recipe(wage ~ age, data = wage) %>%
-  step_bs(age, deg_free = 4)
-wage_lm_bs_4_fit <- workflow() %>%
-  add_model(lm_spec) %>%
-  add_recipe(wage_lm_bs_4_rec) %>%
-  fit(data = wage)
-
-wage_bs_linear_fit <- lm(wage ~ bs(age, df = 4), data = wage)
-
 bind_rows(
-  augment(wage_lm_bs_4_fit, new_data = tibble(age = age_grid)) %>% mutate(method = "tidymodels"),
-  augment(wage_bs_linear_fit, newdata = tibble(age = age_grid)) %>%
-    mutate(method = "lm") %>% rename(.pred = .fitted)
+  gam = tibble(x = d_gam$preplot$`s(age, 5)`$x,
+               y = d_gam$preplot$`s(age, 5)`$y),
+  mgcv = tibble(x = d_mgcv[[2]]$x, y = d_mgcv[[2]]$fit),
+  .id = "func"
 ) %>%
-  ggplot(aes(x = age)) +
-  geom_line(aes(y = .pred, color = method)) +
-  facet_wrap(~method)
+  ggplot(aes(x, y)) +
+  geom_line(aes(color = func))
 ```
 
 
 ```{r}
-wage_bs_linear_fit <- lm(wage ~ bs(age, knots = c(25, 40, 60)), data = wage)
-wage_ns_linear_fit <- lm(wage ~ ns(age, knots = c(25, 40, 60)), data = wage)
+set.seed(0)
+## fake some data...
+f1 <- function(x) {exp(2 * x)}
+f2 <- function(x) { 
+  0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10 
+}
+f3 <- function(x) {x*0}
 
-wage_bs_rec <- recipe(wage ~ age, data = wage) %>%
-  step_bs(age, deg_free = 6)
-wage_ns_rec <- recipe(wage ~ age, data = wage) %>%
-  #step_ns(age, options = list(knots = c(25, 40, 60)))
-  step_ns(age, deg_free = 6)
-wage_bs_fit <- workflow() %>%
-  add_model(lm_spec) %>%
-  add_recipe(wage_bs_rec) %>%
-  fit(data = wage)
-wage_ns_fit <- workflow() %>%
-  add_model(lm_spec) %>%
-  add_recipe(wage_ns_rec) %>%
-  fit(data = wage)
+n<-200
+sig2<-4
+x0 <- rep(1:4,50)
+x1 <- runif(n, 0, 1)
+x2 <- runif(n, 0, 1)
+x3 <- runif(n, 0, 1)
+e <- rnorm(n, 0, sqrt(sig2))
+y <- 2*x0 + f1(x1) + f2(x2) + f3(x3) + e
+x0 <- factor(x0)
 
-bind_rows(
-  bind_rows(
-    wage_bs_linear_fit %>%
-      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Cubic spline"),
-    wage_ns_linear_fit %>%
-      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Natural cubic spline")
-  ) %>%
-    mutate(method = "lm"),
-  bind_rows(
-    wage_bs_fit %>%
-      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Cubic spline"),
-    wage_ns_fit %>%
-      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Natural cubic spline")
-  ) %>%
-    mutate(method = "tidymodels", .fitted = .pred)
-) %>%
-  mutate(model = fct_rev(model)) %>%
-  ggplot(aes(x = age)) +
-  geom_point(data = wage, aes(y = wage),
-             shape = 21, color = "grey50", alpha = 0.5) +
-  geom_line(aes(y = .fitted, color = model), size = 1.5) +
-  # geom_line(aes(y = .lower, color = model), lty = 2, size = 1) +
-  # geom_line(aes(y = .upper, color = model), lty = 2, size = 1) +
-  geom_vline(xintercept = c(25, 40, 60), lty = 2) +
-  facet_wrap(~ method) +
-  #coord_cartesian(ylim = c(40, 300)) +
-  theme(legend.position = c(0.7, 0.9)) +
-  labs(color = NULL)
+## fit and plot...
+b<-gam(y~x0+s(x1)+s(x2)+s(x3))
+d <- mgcv::plot.gam(b, pages = 1)
+d2 <- plot(b, pages = 1)
+plot(b,pages=1,residuals=TRUE,all.terms=TRUE,shade=TRUE,shade.col=2)
+plot(b,pages=1,seWithMean=TRUE) ## better coverage intervals
 ```
 
 ```{r}
-wage_bs_linear_fit <- lm(wage ~ bs(age, df = 6), data = wage)
-wage_ns_linear_fit <- lm(wage ~ ns(age, df = 6), data = wage)
-
-wage_bs_rec <- recipe(wage ~ age, data = wage) %>%
-  step_bs(age, deg_free = 6)
-wage_ns_rec <- recipe(wage ~ age, data = wage) %>%
-  #step_ns(age, options = list(knots = c(25, 40, 60)))
-  step_ns(age, deg_free = 6)
-wage_bs_workflow <- workflow() %>%
-  add_model(lm_spec) %>%
-  add_recipe(wage_bs_rec)
-wage_bs_fit <- wage_bs_workflow %>% fit(data = wage)
-wage_ns_fit <- workflow() %>%
-  add_model(lm_spec) %>%
-  add_recipe(wage_ns_rec) %>%
-  fit(data = wage)
-
-bind_rows(
-  bind_rows(
-    wage_bs_linear_fit %>%
-      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Cubic spline"),
-    wage_ns_linear_fit %>%
-      augment(newdata = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Natural cubic spline")
-  ) %>%
-    mutate(method = "lm"),
-  bind_rows(
-    wage_bs_fit %>%
-      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Cubic spline"),
-    wage_ns_fit %>%
-      augment(new_data = tibble(age = age_grid), interval = "confidence") %>%
-      mutate(model = "Natural cubic spline")
-  ) %>%
-    mutate(method = "tidymodels", .fitted = .pred)
-) %>%
-  mutate(model = fct_rev(model)) %>%
-  ggplot(aes(x = age)) +
-  geom_point(data = wage, aes(y = wage),
-             shape = 21, color = "grey50", alpha = 0.5) +
-  geom_line(aes(y = .fitted, color = model), size = 1.5) +
-  # geom_line(aes(y = .lower, color = model), lty = 2, size = 1) +
-  # geom_line(aes(y = .upper, color = model), lty = 2, size = 1) +
-  geom_vline(xintercept = c(25, 40, 60), lty = 2) +
-  facet_wrap(~ method) +
-  #coord_cartesian(ylim = c(40, 300)) +
-  theme(legend.position = c(0.7, 0.9)) +
-  labs(color = NULL)
-```
-
-```{r}
-extract_fit_engine(wage_bs_fit)
-wage_bs_linear_fit
-```
-
-```{r}
-extract_fit_engine(wage_ns_fit) %>% summary()
+tibble(x1 = d[[1]]$x, y = d[[1]]$fit) %>%
+  ggplot(aes(x1, y)) +
+  geom_line()
 ```
 
 

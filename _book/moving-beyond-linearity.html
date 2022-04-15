@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>7 Moving Beyond Linearity | An Introduction to Statistical Learning with the tidyverse and tidymodels</title>
+  <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="7 Moving Beyond Linearity | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="github-repo" content="taylordunn/islr-tidy" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="7 Moving Beyond Linearity | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
+  
+  <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  
+
+<meta name="author" content="Taylor Dunn" />
+
+
+<meta name="date" content="2022-04-13" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="linear-model-selection-and-regularization.html"/>
+
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Who, what, and why?</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#an-overview-of-statistical-learning"><i class="fa fa-check"></i>An Overview of Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#wage-data"><i class="fa fa-check"></i>Wage Data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#a-brief-history-of-statistical-learning"><i class="fa fa-check"></i>A Brief History of Statistical Learning</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#this-book"><i class="fa fa-check"></i>This Book</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="statistical-learning.html"><a href="statistical-learning.html"><i class="fa fa-check"></i><b>2</b> Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#what-is-statistical-learning"><i class="fa fa-check"></i><b>2.1</b> What Is Statistical Learning?</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="statistical-learning.html"><a href="statistical-learning.html#why-estimate-f"><i class="fa fa-check"></i><b>2.1.1</b> Why Estimate <span class="math inline">\(f\)</span>?</a></li>
+<li class="chapter" data-level="2.1.2" data-path="statistical-learning.html"><a href="statistical-learning.html#how-do-we-estimate-f"><i class="fa fa-check"></i><b>2.1.2</b> How Do We Estimate f?</a></li>
+<li class="chapter" data-level="2.1.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-trade-off-between-prediction-accuracy-and-model-interpretability"><i class="fa fa-check"></i><b>2.1.3</b> The Trade-Off Between Prediction Accuracy and Model Interpretability</a></li>
+<li class="chapter" data-level="2.1.4" data-path="statistical-learning.html"><a href="statistical-learning.html#supervised-versus-unsupervised-learning"><i class="fa fa-check"></i><b>2.1.4</b> Supervised Versus Unsupervised Learning</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#assessing-model-accuracy"><i class="fa fa-check"></i><b>2.2</b> Assessing Model Accuracy</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#measuring-the-quality-of-fit"><i class="fa fa-check"></i><b>2.2.1</b> Measuring the Quality of Fit</a></li>
+<li class="chapter" data-level="2.2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#the-bias-variance-trade-off"><i class="fa fa-check"></i><b>2.2.2</b> The Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="2.2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-classification-setting"><i class="fa fa-check"></i><b>2.2.3</b> The Classification Setting</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#lab-introduction-to-r"><i class="fa fa-check"></i><b>2.3</b> Lab: Introduction to R</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="linear-regression.html"><a href="linear-regression.html"><i class="fa fa-check"></i><b>3</b> Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression"><i class="fa fa-check"></i><b>3.1</b> Simple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-coefficients"><i class="fa fa-check"></i><b>3.1.1</b> Estimating the Coefficients</a></li>
+<li class="chapter" data-level="3.1.2" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-coefficient-estimates"><i class="fa fa-check"></i><b>3.1.2</b> Assessing the Accuracy of the Coefficient Estimates</a></li>
+<li class="chapter" data-level="3.1.3" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-model"><i class="fa fa-check"></i><b>3.1.3</b> Assessing the Accuracy of the Model</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression"><i class="fa fa-check"></i><b>3.2</b> Multiple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-regression-coefficients"><i class="fa fa-check"></i><b>3.2.1</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="3.2.2" data-path="linear-regression.html"><a href="linear-regression.html#some-important-questions"><i class="fa fa-check"></i><b>3.2.2</b> Some Important Questions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="linear-regression.html"><a href="linear-regression.html#other-considerations-in-the-regression-model"><i class="fa fa-check"></i><b>3.3</b> Other Considerations in the Regression Model</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors"><i class="fa fa-check"></i><b>3.3.1</b> Qualitative Predictors</a></li>
+<li class="chapter" data-level="3.3.2" data-path="linear-regression.html"><a href="linear-regression.html#extensions-of-the-linear-model"><i class="fa fa-check"></i><b>3.3.2</b> Extensions of the Linear Model</a></li>
+<li class="chapter" data-level="3.3.3" data-path="linear-regression.html"><a href="linear-regression.html#potential-problems"><i class="fa fa-check"></i><b>3.3.3</b> Potential Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="linear-regression.html"><a href="linear-regression.html#the-marketing-plan"><i class="fa fa-check"></i><b>3.4</b> The Marketing Plan</a></li>
+<li class="chapter" data-level="3.5" data-path="linear-regression.html"><a href="linear-regression.html#comparison-of-linear-regression-with-k-nearest-neighbors"><i class="fa fa-check"></i><b>3.5</b> Comparison of Linear Regression with <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="3.6" data-path="linear-regression.html"><a href="linear-regression.html#lab-linear-regression"><i class="fa fa-check"></i><b>3.6</b> Lab: Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="linear-regression.html"><a href="linear-regression.html#libraries"><i class="fa fa-check"></i><b>3.6.1</b> Libraries</a></li>
+<li class="chapter" data-level="3.6.2" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.2</b> Simple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.3" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.3</b> Multiple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.4" data-path="linear-regression.html"><a href="linear-regression.html#interaction-terms"><i class="fa fa-check"></i><b>3.6.4</b> Interaction Terms</a></li>
+<li class="chapter" data-level="3.6.5" data-path="linear-regression.html"><a href="linear-regression.html#non-linear-transformations-of-the-predictors"><i class="fa fa-check"></i><b>3.6.5</b> Non-linear Transformations of the Predictors</a></li>
+<li class="chapter" data-level="3.6.6" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors-1"><i class="fa fa-check"></i><b>3.6.6</b> Qualitative Predictors</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="linear-regression.html"><a href="linear-regression.html#exercises"><i class="fa fa-check"></i><b>3.7</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#applied"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#reproducibility"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>4</b> Classification</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="classification.html"><a href="classification.html#an-overview-of-classification"><i class="fa fa-check"></i><b>4.1</b> An Overview of Classification</a></li>
+<li class="chapter" data-level="4.2" data-path="classification.html"><a href="classification.html#why-not-linear-regression"><i class="fa fa-check"></i><b>4.2</b> Why Not Linear Regression?</a></li>
+<li class="chapter" data-level="4.3" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>4.3</b> Logistic Regression</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="classification.html"><a href="classification.html#the-logistic-model"><i class="fa fa-check"></i><b>4.3.1</b> The Logistic Model</a></li>
+<li class="chapter" data-level="4.3.2" data-path="classification.html"><a href="classification.html#estimating-the-regression-coefficients-1"><i class="fa fa-check"></i><b>4.3.2</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="4.3.3" data-path="classification.html"><a href="classification.html#making-predictions"><i class="fa fa-check"></i><b>4.3.3</b> Making Predictions</a></li>
+<li class="chapter" data-level="4.3.4" data-path="classification.html"><a href="classification.html#multiple-logistic-regression"><i class="fa fa-check"></i><b>4.3.4</b> Multiple Logistic Regression</a></li>
+<li class="chapter" data-level="4.3.5" data-path="classification.html"><a href="classification.html#multinomial-logistic-regression"><i class="fa fa-check"></i><b>4.3.5</b> Multinomial Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="classification.html"><a href="classification.html#generative-models-for-classification"><i class="fa fa-check"></i><b>4.4</b> Generative Models for Classification</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1"><i class="fa fa-check"></i><b>4.4.1</b> Linear Discriminant Analysis for <span class="math inline">\(p = 1\)</span></a></li>
+<li class="chapter" data-level="4.4.2" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1-1"><i class="fa fa-check"></i><b>4.4.2</b> Linear Discriminant Analysis for <span class="math inline">\(p &gt; 1\)</span></a></li>
+<li class="chapter" data-level="4.4.3" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis"><i class="fa fa-check"></i><b>4.4.3</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.4.4" data-path="classification.html"><a href="classification.html#naive-bayes"><i class="fa fa-check"></i><b>4.4.4</b> Naive Bayes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="classification.html"><a href="classification.html#a-comparison-of-classification-methods"><i class="fa fa-check"></i><b>4.5</b> A Comparison of Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="classification.html"><a href="classification.html#an-analytical-comparison"><i class="fa fa-check"></i><b>4.5.1</b> An Analytical Comparison</a></li>
+<li class="chapter" data-level="4.5.2" data-path="classification.html"><a href="classification.html#an-empirical-comparison"><i class="fa fa-check"></i><b>4.5.2</b> An Empirical Comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="classification.html"><a href="classification.html#generalized-linear-models"><i class="fa fa-check"></i><b>4.6</b> Generalized Linear Models</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="classification.html"><a href="classification.html#linear-regression-on-the-bikeshare-data"><i class="fa fa-check"></i><b>4.6.1</b> Linear Regression on the Bikeshare Data</a></li>
+<li class="chapter" data-level="4.6.2" data-path="classification.html"><a href="classification.html#poisson-regression-on-bikeshare-data"><i class="fa fa-check"></i><b>4.6.2</b> Poisson Regression on Bikeshare Data</a></li>
+<li class="chapter" data-level="4.6.3" data-path="classification.html"><a href="classification.html#generalized-linear-models-in-greater-generality"><i class="fa fa-check"></i><b>4.6.3</b> Generalized Linear Models in Greater Generality</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="classification.html"><a href="classification.html#lab-classification-methods"><i class="fa fa-check"></i><b>4.7</b> Lab: Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="classification.html"><a href="classification.html#the-stock-market-data"><i class="fa fa-check"></i><b>4.7.1</b> The Stock Market Data</a></li>
+<li class="chapter" data-level="4.7.2" data-path="classification.html"><a href="classification.html#logistic-regression-1"><i class="fa fa-check"></i><b>4.7.2</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.7.3" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis"><i class="fa fa-check"></i><b>4.7.3</b> Linear Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.7.4" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis-1"><i class="fa fa-check"></i><b>4.7.4</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.7.5" data-path="classification.html"><a href="classification.html#naive-bayes-1"><i class="fa fa-check"></i><b>4.7.5</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.7.6" data-path="classification.html"><a href="classification.html#k-nearest-neighbors-1"><i class="fa fa-check"></i><b>4.7.6</b> <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="4.7.7" data-path="classification.html"><a href="classification.html#poisson-regression"><i class="fa fa-check"></i><b>4.7.7</b> Poisson Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="classification.html"><a href="classification.html#exercises-1"><i class="fa fa-check"></i><b>4.8</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#applied-1"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#reproducibility-1"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="resampling-methods.html"><a href="resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross Validation</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="resampling-methods.html"><a href="resampling-methods.html#validation-set"><i class="fa fa-check"></i><b>5.1.1</b> The Validation Set Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="resampling-methods.html"><a href="resampling-methods.html#loocv"><i class="fa fa-check"></i><b>5.1.2</b> Leave-One-Out Cross Validation</a></li>
+<li class="chapter" data-level="5.1.3" data-path="resampling-methods.html"><a href="resampling-methods.html#kfoldcv"><i class="fa fa-check"></i><b>5.1.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bias-variance-trade-off-for-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Bias-Variance Trade-Off for <span class="math inline">\(k\)</span>-Fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation-on-classification-problems"><i class="fa fa-check"></i><b>5.1.5</b> Cross-Validation on Classification Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap-lab"><i class="fa fa-check"></i><b>5.2</b> The Bootstrap</a></li>
+<li class="chapter" data-level="5.3" data-path="resampling-methods.html"><a href="resampling-methods.html#lab-cross-validation-and-the-bootstrap"><i class="fa fa-check"></i><b>5.3</b> Lab: Cross-Validation and the Bootstrap</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="resampling-methods.html"><a href="resampling-methods.html#the-validation-set-approach"><i class="fa fa-check"></i><b>5.3.1</b> The Validation Set Approach</a></li>
+<li class="chapter" data-level="5.3.2" data-path="resampling-methods.html"><a href="resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3.2</b> Leave-One-Out Cross-Validation</a></li>
+<li class="chapter" data-level="5.3.3" data-path="resampling-methods.html"><a href="resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.3.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.3.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap"><i class="fa fa-check"></i><b>5.3.4</b> The Bootstrap</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="resampling-methods.html"><a href="resampling-methods.html#exercises-2"><i class="fa fa-check"></i><b>5.4</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#applied-2"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#reproducibility-2"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Linear Model Selection and Regularization</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#subset-selection"><i class="fa fa-check"></i><b>6.1</b> Subset Selection</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#best-subset-selection"><i class="fa fa-check"></i><b>6.1.1</b> Best Subset Selection</a></li>
+<li class="chapter" data-level="6.1.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#stepwise-selection"><i class="fa fa-check"></i><b>6.1.2</b> Stepwise Selection</a></li>
+<li class="chapter" data-level="6.1.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#choosing-the-optimal-model"><i class="fa fa-check"></i><b>6.1.3</b> Choosing the Optimal Model</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#shrinkage-methods"><i class="fa fa-check"></i><b>6.2</b> Shrinkage Methods</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression"><i class="fa fa-check"></i><b>6.2.1</b> Ridge Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#the-lasso"><i class="fa fa-check"></i><b>6.2.2</b> The Lasso</a></li>
+<li class="chapter" data-level="6.2.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#selecting-the-tuning-parameter"><i class="fa fa-check"></i><b>6.2.3</b> Selecting the Tuning Parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#dimension-reduction-methods"><i class="fa fa-check"></i><b>6.3</b> Dimension Reduction Methods</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#principal-components-regression"><i class="fa fa-check"></i><b>6.3.1</b> Principal Components Regression</a></li>
+<li class="chapter" data-level="6.3.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#partial-least-squares"><i class="fa fa-check"></i><b>6.3.2</b> Partial Least Squares</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#considerations-in-high-dimensions"><i class="fa fa-check"></i><b>6.4</b> Considerations in High Dimensions</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#high-dimensional-data"><i class="fa fa-check"></i><b>6.4.1</b> High-Dimensional Data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#what-goes-wrong-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.2</b> What Goes Wrong in High Dimensions?</a></li>
+<li class="chapter" data-level="6.4.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#regression-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.3</b> Regression in High Dimensions</a></li>
+<li class="chapter" data-level="6.4.4" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#interpreting-results-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.4</b> Interpreting Results in High Dimensions</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#lab-linear-models-and-regularization-methods"><i class="fa fa-check"></i><b>6.5</b> Lab: Linear Models and Regularization Methods</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#subset-selection-methods"><i class="fa fa-check"></i><b>6.5.1</b> Subset Selection Methods</a></li>
+<li class="chapter" data-level="6.5.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression-and-the-lasso"><i class="fa fa-check"></i><b>6.5.2</b> Ridge Regression and the Lasso</a></li>
+<li class="chapter" data-level="6.5.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#pcr-and-pls-regression"><i class="fa fa-check"></i><b>6.5.3</b> PCR and PLS Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#applied-3"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#reproducibility-3"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Moving Beyond Linearity</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#polynomial-regression"><i class="fa fa-check"></i><b>7.1</b> Polynomial Regression</a></li>
+<li class="chapter" data-level="7.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#step-functions"><i class="fa fa-check"></i><b>7.2</b> Step Functions</a></li>
+<li class="chapter" data-level="7.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#basis-functions"><i class="fa fa-check"></i><b>7.3</b> Basis Functions</a></li>
+<li class="chapter" data-level="7.4" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#regression-splines"><i class="fa fa-check"></i><b>7.4</b> Regression Splines</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#piecewise-polynomials"><i class="fa fa-check"></i><b>7.4.1</b> Piecewise Polynomials</a></li>
+<li class="chapter" data-level="7.4.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#constraints-and-splines"><i class="fa fa-check"></i><b>7.4.2</b> Constraints and Splines</a></li>
+<li class="chapter" data-level="7.4.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#the-spline-basis-representation"><i class="fa fa-check"></i><b>7.4.3</b> The Spline Basis Representation</a></li>
+<li class="chapter" data-level="7.4.4" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#choosing-the-number-and-locations-of-the-knots"><i class="fa fa-check"></i><b>7.4.4</b> Choosing the Number and Locations of the Knots</a></li>
+<li class="chapter" data-level="7.4.5" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#comparison-to-polynomial-regression"><i class="fa fa-check"></i><b>7.4.5</b> Comparison to Polynomial Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.5</b> Smoothing Splines</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#an-overview-of-smoothing-splines"><i class="fa fa-check"></i><b>7.5.1</b> An Overview of Smoothing Splines</a></li>
+<li class="chapter" data-level="7.5.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#choosing-the-smoothing-parameter-lambda"><i class="fa fa-check"></i><b>7.5.2</b> Choosing the Smoothing Parameter <span class="math inline">\(\lambda\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#reproducibility-4"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse and tidymodels</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="moving-beyond-linearity" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Moving Beyond Linearity</h1>
+<p>Load the packages used in this chapter:</p>
+<div class="sourceCode" id="cb697"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb697-1"><a href="moving-beyond-linearity.html#cb697-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb697-2"><a href="moving-beyond-linearity.html#cb697-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb697-3"><a href="moving-beyond-linearity.html#cb697-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb697-4"><a href="moving-beyond-linearity.html#cb697-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb697-5"><a href="moving-beyond-linearity.html#cb697-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb697-6"><a href="moving-beyond-linearity.html#cb697-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb697-7"><a href="moving-beyond-linearity.html#cb697-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb697-8"><a href="moving-beyond-linearity.html#cb697-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb697-9"><a href="moving-beyond-linearity.html#cb697-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb697-10"><a href="moving-beyond-linearity.html#cb697-10" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb697-11"><a href="moving-beyond-linearity.html#cb697-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td</span>())</span>
+<span id="cb697-12"><a href="moving-beyond-linearity.html#cb697-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb697-13"><a href="moving-beyond-linearity.html#cb697-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
+<p>In the previous chapter, we saw how to improve upon standard least squares linear regression using ridge regression, the lasso, PCA, and other techniques.
+In that setting, the complexity of the linear model is reduced to reduce the variance of the estimates.
+In this chapter, we relax the linearity assumption while still trying to maintain some interpretability, with these methods:</p>
+<ul>
+<li><em>Polynomial regression</em> extends the linear model by adding extra predictors by raising original predictors to a power.</li>
+<li><em>Step functions</em> cut the range of a variable into <span class="math inline">\(K\)</span> distinct regions to produce a qualitative variable.</li>
+<li><em>Regression splines</em> are a flexible combination of polynomials and step functions that involve polynomial functions fit to data in <span class="math inline">\(K\)</span> distinct regions.</li>
+<li><em>Smoothing splines</em> are similar to regression splines but involve a smoothness penalty.</li>
+<li><em>Local regression</em> is similar to splines but allows smooth overlaps across regions.</li>
+<li><em>Generalized additive models</em> allows us to extend the above methods to deal with multiple predictors.</li>
+</ul>
+<div id="polynomial-regression" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Polynomial Regression</h2>
+<p>Polynomial regression involves raising one or more predictors to a degree <span class="math inline">\(d\)</span>, each with its own coefficient:</p>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + \dots + \beta_d x_i^4 + \epsilon_i.
+\]</span></p>
+<p>For a large enough degree <span class="math inline">\(d\)</span>, polynomial regression can produce an extremely non-linear curve, though it is unusual to use <span class="math inline">\(d\)</span> greater than 3 or 4 because the curve can become overly flexible and produce some strange shapes.</p>
+<p>Re-create Figure 7.1 with the <code>wage</code> data:</p>
+<div class="sourceCode" id="cb698"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb698-1"><a href="moving-beyond-linearity.html#cb698-1" aria-hidden="true" tabindex="-1"></a>wage <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Wage</span>
+<span id="cb698-2"><a href="moving-beyond-linearity.html#cb698-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-3"><a href="moving-beyond-linearity.html#cb698-3" aria-hidden="true" tabindex="-1"></a>wage_poly_4_linear_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">poly</span>(age, <span class="dv">4</span>), <span class="at">data =</span> wage)</span>
+<span id="cb698-4"><a href="moving-beyond-linearity.html#cb698-4" aria-hidden="true" tabindex="-1"></a>wage_poly_4_logistic_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">I</span>(wage <span class="sc">&gt;</span> <span class="dv">250</span>) <span class="sc">~</span> <span class="fu">poly</span>(age, <span class="dv">4</span>),</span>
+<span id="cb698-5"><a href="moving-beyond-linearity.html#cb698-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">data =</span> wage, <span class="at">family =</span> binomial)</span>
+<span id="cb698-6"><a href="moving-beyond-linearity.html#cb698-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-7"><a href="moving-beyond-linearity.html#cb698-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Grid of age values for predictions</span></span>
+<span id="cb698-8"><a href="moving-beyond-linearity.html#cb698-8" aria-hidden="true" tabindex="-1"></a>age_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">18</span>, <span class="dv">80</span>, <span class="at">length.out =</span> <span class="dv">63</span>)</span>
+<span id="cb698-9"><a href="moving-beyond-linearity.html#cb698-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-10"><a href="moving-beyond-linearity.html#cb698-10" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> wage_poly_4_linear_fit <span class="sc">%&gt;%</span></span>
+<span id="cb698-11"><a href="moving-beyond-linearity.html#cb698-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid),</span>
+<span id="cb698-12"><a href="moving-beyond-linearity.html#cb698-12" aria-hidden="true" tabindex="-1"></a>          <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>, <span class="at">level =</span> <span class="fl">0.50</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb698-13"><a href="moving-beyond-linearity.html#cb698-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb698-14"><a href="moving-beyond-linearity.html#cb698-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> wage, <span class="fu">aes</span>(<span class="at">y =</span> wage),</span>
+<span id="cb698-15"><a href="moving-beyond-linearity.html#cb698-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb698-16"><a href="moving-beyond-linearity.html#cb698-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted), <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb698-17"><a href="moving-beyond-linearity.html#cb698-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower),</span>
+<span id="cb698-18"><a href="moving-beyond-linearity.html#cb698-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb698-19"><a href="moving-beyond-linearity.html#cb698-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper),</span>
+<span id="cb698-20"><a href="moving-beyond-linearity.html#cb698-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb698-21"><a href="moving-beyond-linearity.html#cb698-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;wage&quot;</span>)</span>
+<span id="cb698-22"><a href="moving-beyond-linearity.html#cb698-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-23"><a href="moving-beyond-linearity.html#cb698-23" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> wage_poly_4_logistic_fit <span class="sc">%&gt;%</span></span>
+<span id="cb698-24"><a href="moving-beyond-linearity.html#cb698-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid),</span>
+<span id="cb698-25"><a href="moving-beyond-linearity.html#cb698-25" aria-hidden="true" tabindex="-1"></a>          <span class="at">type.predict =</span> <span class="st">&quot;link&quot;</span>, <span class="at">se_fit =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb698-26"><a href="moving-beyond-linearity.html#cb698-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb698-27"><a href="moving-beyond-linearity.html#cb698-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Have to compute CIs manually for logistic regression</span></span>
+<span id="cb698-28"><a href="moving-beyond-linearity.html#cb698-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">.lower =</span> .fitted <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> .se.fit,</span>
+<span id="cb698-29"><a href="moving-beyond-linearity.html#cb698-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">.upper =</span> .fitted <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> .se.fit,</span>
+<span id="cb698-30"><a href="moving-beyond-linearity.html#cb698-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert from log-odds to probability scales</span></span>
+<span id="cb698-31"><a href="moving-beyond-linearity.html#cb698-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(.fitted, .lower, .upper), <span class="sc">~</span> <span class="fu">exp</span>(.x) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(.x)))</span>
+<span id="cb698-32"><a href="moving-beyond-linearity.html#cb698-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb698-33"><a href="moving-beyond-linearity.html#cb698-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb698-34"><a href="moving-beyond-linearity.html#cb698-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="at">data =</span> wage <span class="sc">%&gt;%</span> <span class="fu">filter</span>(wage <span class="sc">&gt;</span> <span class="dv">250</span>),</span>
+<span id="cb698-35"><a href="moving-beyond-linearity.html#cb698-35" aria-hidden="true" tabindex="-1"></a>           <span class="at">sides =</span> <span class="st">&quot;t&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb698-36"><a href="moving-beyond-linearity.html#cb698-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="at">data =</span> wage <span class="sc">%&gt;%</span> <span class="fu">filter</span>(wage <span class="sc">&lt;=</span> <span class="dv">250</span>),</span>
+<span id="cb698-37"><a href="moving-beyond-linearity.html#cb698-37" aria-hidden="true" tabindex="-1"></a>           <span class="at">sides =</span> <span class="st">&quot;b&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb698-38"><a href="moving-beyond-linearity.html#cb698-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted), <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb698-39"><a href="moving-beyond-linearity.html#cb698-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb698-40"><a href="moving-beyond-linearity.html#cb698-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb698-41"><a href="moving-beyond-linearity.html#cb698-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb698-42"><a href="moving-beyond-linearity.html#cb698-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Pr(wage &gt; 250 | age)&quot;</span>)</span>
+<span id="cb698-43"><a href="moving-beyond-linearity.html#cb698-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb698-44"><a href="moving-beyond-linearity.html#cb698-44" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure7.1-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="step-functions" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> Step Functions</h2>
+<blockquote>
+<p>Using polynomial functions of the features as predictors in a linear model
+imposes a global structure on the non-linear function of <span class="math inline">\(X\)</span>. We can instead
+use step functions in order to avoid imposing such a global structure. Here
+we break the range of <span class="math inline">\(X\)</span> into <em>bins</em>, and fit a different constant in each bin.
+This amounts to converting a continuous variable into an <em>ordered categorical variable</em>.</p>
+</blockquote>
+<p>This involves using a set of <span class="math inline">\(K\)</span> cutpoints <span class="math inline">\(c_k\)</span> which corresponds to dummy variables <span class="math inline">\(C_k(X)\)</span>:</p>
+<p><span class="math display">\[
+\begin{align}
+C_0(X) &amp;= I(X &lt; c_1), \\
+C_1(X) &amp;= I(c_1 \leq X &lt; c_2), \\
+C_2(X) &amp;= I(c_2 \leq X &lt; c_3), \\
+&amp;\vdots \\
+C_{K-1}(X) &amp;= I(c_{K-1} \leq X &lt; c_K), \\
+C_K(X) &amp;= I(c_K \leq X),
+\end{align}
+\]</span></p>
+<p>where <span class="math inline">\(I()\)</span> is an <em>indicator</em> function that returns a 1 or 0 if the condition is true or false.
+The least squares linear model is then:</p>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 C_1(x_i) + \beta_2 C_2 (x_i) + \dots + \beta_K C_K (x_i) + \epsilon_i.
+\]</span></p>
+<p>To re-create Figure 7.2, I’ll use <code>cut</code> with 4 breaks to separate the <code>age</code> predictor:</p>
+<div class="sourceCode" id="cb699"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb699-1"><a href="moving-beyond-linearity.html#cb699-1" aria-hidden="true" tabindex="-1"></a>wage_step_linear_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">cut</span>(age, <span class="at">breaks =</span> <span class="dv">4</span>), <span class="at">data =</span> wage)</span>
+<span id="cb699-2"><a href="moving-beyond-linearity.html#cb699-2" aria-hidden="true" tabindex="-1"></a>wage_step_logistic_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">I</span>(wage <span class="sc">&gt;</span> <span class="dv">250</span>) <span class="sc">~</span> <span class="fu">cut</span>(age, <span class="at">breaks =</span> <span class="dv">4</span>),</span>
+<span id="cb699-3"><a href="moving-beyond-linearity.html#cb699-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">data =</span> wage, <span class="at">family =</span> binomial)</span>
+<span id="cb699-4"><a href="moving-beyond-linearity.html#cb699-4" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> wage_step_linear_fit <span class="sc">%&gt;%</span></span>
+<span id="cb699-5"><a href="moving-beyond-linearity.html#cb699-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid),</span>
+<span id="cb699-6"><a href="moving-beyond-linearity.html#cb699-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>, <span class="at">level =</span> <span class="fl">0.50</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb699-7"><a href="moving-beyond-linearity.html#cb699-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb699-8"><a href="moving-beyond-linearity.html#cb699-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> wage, <span class="fu">aes</span>(<span class="at">y =</span> wage),</span>
+<span id="cb699-9"><a href="moving-beyond-linearity.html#cb699-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb699-10"><a href="moving-beyond-linearity.html#cb699-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted), <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb699-11"><a href="moving-beyond-linearity.html#cb699-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower),</span>
+<span id="cb699-12"><a href="moving-beyond-linearity.html#cb699-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb699-13"><a href="moving-beyond-linearity.html#cb699-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper),</span>
+<span id="cb699-14"><a href="moving-beyond-linearity.html#cb699-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb699-15"><a href="moving-beyond-linearity.html#cb699-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;wage&quot;</span>)</span>
+<span id="cb699-16"><a href="moving-beyond-linearity.html#cb699-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb699-17"><a href="moving-beyond-linearity.html#cb699-17" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> wage_step_logistic_fit <span class="sc">%&gt;%</span></span>
+<span id="cb699-18"><a href="moving-beyond-linearity.html#cb699-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid),</span>
+<span id="cb699-19"><a href="moving-beyond-linearity.html#cb699-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">type.predict =</span> <span class="st">&quot;link&quot;</span>, <span class="at">se_fit =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb699-20"><a href="moving-beyond-linearity.html#cb699-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb699-21"><a href="moving-beyond-linearity.html#cb699-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">.lower =</span> .fitted <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> .se.fit,</span>
+<span id="cb699-22"><a href="moving-beyond-linearity.html#cb699-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">.upper =</span> .fitted <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> .se.fit,</span>
+<span id="cb699-23"><a href="moving-beyond-linearity.html#cb699-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(.fitted, .lower, .upper), <span class="sc">~</span> <span class="fu">exp</span>(.x) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(.x)))</span>
+<span id="cb699-24"><a href="moving-beyond-linearity.html#cb699-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb699-25"><a href="moving-beyond-linearity.html#cb699-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb699-26"><a href="moving-beyond-linearity.html#cb699-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="at">data =</span> wage <span class="sc">%&gt;%</span> <span class="fu">filter</span>(wage <span class="sc">&gt;</span> <span class="dv">250</span>),</span>
+<span id="cb699-27"><a href="moving-beyond-linearity.html#cb699-27" aria-hidden="true" tabindex="-1"></a>           <span class="at">sides =</span> <span class="st">&quot;t&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb699-28"><a href="moving-beyond-linearity.html#cb699-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="at">data =</span> wage <span class="sc">%&gt;%</span> <span class="fu">filter</span>(wage <span class="sc">&lt;=</span> <span class="dv">250</span>),</span>
+<span id="cb699-29"><a href="moving-beyond-linearity.html#cb699-29" aria-hidden="true" tabindex="-1"></a>           <span class="at">sides =</span> <span class="st">&quot;b&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb699-30"><a href="moving-beyond-linearity.html#cb699-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted), <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb699-31"><a href="moving-beyond-linearity.html#cb699-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb699-32"><a href="moving-beyond-linearity.html#cb699-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;darkgreen&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb699-33"><a href="moving-beyond-linearity.html#cb699-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb699-34"><a href="moving-beyond-linearity.html#cb699-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Pr(wage &gt; 250 | age)&quot;</span>)</span>
+<span id="cb699-35"><a href="moving-beyond-linearity.html#cb699-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb699-36"><a href="moving-beyond-linearity.html#cb699-36" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-385-1.png" width="576" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>Unfortunately, unless there are natural breakpoints in the predictors,
+piecewise-constant functions can miss the action. For example, in the left- hand
+panel of Figure 7.2, the first bin clearly misses the increasing trend
+of <code>wage</code> with <code>age</code>. Nevertheless, step function approaches are very popular
+in biostatistics and epidemiology, among other disciplines. For example,
+5-year age groups are often used to define the bins.</p>
+</blockquote>
+</div>
+<div id="basis-functions" class="section level2" number="7.3">
+<h2><span class="header-section-number">7.3</span> Basis Functions</h2>
+<blockquote>
+<p>Polynomial and piecewise-constant regression models are in fact special
+cases of a basis function approach. The idea is to have at hand a fam ily of
+functions or transformations that can be applied to a variable <span class="math inline">\(X\)</span>:
+<span class="math inline">\(b_1(X), b_2(X), \dots, b_K(X)\)</span>. Instead of fitting a linear model in <span class="math inline">\(X\)</span>, we fit the
+model</p>
+</blockquote>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 b_1(x_i) + \beta_2 b_2 (x_i) + \dots + \beta_K b_K (x_i) + \epsilon_i.
+\]</span></p>
+<p>In polynomial regression, these basis functions were <span class="math inline">\(b_j(x_i) = x_i^j\)</span>.
+In piecewise-constant regression, they were <span class="math inline">\(b_j(x_i) = I(c_j \leq x_i &lt; c_{j+1})\)</span>.
+Despite the increased complexity, this still amounts to estimating the unknown regression coefficients <span class="math inline">\(\beta\)</span>, for which all the least squares tools and models apply.</p>
+</div>
+<div id="regression-splines" class="section level2" number="7.4">
+<h2><span class="header-section-number">7.4</span> Regression Splines</h2>
+<div id="piecewise-polynomials" class="section level3" number="7.4.1">
+<h3><span class="header-section-number">7.4.1</span> Piecewise Polynomials</h3>
+<blockquote>
+<p>Instead of fitting a high-degree polynomial over the entire range of <span class="math inline">\(X\)</span>, piecewise
+polynomial regression involves fitting separate low-degree polynomials
+over different regions of <span class="math inline">\(X\)</span>. For example, a piecewise cubic polynomial works
+by fitting a cubic regression model of the form</p>
+</blockquote>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \beta_3 x_i^3 + \epsilon_i.
+\]</span></p>
+<blockquote>
+<p>where the coefficients <span class="math inline">\(\beta_0, \beta_1, \beta_2,\)</span> and <span class="math inline">\(\beta_3\)</span> differ in parts of the range of <span class="math inline">\(X\)</span>.
+The points where the coefficients change are called <em>knots</em>.</p>
+</blockquote>
+<p>With 0 knots, we have the standard cubic polynomial with <span class="math inline">\(d = 3\)</span> as described in section 7.1.
+With a single knot at point <span class="math inline">\(c\)</span>, this takes the form:</p>
+<p><span class="math display">\[
+\begin{align}
+y_i &amp;= \beta_{01} + \beta_{11} x_i + \beta_{21} x_i^2 + \beta_{31} x_i^3 + \epsilon_i \ \ \ \text{if} \ \  x_i &lt; c \\
+&amp;= \beta_{02} + \beta_{22} x_i + \beta_{22} x_i^2 + \beta_{32} x_i^3 + \epsilon_i \ \ \ \text{if} \ \  x_i \geq c.
+\end{align}
+\]</span></p>
+<p>Functionally, this is essentially fitting two separate regression equations on subsets of <span class="math inline">\(X\)</span>, with 8 degrees of freedom for the eight regression coefficients.</p>
+</div>
+<div id="constraints-and-splines" class="section level3" number="7.4.2">
+<h3><span class="header-section-number">7.4.2</span> Constraints and Splines</h3>
+<p>The problem with piecewise polynomials is that the resulting fit can be discontinuous, like in the top left panel of Figure 7.3.
+To remedy this, we can fit a piecewise polynomial under the <em>constraint</em> that the fitted curve must be continuous, like in the top right panel.
+The bottom left panel shows the result of two additional constraints: that the first and second derivative are continuous at <code>age = 50</code> – this is called a <em>cubic spline</em>, which generally has <span class="math inline">\(K + 4\)</span> degrees of freedom (=5 in this example.
+The lower right panel shows a <em>linear spline</em>.</p>
+</div>
+<div id="the-spline-basis-representation" class="section level3" number="7.4.3">
+<h3><span class="header-section-number">7.4.3</span> The Spline Basis Representation</h3>
+<p>In order to implement the continuity constraints for regression splines, we can use the basis model.
+A cubic spline with <span class="math inline">\(K\)</span> knots can be modeled as</p>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 b_1(x_i) + \beta_2 b_2 (x_i) + \dots + \beta_{K+3 b_{K+3} (x_i) + \epsilon_i,
+\]</span></p>
+<p>for an appropriate choice of basis functions <span class="math inline">\(b_1, b_2, \dots, b_{K+3}\)</span>.
+The model can then be fit with least squares.</p>
+<p>There are many equivalent representations of cubic splines using different basis functions.
+The most direct is to start with the cubic polynomial and then add one <em>truncated power basis function</em> per knot:</p>
+<p><span class="math display">\[
+\begin{align}
+h(x, \xi) = (x - \xi)^2_+ &amp;= (x - \xi)^3 \ \ \ \text{if} \ \ \ x &gt; \xi \\ 
+&amp;= 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \text{otherwise},
+\end{align}
+\]</span></p>
+<p>where <span class="math inline">\(\xi\)</span> is the knot.
+One can show that adding the term <span class="math inline">\(\beta_4 h(x, \xi)\)</span> to the cubic spline model above will lead to a discontinuity in only the third derivative at <span class="math inline">\(\xi\)</span>, but remain continuous in the first and second derivatives.</p>
+<p>Unfortunately, these splines have high variance at boundaries of the predictors.
+This can be reduced with <em>natural splines</em> which have additional constraints at the boundaries to produce more stable estimates.
+We can show this with confidence intervals of the models fit with cubic and natural cubic splines, as in Figure 7.4:</p>
+<div class="sourceCode" id="cb700"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb700-1"><a href="moving-beyond-linearity.html#cb700-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splines)</span>
+<span id="cb700-2"><a href="moving-beyond-linearity.html#cb700-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb700-3"><a href="moving-beyond-linearity.html#cb700-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Use just a subset of the data to mimic the figure</span></span>
+<span id="cb700-4"><a href="moving-beyond-linearity.html#cb700-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20</span>)</span>
+<span id="cb700-5"><a href="moving-beyond-linearity.html#cb700-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> wage <span class="sc">%&gt;%</span></span>
+<span id="cb700-6"><a href="moving-beyond-linearity.html#cb700-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(wage <span class="sc">&lt;</span> <span class="dv">300</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb700-7"><a href="moving-beyond-linearity.html#cb700-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">500</span>)</span>
+<span id="cb700-8"><a href="moving-beyond-linearity.html#cb700-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb700-9"><a href="moving-beyond-linearity.html#cb700-9" aria-hidden="true" tabindex="-1"></a>wage_bs_linear_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">bs</span>(age, <span class="at">knots =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">60</span>)), <span class="at">data =</span> d)</span>
+<span id="cb700-10"><a href="moving-beyond-linearity.html#cb700-10" aria-hidden="true" tabindex="-1"></a>wage_ns_linear_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">ns</span>(age, <span class="at">knots =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">60</span>)), <span class="at">data =</span> d)</span>
+<span id="cb700-11"><a href="moving-beyond-linearity.html#cb700-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb700-12"><a href="moving-beyond-linearity.html#cb700-12" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb700-13"><a href="moving-beyond-linearity.html#cb700-13" aria-hidden="true" tabindex="-1"></a>  wage_bs_linear_fit <span class="sc">%&gt;%</span></span>
+<span id="cb700-14"><a href="moving-beyond-linearity.html#cb700-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid), <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb700-15"><a href="moving-beyond-linearity.html#cb700-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;Cubic spline&quot;</span>),</span>
+<span id="cb700-16"><a href="moving-beyond-linearity.html#cb700-16" aria-hidden="true" tabindex="-1"></a>  wage_ns_linear_fit <span class="sc">%&gt;%</span></span>
+<span id="cb700-17"><a href="moving-beyond-linearity.html#cb700-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid), <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb700-18"><a href="moving-beyond-linearity.html#cb700-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;Natural cubic spline&quot;</span>)</span>
+<span id="cb700-19"><a href="moving-beyond-linearity.html#cb700-19" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb700-20"><a href="moving-beyond-linearity.html#cb700-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model =</span> <span class="fu">fct_rev</span>(model)) <span class="sc">%&gt;%</span></span>
+<span id="cb700-21"><a href="moving-beyond-linearity.html#cb700-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb700-22"><a href="moving-beyond-linearity.html#cb700-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> d, <span class="fu">aes</span>(<span class="at">y =</span> wage),</span>
+<span id="cb700-23"><a href="moving-beyond-linearity.html#cb700-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb700-24"><a href="moving-beyond-linearity.html#cb700-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted, <span class="at">color =</span> model), <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb700-25"><a href="moving-beyond-linearity.html#cb700-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower, <span class="at">color =</span> model), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb700-26"><a href="moving-beyond-linearity.html#cb700-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper, <span class="at">color =</span> model), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb700-27"><a href="moving-beyond-linearity.html#cb700-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">40</span>, <span class="dv">60</span>), <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb700-28"><a href="moving-beyond-linearity.html#cb700-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">300</span>)) <span class="sc">+</span></span>
+<span id="cb700-29"><a href="moving-beyond-linearity.html#cb700-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.9</span>)) <span class="sc">+</span></span>
+<span id="cb700-30"><a href="moving-beyond-linearity.html#cb700-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure7.4-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="choosing-the-number-and-locations-of-the-knots" class="section level3" number="7.4.4">
+<h3><span class="header-section-number">7.4.4</span> Choosing the Number and Locations of the Knots</h3>
+<blockquote>
+<p>When we fit a spline, where should we place the knots? The regression
+spline is most flexible in regions that contain a lot of knots, because in
+those regions the polynomial coefficients can change rapidly. Hence, one
+option is to place more knots in places where we feel the function might
+vary most rapidly, and to place fewer knots where it seems more stable.
+While this option can work well, in practice it is common to place knots in
+a uniform fashion. One way to do this is to specify the desired degrees of
+freedom, and then have the software automatically place the corresponding
+number of knots at uniform quantiles of the data.</p>
+</blockquote>
+<p>The <code>splines::ns()</code> function, when provided the <code>df</code> argument, computes knot locations based on percentiles.
+For the <code>age</code> data and <code>df = 4</code> (3 knots):</p>
+<div class="sourceCode" id="cb701"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb701-1"><a href="moving-beyond-linearity.html#cb701-1" aria-hidden="true" tabindex="-1"></a>age_ns <span class="ot">&lt;-</span> <span class="fu">ns</span>(wage<span class="sc">$</span>age, <span class="at">df =</span> <span class="dv">4</span>)</span>
+<span id="cb701-2"><a href="moving-beyond-linearity.html#cb701-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(age_ns, <span class="st">&quot;knots&quot;</span>)</span></code></pre></div>
+<pre><code>##   25%   50%   75% 
+## 33.75 42.00 51.00</code></pre>
+<p>Fit the model and re-create Figure 7.5:</p>
+<div class="sourceCode" id="cb703"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb703-1"><a href="moving-beyond-linearity.html#cb703-1" aria-hidden="true" tabindex="-1"></a>wage_ns_linear_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">ns</span>(age, <span class="at">df =</span> <span class="dv">4</span>), <span class="at">data =</span> wage)</span>
+<span id="cb703-2"><a href="moving-beyond-linearity.html#cb703-2" aria-hidden="true" tabindex="-1"></a>wage_ns_logistic_fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">I</span>(wage <span class="sc">&gt;</span> <span class="dv">250</span>) <span class="sc">~</span> <span class="fu">ns</span>(age, <span class="at">df =</span> <span class="dv">4</span>),</span>
+<span id="cb703-3"><a href="moving-beyond-linearity.html#cb703-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data =</span> wage, <span class="at">family =</span> binomial)</span>
+<span id="cb703-4"><a href="moving-beyond-linearity.html#cb703-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb703-5"><a href="moving-beyond-linearity.html#cb703-5" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> wage_ns_linear_fit <span class="sc">%&gt;%</span></span>
+<span id="cb703-6"><a href="moving-beyond-linearity.html#cb703-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid), <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb703-7"><a href="moving-beyond-linearity.html#cb703-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb703-8"><a href="moving-beyond-linearity.html#cb703-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> wage, <span class="fu">aes</span>(<span class="at">y =</span> wage),</span>
+<span id="cb703-9"><a href="moving-beyond-linearity.html#cb703-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb703-10"><a href="moving-beyond-linearity.html#cb703-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb703-11"><a href="moving-beyond-linearity.html#cb703-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb703-12"><a href="moving-beyond-linearity.html#cb703-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb703-13"><a href="moving-beyond-linearity.html#cb703-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">attr</span>(age_ns, <span class="st">&quot;knots&quot;</span>), <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div>
+<pre><code>## Warning: &#39;newdata&#39; had 63 rows but variables found have 3000 rows</code></pre>
+<div class="sourceCode" id="cb705"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb705-1"><a href="moving-beyond-linearity.html#cb705-1" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> wage_ns_logistic_fit <span class="sc">%&gt;%</span></span>
+<span id="cb705-2"><a href="moving-beyond-linearity.html#cb705-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid),</span>
+<span id="cb705-3"><a href="moving-beyond-linearity.html#cb705-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">type.predict =</span> <span class="st">&quot;link&quot;</span>, <span class="at">se_fit =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb705-4"><a href="moving-beyond-linearity.html#cb705-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb705-5"><a href="moving-beyond-linearity.html#cb705-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.lower =</span> .fitted <span class="sc">-</span> <span class="fl">1.96</span> <span class="sc">*</span> .se.fit,</span>
+<span id="cb705-6"><a href="moving-beyond-linearity.html#cb705-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.upper =</span> .fitted <span class="sc">+</span> <span class="fl">1.96</span> <span class="sc">*</span> .se.fit,</span>
+<span id="cb705-7"><a href="moving-beyond-linearity.html#cb705-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(.fitted, .lower, .upper), <span class="sc">~</span> <span class="fu">exp</span>(.x) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(.x)))</span>
+<span id="cb705-8"><a href="moving-beyond-linearity.html#cb705-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb705-9"><a href="moving-beyond-linearity.html#cb705-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb705-10"><a href="moving-beyond-linearity.html#cb705-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="at">data =</span> wage <span class="sc">%&gt;%</span> <span class="fu">filter</span>(wage <span class="sc">&gt;</span> <span class="dv">250</span>),</span>
+<span id="cb705-11"><a href="moving-beyond-linearity.html#cb705-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">sides =</span> <span class="st">&quot;t&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb705-12"><a href="moving-beyond-linearity.html#cb705-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rug</span>(<span class="at">data =</span> wage <span class="sc">%&gt;%</span> <span class="fu">filter</span>(wage <span class="sc">&lt;=</span> <span class="dv">250</span>),</span>
+<span id="cb705-13"><a href="moving-beyond-linearity.html#cb705-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">sides =</span> <span class="st">&quot;b&quot;</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb705-14"><a href="moving-beyond-linearity.html#cb705-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb705-15"><a href="moving-beyond-linearity.html#cb705-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .lower), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb705-16"><a href="moving-beyond-linearity.html#cb705-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .upper), <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb705-17"><a href="moving-beyond-linearity.html#cb705-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">attr</span>(age_ns, <span class="st">&quot;knots&quot;</span>), <span class="at">lty =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb705-18"><a href="moving-beyond-linearity.html#cb705-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb705-19"><a href="moving-beyond-linearity.html#cb705-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Pr(wage &gt; 250 | age)&quot;</span>)</span>
+<span id="cb705-20"><a href="moving-beyond-linearity.html#cb705-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb705-21"><a href="moving-beyond-linearity.html#cb705-21" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure7.5-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>The automatic choice of knot location is usually sufficient, but how do we decide on the number of knots <span class="math inline">\(K\)</span>?
+The same way we’ve chosen any model hyperparameters: resampling.
+For this, we turn to <code>tidymodels</code>, which has <code>step_bs()</code> and <code>step_ns()</code> function for specifying basis splines and natural basis splines.</p>
+<div class="sourceCode" id="cb706"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb706-1"><a href="moving-beyond-linearity.html#cb706-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">93</span>)</span>
+<span id="cb706-2"><a href="moving-beyond-linearity.html#cb706-2" aria-hidden="true" tabindex="-1"></a>wage_resamples <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(wage, <span class="at">v =</span> <span class="dv">10</span>)</span>
+<span id="cb706-3"><a href="moving-beyond-linearity.html#cb706-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb706-4"><a href="moving-beyond-linearity.html#cb706-4" aria-hidden="true" tabindex="-1"></a>wage_lm_bs_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(wage <span class="sc">~</span> age, <span class="at">data =</span> wage) <span class="sc">%&gt;%</span></span>
+<span id="cb706-5"><a href="moving-beyond-linearity.html#cb706-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_bs</span>(age, <span class="at">deg_free =</span> <span class="fu">tune</span>(), <span class="at">degree =</span> <span class="fu">tune</span>())</span>
+<span id="cb706-6"><a href="moving-beyond-linearity.html#cb706-6" aria-hidden="true" tabindex="-1"></a>wage_lm_ns_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(wage <span class="sc">~</span> age, <span class="at">data =</span> wage) <span class="sc">%&gt;%</span></span>
+<span id="cb706-7"><a href="moving-beyond-linearity.html#cb706-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_ns</span>(age, <span class="at">deg_free =</span> <span class="fu">tune</span>())</span>
+<span id="cb706-8"><a href="moving-beyond-linearity.html#cb706-8" aria-hidden="true" tabindex="-1"></a>lm_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>()</span>
+<span id="cb706-9"><a href="moving-beyond-linearity.html#cb706-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb706-10"><a href="moving-beyond-linearity.html#cb706-10" aria-hidden="true" tabindex="-1"></a>wage_lm_bs_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb706-11"><a href="moving-beyond-linearity.html#cb706-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb706-12"><a href="moving-beyond-linearity.html#cb706-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage_lm_bs_rec)</span>
+<span id="cb706-13"><a href="moving-beyond-linearity.html#cb706-13" aria-hidden="true" tabindex="-1"></a>wage_lm_ns_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb706-14"><a href="moving-beyond-linearity.html#cb706-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lm_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb706-15"><a href="moving-beyond-linearity.html#cb706-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(wage_lm_ns_rec)</span></code></pre></div>
+<p>If I understand Figure 7.6 correctly, the results being displayed in the right panel aren’t all cubic splines because those models can’t have &lt;3 degrees of freedom.
+For example, if I set degrees of freedom to <code>df = 2</code> and the polynomial degree of freedom to <code>degree = 3</code>, then <code>bs()</code> will calculate a negative number of knots.
+It will automatically adjust <code>degree</code> so the number of knots equals 0 and return a warning:</p>
+<div class="sourceCode" id="cb707"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb707-1"><a href="moving-beyond-linearity.html#cb707-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">bs</span>(age, <span class="at">df =</span> <span class="dv">2</span>, <span class="at">degree =</span> <span class="dv">3</span>), <span class="at">data =</span> wage)</span></code></pre></div>
+<pre><code>## Warning in bs(age, df = 2, degree = 3): &#39;df&#39; was too small; have used 3</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = wage ~ bs(age, df = 2, degree = 3), data = wage)
+## 
+## Coefficients:
+##                  (Intercept)  bs(age, df = 2, degree = 3)1  
+##                        58.69                        102.64  
+## bs(age, df = 2, degree = 3)2  bs(age, df = 2, degree = 3)3  
+##                        48.76                         40.80</code></pre>
+<p>So in choosing the hyperparameters for these models, I will vary both <code>deg_free</code> and <code>degree</code> so that it fits a linear spline, quadratic spline, and 7 cubic splines (with varying numbers of knots) as follows:</p>
+<div class="sourceCode" id="cb710"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb710-1"><a href="moving-beyond-linearity.html#cb710-1" aria-hidden="true" tabindex="-1"></a>bs_df_grid <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb710-2"><a href="moving-beyond-linearity.html#cb710-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">deg_free =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">degree =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>),</span>
+<span id="cb710-3"><a href="moving-beyond-linearity.html#cb710-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">deg_free =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">degree =</span> <span class="dv">3</span>)</span>
+<span id="cb710-4"><a href="moving-beyond-linearity.html#cb710-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb710-5"><a href="moving-beyond-linearity.html#cb710-5" aria-hidden="true" tabindex="-1"></a>bs_df_grid</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 2
+##    deg_free degree
+##       &lt;int&gt;  &lt;dbl&gt;
+##  1        1      1
+##  2        2      2
+##  3        3      3
+##  4        4      3
+##  5        5      3
+##  6        6      3
+##  7        7      3
+##  8        8      3
+##  9        9      3
+## 10       10      3</code></pre>
+<div class="sourceCode" id="cb712"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb712-1"><a href="moving-beyond-linearity.html#cb712-1" aria-hidden="true" tabindex="-1"></a>wage_lm_bs_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb712-2"><a href="moving-beyond-linearity.html#cb712-2" aria-hidden="true" tabindex="-1"></a>  wage_lm_bs_workflow, <span class="at">resamples =</span> wage_resamples,</span>
+<span id="cb712-3"><a href="moving-beyond-linearity.html#cb712-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> bs_df_grid</span>
+<span id="cb712-4"><a href="moving-beyond-linearity.html#cb712-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>The way degrees of freedom work in natural splines doesn’t require this adjustment, I can just provide <code>deg_free = 1:10</code>:</p>
+<div class="sourceCode" id="cb713"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb713-1"><a href="moving-beyond-linearity.html#cb713-1" aria-hidden="true" tabindex="-1"></a>wage_lm_ns_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb713-2"><a href="moving-beyond-linearity.html#cb713-2" aria-hidden="true" tabindex="-1"></a>  wage_lm_ns_workflow, <span class="at">resamples =</span> wage_resamples,</span>
+<span id="cb713-3"><a href="moving-beyond-linearity.html#cb713-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> bs_df_grid <span class="sc">%&gt;%</span> <span class="fu">select</span>(deg_free)</span>
+<span id="cb713-4"><a href="moving-beyond-linearity.html#cb713-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Finally, re-create Figure 7.6:</p>
+<div class="sourceCode" id="cb714"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb714-1"><a href="moving-beyond-linearity.html#cb714-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(wage_lm_ns_tune) <span class="sc">%&gt;%</span></span>
+<span id="cb714-2"><a href="moving-beyond-linearity.html#cb714-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb714-3"><a href="moving-beyond-linearity.html#cb714-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> mean<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb714-4"><a href="moving-beyond-linearity.html#cb714-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> deg_free, <span class="at">y =</span> mse)) <span class="sc">+</span></span>
+<span id="cb714-5"><a href="moving-beyond-linearity.html#cb714-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb714-6"><a href="moving-beyond-linearity.html#cb714-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">fill =</span> <span class="st">&quot;red&quot;</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb714-7"><a href="moving-beyond-linearity.html#cb714-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Degrees of freedom of natural spline&quot;</span>,</span>
+<span id="cb714-8"><a href="moving-beyond-linearity.html#cb714-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>))  <span class="sc">+</span></span>
+<span id="cb714-9"><a href="moving-beyond-linearity.html#cb714-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Mean squared error&quot;</span>)</span>
+<span id="cb714-10"><a href="moving-beyond-linearity.html#cb714-10" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">collect_metrics</span>(wage_lm_bs_tune) <span class="sc">%&gt;%</span></span>
+<span id="cb714-11"><a href="moving-beyond-linearity.html#cb714-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb714-12"><a href="moving-beyond-linearity.html#cb714-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mse =</span> mean<span class="sc">^</span><span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb714-13"><a href="moving-beyond-linearity.html#cb714-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> deg_free, <span class="at">y =</span> mse)) <span class="sc">+</span></span>
+<span id="cb714-14"><a href="moving-beyond-linearity.html#cb714-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">&quot;blue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb714-15"><a href="moving-beyond-linearity.html#cb714-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>, <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb714-16"><a href="moving-beyond-linearity.html#cb714-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Degrees of freedom of cubic spline&quot;</span>,</span>
+<span id="cb714-17"><a href="moving-beyond-linearity.html#cb714-17" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>))  <span class="sc">+</span></span>
+<span id="cb714-18"><a href="moving-beyond-linearity.html#cb714-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb714-19"><a href="moving-beyond-linearity.html#cb714-19" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure7.6-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="comparison-to-polynomial-regression" class="section level3" number="7.4.5">
+<h3><span class="header-section-number">7.4.5</span> Comparison to Polynomial Regression</h3>
+<div class="sourceCode" id="cb715"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb715-1"><a href="moving-beyond-linearity.html#cb715-1" aria-hidden="true" tabindex="-1"></a>wage_ns_15_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">ns</span>(age, <span class="at">df =</span> <span class="dv">15</span>), <span class="at">data =</span> wage)</span>
+<span id="cb715-2"><a href="moving-beyond-linearity.html#cb715-2" aria-hidden="true" tabindex="-1"></a>wage_poly_15_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(wage <span class="sc">~</span> <span class="fu">poly</span>(age, <span class="at">degree =</span> <span class="dv">15</span>), <span class="at">data =</span> wage)</span>
+<span id="cb715-3"><a href="moving-beyond-linearity.html#cb715-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb715-4"><a href="moving-beyond-linearity.html#cb715-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb715-5"><a href="moving-beyond-linearity.html#cb715-5" aria-hidden="true" tabindex="-1"></a>  wage_ns_15_fit <span class="sc">%&gt;%</span></span>
+<span id="cb715-6"><a href="moving-beyond-linearity.html#cb715-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> age_grid)) <span class="sc">%&gt;%</span></span>
+<span id="cb715-7"><a href="moving-beyond-linearity.html#cb715-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;Natural cubic spline&quot;</span>),</span>
+<span id="cb715-8"><a href="moving-beyond-linearity.html#cb715-8" aria-hidden="true" tabindex="-1"></a>  wage_poly_15_fit <span class="sc">%&gt;%</span></span>
+<span id="cb715-9"><a href="moving-beyond-linearity.html#cb715-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extend the age range a bit to see more of the fit</span></span>
+<span id="cb715-10"><a href="moving-beyond-linearity.html#cb715-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(<span class="at">newdata =</span> <span class="fu">tibble</span>(<span class="at">age =</span> <span class="fu">c</span>(age_grid, <span class="fl">80.5</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb715-11"><a href="moving-beyond-linearity.html#cb715-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">&quot;Polynomial&quot;</span>)</span>
+<span id="cb715-12"><a href="moving-beyond-linearity.html#cb715-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb715-13"><a href="moving-beyond-linearity.html#cb715-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> age)) <span class="sc">+</span></span>
+<span id="cb715-14"><a href="moving-beyond-linearity.html#cb715-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> wage, <span class="fu">aes</span>(<span class="at">y =</span> wage),</span>
+<span id="cb715-15"><a href="moving-beyond-linearity.html#cb715-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">color =</span> <span class="st">&quot;grey50&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb715-16"><a href="moving-beyond-linearity.html#cb715-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> .fitted, <span class="at">color =</span> model), <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb715-17"><a href="moving-beyond-linearity.html#cb715-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.8</span>, <span class="fl">0.8</span>)) <span class="sc">+</span></span>
+<span id="cb715-18"><a href="moving-beyond-linearity.html#cb715-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">color =</span> <span class="cn">NULL</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure7.7-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="smoothing-splines" class="section level2" number="7.5">
+<h2><span class="header-section-number">7.5</span> Smoothing Splines</h2>
+<div id="an-overview-of-smoothing-splines" class="section level3" number="7.5.1">
+<h3><span class="header-section-number">7.5.1</span> An Overview of Smoothing Splines</h3>
+<p>To fit a curve <span class="math inline">\(g(x)\)</span> to a set of data, we want <span class="math inline">\(\text{RSS} = \sum_{i=1}^n (y_i - g(x_i))^2\)</span> to be small.
+If there are no constraints on <span class="math inline">\(g(x)\)</span>, however, then it will simply overfit the data completely for <span class="math inline">\(\text{RSS} = 0\)</span>.</p>
+<p>There are a number of ways to ensure that <span class="math inline">\(g\)</span> is smooth.
+One way is to find <span class="math inline">\(g\)</span> that minimizes</p>
+<p><span class="math display">\[
+\text{RSS} + \lambda \int g&#39;&#39; (t)^2 dt
+\]</span></p>
+<p>where <span class="math inline">\(\lambda\)</span> is a non-negative penalty parameter (that will control the bias-variance trade-off as we’ve seen before).
+The function <span class="math inline">\(g\)</span> that minimizes the above is known as a <em>smoothing spline</em>.
+By placing the constraint on the second derivative <span class="math inline">\(g&#39;&#39;\)</span>, we encourage <span class="math inline">\(g\)</span> to be smooth.</p>
+<p>It turns out that the optimal <span class="math inline">\(g(x)\)</span> is a natural cubic polynomial with knots at unique values of <span class="math inline">\(x\)</span> (and continuous first and second derivatives at each knot).
+However, it is not the same one we would get with the basis function approach in Section 7.4.3 with knots at each value of <span class="math inline">\(x\)</span> – rather, it is a <em>shrunken</em> version of that spline, where <span class="math inline">\(\lambda\)</span> controls the level of shrinkage</p>
+</div>
+<div id="choosing-the-smoothing-parameter-lambda" class="section level3" number="7.5.2">
+<h3><span class="header-section-number">7.5.2</span> Choosing the Smoothing Parameter <span class="math inline">\(\lambda\)</span></h3>
+</div>
+</div>
+<div id="reproducibility-4" class="section level2 unnumbered">
+<h2>Reproducibility</h2>
+<div class="sourceCode" id="cb716"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb716-1"><a href="moving-beyond-linearity.html#cb716-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2022-04-13 22:23:54 AST&quot;</code></pre>
+<div class="sourceCode" id="cb718"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb718-1"><a href="moving-beyond-linearity.html#cb718-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
+<span id="cb718-2"><a href="moving-beyond-linearity.html#cb718-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
+<span id="cb718-3"><a href="moving-beyond-linearity.html#cb718-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
+<span id="cb718-4"><a href="moving-beyond-linearity.html#cb718-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb718-5"><a href="moving-beyond-linearity.html#cb718-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
+## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
+## Head:     [bda4b37] 2022-04-13: Started chapter 7</code></pre>
+<div class="sourceCode" id="cb720"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb720-1"><a href="moving-beyond-linearity.html#cb720-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
+<pre><code>## - Session info ---------------------------------------------------------------
+##  setting  value                       
+##  version  R version 4.1.3 (2022-03-10)
+##  os       Windows 10 x64              
+##  system   x86_64, mingw32             
+##  ui       RTerm                       
+##  language (EN)                        
+##  collate  English_Canada.1252         
+##  ctype    English_Canada.1252         
+##  tz       America/Curacao             
+##  date     2022-04-13                  
+## 
+## - Packages -------------------------------------------------------------------
+##  package        * version    date       lib
+##  abind            1.4-5      2016-07-21 [1]
+##  assertthat       0.2.1      2019-03-21 [1]
+##  backports        1.2.1      2020-12-09 [1]
+##  base64enc        0.1-3      2015-07-28 [1]
+##  bayestestR       0.10.5     2021-07-26 [1]
+##  BiocParallel     1.28.3     2021-12-09 [1]
+##  bit              4.0.4      2020-08-04 [1]
+##  bit64            4.0.5      2020-08-30 [1]
+##  bookdown         0.24       2021-09-02 [1]
+##  boot             1.3-28     2021-05-03 [2]
+##  broom          * 0.7.10     2021-10-31 [1]
+##  bslib            0.2.5.1    2021-05-18 [1]
+##  cachem           1.0.6      2021-08-19 [1]
+##  car              3.0-12     2021-11-06 [1]
+##  carData          3.0-4      2020-05-22 [1]
+##  cellranger       1.1.0      2016-07-27 [1]
+##  checkmate        2.0.0      2020-02-06 [1]
+##  class            7.3-20     2022-01-16 [2]
+##  cli              3.2.0      2022-02-14 [1]
+##  coda             0.19-4     2020-09-30 [1]
+##  codetools        0.2-18     2020-11-04 [2]
+##  colorspace       2.0-3      2022-02-21 [1]
+##  combinat         0.0-8      2012-10-29 [1]
+##  conflicted       1.0.4      2019-06-21 [1]
+##  corpcor          1.6.10     2021-09-16 [1]
+##  corrr          * 0.4.3      2020-11-24 [1]
+##  crayon           1.5.1      2022-03-26 [1]
+##  datawizard       0.1.0      2021-06-18 [1]
+##  DBI              1.1.2      2021-12-20 [1]
+##  dbplyr           2.1.1      2021-04-06 [1]
+##  DEoptimR         1.0-9      2021-05-24 [1]
+##  dials          * 0.0.10     2021-09-10 [1]
+##  DiceDesign       1.9        2021-02-13 [1]
+##  digest           0.6.29     2021-12-01 [1]
+##  discrim        * 0.1.3      2021-07-21 [1]
+##  distill          1.3        2021-10-13 [1]
+##  distributional   0.2.2      2021-02-02 [1]
+##  doParallel     * 1.0.16     2020-10-16 [1]
+##  downlit          0.4.0      2021-10-29 [1]
+##  dplyr          * 1.0.8      2022-02-08 [1]
+##  dunnr          * 0.2.5      2022-01-15 [1]
+##  effectsize       0.4.5      2021-05-25 [1]
+##  ellipse          0.4.2      2020-05-27 [1]
+##  ellipsis         0.3.2      2021-04-29 [1]
+##  emmeans          1.7.0      2021-09-29 [1]
+##  equatiomatic     0.2.0      2021-01-30 [1]
+##  estimability     1.3        2018-02-11 [1]
+##  evaluate         0.14       2019-05-28 [1]
+##  extrafont        0.17       2014-12-08 [1]
+##  extrafontdb      1.0        2012-06-11 [1]
+##  fansi            1.0.3      2022-03-24 [1]
+##  farver           2.1.0      2021-02-28 [1]
+##  fastmap          1.1.0      2021-01-25 [1]
+##  forcats        * 0.5.1      2021-01-27 [1]
+##  foreach        * 1.5.2      2022-02-02 [1]
+##  fs               1.5.2      2021-12-08 [1]
+##  furrr            0.2.3      2021-06-25 [1]
+##  future           1.24.0     2022-02-19 [1]
+##  future.apply     1.8.1      2021-08-10 [1]
+##  generics         0.1.2      2022-01-31 [1]
+##  GGally           2.1.2      2021-06-21 [1]
+##  ggdist         * 3.0.0      2021-07-19 [1]
+##  ggplot2        * 3.3.5      2021-06-25 [1]
+##  ggrepel          0.9.1      2021-01-15 [1]
+##  ggridges         0.5.3      2021-01-08 [1]
+##  git2r            0.28.0     2021-01-10 [1]
+##  glmnet         * 4.1-3      2021-11-02 [1]
+##  globals          0.14.0     2020-11-22 [1]
+##  glue             1.6.2      2022-02-24 [1]
+##  gower            0.2.2      2020-06-23 [1]
+##  GPfit            1.0-8      2019-02-08 [1]
+##  gridExtra        2.3        2017-09-09 [1]
+##  gt             * 0.3.1      2021-08-07 [1]
+##  gtable           0.3.0      2019-03-25 [1]
+##  hardhat          0.2.0      2022-01-24 [1]
+##  haven            2.4.1      2021-04-23 [1]
+##  here           * 1.0.1      2020-12-13 [1]
+##  highr            0.9        2021-04-16 [1]
+##  hms              1.1.1      2021-09-26 [1]
+##  htmltools        0.5.2      2021-08-25 [1]
+##  httpuv           1.6.5      2022-01-05 [1]
+##  httr             1.4.2      2020-07-20 [1]
+##  igraph           1.2.11     2022-01-04 [1]
+##  infer          * 1.0.0      2021-08-13 [1]
+##  insight          0.14.2     2021-06-22 [1]
+##  ipred            0.9-12     2021-09-15 [1]
+##  ISLR2          * 1.3-1      2022-01-10 [1]
+##  iterators      * 1.0.14     2022-02-05 [1]
+##  janitor          2.1.0      2021-01-05 [1]
+##  jquerylib        0.1.4      2021-04-26 [1]
+##  jsonlite         1.7.3      2022-01-17 [1]
+##  kknn             1.3.1      2016-03-26 [1]
+##  klaR             0.6-15     2020-02-19 [1]
+##  knitr            1.37       2021-12-16 [1]
+##  labeling         0.4.2      2020-10-20 [1]
+##  labelled         2.8.0      2021-03-08 [1]
+##  later            1.3.0      2021-08-18 [1]
+##  lattice        * 0.20-45    2021-09-22 [2]
+##  lava             1.6.10     2021-09-02 [1]
+##  leaps          * 3.1        2020-01-16 [1]
+##  lhs              1.1.1      2020-10-05 [1]
+##  lifecycle        1.0.1      2021-09-24 [1]
+##  listenv          0.8.0      2019-12-05 [1]
+##  lubridate        1.8.0      2021-10-07 [1]
+##  magrittr         2.0.2      2022-01-26 [1]
+##  MASS           * 7.3-55     2022-01-16 [2]
+##  Matrix         * 1.4-0      2021-12-08 [2]
+##  matrixStats      0.61.0     2021-09-17 [1]
+##  memoise          2.0.1      2021-11-26 [1]
+##  MetBrewer        0.1.0      2022-01-05 [1]
+##  mgcv             1.8-39     2022-02-24 [2]
+##  mime             0.12       2021-09-28 [1]
+##  miniUI           0.1.1.1    2018-05-18 [1]
+##  mixOmics       * 6.19.3     2022-04-04 [1]
+##  modeldata      * 0.1.1      2021-07-14 [1]
+##  modelr           0.1.8      2020-05-19 [1]
+##  munsell          0.5.0      2018-06-12 [1]
+##  mvtnorm        * 1.1-3      2021-10-08 [1]
+##  nlme             3.1-155    2022-01-16 [2]
+##  nnet             7.3-17     2022-01-16 [2]
+##  parallelly       1.30.0     2021-12-17 [1]
+##  parameters       0.14.0     2021-05-29 [1]
+##  parsnip        * 0.1.7      2021-07-21 [1]
+##  patchwork      * 1.1.1      2020-12-17 [1]
+##  performance      0.7.3      2021-07-21 [1]
+##  pillar           1.7.0      2022-02-01 [1]
+##  pkgconfig        2.0.3      2019-09-22 [1]
+##  pls            * 2.8-0      2021-09-03 [1]
+##  plyr             1.8.7      2022-03-24 [1]
+##  poissonreg     * 0.1.1      2021-08-07 [1]
+##  prettyunits      1.1.1      2020-01-24 [1]
+##  pROC             1.17.0.1   2021-01-13 [1]
+##  prodlim          2019.11.13 2019-11-17 [1]
+##  promises         1.2.0.1    2021-02-11 [1]
+##  purrr          * 0.3.4      2020-04-17 [1]
+##  qqplotr          0.0.5      2021-04-23 [1]
+##  questionr        0.7.5      2021-10-06 [1]
+##  R6               2.5.1      2021-08-19 [1]
+##  rARPACK          0.11-0     2016-03-10 [1]
+##  RColorBrewer     1.1-3      2022-04-03 [1]
+##  Rcpp             1.0.8.3    2022-03-17 [1]
+##  readr          * 2.1.1      2021-11-30 [1]
+##  readxl           1.3.1      2019-03-13 [1]
+##  recipes        * 0.1.17     2021-09-27 [1]
+##  repr             1.1.3      2021-01-21 [1]
+##  reprex           2.0.0      2021-04-02 [1]
+##  reshape          0.8.8      2018-10-23 [1]
+##  reshape2         1.4.4      2020-04-09 [1]
+##  rlang          * 1.0.2      2022-03-04 [1]
+##  rmarkdown        2.11       2021-09-14 [1]
+##  robustbase       0.93-8     2021-06-02 [1]
+##  rpart            4.1.16     2022-01-24 [2]
+##  rprojroot        2.0.2      2020-11-15 [1]
+##  rsample        * 0.1.0      2021-05-08 [1]
+##  RSpectra         0.16-0     2019-12-01 [1]
+##  rstudioapi       0.13       2020-11-12 [1]
+##  Rttf2pt1         1.3.8      2020-01-10 [1]
+##  rvest            1.0.0      2021-03-09 [1]
+##  sass             0.4.0      2021-05-12 [1]
+##  scales         * 1.1.1      2020-05-11 [1]
+##  see              0.6.4      2021-05-29 [1]
+##  sessioninfo      1.1.1      2018-11-05 [1]
+##  shape            1.4.6      2021-05-19 [1]
+##  shiny            1.6.0      2021-01-25 [1]
+##  skimr            2.1.3      2021-03-07 [1]
+##  snakecase        0.11.0     2019-05-25 [1]
+##  stringi          1.7.6      2021-11-29 [1]
+##  stringr        * 1.4.0      2019-02-10 [1]
+##  survival         3.2-13     2021-08-24 [2]
+##  tibble         * 3.1.6      2021-11-07 [1]
+##  tictoc         * 1.0.1      2021-04-19 [1]
+##  tidymodels     * 0.1.4      2021-10-01 [1]
+##  tidyr          * 1.2.0      2022-02-01 [1]
+##  tidyselect       1.1.2      2022-02-21 [1]
+##  tidyverse      * 1.3.1      2021-04-15 [1]
+##  timeDate         3043.102   2018-02-21 [1]
+##  tune           * 0.1.6      2021-07-21 [1]
+##  tzdb             0.2.0      2021-10-27 [1]
+##  usethis          2.1.5      2021-12-09 [1]
+##  utf8             1.2.2      2021-07-24 [1]
+##  vctrs          * 0.3.8      2021-04-29 [1]
+##  vroom            1.5.7      2021-11-30 [1]
+##  withr            2.5.0      2022-03-03 [1]
+##  workflows      * 0.2.3      2021-07-16 [1]
+##  workflowsets   * 0.1.0      2021-07-22 [1]
+##  xfun             0.29       2021-12-14 [1]
+##  xml2             1.3.3      2021-11-30 [1]
+##  xtable           1.8-4      2019-04-21 [1]
+##  yaml             2.2.1      2020-02-01 [1]
+##  yardstick      * 0.0.8      2021-03-28 [1]
+##  source                                
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  Bioconductor                          
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  Github (taylordunn/dunnr@c83b30e)     
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.1)                        
+##  Github (mixOmicsTeam/mixOmics@974a8c9)
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.1)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.3)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.2)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+##  CRAN (R 4.1.0)                        
+## 
+## [1] C:/Users/tdunn/Documents/R/win-library/4.1
+## [2] C:/Program Files/R/R-4.1.3/library</code></pre>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
+</div>
+<div class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="linear-model-selection-and-regularization.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

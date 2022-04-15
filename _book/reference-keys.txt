@@ -101,3 +101,16 @@ ridge-regression-and-the-lasso
 pcr-and-pls-regression
 principal-components-regression-1
 exercises-3
+moving-beyond-linearity
+polynomial-regression
+step-functions
+basis-functions
+regression-splines
+piecewise-polynomials
+constraints-and-splines
+the-spline-basis-representation
+choosing-the-number-and-locations-of-the-knots
+comparison-to-polynomial-regression
+smoothing-splines
+an-overview-of-smoothing-splines
+choosing-the-smoothing-parameter-lambda
