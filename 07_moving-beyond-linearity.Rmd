@@ -679,18 +679,18 @@ p1 <- d$`ns(year, 4)` %>%
   geom_line(aes(y = y), color = "red") +
   geom_line(aes(y = y_lower), lty = 2, color = "red") +
   geom_line(aes(y = y_upper), lty = 2, color = "red") +
-  labs(x = d$`ns(year, 4)`$xlab, title = d$`ns(year, 4)`$ylab, y = NULL) +
+  labs(x = NULL, title = d$`ns(year, 4)`$ylab, y = NULL) +
   ylim(c(-20, 20))
 p2 <- d$`ns(age, 5)` %>%
   ggplot(aes(x)) +
   geom_line(aes(y = y), color = "red") +
   geom_line(aes(y = y_lower), lty = 2, color = "red") +
   geom_line(aes(y = y_upper), lty = 2, color = "red") +
-  labs(x = d$`ns(age, 5)`$xlab, title = d$`ns(age, 5)`$ylab, y = NULL)
+  labs(x = NULL, title = d$`ns(age, 5)`$ylab, y = NULL)
 p3 <- d$education %>%
   ggplot(aes(x)) +
   geom_errorbar(aes(y = y, ymin = y_lower, ymax = y_upper)) +
-  labs(x = d$education$xlab, title = d$education$ylab, y = NULL) +
+  labs(x = NULL, title = d$education$ylab, y = NULL) +
   theme(axis.text.x = element_text(angle = 45, size = 8, vjust = 0.7))
 p1 + p2 + p3
 ```
@@ -702,31 +702,63 @@ library(gam)
 wage_gam_smooth_fit <-
   gam(wage ~ s(year, 4) + s(age, 5) + education,
            data = wage)
-d_gam <- plot(wage_gam_smooth_fit, se = TRUE, col = "blue")
+
+d <- plot(wage_gam_smooth_fit, se = TRUE, col = "blue")
+
+d <- map(
+  d$preplot,
+  ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
+    mutate(y_lower = y - y_se, y_upper = y + y_se)
+)
+
+p1 <- d$`s(year, 4)` %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "blue") +
+  geom_line(aes(y = y_lower), lty = 2, color = "blue") +
+  geom_line(aes(y = y_upper), lty = 2, color = "blue") +
+  labs(x = NULL, title = d$`s(year, 4)`$ylab, y = NULL) +
+  ylim(c(-20, 20))
+p2 <- d$`s(age, 5)` %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "blue") +
+  geom_line(aes(y = y_lower), lty = 2, color = "blue") +
+  geom_line(aes(y = y_upper), lty = 2, color = "blue") +
+  labs(x = NULL, title = d$`s(age, 5)`$ylab, y = NULL)
+p3 <- d$education %>%
+  ggplot(aes(x)) +
+  geom_errorbar(aes(y = y, ymin = y_lower, ymax = y_upper)) +
+  labs(x = NULL, title = d$education$ylab, y = NULL) +
+  theme(axis.text.x = element_text(angle = 45, size = 8, vjust = 0.7))
+p1 + p2 + p3
 ```
 
-The `tidymodels` implementation of GAMs uses the `mgcv` package the model engine, so I'll use that for this example:
 
-```{r message=FALSE}
+```{r message=FALSE, include=FALSE}
+# Trying to get the exact same fit with `mgcv`
 detach("package:gam", unload = TRUE)
 library(mgcv)
 wage_mgcv_smooth_fit <-
   gam(
     # With `mgcv::s()`, I need to specify degrees of freedom with `k`, and
     #  turn off penalization with `fx`
-    wage ~ s(year, k = 5, fx = FALSE, bs = "cr") + s(age, k = 6, fx = FALSE, bs = "cr") +
+    # wage ~ s(year, k = 5, fx = FALSE, bs = "cr") + s(age, k = 6, fx = FALSE, bs = "cr") +
+    #wage ~ s(year, k = 5, fx = FALSE) + s(age, k = 6, fx = FALSE) +
+    # wage ~ s(year, k = 4, fx = TRUE) + s(age, k = 5, fx = TRUE) +
+    #   education,
+    # wage ~ s(year, k = 4, fx = FALSE) + s(age, k = 5, fx = FALSE) +
+    #   education,
+    # wage ~ s(year, k = 4, fx = FALSE, bs = "cr") + s(age, k = 5, fx = FALSE, bs = "cr") +
+    #   education,
+    wage ~ s(year, k = 4, fx = TRUE, bs = "cr") + s(age, k = 5, fx = TRUE, bs = "cr") +
       education,
     data = wage
   )
 
-#wage_gam_smooth_fit <- mgcv::gam(wage ~ mgcv::s(year, 4), education,
 d_mgcv <- plot(wage_mgcv_smooth_fit, se = TRUE, all.terms = TRUE)
-```
 
-```{r}
 bind_rows(
-  gam = tibble(x = d_gam$preplot$`s(age, 5)`$x,
-               y = d_gam$preplot$`s(age, 5)`$y),
+  gam = tibble(x = d$`s(age, 5)`$x,
+               y = d$`s(age, 5)`$y),
   mgcv = tibble(x = d_mgcv[[2]]$x, y = d_mgcv[[2]]$fit),
   .id = "func"
 ) %>%
@@ -734,40 +766,113 @@ bind_rows(
   geom_line(aes(color = func))
 ```
 
+The fitted functions are essentially equivalent between the natural and smoothing splines.
 
-```{r}
-set.seed(0)
-## fake some data...
-f1 <- function(x) {exp(2 * x)}
-f2 <- function(x) { 
-  0.2*x^11*(10*(1-x))^6+10*(10*x)^3*(1-x)^10 
-}
-f3 <- function(x) {x*0}
+>
+Fitting a GAM with a smoothing spline is not quite as simple as fitting a GAM
+with a natural spline, since in the case of smoothing splines, least squares
+cannot be used. However, standard software such as the `gam()` function in R
+can be used to fit GAMs using smoothing splines, via an approach known
+as backfitting. This method fits a model involving multiple predictors by backfitting repeatedly updating the fit for each predictor in turn, holding the others
+fixed. The beauty of this approach is that each time we update a function,
+we simply apply the fitting method for that variable to a partial residual.
 
-n<-200
-sig2<-4
-x0 <- rep(1:4,50)
-x1 <- runif(n, 0, 1)
-x2 <- runif(n, 0, 1)
-x3 <- runif(n, 0, 1)
-e <- rnorm(n, 0, sqrt(sig2))
-y <- 2*x0 + f1(x1) + f2(x2) + f3(x3) + e
-x0 <- factor(x0)
+>
+We do not have to use splines as the building blocks for GAMs: we can
+just as well use local regression, polynomial regression, or any combination
+of the approaches seen earlier in this chapter in order to create a GAM.
 
-## fit and plot...
-b<-gam(y~x0+s(x1)+s(x2)+s(x3))
-d <- mgcv::plot.gam(b, pages = 1)
-d2 <- plot(b, pages = 1)
-plot(b,pages=1,residuals=TRUE,all.terms=TRUE,shade=TRUE,shade.col=2)
-plot(b,pages=1,seWithMean=TRUE) ## better coverage intervals
+#### Pros and Cons of GAMs {-}
+
+Pros:
+
+* GAMs allow $f_j$ fits to each $X_j$, which is a way to flexibly and (nearly) automatically capture non-linearity.
+* Non-linear fits can improve prediction accuracy.
+* Because the models are additive, we can examine the effect of each $X_j$ on $Y$ separately, while holding others fixed.
+* Smoothness of each $f_j$ can be summarized via degrees of freedom.
+
+Cons:
+
+* The main limitation is the additive restriction. We cannot add interaction terms like $X_j \times X_k$ to GAMs.
+
+GAMs provide as useful compromise between linear and fully non-parametric models.
+
+### GAMs for Classification Problems
+
+GAMs are easily extended to other response distributions via the `family` argument, such as `binomial` for logistic regression classification.
+
+```{r figure7.13}
+wage_gam_fit_binom <- gam(
+  I(wage > 250) ~ year + s(age, 5) + education,
+  family = binomial, data = wage
+)
+d <- plot(wage_gam_fit_binom)
+
+d <- map(
+  d$preplot,
+  ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
+    mutate(y_lower = y - y_se, y_upper = y + y_se)
+)
+
+p1 <- d$year %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "green") +
+  geom_line(aes(y = y_lower), lty = 2, color = "green") +
+  geom_line(aes(y = y_upper), lty = 2, color = "green") +
+  labs(x = NULL, title = d$`s(year, 4)`$ylab, y = NULL) +
+  ylim(c(-4, 4))
+p2 <- d$`s(age, 5)` %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "green") +
+  geom_line(aes(y = y_lower), lty = 2, color = "green") +
+  geom_line(aes(y = y_upper), lty = 2, color = "green") +
+  labs(x = NULL, title = d$`s(age, 5)`$ylab, y = NULL)
+p3 <- d$education %>%
+  ggplot(aes(x)) +
+  geom_errorbar(aes(y = y, ymin = y_lower, ymax = y_upper)) +
+  labs(x = NULL, title = d$education$ylab, y = NULL) +
+  theme(axis.text.x = element_text(angle = 45, size = 8, vjust = 0.7))
+p1 + p2 + p3
 ```
 
-```{r}
-tibble(x1 = d[[1]]$x, y = d[[1]]$fit) %>%
-  ggplot(aes(x1, y)) +
-  geom_line()
+There are 0 occurrences of `wage > 250` for `education = "1. < HS Grad"`, which is causing very wide SE range.
+Re-fit the model excluding that value of `education`:
+
+```{r figure7.14}
+wage_gam_fit_binom <- gam(
+  I(wage > 250) ~ year + s(age, 5) + education,
+  family = binomial, data = filter(wage, education != "1. < HS Grad")
+)
+d <- plot(wage_gam_fit_binom)
+
+d <- map(
+  d$preplot,
+  ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
+    mutate(y_lower = y - y_se, y_upper = y + y_se)
+)
+
+p1 <- d$year %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "green") +
+  geom_line(aes(y = y_lower), lty = 2, color = "green") +
+  geom_line(aes(y = y_upper), lty = 2, color = "green") +
+  labs(x = NULL, title = d$`s(year, 4)`$ylab, y = NULL) +
+  ylim(c(-4, 4))
+p2 <- d$`s(age, 5)` %>%
+  ggplot(aes(x)) +
+  geom_line(aes(y = y), color = "green") +
+  geom_line(aes(y = y_lower), lty = 2, color = "green") +
+  geom_line(aes(y = y_upper), lty = 2, color = "green") +
+  labs(x = NULL, title = d$`s(age, 5)`$ylab, y = NULL)
+p3 <- d$education %>%
+  ggplot(aes(x)) +
+  geom_errorbar(aes(y = y, ymin = y_lower, ymax = y_upper)) +
+  labs(x = NULL, title = d$education$ylab, y = NULL) +
+  theme(axis.text.x = element_text(angle = 45, size = 8, vjust = 0.7))
+p1 + p2 + p3
 ```
 
+The `tidymodels` implementation of GAMs uses the `mgcv` package the model engine, so I'll use that for this example:
 
 ## Reproducibility {-}
 
