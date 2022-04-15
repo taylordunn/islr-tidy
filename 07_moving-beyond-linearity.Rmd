@@ -47,7 +47,7 @@ For a large enough degree $d$, polynomial regression can produce an extremely no
 
 Re-create Figure 7.1 with the `wage` data:
 
-```{r figure7.1, warning=FALSE}
+```{r figure7.1, warning=FALSE, fig.cap="Figure 7.1"}
 wage <- ISLR2::Wage
 
 wage_poly_4_linear_fit <- lm(wage ~ poly(age, 4), data = wage)
@@ -124,7 +124,7 @@ $$
 
 To re-create Figure 7.2, I'll use `cut` with 4 breaks to separate the `age` predictor:
 
-```{r warning=FALSE}
+```{r figure7.2, fig.cap="Figure 7.2", warning=FALSE}
 wage_step_linear_fit <- lm(wage ~ cut(age, breaks = 4), data = wage)
 wage_step_logistic_fit <- glm(I(wage > 250) ~ cut(age, breaks = 4),
                                 data = wage, family = binomial)
@@ -581,7 +581,7 @@ squares regression using arbitrary basis functions.
 
 The `smooth.spline()` function fits a cubic smoothing spline to data as follows:
 
-```{r figure7.8}
+```{r figure7.8, fig.cap="Figure 7.8"}
 wage_smooth_df_16 <- smooth.spline(x = wage$age, y = wage$wage, df = 16)
 wage_smooth_df_16
 
@@ -592,7 +592,7 @@ bind_rows(
   as_tibble(predict(wage_smooth_df_16, age_grid)) %>%
     mutate(model = "16 degrees of freedom"),
   as_tibble(predict(wage_smooth_cv, age_grid)) %>%
-    mutate(model = "6.8 degrres of freedom (LOOCV)")
+    mutate(model = "6.8 degrees of freedom (LOOCV)")
 ) %>%
   ggplot() +
   geom_point(data = wage, aes(x = age, y = wage),
@@ -872,7 +872,126 @@ p3 <- d$education %>%
 p1 + p2 + p3
 ```
 
-The `tidymodels` implementation of GAMs uses the `mgcv` package the model engine, so I'll use that for this example:
+## Lab: Non-linear Modeling
+
+### Polynomial Regression and Step Functions
+
+The figure was re-produced here: \@ref(fig: figure7.1).
+
+To determine the simplest sufficient polynomial model, we can perform $F$-tests with `anova()`.
+
+```{r}
+wage_poly_1_linear_fit <- lm(wage ~ age, data = wage)
+wage_poly_2_linear_fit <- lm(wage ~ poly(age, 2), data = wage)
+wage_poly_3_linear_fit <- lm(wage ~ poly(age, 3), data = wage)
+wage_poly_5_linear_fit <- lm(wage ~ poly(age, 5), data = wage)
+
+anova(wage_poly_1_linear_fit, wage_poly_2_linear_fit,
+      wage_poly_3_linear_fit, wage_poly_4_linear_fit,
+      wage_poly_5_linear_fit)
+```
+
+The cubic fit is probably the best choice here.
+
+Equivalently, because of the way `poly()` created orthogonalized polynomials, we can get the same $p$-values and $F$-statistics (= square of the $t$-statistics) like this:
+
+```{r}
+tidy(wage_poly_5_linear_fit) %>%
+  transmute(term, t = statistic, `F` = t^2, p = scales::pvalue(p.value)) %>%
+  gt() %>%
+  fmt_number(columns = c(t, `F`), n_sigfig = 4)
+```
+
+However, this only works because the polynomials are orthogonal and there is just the one predictor.
+Otherwise, `anova()` must be used for these model comparisons.
+
+The step function was fit and visualized here: \@ref(fig: figure7.2).
+
+### Splines
+
+The smoothing spline fits are shown here: \@ref(fig: figure7.8).
+
+```{r}
+wage_smooth_df_16
+```
+
+The `tidymodels` implementation of smooth splines and GAMs uses the `mgcv` package as the default (and currently only) engine, so I'll use that for this example:
+
+See some examples in the `parsnip` documentation [here]
+(https://parsnip.tidymodels.org/articles/Examples.html?q=additiv#gen_additive_mod-models)
+and [here]
+(https://parsnip.tidymodels.org/reference/details_gen_additive_mod_mgcv.html?q=gen_additive#model-fitting).
+An example of tuning degrees of freedom can be found [here](https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206/2).
+
+
+```{r warning=FALSE}
+wage_smooth_fit_16 <-
+  as_tibble(predict(wage_smooth_df_16, age_grid)) %>%
+  mutate(model = "smooth.spline()") %>%
+  rename(age = x, .fitted = y)
+
+detach("package:mgcv", unload = TRUE)
+library(gam)
+wage_gam_fit_16 <- gam(wage ~ s(age, df = 16), data = wage)
+wage_gam_fit_16_pred <-
+  augment(wage_gam_fit_16, newdata = tibble(age = age_grid)) %>%
+  mutate(model = "gam()")
+detach("package:gam", unload = TRUE)
+library(mgcv)
+wage_mgcv_fit_16 <- gam(wage ~ s(age, k = 16, fx = TRUE), data = wage)
+wage_mgcv_fit_16_pred <-
+  augment(wage_mgcv_fit_16, newdata = tibble(age = age_grid)) %>%
+  mutate(model = "mgcv()")
+
+wage_tidymodels_fit <- gen_additive_mod(select_features = FALSE, adjust_deg_free = 6) %>%
+  set_engine("mgcv") %>%
+  set_mode("regression") %>%
+  fit(wage ~ s(age, k = 16, fx = TRUE), data = wage)
+wage_tidymodels_fit_pred <-
+  augment(wage_tidymodels_fit, new_data = tibble(age = age_grid)) %>%
+  mutate(model = "tidymodels")
+  
+bind_rows(
+  # wage_smooth_fit_16,
+  # wage_gam_fit_16_pred,
+  wage_mgcv_fit_16_pred,
+  wage_tidymodels_fit_pred
+) %>%
+  ggplot(aes(x = age)) +
+  # geom_point(data = wage, aes(x = age, y = wage),
+  #            shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .fitted, color = model), size = 1.5, alpha = 0.5) +
+  theme(legend.position = c(0.7, 0.7)) +
+  labs(color = NULL)
+  #facet_wrap(~ model)
+```
+
+
+```{r}
+gam_spec <- gen_additive_mod(select_features = FALSE, adjust_deg_free = tune()) %>%
+  set_engine(engine = 'mgcv') %>%
+  set_mode('regression')
+wage_gam_workflow <- workflow() %>%
+  add_model(gam_spec) %>%
+  add_recipe()
+
+wage_resamples
+fit_resamples(object = )
+wage_tidymodels_fit <- gen_additive_mod(select_features = FALSE, adjust_deg_free = 6) %>%
+  set_engine("mgcv") %>%
+  set_mode("regression") %>%
+  fit(wage ~ s(age, k = 16, fx = TRUE), data = wage)
+
+
+# fitting gam model
+gam_mod <- fit(gam_spec, interest_rate ~ s(annual_income) + s(debt_to_income) + s(delinq_2y), data = loans)
+```
+
+
+### GAM
+
+
+https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206/2
 
 ## Reproducibility {-}
 
