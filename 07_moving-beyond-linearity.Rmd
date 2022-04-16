@@ -35,7 +35,7 @@ In this chapter, we relax the linearity assumption while still trying to maintai
 * *Local regression* is similar to splines but allows smooth overlaps across regions.
 * *Generalized additive models* allows us to extend the above methods to deal with multiple predictors.
 
-## Polynomial Regression
+## Polynomial Regression {#polynomial-regression}
 
 Polynomial regression involves raising one or more predictors to a degree $d$, each with its own coefficient:
 
@@ -47,7 +47,7 @@ For a large enough degree $d$, polynomial regression can produce an extremely no
 
 Re-create Figure 7.1 with the `wage` data:
 
-```{r figure7.1, warning=FALSE, fig.cap="Figure 7.1"}
+```{r figure7-1, warning=FALSE}
 wage <- ISLR2::Wage
 
 wage_poly_4_linear_fit <- lm(wage ~ poly(age, 4), data = wage)
@@ -93,7 +93,7 @@ p2 <- wage_poly_4_logistic_fit %>%
 p1 + p2
 ```
 
-## Step Functions
+## Step Functions {#step-functions}
 
 >
 Using polynomial functions of the features as predictors in a linear model
@@ -124,7 +124,7 @@ $$
 
 To re-create Figure 7.2, I'll use `cut` with 4 breaks to separate the `age` predictor:
 
-```{r figure7.2, fig.cap="Figure 7.2", warning=FALSE}
+```{r figure7-2, warning=FALSE}
 wage_step_linear_fit <- lm(wage ~ cut(age, breaks = 4), data = wage)
 wage_step_logistic_fit <- glm(I(wage > 250) ~ cut(age, breaks = 4),
                                 data = wage, family = binomial)
@@ -225,7 +225,7 @@ To remedy this, we can fit a piecewise polynomial under the *constraint* that th
 The bottom left panel shows the result of two additional constraints: that the first and second derivative are continuous at `age = 50` -- this is called a *cubic spline*, which generally has $K + 4$ degrees of freedom (=5 in this example).
 The lower right panel shows a *linear spline*.
 
-### The Spline Basis Representation
+### The Spline Basis Representation {#spline-basis}
 
 In order to implement the continuity constraints for regression splines, we can use the basis model.
 A cubic spline with $K$ knots can be modeled as
@@ -254,7 +254,7 @@ Unfortunately, these splines have high variance at boundaries of the predictors.
 This can be reduced with *natural splines* which have additional constraints at the boundaries to produce more stable estimates.
 We can show this with confidence intervals of the models fit with cubic and natural cubic splines, as in Figure 7.4:
 
-```{r figure7.4, warning=FALSE}
+```{r figure7-4, warning=FALSE}
 library(splines)
 
 # Use just a subset of the data to mimic the figure
@@ -287,7 +287,7 @@ bind_rows(
   labs(color = NULL)
 ```
 
-### Choosing the Number and Locations of the Knots
+### Choosing the Number and Locations of the Knots {#choosing-knots}
 
 >
 When we fit a spline, where should we place the knots? The regression
@@ -310,7 +310,7 @@ attr(age_ns, "knots")
 
 Fit the model and re-create Figure 7.5:
 
-```{r figure7.5, warning=FALSE}
+```{r figure7-5, warning=FALSE}
 wage_ns_linear_fit <- lm(wage ~ ns(age, df = 4), data = wage)
 wage_ns_logistic_fit <- glm(I(wage > 250) ~ ns(age, df = 4),
                             data = wage, family = binomial)
@@ -348,8 +348,8 @@ p1 + p2
 ```
 
 The automatic choice of knot location is usually sufficient, but how do we decide on the number of knots $K$?
-The same way we've chosen any model hyperparameters: resampling.
-For this, we turn to `tidymodels`, which has `step_bs()` and `step_ns()` function for specifying basis splines and natural basis splines.
+The same way we usually choose model hyperparameters: resampling.
+For this, we turn to `tidymodels`, which has `step_bs()` and `step_ns()` functions for specifying basis splines and natural basis splines.
 
 ```{r}
 set.seed(93)
@@ -405,7 +405,7 @@ wage_lm_ns_tune <- tune_grid(
 
 Finally, re-create Figure 7.6:
 
-```{r figure7.6}
+```{r figure7-6}
 p1 <- collect_metrics(wage_lm_ns_tune) %>%
   filter(.metric == "rmse") %>%
   mutate(mse = mean^2) %>%
@@ -496,11 +496,11 @@ bind_rows(
   facet_wrap(~ model, ncol = 2)
 ```
 
-### Comparison to Polynomial Regression
+### Comparison to Polynomial Regression {#comparison-polynomial}
 
 Figure 7.7 compares a natural cubic spline with 15 degrees of freedom to a 15-degree polynomial regression on the `wage` data:
 
-```{r figure7.7, warning=FALSE}
+```{r figure7-7, warning=FALSE}
 wage_ns_15_fit <- lm(wage ~ ns(age, df = 15), data = wage)
 wage_poly_15_fit <- lm(wage ~ poly(age, degree = 15), data = wage)
 
@@ -526,7 +526,7 @@ The extra flexibility in the polynomial produces undesirable results at the boun
 cubic spline still provides a reasonable fit to the data. Regression splines
 often give superior results to polynomial regression. This is because unlike
 polynomials, which must use a high degree (exponent in the highest monomial term,
-e.g. $X^15$) to produce flexible fits, splines introduce flexibility
+e.g. $X^{15}$) to produce flexible fits, splines introduce flexibility
 by increasing the number of knots but keeping the degree fixed. Generally,
 this approach produces more stable estimates. Splines also allow us to place
 more knots, and hence flexibility, over regions where the function $f$ seems
@@ -553,35 +553,36 @@ By placing the constraint on the second derivative $g''$, we encourage $g$ to be
 It turns out that the optimal $g(x)$ is a natural cubic polynomial with knots at unique values of $x$ (and continuous first and second derivatives at each knot).
 However, it is not the same one we would get with the basis function approach in Section 7.4.3 with knots at each value of $x$ -- rather, it is a *shrunken* version of that spline, where $\lambda$ controls the level of shrinkage
 
-### Choosing the Smoothing Parameter $\lambda$
+### Choosing the Smoothing Parameter $\lambda$ {#smoothing-parameter}
 
 It may seem like a smoothing spline, with knots at every unique value of $x_i$, will have far too many degrees of freedom, but the tuning parameter $\lambda$ controls the *effective degrees of freedom* $df_{\lambda}$.
 The higher $df_{\lambda}$, the more flexible (lower bias, higher variance) the smoothing spline.
 
 Unlike the other spline methods, we do not need to select the number or location of the knots.
 We instead have to choose the value of $\lambda$, usually via cross-validation.
-It turns out that the LOOCV error can be computed very efficiecntly for smoothing splines, with essentially the same cost as computing a single fit, with this formula:
+It turns out that the LOOCV error can be computed very efficiently for smoothing splines, with essentially the same cost as computing a single fit, with this formula:
 
 $$
 \text{RSS}_{cv} (\lambda) = \sum_{i=1}^n (y_i - \hat{g}_{\lambda}^{(-i)} (x_i))^2
 = \sum_{i=1}^n \left[\frac{y_i - \hat{g}_{\lambda}(x_i)}{1 - \{\textbf{S}_{\lambda}\}_{ii}}\right].
 $$
-where $\hat{g}_{\lambda}^{(-i)}$ is the fitted value for this smoothing spline evaluated at $x_i$, with the fit using all training observations expert for $(x_i, y_i)$.
+
+where $\hat{g}_{\lambda}^{(-i)}$ is the fitted value for this smoothing spline evaluated at $x_i$, with the fit using all training observations except for $(x_i, y_i)$.
 
 >
 In contrast, $\hat{g}_{\lambda}(x_i)$ indicates the smoothing
 spline function fit to all of the training observations and evaluated at $x_i$.
-This remarkable formula says that we can compute each of these leave-
-one-out fits using only $\hat{g}_{\lambda}$, the original fit to all of the data!
+This remarkable formula says that we can compute each of these leave- one-out
+fits using only $\hat{g}_{\lambda}$, the original fit to all of the data!
 We have
 a very similar formula (5.2) on page 202 in Chapter 5 for least squares
 linear regression. Using (5.2), we can very quickly perform LOOCV for
 the regression splines discussed earlier in this chapter, as well as for least
 squares regression using arbitrary basis functions.
 
-The `smooth.spline()` function fits a cubic smoothing spline to data as follows:
+The `smooth.spline()` function fits a smoothing spline to data as follows:
 
-```{r figure7.8, fig.cap="Figure 7.8"}
+```{r figure7-8, warning=FALSE}
 wage_smooth_df_16 <- smooth.spline(x = wage$age, y = wage$wage, df = 16)
 wage_smooth_df_16
 
@@ -598,7 +599,7 @@ bind_rows(
   geom_point(data = wage, aes(x = age, y = wage),
              shape = 21, color = "grey50", alpha = 0.5) +
   geom_line(aes(x = x, y = y, color = model), size = 1.5) +
-  theme(legend.position = c(0.7, 0.7)) +
+  theme(legend.position = "top") +
   labs(color = NULL)
 ```
 
@@ -614,14 +615,14 @@ between the two fits, the smoothing spline fit with 6.8 degrees of freedom
 is preferable, since in general simpler models are better unless the data
 provides evidence in support of a more complex model.
 
-## Local Regression
+## Local Regression {#local-regression}
 
 *Local regression* involves computing the fit at a target point $x_0$ using just the nearby (local) training observations.
 It involves a number of choices, such the weighting function $K$, and whether to fit a linear, constant or quadratic regression.
 The most important choice is the span $s$ which is the proportion of points used to compute the local regression at $x_0$.
 It is analogous to $\lambda$ in smoothing splines: the smaller the value $s$, the more *local* and flexible the fit; the larger the value, the less flexible.
 
-```{r figure7.10, warning=FALSE}
+```{r figure7-10, warning=FALSE}
 wage_local_s_0.2 <- loess(wage ~ age, data = wage, span = 0.2)
 wage_local_s_0.7 <- loess(wage ~ age, data = wage, span = 0.7)
 
@@ -637,7 +638,7 @@ bind_rows(
   geom_point(data = wage, aes(y = wage),
              shape = 21, color = "grey50", alpha = 0.5) +
   geom_line(aes(y = .fitted, color = model), size = 1.5) +
-  theme(legend.position = c(0.5, 0.7)) +
+  theme(legend.position = "top") +
   labs(color = NULL)
 ```
 
@@ -646,9 +647,9 @@ bind_rows(
 In previous sections, we have presented approaches for flexibly predicting a response $Y$ with a single predictor $X$.
 *Generalized additive models* (GAMs) provide a general framework for extending a standard linear model by allowing non-linear functions of each of the variables, while maintaining *additivity*.
 
-### GAMs for Regression Problems
+### GAMs for Regression Problems {#gam-regression}
 
-To extend the multiple linear regression model, we replace the coefficient components $\beta_j x_{ij}$ with smoth non-linear functions $f_j (x_{ij})$:
+To extend the multiple linear regression model, we replace the coefficient components $\beta_j x_{ij}$ with smooth non-linear functions $f_j (x_{ij})$:
 
 $$
 y_i = \beta_0 + f_1 (x_{i1}) + f_2 (x_{i2}) + \dots + f_p (x_{ip}) + \epsilon_i.
@@ -662,11 +663,12 @@ $$
 
 In the example in Figure 7.11, the quantitative variables `year` and `age` are fit using natural splines, and the qualitative variable (with 5 levels) `education` is fit via the usual dummy variable approach.
 
-```{r figure7.11, fig.width=6}
+```{r figure7-11, fig.width=6}
 wage_gam_ns_fit <- lm(wage ~ ns(year, 4) + ns(age, 5) + education, data = wage)
 # Though the model wasn't fit with `gam::gam()`, we can still use the
 #  `gam::plot.Gam()` function on the `lm` object to retrieve the smooth functions
-d <- gam::plot.Gam(wage_gam_ns_fit, se = TRUE, col = "red")
+# Grab the data from the plot object so I can use it in `ggplot2`
+d <- invisible(gam::plot.Gam(wage_gam_ns_fit))
 
 d <- map(
   d$preplot,
@@ -697,14 +699,17 @@ p1 + p2 + p3
 
 For Figure 7.12, we use the `gam` package and specify smoothing splines:
 
-```{r message=FALSE}
+```{r results='hide'}
 library(gam)
 wage_gam_smooth_fit <-
   gam(wage ~ s(year, 4) + s(age, 5) + education,
-           data = wage)
+      data = wage)
 
 d <- plot(wage_gam_smooth_fit, se = TRUE, col = "blue")
+```
 
+
+```{r figure7-12, message=FALSE}
 d <- map(
   d$preplot,
   ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
@@ -733,7 +738,7 @@ p1 + p2 + p3
 ```
 
 
-```{r message=FALSE, include=FALSE}
+```{r message=FALSE, include=FALSE, eval=FALSE}
 # Trying to get the exact same fit with `mgcv`
 detach("package:gam", unload = TRUE)
 library(mgcv)
@@ -797,17 +802,20 @@ Cons:
 
 GAMs provide as useful compromise between linear and fully non-parametric models.
 
-### GAMs for Classification Problems
+### GAMs for Classification Problems {#gam-classification}
 
 GAMs are easily extended to other response distributions via the `family` argument, such as `binomial` for logistic regression classification.
 
-```{r figure7.13}
+```{r results='hide'}
 wage_gam_fit_binom <- gam(
   I(wage > 250) ~ year + s(age, 5) + education,
   family = binomial, data = wage
 )
 d <- plot(wage_gam_fit_binom)
+```
 
+
+```{r figure7-13}
 d <- map(
   d$preplot,
   ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
@@ -838,13 +846,16 @@ p1 + p2 + p3
 There are 0 occurrences of `wage > 250` for `education = "1. < HS Grad"`, which is causing very wide SE range.
 Re-fit the model excluding that value of `education`:
 
-```{r figure7.14}
+```{r results='hide'}
 wage_gam_fit_binom <- gam(
   I(wage > 250) ~ year + s(age, 5) + education,
   family = binomial, data = filter(wage, education != "1. < HS Grad")
 )
 d <- plot(wage_gam_fit_binom)
+```
 
+
+```{r figure7-14}
 d <- map(
   d$preplot,
   ~ tibble(x = .$x, y = .$y, y_se = .$se.y, xlab = .$xlab, ylab = .$ylab) %>%
@@ -856,7 +867,7 @@ p1 <- d$year %>%
   geom_line(aes(y = y), color = "green") +
   geom_line(aes(y = y_lower), lty = 2, color = "green") +
   geom_line(aes(y = y_upper), lty = 2, color = "green") +
-  labs(x = NULL, title = d$`s(year, 4)`$ylab, y = NULL) +
+  labs(x = NULL, title = d$year$ylab, y = NULL) +
   ylim(c(-4, 4))
 p2 <- d$`s(age, 5)` %>%
   ggplot(aes(x)) +
@@ -876,7 +887,7 @@ p1 + p2 + p3
 
 ### Polynomial Regression and Step Functions
 
-The figure was re-produced here: \@ref(fig: figure7.1).
+The figure was re-produced in section \@ref(polynomial-regression).
 
 To determine the simplest sufficient polynomial model, we can perform $F$-tests with `anova()`.
 
@@ -886,9 +897,8 @@ wage_poly_2_linear_fit <- lm(wage ~ poly(age, 2), data = wage)
 wage_poly_3_linear_fit <- lm(wage ~ poly(age, 3), data = wage)
 wage_poly_5_linear_fit <- lm(wage ~ poly(age, 5), data = wage)
 
-anova(wage_poly_1_linear_fit, wage_poly_2_linear_fit,
-      wage_poly_3_linear_fit, wage_poly_4_linear_fit,
-      wage_poly_5_linear_fit)
+anova(wage_poly_1_linear_fit, wage_poly_2_linear_fit, wage_poly_3_linear_fit,
+      wage_poly_4_linear_fit, wage_poly_5_linear_fit)
 ```
 
 The cubic fit is probably the best choice here.
@@ -905,15 +915,308 @@ tidy(wage_poly_5_linear_fit) %>%
 However, this only works because the polynomials are orthogonal and there is just the one predictor.
 Otherwise, `anova()` must be used for these model comparisons.
 
-The step function was fit and visualized here: \@ref(fig: figure7.2).
+The step function was fit and visualized in section \@ref(step-functions).
 
 ### Splines
 
-The smoothing spline fits are shown here: \@ref(fig: figure7.8).
+The cubic spline and natural spline fits are shown in sections \@ref(spline-basis) and \@ref(choosing-knots).
+The smoothing spline fits are shown in section \@ref(smoothing-parameter), and the local regression fits in section \@ref(local-regression).
+
+### GAMs {#gams-lab}
+
+Figure 7.11 and 7.12 are re-produced in section \@ref(gam-regression).
+
+Use `anova()` with different variations of the `year` variable:
 
 ```{r}
-wage_smooth_df_16
+wage_gam_no_year <- 
+  gam(wage ~ s(age, 5) + education, data = wage)
+wage_gam_linear_year <- 
+  gam(wage ~ year + s(age, 5) + education, data = wage)
+
+anova(wage_gam_no_year, wage_gam_linear_year, wage_gam_smooth_fit, test = "F")
 ```
+
+We find evidence that the linear function of `year` is preferred, which can also be seen in the model `summary()`:
+
+```{r}
+summary(wage_gam_smooth_fit)
+```
+
+We see under `Anova for Parametric Effects` that all of the terms are statistically significant, for even a linear relationship.
+Under `Anova for Nonparametric Effects`, we see that only the `age` term has a statistically significant improvement over the linear.
+
+The logistic regression example is in section \@ref(gam-classification).
+
+## Exercises
+
+### Applied {-}
+
+#### 6. Polynomial and step function regression on `wage` {-}
+
+(a) Find the optimal degree $d$ for polynomial regression.
+
+```{r exercise-6}
+set.seed(201)
+wage_resamples <- vfold_cv(wage, v = 10)
+
+lm_spec <- linear_reg()
+wage_poly_spec <- recipe(wage ~ age, data = wage) %>%
+  step_poly(age, degree = tune())
+
+wage_poly_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_poly_spec)
+
+degree_grid <- tibble(degree = 1:10)
+wage_poly_tune <- tune_grid(wage_poly_workflow, resamples = wage_resamples,
+                            grid = degree_grid)
+autoplot(wage_poly_tune) +
+  scale_x_continuous(breaks = 1:10)
+```
+
+The best `degree` values:
+
+```{r}
+show_best(wage_poly_tune, metric = "rmse")
+```
+
+But it is clear from the above figure that there is little difference past `degree` 2 or 3.
+We can find the least complex model within one standard error of the best model with this function:
+
+```{r}
+(best_degree <- select_by_one_std_err(wage_poly_tune, metric = "rmse", degree))
+```
+
+And here is how the fit looks overlaid on the data:
+
+```{r}
+age_grid <- tibble(age = 18:80)
+finalize_workflow(wage_poly_workflow, best_degree) %>%
+  fit(data = wage) %>%
+  augment(new_data = age_grid) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .pred), color = td_colors$nice$soft_orange, size = 2)
+```
+
+(b) Find the optimal number of cuts $K$ for step function regression.
+
+```{r}
+wage_step_spec <- recipe(wage ~ age, data = wage) %>%
+  #step_cut(age, breaks = tune())
+  step_discretize(age, num_breaks = tune(),
+                  # Need to adjust this from the default (=10)
+                  min_unique = 2)
+
+wage_step_workflow <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(wage_step_spec)
+
+breaks_grid <- tibble(num_breaks = 2:20)
+wage_step_tune <- tune_grid(wage_step_workflow, resamples = wage_resamples,
+                            grid = breaks_grid)
+autoplot(wage_step_tune)
+```
+
+```{r}
+show_best(wage_step_tune, metric = "rmse")
+```
+
+The best model by RMSE has the most `num_breaks`, but within one `std_error` gives:
+
+```{r}
+(best_num_breaks <-
+  select_by_one_std_err(wage_step_tune, metric = "rmse", num_breaks))
+```
+
+For posterity, here is the best model by RMSE, and best model within one standard error:
+
+```{r}
+bind_rows(
+  finalize_workflow(wage_step_workflow,
+                    select_best(wage_step_tune, metric = "rmse")) %>%
+    fit(data = wage) %>%
+    augment(new_data = age_grid) %>%
+    mutate(model = "best by RMSE"),
+  finalize_workflow(wage_step_workflow, best_num_breaks) %>%
+    fit(data = wage) %>%
+    augment(new_data = age_grid) %>%
+    mutate(model = "best within 1 SE")
+) %>%
+  ggplot(aes(x = age)) +
+  geom_point(data = wage, aes(y = wage),
+             shape = 21, color = "grey50", alpha = 0.5) +
+  geom_line(aes(y = .pred, color = model), size = 2) +
+  theme(legend.position = "top") +
+  labs(color = NULL)
+```
+
+
+#### 7. Explore other predictors in `wage`
+
+In `tidymodels`, the implementation of smooth splines and GAMs uses the `mgcv` package as the default (and currently only) engine, so I'll use that for this example.
+
+```{r message=FALSE}
+library(mgcv)
+glimpse(wage)
+```
+
+Every other feature in this data set is data set is categorical.
+Here is the `wage` distribution by the different categories:
+
+```{r fig.height=5}
+wage %>%
+  select(wage, where(is.factor), -education) %>%
+  rownames_to_column() %>%
+  pivot_longer(cols = -c(wage, rowname),
+               names_to = "var", values_to = "val") %>%
+  ggplot(aes(y = val, x = wage)) +
+  geom_boxplot() +
+  facet_wrap(~ var, scales = "free_y", ncol = 2)
+```
+
+Some general observations:
+
+* People with better `health` have slightly higher wages.
+* People with `health_ins` have higher wages.
+* People with `jobclass = "Information"` have slightly higher wages.
+* `maritl` status has no significant patterns.
+* `race` has no significant patterns.
+* The `region` variable has a single value.
+
+Since these are all categorical, there aren't any new smoothing/spline/polynomial/etc. functions to try out.
+Instead I will add the variables and determine if they improve the fit:
+
+```{r}
+wage_gam_1 <- gam(wage ~ s(age, k = 5) + s(year, k = 4) + education, data = wage)
+summary(wage_gam_1)
+```
+
+Like we saw in the lab (section \@ref(gams-lab)), the `year` variable can be modeled as linear.
+
+```{r}
+wage_gam_2 <- gam(wage ~ s(age, k = 5) + year + education, data = wage)
+summary(wage_gam_2)
+```
+
+Now add the new categorical variables:
+
+```{r}
+wage_gam_3 <- gam(
+  wage ~ s(age, k = 5) + year + education + health + health_ins + jobclass +
+    maritl + race,
+  data = wage
+)
+summary(wage_gam_3)
+
+plot(wage_gam_3, pages = 1, all.terms = TRUE, shade = TRUE)
+```
+
+It does provide a statistically singificant improvement:
+
+```{r}
+anova(wage_gam_2, wage_gam_3, test = "F")
+```
+
+#### 8. Non-linear models of `auto`
+
+```{r}
+auto <- ISLR2::Auto %>%
+  # Origin is a factor coded as numeric
+  mutate(
+    origin = factor(origin, levels = c(1, 2, 3),
+                    labels = c("American", "European", "Japanese"))
+  )
+glimpse(auto)
+```
+
+The variables (excluding `name`) vs `mpg`:
+
+```{r message=FALSE, fig.height=5}
+p1 <- auto %>%
+  select(mpg, acceleration, displacement, year, horsepower) %>%
+  rownames_to_column() %>%
+  pivot_longer(cols = -c(rowname, mpg), names_to = "var") %>%
+  ggplot(aes(x = value, y = mpg)) +
+  geom_point() +
+  geom_smooth(method = "gam") +
+  facet_wrap(~ var, scales = "free_x")
+p2 <- auto %>%
+  transmute(mpg, cylinders = factor(cylinders), origin) %>%
+  rownames_to_column() %>%
+  pivot_longer(cols = -c(rowname, mpg), names_to = "var") %>%
+  ggplot(aes(y = factor(value), x = mpg)) +
+  geom_boxplot() +
+  facet_wrap(~ var, scales = "free_y")
+p1 / p2 +
+  plot_layout(heights = c(2, 1))
+```
+
+Fit a GAM with all of the variables:
+
+```{r}
+auto_gam <- gam(
+  mpg ~ s(acceleration, k = 5) + s(displacement, k = 5) + s(horsepower, k = 5) +
+    s(year, k = 5) + s(cylinders, k = 3) + origin,
+  data = auto
+)
+summary(auto_gam)
+```
+
+This suggests that there are non-linear relationships in `acceleration`, `displacement`, `horsepower`, and `year`.
+Visualize the smooth functions:
+
+```{r}
+plot(auto_gam, pages = 1, shade = TRUE)
+```
+
+
+#### 9. Predicting nitrogen oxide concentration in `boston`
+
+```{r}
+boston <- ISLR2::Boston
+glimpse(boston)
+```
+
+Visualize the `nox` and `dis` variables:
+
+```{r fig.height=5, message=FALSE}
+p1 <- boston %>%
+  select(nox, dis) %>%
+  pivot_longer(cols = c(nox, dis)) %>%
+  ggplot(aes(x = value)) +
+  geom_boxplot(aes(y = 0, fill = name), outlier.shape = NA) +
+  geom_jitter(aes(y = 1, color = name), alpha = 0.5) +
+  facet_wrap(~ name, scales = "free_x") +
+  dunnr::remove_axis("y") +
+  theme(legend.position = "none")
+p2 <- boston %>%
+  ggplot(aes(x = dis, y = nox)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "gam")
+p1 / p2
+```
+
+
+Looks like higher values of `dis` (the distance from Boston employment centers) are associated with lower `nox` (nitrogen oxide concentration).
+
+(a) Cubic polynomial regression.
+
+(b) Polynomial fits from 1 to 10 degrees.
+
+(c) Choose the optimal degree by cross-validation.
+
+(d) Regression splines.
+
+(e) Regression splines for a range of degrees of freedom.
+
+(f) Choose the optimal degrees of freedom by cross-validation
+
+#### 10. Predicting tuition with `college`
+
+### delete
 
 The `tidymodels` implementation of smooth splines and GAMs uses the `mgcv` package as the default (and currently only) engine, so I'll use that for this example:
 
@@ -923,8 +1226,7 @@ and [here]
 (https://parsnip.tidymodels.org/reference/details_gen_additive_mod_mgcv.html?q=gen_additive#model-fitting).
 An example of tuning degrees of freedom can be found [here](https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206/2).
 
-
-```{r warning=FALSE}
+```{r warning=FALSE, eval=FALSE}
 wage_smooth_fit_16 <-
   as_tibble(predict(wage_smooth_df_16, age_grid)) %>%
   mutate(model = "smooth.spline()") %>%
@@ -967,7 +1269,7 @@ bind_rows(
 ```
 
 
-```{r}
+```{r eval=FALSE}
 gam_spec <- gen_additive_mod(select_features = FALSE, adjust_deg_free = tune()) %>%
   set_engine(engine = 'mgcv') %>%
   set_mode('regression')
@@ -987,11 +1289,6 @@ wage_tidymodels_fit <- gen_additive_mod(select_features = FALSE, adjust_deg_free
 gam_mod <- fit(gam_spec, interest_rate ~ s(annual_income) + s(debt_to_income) + s(delinq_2y), data = loans)
 ```
 
-
-### GAM
-
-
-https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206/2
 
 ## Reproducibility {-}
 
