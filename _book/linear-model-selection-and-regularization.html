@@ -24,7 +24,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-04-15" />
+<meta name="date" content="2022-04-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -346,7 +346,7 @@ div.csl-indent {
 <li class="chapter" data-level="7.5.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#an-overview-of-smoothing-splines"><i class="fa fa-check"></i><b>7.5.1</b> An Overview of Smoothing Splines</a></li>
 <li class="chapter" data-level="7.5.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#smoothing-parameter"><i class="fa fa-check"></i><b>7.5.2</b> Choosing the Smoothing Parameter <span class="math inline">\(\lambda\)</span></a></li>
 </ul></li>
-<li class="chapter" data-level="7.6" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#local-regression-local-regression"><i class="fa fa-check"></i><b>7.6</b> Local Regression {#local-regression{}}</a></li>
+<li class="chapter" data-level="7.6" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#local-regression"><i class="fa fa-check"></i><b>7.6</b> Local Regression</a></li>
 <li class="chapter" data-level="7.7" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#generalized-additive-models"><i class="fa fa-check"></i><b>7.7</b> Generalized Additive Models</a>
 <ul>
 <li class="chapter" data-level="7.7.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#gam-regression"><i class="fa fa-check"></i><b>7.7.1</b> GAMs for Regression Problems</a></li>
@@ -356,8 +356,12 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.8.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#polynomial-regression-and-step-functions"><i class="fa fa-check"></i><b>7.8.1</b> Polynomial Regression and Step Functions</a></li>
 <li class="chapter" data-level="7.8.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#splines"><i class="fa fa-check"></i><b>7.8.2</b> Splines</a></li>
-<li class="chapter" data-level="7.8.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#local-regression"><i class="fa fa-check"></i><b>7.8.3</b> Local regression</a></li>
-<li class="chapter" data-level="7.8.4" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#gam"><i class="fa fa-check"></i><b>7.8.4</b> GAM</a></li>
+<li class="chapter" data-level="7.8.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#gams-lab"><i class="fa fa-check"></i><b>7.8.3</b> GAMs</a></li>
+</ul></li>
+<li class="chapter" data-level="7.9" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#exercises-4"><i class="fa fa-check"></i><b>7.9</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#applied-4"><i class="fa fa-check"></i>Applied</a></li>
+<li class="chapter" data-level="7.9.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#delete"><i class="fa fa-check"></i><b>7.9.1</b> delete</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#reproducibility-4"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
@@ -6122,7 +6126,7 @@ The coefficient estimates are all non-zero (though some get close):</p>
 <div id="reproducibility-3" class="section level2 unnumbered">
 <h2>Reproducibility</h2>
 <div class="sourceCode" id="cb691"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb691-1"><a href="linear-model-selection-and-regularization.html#cb691-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-04-15 16:18:48 AST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-04-16 22:15:41 AST&quot;</code></pre>
 <div class="sourceCode" id="cb693"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb693-1"><a href="linear-model-selection-and-regularization.html#cb693-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
 <span id="cb693-2"><a href="linear-model-selection-and-regularization.html#cb693-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
 <span id="cb693-3"><a href="linear-model-selection-and-regularization.html#cb693-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
@@ -6130,7 +6134,7 @@ The coefficient estimates are all non-zero (though some get close):</p>
 <span id="cb693-5"><a href="linear-model-selection-and-regularization.html#cb693-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [efec28a] 2022-04-15: Working on the lab</code></pre>
+## Head:     [6db93f0] 2022-04-16: Started the exercises</code></pre>
 <div class="sourceCode" id="cb695"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb695-1"><a href="linear-model-selection-and-regularization.html#cb695-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## - Session info ---------------------------------------------------------------
 ##  setting  value                       
@@ -6142,7 +6146,7 @@ The coefficient estimates are all non-zero (though some get close):</p>
 ##  collate  English_Canada.1252         
 ##  ctype    English_Canada.1252         
 ##  tz       America/Curacao             
-##  date     2022-04-15                  
+##  date     2022-04-16                  
 ## 
 ## - Packages -------------------------------------------------------------------
 ##  package        * version    date       lib

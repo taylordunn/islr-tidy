@@ -37,3 +37,12 @@ iterators
 doParallel
 mvtnorm
 future
+Matrix
+glmnet
+leaps
+pls
+MASS
+lattice
+mixOmics
+nlme
+mgcv

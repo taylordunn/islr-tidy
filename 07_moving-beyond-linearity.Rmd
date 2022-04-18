@@ -1005,7 +1005,6 @@ finalize_workflow(wage_poly_workflow, best_degree) %>%
 
 ```{r}
 wage_step_spec <- recipe(wage ~ age, data = wage) %>%
-  #step_cut(age, breaks = tune())
   step_discretize(age, num_breaks = tune(),
                   # Need to adjust this from the default (=10)
                   min_unique = 2)
@@ -1054,11 +1053,12 @@ bind_rows(
 ```
 
 
-#### 7. Explore other predictors in `wage`
+#### 7. Explore other predictors in `wage` {-}
 
 In `tidymodels`, the implementation of smooth splines and GAMs uses the `mgcv` package as the default (and currently only) engine, so I'll use that for this example.
 
 ```{r message=FALSE}
+detach("package:gam", unload = TRUE)
 library(mgcv)
 glimpse(wage)
 ```
@@ -1082,8 +1082,8 @@ Some general observations:
 * People with better `health` have slightly higher wages.
 * People with `health_ins` have higher wages.
 * People with `jobclass = "Information"` have slightly higher wages.
-* `maritl` status has no significant patterns.
-* `race` has no significant patterns.
+* People with `maritl = "Married"` have have higher wages than `"Never Married"`.
+* People with `race = "Other"` has lower wages.
 * The `region` variable has a single value.
 
 Since these are all categorical, there aren't any new smoothing/spline/polynomial/etc. functions to try out.
@@ -1111,6 +1111,7 @@ wage_gam_3 <- gam(
 )
 summary(wage_gam_3)
 
+par(mar = c(2, 2, 2, 2))
 plot(wage_gam_3, pages = 1, all.terms = TRUE, shade = TRUE)
 ```
 
@@ -1119,7 +1120,6 @@ It does provide a statistically singificant improvement:
 ```{r}
 anova(wage_gam_2, wage_gam_3, test = "F")
 ```
-
 #### 8. Non-linear models of `auto`
 
 ```{r}
@@ -1173,7 +1173,7 @@ plot(auto_gam, pages = 1, shade = TRUE)
 ```
 
 
-#### 9. Predicting nitrogen oxide concentration in `boston`
+#### 9. Predicting nitrogen oxide concentration in `boston` {-}
 
 ```{r}
 boston <- ISLR2::Boston
@@ -1204,17 +1204,670 @@ Looks like higher values of `dis` (the distance from Boston employment centers) 
 
 (a) Cubic polynomial regression.
 
+```{r}
+lm_spec <- linear_reg()
+boston_poly_3_recipe <- recipe(nox ~ dis, data = boston) %>%
+  step_poly(dis, degree = 3)
+boston_poly_3_fit <- workflow() %>%
+  add_recipe(boston_poly_3_recipe) %>%
+  add_model(lm_spec) %>%
+  fit(data = boston)
+summary(boston_poly_3_fit %>% extract_fit_engine())
+```
+
+Visualize the cubic fit:
+
+```{r}
+dis_grid <- tibble(dis = seq(min(boston$dis), max(boston$dis),
+                             length.out = 100))
+boston_poly_3_pred <- bind_cols(
+  dis_grid,
+  # I'll use `predict` instead of `augment` because I don't think I can get
+  #  SEs/CIs easily with the latter
+  predict(boston_poly_3_fit, new_data = dis_grid),
+  predict(boston_poly_3_fit, new_data = dis_grid, type = "conf_int")
+)
+
+p_base <- ggplot(boston, aes(x = dis)) +
+  geom_point(aes(y = nox), color = "grey50", alpha = 0.5) +
+  scale_x_continuous(breaks = seq(2, 12, 2))
+
+p_base +
+  geom_line(data = boston_poly_3_pred, aes(y = .pred),
+            color = td_colors$nice$spanish_blue, size = 2) +
+  geom_ribbon(data = boston_poly_3_pred,
+              aes(ymin = .pred_lower, ymax = .pred_upper),
+              fill = td_colors$nice$spanish_blue, alpha = 0.5)
+```
+
 (b) Polynomial fits from 1 to 10 degrees.
+
+Since we're not `tune()`ing the `degree` parameter on resamples here (just fitting a model for each `degree` to the full data set) I can't use the typical `tune_grid()/fit_resamples()` approach.
+
+```{r}
+boston_recipe <- recipe(nox ~ dis, data = boston)
+
+boston_poly_fits <-
+  tibble(
+    degree = 1:10,
+    poly_fit = map(
+      degree,
+      ~ workflow() %>%
+        add_recipe(boston_recipe %>% step_poly(dis, degree = .x)) %>%
+        add_model(lm_spec) %>%
+        fit(data = boston)
+    )
+  ) %>%
+  mutate(
+    poly_pred = map(
+      poly_fit,
+      ~ bind_cols(
+        dis_grid,
+        predict(.x, new_data = dis_grid),
+        predict(.x, new_data = dis_grid, type = "conf_int")
+      )
+    ),
+    mod_rss = map_dbl(poly_fit, ~ glance(.x)$deviance)
+  )
+
+p_base +
+  geom_line(
+    data = boston_poly_fits %>%
+      mutate(
+        degree_label = fct_inorder(paste0(degree, " (", round(mod_rss, 3), ")"),
+                                   ordered = TRUE)
+      ) %>%
+      unnest(poly_pred),
+    aes(y = .pred, color = degree_label), size = 1
+  ) +
+  scale_color_viridis_d(end = 0.8) +
+  labs(color = "Degree (RSS)") +
+  coord_cartesian(ylim = c(0.35, 0.9))
+```
 
 (c) Choose the optimal degree by cross-validation.
 
+Now I can `tune()`:
+
+```{r}
+boston_poly_recipe <- recipe(nox ~ dis, data = boston) %>%
+  step_poly(dis, degree = tune())
+boston_poly_workflow <- workflow() %>%
+  add_recipe(boston_poly_recipe) %>%
+  add_model(lm_spec)
+
+degree_grid <- tibble(degree = 1:10)
+
+set.seed(4928)
+boston_resamples <- vfold_cv(boston, v = 10)
+
+boston_poly_tune <-
+  tune_grid(boston_poly_workflow, resamples = boston_resamples,
+            grid = degree_grid)
+
+autoplot(boston_poly_tune) +
+  scale_x_continuous(breaks = 1:10)
+```
+
+Both the 3-degree and 4-degree fits appear best.
+I would choose the 3-degree since it is simpler.
+You could also make a case for the quadratic fit by the one SE rule:
+
+```{r}
+select_by_one_std_err(boston_poly_tune, metric = "rmse", degree)
+```
+
+
 (d) Regression splines.
+
+With 4 degrees of freedom, a cubic spline has a single knot.
+By default, it will be placed at the median of `dis`:
+
+```{r}
+attr(bs(boston$dis, df = 4), "knots")
+```
+
+
+```{r}
+boston_spline_4_recipe <- recipe(nox ~ dis, data = boston) %>%
+  step_bs(dis, deg_free = 4)
+boston_spline_4_fit <- workflow() %>%
+  add_model(lm_spec) %>%
+  add_recipe(boston_spline_4_recipe) %>%
+  fit(data = boston)
+
+extract_fit_engine(boston_spline_4_fit) %>%
+  summary()
+```
+
+
+```{r}
+boston_spline_4_pred <- bind_cols(
+  dis_grid,
+  predict(boston_spline_4_fit, new_data = dis_grid),
+  predict(boston_spline_4_fit, new_data = dis_grid, type = "conf_int")
+)
+
+p_base +
+  geom_line(data = boston_spline_4_pred, aes(y = .pred),
+            color = td_colors$nice$ruby_red, size = 2) +
+  geom_ribbon(data = boston_spline_4_pred,
+              aes(ymin = .pred_lower, ymax = .pred_upper),
+              fill = td_colors$nice$ruby_red, alpha = 0.5)
+
+```
 
 (e) Regression splines for a range of degrees of freedom.
 
+I'll range `deg_free` from 3 (no knots) to 10 (7 knots):
+
+```{r}
+boston_spline_fits <-
+  tibble(
+    deg_free = 3:10,
+    spline_fit = map(
+      deg_free,
+      ~ workflow() %>%
+        add_recipe(boston_recipe %>% step_bs(dis, deg_free = .x)) %>%
+        add_model(lm_spec) %>%
+        fit(data = boston)
+    )
+  ) %>%
+  mutate(
+    spline_pred = map(
+      spline_fit,
+      ~ bind_cols(
+        dis_grid,
+        predict(.x, new_data = dis_grid),
+        predict(.x, new_data = dis_grid, type = "conf_int")
+      )
+    ),
+    mod_rss = map_dbl(spline_fit, ~ glance(.x)$deviance)
+  )
+
+p_base +
+  geom_line(
+    data = boston_spline_fits %>%
+      mutate(
+        df_label = fct_inorder(paste0(deg_free, " (", round(mod_rss, 3), ")"),
+                                   ordered = TRUE)
+      ) %>%
+      unnest(spline_pred),
+    aes(y = .pred, color = df_label), size = 1
+  ) +
+  scale_color_viridis_d(end = 0.8) +
+  labs(color = "df (RSS)") +
+  coord_cartesian(ylim = c(0.35, 0.9))
+```
+
+
 (f) Choose the optimal degrees of freedom by cross-validation
 
-#### 10. Predicting tuition with `college`
+```{r}
+boston_spline_recipe <- recipe(nox ~ dis, data = boston) %>%
+  step_bs(dis, deg_free = tune())
+boston_spline_workflow <- workflow() %>%
+  add_recipe(boston_spline_recipe) %>%
+  add_model(lm_spec)
+deg_free_grid <- tibble(deg_free = 3:15)
+```
+
+
+```{r boston-spline-tune, cache=TRUE}
+boston_spline_tune <-
+  tune_grid(boston_spline_workflow, resamples = boston_resamples,
+            grid = deg_free_grid)
+```
+
+```{r}
+autoplot(boston_spline_tune) +
+  scale_x_continuous(breaks = 3:15)
+```
+
+The RMSE estimates are a bit noisier than I would like.
+The best model within one SE:
+
+```{r}
+select_by_one_std_err(boston_spline_tune, metric = "rmse", deg_free)
+```
+
+From the plot, it might be surprising that the best model has 0 knots (`deg_free = 3`), but relative to the standard errors, there isn't a huge improvement for larger values.
+
+```{r include=FALSE}
+# Grab metrics for the below text
+spline_metrics <- collect_metrics(boston_spline_tune) %>%
+  filter(.metric == "rmse") %>%
+  pull(mean, name = deg_free)
+```
+
+
+An alternative way of choosing the model is by percent loss via `tune::select_by_pct_loss()`.
+The best model here has an RMSE of
+`r round(min(spline_metrics), 4)`.
+The `deg_free = 3` model has an RMSE of
+`r round(spline_metrics[['3']], 4)`.
+This corresponds to a percentage loss of 
+(`r round(spline_metrics[['3']], 4)` - `r round(min(spline_metrics), 4)`) /
+`r round(min(spline_metrics), 4)` * 100 = 
+`r scales::percent((spline_metrics[['3']] - min(spline_metrics)) / min(spline_metrics), accuracy = 0.1)`.
+We can choose an upper `limit` of acceptable percent loss in `tune::select_by_pct_loss()` -- the default is `limit = 2` which eliminates `deg_free = 3` as an option:
+
+```{r}
+select_by_pct_loss(boston_spline_tune, metric = "rmse", deg_free)
+```
+
+By percent loss, `deg_free = 9` is chosen.
+
+#### 10. Predicting tuition with `college` {-}
+
+```{r}
+college <- ISLR2::College %>% janitor::clean_names()
+glimpse(college)
+```
+
+Some quick EDA:
+
+```{r message=FALSE, fig.height=7, fig.width=8}
+p1 <- college %>%
+  ggplot(aes(x = outstate)) +
+  geom_density(fill = td_colors$nice$mellow_yellow, alpha = 0.5) +
+  geom_rug() +
+  dunnr::remove_axis("y")
+p2 <- college %>%
+  ggplot(aes(y = private, x = outstate)) +
+  geom_boxplot(fill = td_colors$nice$mellow_yellow, alpha = 0.5)
+p3 <- college %>%
+  select(where(is.double)) %>%
+  pivot_longer(cols = -outstate) %>%
+  ggplot(aes(x = value, y = outstate)) +
+  geom_point(color = "grey50", alpha = 0.3) +
+  geom_smooth(method = "gam", color = td_colors$nice$mellow_yellow) +
+  facet_wrap(~ name, scales = "free_x", ncol = 4)
+(p1 + p2) / p3 +
+  plot_layout(heights = c(1, 5))
+```
+
+
+(a) Split the data and select a subset of predictors.
+
+```{r}
+set.seed(10291)
+college_splits <- initial_split(college, prop = 0.7, strata = outstate)
+college_train <- training(college_splits)
+college_test <- testing(college_splits)
+college_resamples <- vfold_cv(college_train, v = 10)
+```
+
+```{r include=FALSE}
+# Here is how to choose subset automatically with lasso
+lasso_spec <- linear_reg(mixture = 1, penalty = tune()) %>%
+  set_engine("glmnet")
+college_lasso_recipe <- recipe(outstate ~ ., data = college_train) %>%
+  step_novel(all_nominal()) %>%
+  step_dummy(all_nominal()) %>%
+  step_zv(all_predictors()) %>%
+  step_normalize(all_predictors())
+college_lasso_workflow <- workflow() %>%
+  add_recipe(college_lasso_recipe) %>%
+  add_model(lasso_spec)
+
+penalty_grid <- grid_regular(penalty(range = c(-10, 3)), levels = 30)
+
+college_lasso_tune <- tune_grid(
+  college_lasso_workflow, resamples = college_resamples,
+  grid = penalty_grid
+)
+
+college_lasso_train_fit <- finalize_workflow(
+  college_lasso_workflow, select_best(college_lasso_tune, metric = "rmse")
+) %>%
+  fit(data = college_train)
+college_lasso_train_fit %>%
+  tidy() %>%
+  filter(term != "(Intercept)") %>%
+  arrange(abs(estimate))
+# The only variable removed (coefficient shrunk to zero) was `p_undergrad`
+```
+
+```{r}
+college_regsubsets <-
+  leaps::regsubsets(outstate ~ ., data = college_train,
+                    method = "forward", nvmax = 17) %>%
+  tidy() %>%
+  select(-`(Intercept)`) %>%
+  rownames_to_column(var = "n_vars") %>%
+  pivot_longer(cols = privateYes:grad_rate, names_to = "var") %>%
+  filter(value) %>%
+  select(-value) %>%
+  group_by(across(-var)) %>%
+  summarise(var = paste0(sort(var), collapse = ", "), .groups = "drop") %>%
+  mutate(n_vars = as.integer(n_vars)) %>%
+  arrange(n_vars)
+college_regsubsets %>%
+  gt() %>%
+  fmt_number(columns = c(r.squared, adj.r.squared, BIC, mallows_cp),
+             n_sigfig = 4) %>%
+  data_color(columns = r.squared, colors = c("red", "green"), alpha = 0.5) %>%
+  data_color(columns = adj.r.squared, colors = c("red", "green"), alpha = 0.5) %>%
+  data_color(columns = BIC, colors = c("green", "red"), alpha = 0.5) %>%
+  data_color(columns = mallows_cp, colors = c("green", "red"), alpha = 0.5)
+```
+
+By forward stepwise selection, the best model has 12, 7, or 11 variables by highest adjusted $R^2$, lowest BIC, and lowest $C_p$ respectively.
+I'll go with the 7 variable model to keep it simpler:
+
+```{r}
+college_regsubsets %>%
+  filter(BIC == min(BIC)) %>%
+  select(n_vars, BIC, var)
+```
+
+(b) Fit a GAM and evaluate on the test set.
+
+Here is the GAM spec in `tidymodels` with `mgcv` as the engine and `tune()`-able degrees of freedom:
+
+```{r}
+gam_spec <- gen_additive_mod(adjust_deg_free = tune()) %>%
+  # This needs to be specificied (can be regression or classification)
+  set_mode("regression") %>%
+  # This doesn't, as it is the default engine
+  set_engine("mgcv")
+translate(gam_spec)
+```
+
+Note that the `adjust_deg_free` parameter corresponds to `gamma` in `mgcv`, which controls model smoothness.
+
+The `workflow` for GAMs doesn't use the regular `recipe` approach -- see [this example](https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206).
+Instead, smoothing terms are specified with the `formula` argument:
+
+```{r}
+college_gam_workflow <- workflow() %>%
+  add_model(
+    gam_spec,
+    formula = outstate ~ s(expend) + s(grad_rate) + s(perc_alumni) +
+      s(personal) + s(ph_d) + s(room_board) + private
+  ) %>%
+  add_variables(predictors = everything(), outcomes = outstate)
+```
+
+An explanation from the `?add_model()` documentation:
+
+>
+Typically, the terms are extracted from the formula or recipe preprocessing methods. However, some models (like survival and bayesian models) use the formula not to preprocess, but to specify the structure of the model. In those cases, a formula specifying the model structure must be passed unchanged into the model call itself.
+
+Now tune the model for a range of `adjust_deg_free`:
+
+```{r}
+adjust_deg_free_grid <-
+  grid_regular(adjust_deg_free(range = c(0.25, 5)), levels = 30)
+college_gam_tune <-
+  tune_grid(college_gam_workflow, resamples = college_resamples,
+            grid = adjust_deg_free_grid)
+autoplot(college_gam_tune)
+```
+
+Take the best model, fit to the full training set, and print the model output:
+
+```{r}
+college_gam_final_workflow <-
+  finalize_workflow(college_gam_workflow,
+                    select_best(college_gam_tune, metric = "rmse"))
+college_gam_fit_training <- college_gam_final_workflow %>%
+  fit(data = college_train)
+
+extract_fit_engine(college_gam_fit_training) %>%
+  summary()
+```
+
+(c) Evaluate the model obtained on the test set.
+
+```{r}
+college_test_pred <- college_gam_fit_training %>%
+  augment(new_data = college_test)
+college_test_pred %>%
+  rmse(truth = outstate, estimate = .pred)
+```
+
+As a comparison, here is the test RMSE for a purely linear model:
+
+```{r}
+linear_reg() %>%
+  fit(
+    outstate ~ expend + grad_rate + perc_alumni +
+      personal + ph_d + room_board + private,
+    data = college_train
+  ) %>%
+  augment(new_data = college_test) %>%
+  rmse(truth = outstate, estimate = .pred)
+```
+
+Plot the actual vs predicted from the GAM fit:
+
+```{r fig.height=3, fig.width=3}
+college_test_pred %>%
+  ggplot(aes(x = outstate, y = .pred)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(lty = 2)
+```
+
+
+(d) For which variables, if any, is there evidence of a non-linear relationship?
+
+Visualize the smooth functions:
+
+```{r}
+extract_fit_engine(college_gam_fit_training) %>%
+  plot(pages = 1, shade = TRUE)
+```
+
+The `expend`, `grad_rate`, and `ph_d` exhibit non-linear relationships
+
+#### 11. Backfitting with simulated data {-}
+
+(a) Generate response $Y$ and predictors $X_1$ and $X_2$ for $n = 100$.
+
+Generate some $\beta$s:
+
+```{r}
+set.seed(2939)
+(betas <- runif(3, min = -10, max = 10))
+```
+
+Then the data-generating model will be:
+
+$$
+\begin{align}
+Y &= -0.785 + 9.199 X_1 - 9.655 X_2 + \epsilon \\
+X_1 &\sim N(0, 2) \\
+X_2 &\sim N(0, 2) \\
+\epsilon &\sim N(0, 5)
+\end{align}
+$$
+
+```{r}
+d <- tibble(
+  x1 = rnorm(100, 0, 2),
+  x2 = rnorm(100, 0, 2),
+  epsilon = rnorm(100, 0, 5)
+) %>%
+  mutate(y = betas[1] + betas[2] * x1 + betas[3] * x2 + epsilon)
+glimpse(d)
+```
+(b) Initialize $\hat{\beta}_1$.
+
+```{r}
+beta_hat_1 <- -3.14
+```
+
+(c) Keeping $\hat{\beta}_1$ fixed, fit the model
+
+$$
+Y - \hat{\beta}_1 X_1 = \beta_0 + \beta_2 X_2 + \epsilon
+$$
+
+```{r}
+d <- d %>% mutate(y_diff = y - beta_hat_1 * x1)
+(beta_hat_2 <- lm(y_diff ~ x2, data = d)$coefficients[2])
+```
+ 
+(d) Keeping $\hat{\beta}_2$ fixed, fit the model
+ 
+$$
+Y - \hat{\beta}_2 X_2 = \beta_0 + \beta_1 X_1 + \epsilon
+$$
+
+```{r}
+d <- d %>% mutate(y_diff = y - beta_hat_2 * x2)
+(beta_hat_1 <- lm(y_diff ~ x1, data = d)$coefficients[2])
+```
+
+(e) Repeat 1000 times and plot the coefficient estimates.
+
+```{r}
+beta_hat_0 <- numeric(0)
+beta_hat_1 <- c(-3.14)
+beta_hat_2 <- numeric(0)
+for (i in 1:1000) {
+  d <- d %>% mutate(y_diff = y - beta_hat_1[i] * x1)
+  m <- lm(y_diff ~ x2, data = d)
+  beta_hat_2 <- c(beta_hat_2, m$coefficients[2])
+  
+  d <- d %>% mutate(y_diff = y - beta_hat_2[i] * x2)
+  m <- lm(y_diff ~ x1, data = d)
+  beta_hat_0 <- c(beta_hat_0, m$coefficients[1])
+  beta_hat_1 <- c(beta_hat_1, m$coefficients[2])
+}
+
+d_estimates <- tibble(
+  beta_0 = c(NA_real_, beta_hat_0),
+  beta_1 = beta_hat_1,
+  beta_2 = c(NA_real_, beta_hat_2)
+) %>%
+  mutate(i = 0:1000) %>%
+  pivot_longer(cols = -i, names_to = "coef", values_to = "estimate") %>%
+  filter(!is.na(estimate))
+p <- ggplot(d_estimates, aes(x = i, y = estimate, color = coef)) +
+  geom_line(size = 1.5)
+p
+```
+
+The convergence happens immediately.
+
+(f) Compare to a multiple linear regression.
+
+```{r}
+d_estimates_mult <- lm(y ~ x1 + x2, data = d) %>%
+  tidy() %>%
+  mutate(coef = factor(term, levels = c("(Intercept)", "x1", "x2"),
+                       labels = c("beta_0", "beta_1", "beta_2")))
+p <- p +
+  geom_hline(data = d_estimates_mult,
+             aes(yintercept = estimate, color = coef), lty = 2, size = 1)
+p
+```
+
+Basically the exact same estimates.
+
+(g) How many backfitting iterations were required.
+
+Just a single iteration was needed.
+
+```{r}
+d_estimates %>%
+  filter(i < 5) %>%
+  pivot_wider(names_from = coef, values_from = estimate)
+```
+
+```{r}
+p + 
+  coord_cartesian(xlim = c(0, 5)) +
+  facet_wrap(~ coef, scales = "free_y", ncol = 1)
+```
+
+#### 12. Backfitting with simulated data (continued) {-]
+
+I'll use `matrix` to initialize such a large data set:
+
+```{r}
+set.seed(1009)
+betas <- runif(100, min = -5, max = 5)
+# Intercept
+beta_0 <- runif(1, min = -5, max = 5)
+
+# A matrix of 100 predictors times 100 observations
+x <- matrix(rnorm(100 * 100, mean = 0, sd = 1), ncol = 100)
+# Matrix multiplication to get the response
+y <- beta_0 + x %*% betas +
+  # Using a smaller random noise term
+  rnorm(100, mean = 0, sd = 1)
+```
+
+I'll use a vector to keep track of the $\hat{\beta}_j$s, and a data frame to track estimates over time:
+
+```{r}
+# Initial coefficient guesses
+beta_hat <- runif(100, min = -10, max = 10)
+# A tibble for keeping track of beta hats
+beta_hat_estimates <- tibble(
+  iter = 0,
+  coef = paste0("beta_", 0:100),
+  # Including intercept estimate here (beta_0)
+  estimate = c(NA_real_, beta_hat)
+)
+```
+
+I'll try 100 iterations:
+
+```{r}
+for (i in 1:100) {
+  for (j in 1:100) {
+    y_resid <- y - x[, -j] %*% beta_hat[-j]
+    m <- lm(y_resid ~ x[, j])
+    beta_hat[j] <- m$coefficients[2]
+  }
+  
+  beta_hat_estimates <- beta_hat_estimates %>%
+    bind_rows(
+      tibble(
+        iter = i,
+        coef = paste0("beta_", 0:100),
+        estimate = c(m$coefficients[1], beta_hat)
+      )
+    )
+}
+```
+
+And here is how each coefficient estimate evolves:
+
+```{r}
+beta_hat_estimates %>%
+  filter(!is.na(estimate)) %>%
+  ggplot(aes(x = iter, y = estimate, group = coef)) +
+  geom_line(alpha = 0.5)
+```
+
+Fit the full multiple regression model.
+
+```{r}
+d <- data.frame(x) %>% bind_cols(y = y)
+m_mult <- lm(y ~ ., data = d)
+tidy(m_mult)
+```
+
+```{r}
+tidy(m_mult) %>%
+  transmute(coef = paste0("beta_", 0:99), estimate_mult = estimate) %>%
+  left_join(
+    beta_hat_estimates %>%
+      filter(!is.na(estimate)),
+    by = "coef"
+  ) %>%
+  mutate(abs_diff = abs(estimate_mult - estimate)) %>%
+  ggplot(aes(x = iter, y = abs_diff, group = coef)) +
+  geom_line()
+```
+
+Can't get the multiple regression coefficients to converge.
 
 ### delete
 
@@ -1225,69 +1878,6 @@ See some examples in the `parsnip` documentation [here]
 and [here]
 (https://parsnip.tidymodels.org/reference/details_gen_additive_mod_mgcv.html?q=gen_additive#model-fitting).
 An example of tuning degrees of freedom can be found [here](https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206/2).
-
-```{r warning=FALSE, eval=FALSE}
-wage_smooth_fit_16 <-
-  as_tibble(predict(wage_smooth_df_16, age_grid)) %>%
-  mutate(model = "smooth.spline()") %>%
-  rename(age = x, .fitted = y)
-
-detach("package:mgcv", unload = TRUE)
-library(gam)
-wage_gam_fit_16 <- gam(wage ~ s(age, df = 16), data = wage)
-wage_gam_fit_16_pred <-
-  augment(wage_gam_fit_16, newdata = tibble(age = age_grid)) %>%
-  mutate(model = "gam()")
-detach("package:gam", unload = TRUE)
-library(mgcv)
-wage_mgcv_fit_16 <- gam(wage ~ s(age, k = 16, fx = TRUE), data = wage)
-wage_mgcv_fit_16_pred <-
-  augment(wage_mgcv_fit_16, newdata = tibble(age = age_grid)) %>%
-  mutate(model = "mgcv()")
-
-wage_tidymodels_fit <- gen_additive_mod(select_features = FALSE, adjust_deg_free = 6) %>%
-  set_engine("mgcv") %>%
-  set_mode("regression") %>%
-  fit(wage ~ s(age, k = 16, fx = TRUE), data = wage)
-wage_tidymodels_fit_pred <-
-  augment(wage_tidymodels_fit, new_data = tibble(age = age_grid)) %>%
-  mutate(model = "tidymodels")
-  
-bind_rows(
-  # wage_smooth_fit_16,
-  # wage_gam_fit_16_pred,
-  wage_mgcv_fit_16_pred,
-  wage_tidymodels_fit_pred
-) %>%
-  ggplot(aes(x = age)) +
-  # geom_point(data = wage, aes(x = age, y = wage),
-  #            shape = 21, color = "grey50", alpha = 0.5) +
-  geom_line(aes(y = .fitted, color = model), size = 1.5, alpha = 0.5) +
-  theme(legend.position = c(0.7, 0.7)) +
-  labs(color = NULL)
-  #facet_wrap(~ model)
-```
-
-
-```{r eval=FALSE}
-gam_spec <- gen_additive_mod(select_features = FALSE, adjust_deg_free = tune()) %>%
-  set_engine(engine = 'mgcv') %>%
-  set_mode('regression')
-wage_gam_workflow <- workflow() %>%
-  add_model(gam_spec) %>%
-  add_recipe()
-
-wage_resamples
-fit_resamples(object = )
-wage_tidymodels_fit <- gen_additive_mod(select_features = FALSE, adjust_deg_free = 6) %>%
-  set_engine("mgcv") %>%
-  set_mode("regression") %>%
-  fit(wage ~ s(age, k = 16, fx = TRUE), data = wage)
-
-
-# fitting gam model
-gam_mod <- fit(gam_spec, interest_rate ~ s(annual_income) + s(debt_to_income) + s(delinq_2y), data = loans)
-```
 
 
 ## Reproducibility {-}
