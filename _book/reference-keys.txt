@@ -123,8 +123,5 @@ polynomial-regression-and-step-functions
 splines
 gams-lab
 exercises-4
-explore-other-predictors-in-wage
 non-linear-models-of-auto
-predicting-nitrogen-oxide-concentration-in-boston
-predicting-tuition-with-college
-delete
+backfitting-with-simulated-data-continued--

@@ -6,7 +6,7 @@ knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
 
 # Moving Beyond Linearity
 
-Load the packages used in this chapter:
+Load the usual packages:
 
 ```{r message=FALSE}
 library(tidyverse)
@@ -1794,12 +1794,16 @@ betas <- runif(100, min = -5, max = 5)
 # Intercept
 beta_0 <- runif(1, min = -5, max = 5)
 
+# Increase number of observations to account for the increase in predictors
+n <- 1000
+
 # A matrix of 100 predictors times 100 observations
-x <- matrix(rnorm(100 * 100, mean = 0, sd = 1), ncol = 100)
+x <- matrix(rnorm(n * 100, mean = 0, sd = 1), ncol = 100)
+
 # Matrix multiplication to get the response
 y <- beta_0 + x %*% betas +
   # Using a smaller random noise term
-  rnorm(100, mean = 0, sd = 1)
+  rnorm(n, mean = 0, sd = 1)
 ```
 
 I'll use a vector to keep track of the $\hat{\beta}_j$s, and a data frame to track estimates over time:
@@ -1816,7 +1820,7 @@ beta_hat_estimates <- tibble(
 )
 ```
 
-I'll try 100 iterations:
+I'll try 100 iterations of backfitting:
 
 ```{r}
 for (i in 1:100) {
@@ -1849,14 +1853,15 @@ beta_hat_estimates %>%
 Fit the full multiple regression model.
 
 ```{r}
-d <- data.frame(x) %>% bind_cols(y = y)
-m_mult <- lm(y ~ ., data = d)
+m_mult <- lm(y ~ x)
 tidy(m_mult)
 ```
 
+Plot the absolute difference between the multiple regression coefficients and the backfitting coefficient estimates:
+
 ```{r}
 tidy(m_mult) %>%
-  transmute(coef = paste0("beta_", 0:99), estimate_mult = estimate) %>%
+  transmute(coef = paste0("beta_", 0:100), estimate_mult = estimate) %>%
   left_join(
     beta_hat_estimates %>%
       filter(!is.na(estimate)),
@@ -1864,21 +1869,12 @@ tidy(m_mult) %>%
   ) %>%
   mutate(abs_diff = abs(estimate_mult - estimate)) %>%
   ggplot(aes(x = iter, y = abs_diff, group = coef)) +
-  geom_line()
+  geom_line() +
+  coord_cartesian(xlim = c(0, 10)) +
+  scale_x_continuous(breaks = 1:10)
 ```
 
-Can't get the multiple regression coefficients to converge.
-
-### delete
-
-The `tidymodels` implementation of smooth splines and GAMs uses the `mgcv` package as the default (and currently only) engine, so I'll use that for this example:
-
-See some examples in the `parsnip` documentation [here]
-(https://parsnip.tidymodels.org/articles/Examples.html?q=additiv#gen_additive_mod-models)
-and [here]
-(https://parsnip.tidymodels.org/reference/details_gen_additive_mod_mgcv.html?q=gen_additive#model-fitting).
-An example of tuning degrees of freedom can be found [here](https://community.rstudio.com/t/tune-grid-and-gam-model-incl-gam-formula/127206/2).
-
+Looks like it only takes a few iterations to obtain a good approximation.
 
 ## Reproducibility {-}
 
