@@ -578,7 +578,7 @@ tidy(lm(mpg ~ horsepower, data = auto)) %>%
   fmt_number(columns = -term, decimals = 4)
 ```
 
-These estimates are similar, but you wouldn't be considered close.
+These estimates are similar, but wouldn't be considered close.
 
 >
 Does this indicate a problem with the bootstrap? In fact, it suggests the opposite. Recall that the standard formulas given in Equation 3.8 on page 66 rely on certain assumptions. For example, they depend on the unknown parameter $\sigma^2$, the noise variance. We then estimate $\sigma^2$ using the RSS. Now although the formulas for the standard errors do not rely on the linear model being correct, the estimate for $\sigma^2$ does. We see in
