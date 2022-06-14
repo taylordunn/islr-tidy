@@ -1503,7 +1503,7 @@ We can re-create this split manually with `rsample::make_splits`:
 ```{r}
 smarket_split <-
   make_splits(
-    ind = list(
+    x = list(
       # Get row numbers for <2005
       "analysis" = which(smarket$Year < 2005),
       # Get row numbers for 2005
@@ -1598,7 +1598,7 @@ library(discrim)
 lda_direction_fit <-
   # Note that this model definition does not come with parsnip, but the
   #  extension package discrim
-  discrim::discrim_linear(mode = "classification", engine = "MASS") %>%
+  discrim_linear(mode = "classification", engine = "MASS") %>%
   fit(Direction ~ Lag1 + Lag2, data = smarket_train)
 lda_direction_fit
 ```
@@ -1717,7 +1717,7 @@ Split the data into training and testing based on row number:
 ```{r}
 caravan_split <-
   make_splits(
-    ind = list("assessment" = 1:1000,
+    x = list("assessment" = 1:1000,
                "analysis" = 1001:nrow(caravan)),
     data = caravan
   )

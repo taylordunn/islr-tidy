@@ -1120,7 +1120,7 @@ It does provide a statistically singificant improvement:
 ```{r}
 anova(wage_gam_2, wage_gam_3, test = "F")
 ```
-#### 8. Non-linear models of `auto`
+#### 8. Non-linear models of `auto` {-}
 
 ```{r}
 auto <- ISLR2::Auto %>%
@@ -1784,7 +1784,7 @@ p +
   facet_wrap(~ coef, scales = "free_y", ncol = 1)
 ```
 
-#### 12. Backfitting with simulated data (continued) {-]
+#### 12. Backfitting with simulated data (continued) {-}
 
 I'll use `matrix` to initialize such a large data set:
 

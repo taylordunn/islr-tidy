@@ -104,9 +104,9 @@ auto_poly_fits_validation <- evaluate_poly_fits(auto_splits)
 auto_poly_fits_validation
 ```
 
-Now reproduce Figure 5.2:
+Run it an additional 9 times:
 
-```{r figure5.2}
+```{r auto_poly_fits_validation, cache=TRUE}
 auto_poly_fits_validation <- bind_rows(
   # 9 additional sets of fits
   map_dfr(
@@ -119,7 +119,11 @@ auto_poly_fits_validation <- bind_rows(
   ),
   auto_poly_fits_validation %>% mutate(rep = "10")
 )
+```
 
+Now reproduce Figure 5.2:
+
+```{r figure5.2}
 # Use a 10 color palette from the MetBrewer package
 pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
 
@@ -914,7 +918,7 @@ classification_metrics(direction_loocv_preds,
   pivot_wider(names_from = .metric, values_from = .estimate) %>%
   transmute(
     error_rate = 1 - accuracy,
-    across(c(accuracy, error_rate, sens, spec), scales::percent)
+    across(c(accuracy, error_rate, sensitivity, specificity), scales::percent)
   ) %>%
   gt()
 ```

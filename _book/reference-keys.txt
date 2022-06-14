@@ -123,5 +123,3 @@ polynomial-regression-and-step-functions
 splines
 gams-lab
 exercises-4
-non-linear-models-of-auto
-backfitting-with-simulated-data-continued--
