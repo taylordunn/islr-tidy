@@ -1,0 +1,130 @@
+```{r echo=FALSE}
+knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
+                      fig.width = 6, fig.height = 3,
+                      cache.path = "cache/")
+```
+
+# Tree-Based Methods
+
+Load the usual packages:
+
+```{r message=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(broom)
+library(gt)
+library(patchwork)
+library(tictoc)
+
+# Load my R package and set the ggplot theme
+library(dunnr)
+extrafont::loadfonts(device = "win", quiet = TRUE)
+theme_set(theme_td_minimal())
+set_geom_fonts()
+set_palette()
+```
+
+Tree-based methods involve *stratifying* or *segmenting* the predictor space into a number of simple regions.
+Predictions are typically the mean or mode of the response value for training observations in a region.
+Since the set of splitting rules can be summarized in a tree, these types of approaches are known as *decision tree* methods.
+
+>Tree-based methods are simple and useful for interpretation. However,
+they typically are not competitive with the best supervised learning aproaches, such as those seen in Chapters 6 and 7, in terms of prediction
+accuracy. Hence in this chapter we also introduce bagging, random forests,
+boosting, and Bayesian additive regression trees. Each of these approaches
+involves producing multiple trees which are then combined to yield a single
+consensus prediction. We will see that combining a large number of trees
+can often result in dramatic improvements in prediction accuracy, at the
+expense of some loss in interpretation.
+
+## The Basics of Decision Trees
+
+### Regression Trees
+
+#### Predicting Baseline Players' Salaries Using Regression Trees
+
+To motivate *regression trees*, we use an example of predicting a baseball player's `salary` based on `years` (number of years played in the major leagues), and `hits` (number of hits made in the previous year).
+
+```{r}
+hitters <- ISLR2::Hitters %>% janitor::clean_names()
+
+# As per the text, we remove missing `salary` values and log-transform it
+hitters <- hitters %>%
+  filter(!is.na(salary)) %>%
+  mutate(salary = log(salary))
+
+glimpse(hitters)
+```
+
+I'll start with the `trees` library for this example:
+
+```{r}
+library(tree)
+
+hitters_tree <- tree(salary ~ years + hits, data = hitters,
+                     # In order to limit the tree to just two partitions,
+                     #  need to set the `control` option
+                     control = tree.control(nrow(hitters), minsize = 100))
+```
+
+Use the built-in `plot()` to visualize the tree in Figure 8.1:
+
+```{r figure8.1}
+plot(hitters_tree)
+text(hitters_tree)
+```
+
+To visualize the regions, there is no `broom::tidy()` method for `tree` objects, but I can get the cuts from the `frame$splits` object:
+
+```{r}
+hitters_tree$frame$splits
+```
+
+```{r}
+splits <- hitters_tree$frame$splits %>%
+  as_tibble() %>%
+  filter(cutleft != "") %>%
+  mutate(val = readr::parse_number(cutleft)) %>%
+  pull(val)
+splits
+```
+
+```{r figure8.2}
+hitters %>%
+  ggplot(aes(x = years, y = hits)) +
+  geom_point(color = td_colors$nice$soft_orange) +
+  geom_vline(xintercept = splits[1], size = 1, color = "forestgreen") +
+  geom_segment(aes(x = splits[1], xend = 25, y = splits[2], yend = splits[2]),
+               size = 1, color = "forestgreen") +
+  annotate("text", x = 10, y = 50, label = "R[2]", size = 6, parse = TRUE) +
+  annotate("text", x = 10, y = 200, label = "R[3]", size = 6, parse = TRUE) +
+  annotate("text", x = 2, y = 118, label = "R[1]", size = 6, parse = TRUE) +
+  coord_cartesian(xlim = c(0, 25), ylim = c(0, 240)) +
+  scale_x_continuous(breaks = c(1, 4.5, 24)) +
+  scale_y_continuous(breaks = c(1, 117.5, 238))
+```
+
+>
+Overall, the tree stratifies
+or segments the players into three regions of predictor space: players who
+have played for four or fewer years, players who have played for five or more
+years and who made fewer than 118 hits last year, and players who have
+played for five or more years and who made at least 118 hits last year.
+
+The regions $R_1$, $R_2$, and $R_3$ are known as *terminal nodes* or *leaves* of the tree.
+The splits along the way are referred to as *internal nodes* -- the connections between nodes are called *branches*.
+
+A key advantage of a simple decision tree like this is its ease of interpretation:
+
+>
+We might interpret the regression tree displayed in Figure 8.1 as follows:
+`Years` is the most important factor in determining `Salary`, and players with
+less experience earn lower salaries than more experienced players. Given
+that a player is less experienced, the number of hits that he made in the
+previous year seems to play little role in his salary. But among players who
+have been in the major leagues for five or more years, the number of hits
+made in the previous year does affect salary, and players who made more
+hits last year tend to have higher salaries.
+
+
+#### Prediction via Stratification of the Feature Space {-}
