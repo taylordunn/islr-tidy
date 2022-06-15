@@ -106,8 +106,8 @@ auto_poly_fits_validation
 
 Run it an additional 9 times:
 
-```{r auto_poly_fits_validation, cache=TRUE}
-auto_poly_fits_validation <- bind_rows(
+```{r auto_poly_fits_validation_10}
+auto_poly_fits_validation_10 <- bind_rows(
   # 9 additional sets of fits
   map_dfr(
     1:9,
@@ -127,7 +127,7 @@ Now reproduce Figure 5.2:
 # Use a 10 color palette from the MetBrewer package
 pal <- MetBrewer::met.brewer("Veronese", 10, type = "continuous")
 
-p2 <- auto_poly_fits_validation %>%
+p2 <- auto_poly_fits_validation_10 %>%
   ggplot(aes(x = poly_df, y = rmse^2, fill = rep)) +
   geom_line(aes(color = rep), size = 1) +
   expand_limits(y = c(15, 30)) +
@@ -136,7 +136,7 @@ p2 <- auto_poly_fits_validation %>%
   scale_fill_manual(values = pal) +
   labs(x = "Degree of polynomial", y = NULL) +
   theme(legend.position = "none")
-p1 <- p2 %+% filter(auto_poly_fits_validation, rep == "1") +
+p1 <- p2 %+% filter(auto_poly_fits_validation_10, rep == "1") +
   geom_point(aes(fill = rep), shape = 21,  color = "white", size = 4) +
   labs(y = "MSE")
 p1 | p2
@@ -465,7 +465,7 @@ be used to effectively estimate the variability associated with $\hat{\alpha}$.
 Here are the MSE values as computed in \@ref(validation-set):
 
 ```{r}
-auto_poly_fits_validation %>%
+auto_poly_fits_validation_10 %>%
   filter(poly_df <= 3, rep == 1) %>%
   mutate(mse = rmse^2)
 ```
