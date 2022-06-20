@@ -1,0 +1,769 @@
+{
+  "version": 1,
+  "locale": "en_US",
+  "platform": "4.2.0",
+  "metadata": {
+    "appmode": "static",
+    "primary_rmd": null,
+    "primary_html": "index.html",
+    "content_category": null,
+    "has_parameters": false
+  },
+  "packages": null,
+  "files": {
+    "_main_files/figure-html/exercise-6-1.png": {
+      "checksum": "9e672dc0a6ab07ef7d2be8e021e10c8d"
+    },
+    "_main_files/figure-html/figure 5.2-1.png": {
+      "checksum": "4132d8197e4ae6234afb07e92e03164b"
+    },
+    "_main_files/figure-html/figure1.1-1.png": {
+      "checksum": "97e1190b890d63048330c5009d63b3e6"
+    },
+    "_main_files/figure-html/figure3.14-1.png": {
+      "checksum": "f9e7e14a274c3c65a22eb5a9faf4d36c"
+    },
+    "_main_files/figure-html/figure3.3-1.png": {
+      "checksum": "ddb8708d59aa367094094a72662bd88e"
+    },
+    "_main_files/figure-html/figure3.7-1.png": {
+      "checksum": "755e18506cc4e3615ec0ea49488168ee"
+    },
+    "_main_files/figure-html/figure3.8-1.png": {
+      "checksum": "d2af3a234f4c0b9571ebb7af29f6d473"
+    },
+    "_main_files/figure-html/figure3.9-1.png": {
+      "checksum": "e3c7bb399bc715d06ffef20d3c2eaf01"
+    },
+    "_main_files/figure-html/figure3.9-2.png": {
+      "checksum": "b7d030dd844391001194588084ac1e25"
+    },
+    "_main_files/figure-html/figure4.1-1.png": {
+      "checksum": "b193bdfb5e30b77fdf2502e945ec418b"
+    },
+    "_main_files/figure-html/figure4.13-1.png": {
+      "checksum": "24b4fa75ce0034e7695610b774d3d07e"
+    },
+    "_main_files/figure-html/figure4.14-1.png": {
+      "checksum": "7e235c68e1b7ec85c02003deec56ba90"
+    },
+    "_main_files/figure-html/figure4.15-1.png": {
+      "checksum": "6a17a5ae6cf9f9583c6748013d82af61"
+    },
+    "_main_files/figure-html/figure4.2-1.png": {
+      "checksum": "7a87210090b14d3fced39cf5ed712998"
+    },
+    "_main_files/figure-html/figure4.3-1.png": {
+      "checksum": "8812eb25a4eb66b262c25b5926018087"
+    },
+    "_main_files/figure-html/figure4.4-1.png": {
+      "checksum": "8bedefed341450d10e119be334acc551"
+    },
+    "_main_files/figure-html/figure4.5-1.png": {
+      "checksum": "ba4096bfc32f300d34b657ba99650dde"
+    },
+    "_main_files/figure-html/figure4.8-1.png": {
+      "checksum": "f58d8a86a9be35f4ae45fd49c2b48ae6"
+    },
+    "_main_files/figure-html/figure5.10-1.png": {
+      "checksum": "024d156f3018da97a8cd3a2f56bea840"
+    },
+    "_main_files/figure-html/figure5.2-1.png": {
+      "checksum": "da164263f377a4ae796fe55b61254333"
+    },
+    "_main_files/figure-html/figure5.4-1.png": {
+      "checksum": "d7f14ed0227540836b8838f0f4e2cee4"
+    },
+    "_main_files/figure-html/figure5.9-1.png": {
+      "checksum": "655803c247388c64cd59092121a61dc4"
+    },
+    "_main_files/figure-html/figure6.1-1.png": {
+      "checksum": "9074cf230ed0b8d59c0287fb6ce668ed"
+    },
+    "_main_files/figure-html/figure6.2-1.png": {
+      "checksum": "c415bd291d08589f26b85360f13f2ee7"
+    },
+    "_main_files/figure-html/figure6.20-1.png": {
+      "checksum": "c6b95d9e095b32ddf4d36a2ead02c259"
+    },
+    "_main_files/figure-html/figure6.22-1.png": {
+      "checksum": "cfa09277352bccad401afcdadcb6f0b5"
+    },
+    "_main_files/figure-html/figure6.3-1.png": {
+      "checksum": "2d02b0cb399979992828ecbeca9280a8"
+    },
+    "_main_files/figure-html/figure6.4-1.png": {
+      "checksum": "fdabf3e879d762f74b1bab41f3476af5"
+    },
+    "_main_files/figure-html/figure6.4_incorrect-1.png": {
+      "checksum": "b83a33e0af839b39b4ce0ee2bba6b007"
+    },
+    "_main_files/figure-html/figure6.6-1.png": {
+      "checksum": "a56bb5ac680791371b5fad6db4b61b19"
+    },
+    "_main_files/figure-html/figure7-1-1.png": {
+      "checksum": "960ad37b9d266d52e7fe35f266aa68f3"
+    },
+    "_main_files/figure-html/figure7-10-1.png": {
+      "checksum": "1a9b2ee3b53b4b224ab5cbb663ba8973"
+    },
+    "_main_files/figure-html/figure7-11-1.png": {
+      "checksum": "83ecb3eaef537577659a0be558cbb6d3"
+    },
+    "_main_files/figure-html/figure7-11-2.png": {
+      "checksum": "157ccf81f7997793c415776d37a247a4"
+    },
+    "_main_files/figure-html/figure7-11-3.png": {
+      "checksum": "5388095872e37e13863bfeb26ecd2d78"
+    },
+    "_main_files/figure-html/figure7-11-4.png": {
+      "checksum": "8f215f930f20345a1bae57f1ef32ce77"
+    },
+    "_main_files/figure-html/figure7-12-1.png": {
+      "checksum": "a53d9f0f6b371222deffec7957250705"
+    },
+    "_main_files/figure-html/figure7-12-2.png": {
+      "checksum": "7c5ae30bc8d7ecd5dad83b0bebe170d8"
+    },
+    "_main_files/figure-html/figure7-12-3.png": {
+      "checksum": "dbea85506bd2312c51cbf9e61378b1a2"
+    },
+    "_main_files/figure-html/figure7-12-4.png": {
+      "checksum": "a53d9f0f6b371222deffec7957250705"
+    },
+    "_main_files/figure-html/figure7-13-1.png": {
+      "checksum": "ba989cbfed58c65fa1e4de43a02f776f"
+    },
+    "_main_files/figure-html/figure7-13-2.png": {
+      "checksum": "2f51d0f0fad2b111776d72f20a9e8ea8"
+    },
+    "_main_files/figure-html/figure7-13-3.png": {
+      "checksum": "d90c74cc87f917386c621d9ba036a85d"
+    },
+    "_main_files/figure-html/figure7-13-4.png": {
+      "checksum": "ba989cbfed58c65fa1e4de43a02f776f"
+    },
+    "_main_files/figure-html/figure7-14-1.png": {
+      "checksum": "0277f850f01916370364a9ea9d8a1275"
+    },
+    "_main_files/figure-html/figure7-14-2.png": {
+      "checksum": "b074dcf69c428a080dd7a11e4ae491f3"
+    },
+    "_main_files/figure-html/figure7-14-3.png": {
+      "checksum": "6ce863a964e97b13cf0406ab5c4e9d34"
+    },
+    "_main_files/figure-html/figure7-14-4.png": {
+      "checksum": "0277f850f01916370364a9ea9d8a1275"
+    },
+    "_main_files/figure-html/figure7-2-1.png": {
+      "checksum": "2f2c33e4d95148e6c4fc22eef1aca1f5"
+    },
+    "_main_files/figure-html/figure7-4-1.png": {
+      "checksum": "0293b5225b682b2b8d49a177beb77bbd"
+    },
+    "_main_files/figure-html/figure7-5-1.png": {
+      "checksum": "ae69fa3acf2b845c650b3e27829c4993"
+    },
+    "_main_files/figure-html/figure7-6-1.png": {
+      "checksum": "686b70e078b3a12360fa52d218a76f72"
+    },
+    "_main_files/figure-html/figure7-7-1.png": {
+      "checksum": "3fe6b61a52948357b919c8c4863b25f6"
+    },
+    "_main_files/figure-html/figure7-8-1.png": {
+      "checksum": "5286161c05d4a4992342dfc8ba38b8b2"
+    },
+    "_main_files/figure-html/figure7.1-1.png": {
+      "checksum": "960ad37b9d266d52e7fe35f266aa68f3"
+    },
+    "_main_files/figure-html/figure7.10-1.png": {
+      "checksum": "afa9d72d3de28743735d7bdc220a0a6e"
+    },
+    "_main_files/figure-html/figure7.11-1.png": {
+      "checksum": "f1e91ff74ff4d1cc66bc0a3b6b3bb7d0"
+    },
+    "_main_files/figure-html/figure7.11-2.png": {
+      "checksum": "52c0a3909b99552316dd377298b9c932"
+    },
+    "_main_files/figure-html/figure7.11-3.png": {
+      "checksum": "ce47e06809248d191bb14e5d76dfc682"
+    },
+    "_main_files/figure-html/figure7.11-4.png": {
+      "checksum": "8f215f930f20345a1bae57f1ef32ce77"
+    },
+    "_main_files/figure-html/figure7.13-1.png": {
+      "checksum": "33683bd1d99a3d1573afb3e04066bb06"
+    },
+    "_main_files/figure-html/figure7.13-2.png": {
+      "checksum": "2f51d0f0fad2b111776d72f20a9e8ea8"
+    },
+    "_main_files/figure-html/figure7.13-3.png": {
+      "checksum": "d90c74cc87f917386c621d9ba036a85d"
+    },
+    "_main_files/figure-html/figure7.13-4.png": {
+      "checksum": "ba989cbfed58c65fa1e4de43a02f776f"
+    },
+    "_main_files/figure-html/figure7.14-1.png": {
+      "checksum": "8e5f1933b7157ff5df01c341f2f4a363"
+    },
+    "_main_files/figure-html/figure7.14-2.png": {
+      "checksum": "b074dcf69c428a080dd7a11e4ae491f3"
+    },
+    "_main_files/figure-html/figure7.14-3.png": {
+      "checksum": "6ce863a964e97b13cf0406ab5c4e9d34"
+    },
+    "_main_files/figure-html/figure7.14-4.png": {
+      "checksum": "0277f850f01916370364a9ea9d8a1275"
+    },
+    "_main_files/figure-html/figure7.2-1.png": {
+      "checksum": "2f2c33e4d95148e6c4fc22eef1aca1f5"
+    },
+    "_main_files/figure-html/figure7.4-1.png": {
+      "checksum": "0293b5225b682b2b8d49a177beb77bbd"
+    },
+    "_main_files/figure-html/figure7.5-1.png": {
+      "checksum": "ae69fa3acf2b845c650b3e27829c4993"
+    },
+    "_main_files/figure-html/figure7.6-1.png": {
+      "checksum": "686b70e078b3a12360fa52d218a76f72"
+    },
+    "_main_files/figure-html/figure7.7-1.png": {
+      "checksum": "3fe6b61a52948357b919c8c4863b25f6"
+    },
+    "_main_files/figure-html/figure7.8-1.png": {
+      "checksum": "517fcdfa162b0c88c08749bd719a2a7f"
+    },
+    "_main_files/figure-html/unnamed-chunk-104-1.png": {
+      "checksum": "de56de2df42ad33a22238cf23448e7e9"
+    },
+    "_main_files/figure-html/unnamed-chunk-105-1.png": {
+      "checksum": "a7a2755a537457956f69aab7510b0e51"
+    },
+    "_main_files/figure-html/unnamed-chunk-108-1.png": {
+      "checksum": "b2ec7f7836ceece50de47296c92de16b"
+    },
+    "_main_files/figure-html/unnamed-chunk-110-1.png": {
+      "checksum": "955e4361016ad7096d0398a501c8b75e"
+    },
+    "_main_files/figure-html/unnamed-chunk-111-1.png": {
+      "checksum": "c2603091db21487611013c152bf9abfd"
+    },
+    "_main_files/figure-html/unnamed-chunk-113-1.png": {
+      "checksum": "ec4e9978f545bd97140a3488183d4713"
+    },
+    "_main_files/figure-html/unnamed-chunk-115-1.png": {
+      "checksum": "e811cbdec6b666f81a96acd670808edf"
+    },
+    "_main_files/figure-html/unnamed-chunk-117-1.png": {
+      "checksum": "704dd36330fa073560276939849e20ed"
+    },
+    "_main_files/figure-html/unnamed-chunk-118-1.png": {
+      "checksum": "d49fe3e4550df7357163a777f2d885dc"
+    },
+    "_main_files/figure-html/unnamed-chunk-120-1.png": {
+      "checksum": "3dfe66df9f3a95f85baab099fb4370ff"
+    },
+    "_main_files/figure-html/unnamed-chunk-123-1.png": {
+      "checksum": "2bb1f331eef1bdd8f80dfa76e1f58d11"
+    },
+    "_main_files/figure-html/unnamed-chunk-126-1.png": {
+      "checksum": "de5540d6dfe77a61065a85a09880c4d7"
+    },
+    "_main_files/figure-html/unnamed-chunk-131-1.png": {
+      "checksum": "42bb18b1e145be70a7c9ec573efde909"
+    },
+    "_main_files/figure-html/unnamed-chunk-159-1.png": {
+      "checksum": "ed76c004a33171c6d92a8f613663046d"
+    },
+    "_main_files/figure-html/unnamed-chunk-163-1.png": {
+      "checksum": "16f83b3ef2d0b13b94bcd7dcf1f622dc"
+    },
+    "_main_files/figure-html/unnamed-chunk-173-1.png": {
+      "checksum": "0dd4335ceda6ad9a3206fe19c4a906a7"
+    },
+    "_main_files/figure-html/unnamed-chunk-174-1.png": {
+      "checksum": "56cd89d0f96216b0b27e866ffa6fd0aa"
+    },
+    "_main_files/figure-html/unnamed-chunk-175-1.png": {
+      "checksum": "728c7f52826a9d074f14e353b4728ca0"
+    },
+    "_main_files/figure-html/unnamed-chunk-182-1.png": {
+      "checksum": "c7c44d80344f89ce14271f93cd01b8c9"
+    },
+    "_main_files/figure-html/unnamed-chunk-183-1.png": {
+      "checksum": "276d317a3830f2387736208d8dec8c2e"
+    },
+    "_main_files/figure-html/unnamed-chunk-19-1.png": {
+      "checksum": "590090bb4c496ccf5f98bddbc5a46d8a"
+    },
+    "_main_files/figure-html/unnamed-chunk-20-1.png": {
+      "checksum": "86a274099ef67e591f88157d38a2790c"
+    },
+    "_main_files/figure-html/unnamed-chunk-202-1.png": {
+      "checksum": "32b06dafac5466d93aba9a1f3ba4b941"
+    },
+    "_main_files/figure-html/unnamed-chunk-203-1.png": {
+      "checksum": "32b06dafac5466d93aba9a1f3ba4b941"
+    },
+    "_main_files/figure-html/unnamed-chunk-21-1.png": {
+      "checksum": "3f3e01fab8d7da143e8979564a480531"
+    },
+    "_main_files/figure-html/unnamed-chunk-22-1.png": {
+      "checksum": "e3c7bb399bc715d06ffef20d3c2eaf01"
+    },
+    "_main_files/figure-html/unnamed-chunk-23-1.png": {
+      "checksum": "0f2d053135802b2f53db5612305f054f"
+    },
+    "_main_files/figure-html/unnamed-chunk-24-1.png": {
+      "checksum": "4e8a0ef02bf057d4965ad1ad503653fa"
+    },
+    "_main_files/figure-html/unnamed-chunk-240-1.png": {
+      "checksum": "53dfca8ef60ef097cfd4a8c8846ceeda"
+    },
+    "_main_files/figure-html/unnamed-chunk-27-1.png": {
+      "checksum": "83db1b6e2ce30db1a560b3ac3a653200"
+    },
+    "_main_files/figure-html/unnamed-chunk-283-1.png": {
+      "checksum": "9580ffaa08774ea5430cdb6687cf3cee"
+    },
+    "_main_files/figure-html/unnamed-chunk-284-1.png": {
+      "checksum": "98c477ede0c6b7a3e23764f4322982e5"
+    },
+    "_main_files/figure-html/unnamed-chunk-293-1.png": {
+      "checksum": "de85ea59a70ddd57c5204e454f325c9f"
+    },
+    "_main_files/figure-html/unnamed-chunk-3-1.png": {
+      "checksum": "97e1190b890d63048330c5009d63b3e6"
+    },
+    "_main_files/figure-html/unnamed-chunk-302-1.png": {
+      "checksum": "65e54ec3e858b08f9d6531a7f71c9628"
+    },
+    "_main_files/figure-html/unnamed-chunk-31-1.png": {
+      "checksum": "7c85b2acdfc42da64955872ac5ecd632"
+    },
+    "_main_files/figure-html/unnamed-chunk-310-1.png": {
+      "checksum": "51fc9ae5466778c1cf17999efa6ba502"
+    },
+    "_main_files/figure-html/unnamed-chunk-315-1.png": {
+      "checksum": "d1f00c105dd6b61414ee809aa4dc883f"
+    },
+    "_main_files/figure-html/unnamed-chunk-316-1.png": {
+      "checksum": "63cd8e9be4c16eb85692794de11e764b"
+    },
+    "_main_files/figure-html/unnamed-chunk-32-1.png": {
+      "checksum": "291bc6c87e6bce47a1843b1f4035ff56"
+    },
+    "_main_files/figure-html/unnamed-chunk-320-1.png": {
+      "checksum": "53b11ebb8526610ffdb508e082409acd"
+    },
+    "_main_files/figure-html/unnamed-chunk-328-1.png": {
+      "checksum": "7b1b5f2dc11d7749a682a1be26f3ceaa"
+    },
+    "_main_files/figure-html/unnamed-chunk-334-1.png": {
+      "checksum": "7613ae97ba48531ee50a90a99aebbe64"
+    },
+    "_main_files/figure-html/unnamed-chunk-337-1.png": {
+      "checksum": "c2e544a46765636aae4828c266e3cc26"
+    },
+    "_main_files/figure-html/unnamed-chunk-340-1.png": {
+      "checksum": "d36cba75a1d690a9547fe35e1656b462"
+    },
+    "_main_files/figure-html/unnamed-chunk-342-1.png": {
+      "checksum": "44c33eeb73854c0b35820e2d482a9d3a"
+    },
+    "_main_files/figure-html/unnamed-chunk-351-1.png": {
+      "checksum": "85f5ba6d07073da0791b05512f83efcd"
+    },
+    "_main_files/figure-html/unnamed-chunk-352-1.png": {
+      "checksum": "85f5ba6d07073da0791b05512f83efcd"
+    },
+    "_main_files/figure-html/unnamed-chunk-353-1.png": {
+      "checksum": "7774bd3a117ea52b066fbf979dad7fdc"
+    },
+    "_main_files/figure-html/unnamed-chunk-354-1.png": {
+      "checksum": "7774bd3a117ea52b066fbf979dad7fdc"
+    },
+    "_main_files/figure-html/unnamed-chunk-356-1.png": {
+      "checksum": "e215ea4def6f09933eafc6643e525218"
+    },
+    "_main_files/figure-html/unnamed-chunk-357-1.png": {
+      "checksum": "e215ea4def6f09933eafc6643e525218"
+    },
+    "_main_files/figure-html/unnamed-chunk-36-1.png": {
+      "checksum": "1f64cc7489a14eef761aa20445f3f975"
+    },
+    "_main_files/figure-html/unnamed-chunk-361-1.png": {
+      "checksum": "589f307244ec98482d364f4a9ff9cc57"
+    },
+    "_main_files/figure-html/unnamed-chunk-362-1.png": {
+      "checksum": "589f307244ec98482d364f4a9ff9cc57"
+    },
+    "_main_files/figure-html/unnamed-chunk-363-1.png": {
+      "checksum": "c19ec32198ec29428795944656604b80"
+    },
+    "_main_files/figure-html/unnamed-chunk-365-1.png": {
+      "checksum": "397e899ec628aea86fd3fd03f254533c"
+    },
+    "_main_files/figure-html/unnamed-chunk-366-1.png": {
+      "checksum": "397e899ec628aea86fd3fd03f254533c"
+    },
+    "_main_files/figure-html/unnamed-chunk-367-1.png": {
+      "checksum": "51316a73f40ec985606bc8c41906e98e"
+    },
+    "_main_files/figure-html/unnamed-chunk-368-1.png": {
+      "checksum": "51316a73f40ec985606bc8c41906e98e"
+    },
+    "_main_files/figure-html/unnamed-chunk-369-1.png": {
+      "checksum": "95dc3a47718403b1b2e99d1b2f9d461c"
+    },
+    "_main_files/figure-html/unnamed-chunk-370-1.png": {
+      "checksum": "a4c0c08fca18dadebb171491ce811abe"
+    },
+    "_main_files/figure-html/unnamed-chunk-371-1.png": {
+      "checksum": "a4c0c08fca18dadebb171491ce811abe"
+    },
+    "_main_files/figure-html/unnamed-chunk-372-1.png": {
+      "checksum": "61e81e8550a942f0a440f74b6d0d962c"
+    },
+    "_main_files/figure-html/unnamed-chunk-373-1.png": {
+      "checksum": "61e81e8550a942f0a440f74b6d0d962c"
+    },
+    "_main_files/figure-html/unnamed-chunk-374-1.png": {
+      "checksum": "ea94e42005250eb6ef926f2638cae216"
+    },
+    "_main_files/figure-html/unnamed-chunk-375-1.png": {
+      "checksum": "ea94e42005250eb6ef926f2638cae216"
+    },
+    "_main_files/figure-html/unnamed-chunk-38-1.png": {
+      "checksum": "5a250c9b8915d964ce33ec8e110e4d6d"
+    },
+    "_main_files/figure-html/unnamed-chunk-385-1.png": {
+      "checksum": "2f2c33e4d95148e6c4fc22eef1aca1f5"
+    },
+    "_main_files/figure-html/unnamed-chunk-39-1.png": {
+      "checksum": "10d17c8ed60b7b56f0d8b57f7161144a"
+    },
+    "_main_files/figure-html/unnamed-chunk-393-1.png": {
+      "checksum": "4e822930ed7d73ac74b2a38d75c50c30"
+    },
+    "_main_files/figure-html/unnamed-chunk-393-2.png": {
+      "checksum": "7c5ae30bc8d7ecd5dad83b0bebe170d8"
+    },
+    "_main_files/figure-html/unnamed-chunk-393-3.png": {
+      "checksum": "dbea85506bd2312c51cbf9e61378b1a2"
+    },
+    "_main_files/figure-html/unnamed-chunk-393-4.png": {
+      "checksum": "a53d9f0f6b371222deffec7957250705"
+    },
+    "_main_files/figure-html/unnamed-chunk-395-1.png": {
+      "checksum": "33683bd1d99a3d1573afb3e04066bb06"
+    },
+    "_main_files/figure-html/unnamed-chunk-395-2.png": {
+      "checksum": "2f51d0f0fad2b111776d72f20a9e8ea8"
+    },
+    "_main_files/figure-html/unnamed-chunk-395-3.png": {
+      "checksum": "d90c74cc87f917386c621d9ba036a85d"
+    },
+    "_main_files/figure-html/unnamed-chunk-396-1.png": {
+      "checksum": "8e5f1933b7157ff5df01c341f2f4a363"
+    },
+    "_main_files/figure-html/unnamed-chunk-396-2.png": {
+      "checksum": "b074dcf69c428a080dd7a11e4ae491f3"
+    },
+    "_main_files/figure-html/unnamed-chunk-396-3.png": {
+      "checksum": "6ce863a964e97b13cf0406ab5c4e9d34"
+    },
+    "_main_files/figure-html/unnamed-chunk-40-1.png": {
+      "checksum": "5e04f670a5205e9509b78fd5084f66e6"
+    },
+    "_main_files/figure-html/unnamed-chunk-403-1.png": {
+      "checksum": "b99a1d485e7bc5f7b54060ae86a371d3"
+    },
+    "_main_files/figure-html/unnamed-chunk-404-1.png": {
+      "checksum": "c1d453c009c407f69fc10f6aae470c76"
+    },
+    "_main_files/figure-html/unnamed-chunk-407-1.png": {
+      "checksum": "9866a9cb5dbfb188950d0be0e48ba52d"
+    },
+    "_main_files/figure-html/unnamed-chunk-409-1.png": {
+      "checksum": "cca145371a087b884ecc96a5b651a1ca"
+    },
+    "_main_files/figure-html/unnamed-chunk-412-1.png": {
+      "checksum": "df13744f34b0fc9a26341155815ffcb3"
+    },
+    "_main_files/figure-html/unnamed-chunk-415-1.png": {
+      "checksum": "039354facc9d346601c321864c295cfe"
+    },
+    "_main_files/figure-html/unnamed-chunk-417-1.png": {
+      "checksum": "cc59463ad28a2bc55cce68d481a89f32"
+    },
+    "_main_files/figure-html/unnamed-chunk-419-1.png": {
+      "checksum": "f16d7a61adf6d865b56897d95de32a20"
+    },
+    "_main_files/figure-html/unnamed-chunk-421-1.png": {
+      "checksum": "8d381fae9f3fe288b7908101454a8b15"
+    },
+    "_main_files/figure-html/unnamed-chunk-422-1.png": {
+      "checksum": "dfc15d7c4c7ceea68f510297d6509943"
+    },
+    "_main_files/figure-html/unnamed-chunk-423-1.png": {
+      "checksum": "afcc5406313e972d14a55cbc814411c8"
+    },
+    "_main_files/figure-html/unnamed-chunk-427-1.png": {
+      "checksum": "73ed729d741a53c75d44e3b94b629bac"
+    },
+    "_main_files/figure-html/unnamed-chunk-428-1.png": {
+      "checksum": "d0deff25f8fe2bde2e39eae7bbbe46b7"
+    },
+    "_main_files/figure-html/unnamed-chunk-430-1.png": {
+      "checksum": "bfc9ccf2123b4c6beee8c5df931f9089"
+    },
+    "_main_files/figure-html/unnamed-chunk-435-1.png": {
+      "checksum": "f654528e1f81201331024faf80bbd461"
+    },
+    "_main_files/figure-html/unnamed-chunk-442-1.png": {
+      "checksum": "43826d95362783da343b877d22ea9350"
+    },
+    "_main_files/figure-html/unnamed-chunk-446-1.png": {
+      "checksum": "2ea6f71352ddf2348fd55ef3126af7f7"
+    },
+    "_main_files/figure-html/unnamed-chunk-447-1.png": {
+      "checksum": "b23943269380be6664403b4b8d055397"
+    },
+    "_main_files/figure-html/unnamed-chunk-45-1.png": {
+      "checksum": "41add581805ac19e50b4befffe07e85c"
+    },
+    "_main_files/figure-html/unnamed-chunk-453-1.png": {
+      "checksum": "a5769a5c186e02c639f54c273d3bf0cd"
+    },
+    "_main_files/figure-html/unnamed-chunk-454-1.png": {
+      "checksum": "c400dee0555af61c55aa97f11e1fa3f4"
+    },
+    "_main_files/figure-html/unnamed-chunk-456-1.png": {
+      "checksum": "3ab09d72ea6b87537264d278b1811eaa"
+    },
+    "_main_files/figure-html/unnamed-chunk-46-1.png": {
+      "checksum": "0d6e7d750c61c304bae8c1effeffd741"
+    },
+    "_main_files/figure-html/unnamed-chunk-460-1.png": {
+      "checksum": "c3e3a48218d458917848c15d2b49542d"
+    },
+    "_main_files/figure-html/unnamed-chunk-462-1.png": {
+      "checksum": "46db5637d39e9cf7d0ae963a20419cde"
+    },
+    "_main_files/figure-html/unnamed-chunk-53-1.png": {
+      "checksum": "383ba58dc3edca3fa8da298b1c938a62"
+    },
+    "_main_files/figure-html/unnamed-chunk-54-1.png": {
+      "checksum": "a9ef581a71530e34546771435c421e28"
+    },
+    "_main_files/figure-html/unnamed-chunk-55-1.png": {
+      "checksum": "a9ef581a71530e34546771435c421e28"
+    },
+    "_main_files/figure-html/unnamed-chunk-56-1.png": {
+      "checksum": "691c38bc0d2534e0bfb1ba31e254b2a1"
+    },
+    "_main_files/figure-html/unnamed-chunk-57-1.png": {
+      "checksum": "0c4102d2fd6d2164ca612097ae9684b6"
+    },
+    "_main_files/figure-html/unnamed-chunk-58-1.png": {
+      "checksum": "a84691867901feeea8c66617e7fb291d"
+    },
+    "_main_files/figure-html/unnamed-chunk-59-1.png": {
+      "checksum": "4bdf01e59a57014add1b9efc55f1ed0c"
+    },
+    "_main_files/figure-html/unnamed-chunk-60-1.png": {
+      "checksum": "c90eb7e61c5428b198ce1b523a920a81"
+    },
+    "_main_files/figure-html/unnamed-chunk-61-1.png": {
+      "checksum": "fb79061e3b47be56e820ee65daf7ed2c"
+    },
+    "_main_files/figure-html/unnamed-chunk-63-1.png": {
+      "checksum": "53b11ebb8526610ffdb508e082409acd"
+    },
+    "_main_files/figure-html/unnamed-chunk-64-1.png": {
+      "checksum": "57c0437efc74376580d0a4e1da24e82f"
+    },
+    "_main_files/figure-html/unnamed-chunk-67-1.png": {
+      "checksum": "a9c24d7080f731096b37399f56cc8f20"
+    },
+    "_main_files/figure-html/unnamed-chunk-68-1.png": {
+      "checksum": "0448b8e8fe28f59288e41e7dd6a0de49"
+    },
+    "_main_files/figure-html/unnamed-chunk-71-1.png": {
+      "checksum": "055c98f76f2dad465d087855a9cc1fb1"
+    },
+    "_main_files/figure-html/unnamed-chunk-72-1.png": {
+      "checksum": "b6154acb0b96573b15efbfb63d7d3e02"
+    },
+    "_main_files/figure-html/unnamed-chunk-73-1.png": {
+      "checksum": "f47aa482b1e2b206917c52fcb23a75fe"
+    },
+    "_main_files/figure-html/unnamed-chunk-74-1.png": {
+      "checksum": "3847a2e9733e10d030eb48d7d901c067"
+    },
+    "_main_files/figure-html/unnamed-chunk-75-1.png": {
+      "checksum": "68ef24cbb54b4342f8e9abb131c6e88a"
+    },
+    "_main_files/figure-html/unnamed-chunk-76-1.png": {
+      "checksum": "252488d2d345c4e7de5d74b92d661c44"
+    },
+    "_main_files/figure-html/unnamed-chunk-77-1.png": {
+      "checksum": "2f10d36fcbc5560b6eebf24980f30fcb"
+    },
+    "_main_files/figure-html/unnamed-chunk-77-2.png": {
+      "checksum": "793055190e5b46cd222dc35ecaa04da3"
+    },
+    "_main_files/figure-html/unnamed-chunk-78-1.png": {
+      "checksum": "8c3c40bdcc2ee1748c12bc852be90f93"
+    },
+    "_main_files/figure-html/unnamed-chunk-78-2.png": {
+      "checksum": "d406632500961407d39c57d65bcea20f"
+    },
+    "_main_files/figure-html/unnamed-chunk-79-1.png": {
+      "checksum": "ee75232a964e7321265c6baaa93ec2c3"
+    },
+    "_main_files/figure-html/unnamed-chunk-79-2.png": {
+      "checksum": "f4128cac0cb98c0d6e322cc35ec0adba"
+    },
+    "_main_files/figure-html/unnamed-chunk-80-1.png": {
+      "checksum": "1b7ad5426c12b7d1a568e2017961b85c"
+    },
+    "_main_files/figure-html/unnamed-chunk-83-1.png": {
+      "checksum": "3922500732f0b69bb7cd1667cff4e9da"
+    },
+    "_main_files/figure-html/unnamed-chunk-84-1.png": {
+      "checksum": "14a84624b19a1abd1d5590c99fbbc214"
+    },
+    "_main_files/figure-html/unnamed-chunk-85-1.png": {
+      "checksum": "a35baaba73980c9a70d54799f6a3ad2f"
+    },
+    "_main_files/figure-html/unnamed-chunk-89-1.png": {
+      "checksum": "11f9b681ba1633e4d0296c753f3b7b37"
+    },
+    "_main_files/figure-html/unnamed-chunk-90-1.png": {
+      "checksum": "903a99b145cb734f1165b08ba09bf1b9"
+    },
+    "_main_files/figure-html/unnamed-chunk-91-1.png": {
+      "checksum": "1e36625a2d83bdcf8aabf5a203e85805"
+    },
+    "_main_files/figure-html/unnamed-chunk-92-1.png": {
+      "checksum": "40a154fde31d3a973e1a4b6e2f477ca9"
+    },
+    "_main_files/figure-html/unnamed-chunk-94-1.png": {
+      "checksum": "887fc76c04b2e1a030275abc5b352f79"
+    },
+    "_main_files/figure-html/unnamed-chunk-96-1.png": {
+      "checksum": "66c2cac379cbefd22cf08b331c085b92"
+    },
+    "_main_files/figure-html/unnamed-chunk-99-1.png": {
+      "checksum": "2f2c65a3323fd30fc859ea0cf65d6c2f"
+    },
+    "404.html": {
+      "checksum": "5084f8c4e7f9a451ca7dd8627130c7d4"
+    },
+    "classification.html": {
+      "checksum": "f85f94af66a416c202dbf988366aa6fc"
+    },
+    "index.html": {
+      "checksum": "3b48b6db4603341a95e6141a8d2fe01e"
+    },
+    "introduction.html": {
+      "checksum": "f3587e5eb9af40e355f74dc02f10342a"
+    },
+    "libs/anchor-sections-1.0.1/anchor-sections.css": {
+      "checksum": "f2ce152d9297a0935b5fc4e084a44da7"
+    },
+    "libs/anchor-sections-1.0.1/anchor-sections.js": {
+      "checksum": "769b825084a054ff4bfd95c56b516fb0"
+    },
+    "libs/gitbook-2.6.7/css/fontawesome/fontawesome-webfont.ttf": {
+      "checksum": "b06871f281fee6b241d60582ae9369b9"
+    },
+    "libs/gitbook-2.6.7/css/plugin-bookdown.css": {
+      "checksum": "511b32706d0828b46237a7cdebf52126"
+    },
+    "libs/gitbook-2.6.7/css/plugin-clipboard.css": {
+      "checksum": "e4a3bdc1e3d5590f47cbac67976f3961"
+    },
+    "libs/gitbook-2.6.7/css/plugin-fontsettings.css": {
+      "checksum": "ddba6e8649d659db2ca0e963ee4b76fb"
+    },
+    "libs/gitbook-2.6.7/css/plugin-highlight.css": {
+      "checksum": "467fbe4b6b5a4b88fdd75c463f8626ec"
+    },
+    "libs/gitbook-2.6.7/css/plugin-search.css": {
+      "checksum": "0d7a6bb6a50e00c7358cf61027f099f0"
+    },
+    "libs/gitbook-2.6.7/css/plugin-table.css": {
+      "checksum": "8cb82f94ce1446fa4bafe7a3933e6c65"
+    },
+    "libs/gitbook-2.6.7/css/style.css": {
+      "checksum": "be0c52de37f19e465d67f64de17bb539"
+    },
+    "libs/gitbook-2.6.7/js/app.min.js": {
+      "checksum": "395a8093ce46450cabfaa545a0705a3b"
+    },
+    "libs/gitbook-2.6.7/js/clipboard.min.js": {
+      "checksum": "be72101c8c16ba95fd8b69760d5ebc56"
+    },
+    "libs/gitbook-2.6.7/js/jquery.highlight.js": {
+      "checksum": "999424d32e03b9857098d2c7f53928c2"
+    },
+    "libs/gitbook-2.6.7/js/plugin-bookdown.js": {
+      "checksum": "36b5487b9c1020c0de1352b8f26b8a8e"
+    },
+    "libs/gitbook-2.6.7/js/plugin-clipboard.js": {
+      "checksum": "a30f95fcd3fde10637ace1fb691b7475"
+    },
+    "libs/gitbook-2.6.7/js/plugin-fontsettings.js": {
+      "checksum": "4f57689705fdfa3eabfb7b7b92614f33"
+    },
+    "libs/gitbook-2.6.7/js/plugin-search.js": {
+      "checksum": "a906e04e1fc7aa9e057f3de4668f4a68"
+    },
+    "libs/gitbook-2.6.7/js/plugin-sharing.js": {
+      "checksum": "e2b65328457b1e2b16c46a0fd4f2852c"
+    },
+    "libs/header-attrs-2.11/header-attrs.js": {
+      "checksum": "9c32b58ed5fd8fe2efbd5bd7023cdef0"
+    },
+    "libs/jquery-3.6.0/jquery-3.6.0.min.js": {
+      "checksum": "8fb8fee4fcc3cc86ff6c724154c49c42"
+    },
+    "libs/pagedtable-1.1/css/pagedtable.css": {
+      "checksum": "7773d8ddc5fe6c5adbde2349b933127f"
+    },
+    "libs/pagedtable-1.1/js/pagedtable.js": {
+      "checksum": "8b657fbd2add193c16394a3f8339d3cf"
+    },
+    "linear-model-selection-and-regularization.html": {
+      "checksum": "94ddeab9bf95fa54a6dfe1576de44d0a"
+    },
+    "linear-regression.html": {
+      "checksum": "6ea15411d64580efa51646c39b0971ee"
+    },
+    "moving-beyond-linearity.html": {
+      "checksum": "7f97b8e5ad2afedbee4b8adc8989eae5"
+    },
+    "reference-keys.txt": {
+      "checksum": "0498d46c160e7f05f9bbacaa7e98406f"
+    },
+    "references.html": {
+      "checksum": "e4ba3b1461d663acf2e429709a9cbe9e"
+    },
+    "reproducibility.html": {
+      "checksum": "ec4429a155c6b963c95f46fa16e9ed38"
+    },
+    "resampling-methods.html": {
+      "checksum": "7a096083335090ec4e5e125b237ac27d"
+    },
+    "search_index.json": {
+      "checksum": "68c86efe164389a2a492c193a58c4439"
+    },
+    "statistical-learning.html": {
+      "checksum": "f491a2d8d26571d3ad9c5d0f32557e46"
+    }
+  },
+  "users": null
+}

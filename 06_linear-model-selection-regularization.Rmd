@@ -2155,10 +2155,9 @@ The lasso model performed slightly better than least squares, but worse than rid
 
 ```{r message=FALSE}
 # Need to import `mixOmics` package first, or else I get the error:
-# 'X' must be a numeric matrix (possibly inculding NA's) with finite values
-library(mixOmics)
+# 'X' must be a numeric matrix (possibly including NA's) with finite values
+#library(mixOmics)
 ```
-
 
 ```{r message=FALSE}
 college_pcr_recipe <- recipe(apps ~ ., data = college_train) %>%
@@ -2166,7 +2165,7 @@ college_pcr_recipe <- recipe(apps ~ ., data = college_train) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_zv(all_predictors()) %>%
   step_normalize(all_predictors()) %>%
-  step_pca(all_predictors(), num_comp = tune())
+  step_pca(all_predictors(), num_comp = parsnip::tune())
 
 college_pcr_workflow <- workflow() %>%
   add_model(lm_spec) %>%
@@ -2215,7 +2214,7 @@ college_pls_recipe <- recipe(apps ~ ., data = college_train) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_zv(all_predictors()) %>%
   step_normalize(all_predictors()) %>%
-  step_pls(all_predictors(), outcome = "apps", num_comp = tune())
+  step_pls(all_predictors(), outcome = "apps", num_comp = parsnip::tune())
 
 college_pls_workflow <- workflow() %>%
   add_model(lm_spec) %>%

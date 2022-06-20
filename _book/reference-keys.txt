@@ -114,12 +114,12 @@ comparison-polynomial
 smoothing-splines
 an-overview-of-smoothing-splines
 smoothing-parameter
-local-regression-local-regression
+local-regression
 generalized-additive-models
 gam-regression
 gam-classification
 lab-non-linear-modeling
 polynomial-regression-and-step-functions
 splines
-local-regression
-gam
+gams-lab
+exercises-4
