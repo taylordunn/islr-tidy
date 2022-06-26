@@ -128,3 +128,72 @@ hits last year tend to have higher salaries.
 
 
 #### Prediction via Stratification of the Feature Space {-}
+
+Roughly speaking, there are two steps in building a regression tree:
+
+1. Divide the predictor space into $J$ distinct non-overlapping regions $R_1, \dots, R_J$.
+2. For every observation that falls into the region $R_j$, we make the same prediction: the mean of the respone values of the training observations.
+
+In theory, the regions could be any shape but we choose *boxes* for simplicity.
+The goal of step 1 is the finx the boxes that minimize the RSS
+
+$$
+\sum_{j=1}^J \sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2.
+$$
+
+>
+Unfortunately, it is computationally infeasible to consider every
+possible partition of the feature space into $J$ boxes. For this reason, we take
+a *top-down, greedy* approach that is known as *recursive binary splitting*. The
+approach is *top-down* because it begins at the top of the tree (at which point
+all observations belong to a single region) and then successively splits the
+predictor space; each split is indicated via two new branches further down
+on the tree. It is *greedy* because at each step of the tree-building process,
+the best split is made at that particular step, rather than looking ahead
+and picking a split that will lead to a better tree in some future step.
+
+The first split is defined as a pair of half planes:
+
+$$
+R_1 (j,s) = \{X | X_j < s \} \text{ and } R_2 (j,s) = \{ X | X_j \geq s \},
+$$
+
+and we seek the values $j$ and $s$ that minimize
+
+$$
+\sum_{i: x_i \in R_1 (j,s)} (y_i - \hat{y}_{R_1})^2 +
+\sum_{i: x_i \in R_2 (j,s)} (y_i - \hat{y}_{R_2})^2.
+$$
+
+Finding the values $j$ and $s$ to minimize the above RSS can be done quite quickly, especially when the number of features $p$ is not too large.
+
+The process is repeated -- looking for the best predictor and best cutpoint in order to split the data further and minimize the RSS within the regions -- expect instead of splitting the entire predictor space, we split one of the previously identified regions.
+This results in three regions, which we again look to split.
+This continues until a stopping criterion is reached; for instance, we may continue until no region contains more than five observations.
+
+#### Tree Pruning {-}
+
+The above process is likely to overfit the data, leading to poor test set performance.
+This is because the resulting tree might be too complex.
+A smaller tree with fewer splits/regions might lead to lower variance and better interpretation at the cost of higher bias.
+One way to control this is to only choose splits that exceed some high threshold of RSS reduction.
+This way is short-sighted however, because a seemingly worthless split early on might be followed by a great split.
+
+>
+Therefore, a better strategy is to grow a very large tree $T_0$, and then
+*prune* it back in order to obtain a *subtree*. How do we determine the best
+way to prune the tree? Intuitively, our goal is to select a subtree that 
+leads to the lowest test error rate. Given a subtree, we can estimate its
+test error using cross-validation or the validation set approach. However,
+estimating the cross-validation error for every possible subtree would be too
+cumbersome, since there is an extremely large number of possible subtrees.
+Instead, we need a way to select a small set of subtrees for consideration.
+>
+*Cost complexity pruning* — also known as *weakest link pruning* — gives us cost
+a way to do just this. Rather than considering every possible subtree, we
+consider a sequence of trees indexed by a nonnegative tuning parameter $\alpha$.
+For each value of α there corresponds a subtree $T \subset T0$ such that
+
+$$
+\sum^{|T|}_{m=1} \sum_{x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha |T|
+$$
