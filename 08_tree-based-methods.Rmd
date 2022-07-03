@@ -167,7 +167,7 @@ $$
 
 Finding the values $j$ and $s$ to minimize the above RSS can be done quite quickly, especially when the number of features $p$ is not too large.
 
-The process is repeated -- looking for the best predictor and best cutpoint in order to split the data further and minimize the RSS within the regions -- expect instead of splitting the entire predictor space, we split one of the previously identified regions.
+The process is repeated -- looking for the best predictor and best cutpoint in order to split the data further and minimize the RSS within the regions -- except instead of splitting the entire predictor space, we split one of the previously identified regions.
 This results in three regions, which we again look to split.
 This continues until a stopping criterion is reached; for instance, we may continue until no region contains more than five observations.
 
@@ -219,7 +219,7 @@ decision_tree_spec <- decision_tree(cost_complexity = tune()) %>%
   set_engine("rpart")
 ```
 
-Split the data into half training and half testing, and six-fold CV:
+Split the data into half testing and half training with six-fold CV:
 
 ```{r}
 set.seed(-403)
@@ -246,20 +246,66 @@ hitters_workflow <- workflow() %>%
   add_model(decision_tree_spec)
 ```
 
-Now fit the resamples:
+It also isn't clear which values of $\alpha$ (cost complexity) were used to get the different tree sizes.
 
 ```{r}
 cost_complexity_grid <-
   grid_regular(cost_complexity(range = c(-2, 0)), levels = 10)
 ```
 
+Now fit the resamples:
 
 ```{r}
+get_rpart_mod <- function(x) {
+  extract_fit_engine(x)
+}
+
 hitters_tune <- tune_grid(
   hitters_workflow, resamples = hitters_resamples,
-  grid = cost_complexity_grid, metrics = metric_set(rmse)
+  grid = cost_complexity_grid, metrics = metric_set(rmse),
+  control = control_grid(extract = get_rpart_mod)
 )
 ```
+
+The number of terminal nodes can be retrieved from the `rpart` models:
+
+```{r}
+rpart_mod <- hitters_tune$.extracts[[1]]$.extracts[[1]]
+sum(rpart_mod$frame$var == "<leaf>")
+```
+
+```{r}
+hitters_tune %>%
+  unnest(.extracts) %>%
+  slice(1:2) %>%
+  select(id, cost_complexity, .extracts, .config) %>%
+  mutate(n_terminal = map_int(.extracts,
+                          ~ sum(.x$frame$var == "<leaf>")))
+```
+
+```{r}
+hitters_tune %>%
+  unnest(c(.metrics, .extracts), names_repair = "unique") %>%
+  view()
+hitters_tune$.extracts[[1]]
+
+hitters_tune %>%
+  mutate(
+    
+  )
+```
+
+
+```{r}
+rpart_mod <- hitters_tune$.extracts[[1]]$.extracts[[1]]
+rpart_mod
+```
+
+```{r}
+str(rpart_mod)
+sum(rpart_mod$frame$var == "<leaf>")
+```
+
 
 
 ```{r}
