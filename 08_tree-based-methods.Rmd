@@ -211,18 +211,10 @@ in which a similar formulation was used in order to control the complexity of a 
 As $\alpha$ is increased from zero, branches get prunced in a nested and predictable way, so obtaining the full sequence of subtrees as a function of $\alpha$ is easy.
 The value of $\alpha$ can then be selected using cross-validation or a validation set, which we then apply to the full data set to obtain the subtree.
 
-For the next example, I'll now switch to the `tidymodels` framework, with `decision_tree()` and the tunable `cost_complexity` parameter:
+The example with the `hitters` data first involves splitting the data into half training and half testing:
 
 ```{r}
-decision_tree_spec <- decision_tree(cost_complexity = tune()) %>%
-  set_mode("regression") %>%
-  set_engine("rpart")
-```
-
-Split the data into half testing and half training with six-fold CV:
-
-```{r}
-set.seed(-403)
+set.seed(-203)
 hitters_split <- initial_split(hitters,
                                # Bumped up the prop to get 132 training observations
                                prop = 0.505)
@@ -233,29 +225,199 @@ hitters_test <- testing(hitters_split)
 hitters_resamples <- vfold_cv(hitters_train, v = 6)
 ```
 
-It isn't clear from the text which of the nine features are included in the model, so instead I will just use the features shown in Figure 8.4:
+Then fitting a decision tree with nine of the features, which aren't specified so instead I'll fit using the six features in Figure 8.4
+
+```{r figure8.4, fig.height=7, fig.width=7}
+hitters_train_tree <- tree(
+  salary ~ years + hits + rbi + put_outs + walks + runs,
+  data = hitters_train,
+)
+plot(hitters_train_tree)
+text(hitters_train_tree, digits = 3)
+```
+
+This isn't exactly the same tree as that in the text, as expected with a different random splitting and feature selection.
+I'll do the same with each CV split:
 
 ```{r}
-hitters_recipe <- recipe(
-  salary ~ years + hits + rbi + put_outs + walks + runs,
-  data = hitters_train
-)
+hitters_resamples_tree <-
+  # Compile all of the analysis data sets from the six splits
+  map_dfr(hitters_resamples$splits, analysis, .id = "split") %>%
+  # For each split...
+  group_by(split) %>%
+  nest() %>%
+  mutate(
+    # ... fit a tree to the analysis set, then...
+    tree_mod = map(
+      data,
+      ~ tree(
+        salary ~ years + hits + rbi + put_outs + walks + runs,
+        data = .x,
+      )
+    )
+  )
+```
+
+Next, we prune the large tree above from `r sum(hitters_tree$frame$var == "<leaf>")` terminal nodes down to 1.
+For this, I'll vary the `best` parameter in the `prune.tree()` function:
+
+```{r}
+hitters_tree_pruned <- 
+  tibble(n_terminal = 1:10) %>%
+  mutate(
+    train_tree_pruned = map(n_terminal,
+                            ~ prune.tree(hitters_train_tree, best = .x)),
+  )
+hitters_tree_pruned
+```
+
+Note that, for `n_terminal` = 1, the object is `singlenode`, not `tree`.
+This makes sense -- a single node can't really be called a tree -- but unfortunately it means that I can't use the `predict()` function to calculate MSE later on.
+Mathematically, a single node is just a prediction of the mean of the training set, so I will replace `n_terminal` = 1 with a `lm` model with just an intercept:
+
+```{r}
+hitters_tree_pruned <- hitters_tree_pruned %>%
+  mutate(
+    train_tree_pruned = ifelse(
+      n_terminal == 1,
+      list(lm(salary ~ 1, data = hitters_train)),
+      train_tree_pruned
+    )
+  )
+```
+
+Do the same for each CV split:
+
+```{r}
+hitters_resamples_tree_pruned <- hitters_resamples_tree %>%
+  crossing(n_terminal = 1:10) %>%
+  mutate(
+    tree_pruned = map2(tree_mod, n_terminal,
+                       ~ prune.tree(.x, best = .y)),
+    # As above, replace the single node trees with lm
+    tree_pruned = ifelse(
+      n_terminal == 1,
+      map(data, ~ lm(salary ~ 1, data = .x)),
+      tree_pruned
+    )
+  )
+```
+
+Note the warnings.
+This tells me that some of the models fit to the CV splits had 10 or fewer terminal nodes already, and so no pruning was performed.
+
+Finally, I'll compute the MSE for the different data sets.
+The training and testing sets:
+
+```{r}
+# Simple helper function to compute mean squared error
+calc_mse <- function(mod, data) {
+  mean((predict(mod, newdata = data) - data$salary)^2)
+}
+
+hitters_tree_pruned_mse <- hitters_tree_pruned %>%
+  mutate(
+    train_mse = map_dbl(
+      train_tree_pruned,
+      ~ calc_mse(.x, hitters_train)
+    ),
+    test_mse = map_dbl(
+      train_tree_pruned,
+      ~ calc_mse(.x, hitters_test)
+    )
+  )
+hitters_tree_pruned_mse
+```
+
+And the CV splits:
+
+```{r}
+hitters_resamples_tree_pruned_mse <- hitters_resamples_tree_pruned %>%
+  select(split, n_terminal, tree_pruned) %>%
+  left_join(
+    map_dfr(hitters_resamples$splits, assessment, .id = "split") %>%
+      group_by(split) %>%
+      nest() %>%
+      rename(assessment_data = data),
+    by = "split"
+  ) %>%
+  mutate(
+    cv_mse = map2_dbl(
+      tree_pruned, assessment_data,
+      ~ calc_mse(.x, .y)
+    )
+  ) %>%
+  group_by(n_terminal) %>%
+  summarise(cv_mse = mean(cv_mse), .groups = "drop")
+```
+
+Finally, put it all together as in Figure 8.5 (without standard error bars):
+
+```{r figure8.5}
+hitters_tree_pruned_mse %>%
+  select(-train_tree_pruned) %>%
+  left_join(hitters_resamples_tree_pruned_mse, by = "n_terminal") %>%
+  pivot_longer(cols = c(train_mse, test_mse, cv_mse), names_to = "data_set") %>%
+  mutate(
+    data_set = factor(data_set,
+                      levels = c("train_mse", "test_mse", "cv_mse"),
+                      labels = c("Training", "Cross-validation", "Test"))
+  ) %>%
+  ggplot(aes(x = n_terminal, y = value, color = data_set)) +
+  geom_point(size = 3) +
+  geom_line(size = 1) +
+  scale_y_continuous("Mean squared error", breaks = seq(0, 1.0, 0.2)) +
+  expand_limits(y = c(0, 1.0)) +
+  scale_x_continuous("Tree size", breaks = seq(2, 10, 2)) +
+  scale_color_manual(NULL, values = c("black", "darkgreen", "darkorange")) +
+  theme(legend.position = c(0.7, 0.8))
+```
+
+As in the text, the minimum test and CV MSE correspond to the decision trees with three terminal nodes.
+
+### Classification Trees
+
+A classification tree is used for a qualitative response.
+An observation is predicted to belong to the *most commonly occurring class* of training observations in its region.
+Often, we are not only interested in the predicted class for the terminal nodes, but also the *class proportions* among the training observations.
+
+Just as in the regression setting, we use recursive binary splitting to grow a classification tree.
+Instead of RSS, the natural alternative is the *classification error rate*.
+For a given region, this is simply the fraction of training observations in that region that do not belong to the most common class:
+
+$$
+E = 1 - \underset{k}{\text{max}} (\hat{p}_{mk})
+$$
+
+where $\hat{p}_{mk}$ represents the proportion of training observations in the $m$th region that are from the $k$th class.
+
+It turns out the classification error is not sufficiently sensitive for tree-growing.
+In practice, two other measures are preferable.
+
+The *Gini index* is defined as:
+
+$$
+G = \sum_{k=1}^K \hat{p}_{mk} (1 - \hat{p}_{mk}).
+$$
+
+It measures total variance across all $K$ classes 
+
+### delete
+
+For the next example, I'll now switch to the `tidymodels` framework, with `decision_tree()`, the `rpart` engine, and the tunable `cost_complexity` parameter:
+
+```{r}
+decision_tree_spec <- decision_tree(cost_complexity = tune()) %>%
+  set_mode("regression") %>%
+  set_engine("rpart")
 
 hitters_workflow <- workflow() %>%
   add_recipe(hitters_recipe) %>%
   add_model(decision_tree_spec)
-```
 
-It also isn't clear which values of $\alpha$ (cost complexity) were used to get the different tree sizes.
-
-```{r}
 cost_complexity_grid <-
   grid_regular(cost_complexity(range = c(-2, 0)), levels = 10)
-```
 
-Now fit the resamples:
-
-```{r}
 get_rpart_mod <- function(x) {
   extract_fit_engine(x)
 }
@@ -267,62 +429,43 @@ hitters_tune <- tune_grid(
 )
 ```
 
-The number of terminal nodes can be retrieved from the `rpart` models:
+The number of terminal nodes can be retrieved from the `rpart` model objects like this:
 
 ```{r}
 rpart_mod <- hitters_tune$.extracts[[1]]$.extracts[[1]]
 sum(rpart_mod$frame$var == "<leaf>")
 ```
+
+This specific model has 5 terminal nodes.
+Apply this to each model in the tuning results:
 
 ```{r}
 hitters_tune %>%
   unnest(.extracts) %>%
-  slice(1:2) %>%
-  select(id, cost_complexity, .extracts, .config) %>%
+  #select(id, cost_complexity, .extracts, .config) %>%
   mutate(n_terminal = map_int(.extracts,
-                          ~ sum(.x$frame$var == "<leaf>")))
+                          ~ sum(.x$frame$var == "<leaf>"))) %>%
+  ggplot(aes(x = cost_complexity, y = n_terminal, color = id)) +
+  geom_point() +
+  geom_line() +
+  scale_y_continuous(breaks = 1:10) +
+  scale_x_log10()
+```
+
+## Reproducibility {-}
+
+```{r}
+Sys.time()
 ```
 
 ```{r}
-hitters_tune %>%
-  unnest(c(.metrics, .extracts), names_repair = "unique") %>%
-  view()
-hitters_tune$.extracts[[1]]
-
-hitters_tune %>%
-  mutate(
-    
-  )
-```
-
-
-```{r}
-rpart_mod <- hitters_tune$.extracts[[1]]$.extracts[[1]]
-rpart_mod
+if ("git2r" %in% installed.packages()) {
+  if (git2r::in_repository()) {
+    git2r::repository()
+  }
+}
 ```
 
 ```{r}
-str(rpart_mod)
-sum(rpart_mod$frame$var == "<leaf>")
+sessioninfo::session_info()
 ```
-
-
-
-```{r}
-autoplot(hitters_tune)
-```
-
-
-```{r}
-
-hitters_tree <- tree(
-  salary ~ years + hits + rbi + put_outs + walks + runs + ,
-  data = hitters_train
-)
-hitters_cv_tree <- cv.tree()
-```
-
-```{r}
-glimpse(hitters)
-```
-
