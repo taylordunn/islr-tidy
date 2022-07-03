@@ -39,9 +39,9 @@ expense of some loss in interpretation.
 
 ## The Basics of Decision Trees
 
-### Regression Trees
+### Regression Trees {#regression-trees}
 
-#### Predicting Baseline Players' Salaries Using Regression Trees
+#### Predicting Baseball Players' Salaries Using Regression Trees {-}
 
 To motivate *regression trees*, we use an example of predicting a baseball player's `salary` based on `years` (number of years played in the major leagues), and `hits` (number of hits made in the previous year).
 
@@ -247,7 +247,7 @@ hitters_resamples_tree <-
   group_by(split) %>%
   nest() %>%
   mutate(
-    # ... fit a tree to the analysis set, then...
+    # ... fit a tree to the analysis set
     tree_mod = map(
       data,
       ~ tree(
@@ -360,7 +360,7 @@ hitters_tree_pruned_mse %>%
   pivot_longer(cols = c(train_mse, test_mse, cv_mse), names_to = "data_set") %>%
   mutate(
     data_set = factor(data_set,
-                      levels = c("train_mse", "test_mse", "cv_mse"),
+                      levels = c("train_mse", "cv_mse", "test_mse"),
                       labels = c("Training", "Cross-validation", "Test"))
   ) %>%
   ggplot(aes(x = n_terminal, y = value, color = data_set)) +
@@ -400,7 +400,205 @@ $$
 G = \sum_{k=1}^K \hat{p}_{mk} (1 - \hat{p}_{mk}).
 $$
 
-It measures total variance across all $K$ classes 
+It measures total variance across all $K$ classes, taking on a small value if all $\hat{p}_{mk}$'s are close to 0 or 1.
+For this reason, the Gini index is referred to as a measure of node *purity*, in that a small value indicates that a node contains predominantly observations from a single class.
+
+An alternative is the *entropy*:
+
+$$
+D = - \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}.
+$$
+
+Like the Gini index, the entropy will take on a small value ($\geq 0$) for pure nodes.
+
+A tree is typically pruned by evaluating split quality with Gini index or entropy, through the classification error rate is preferable if prediction accuracy of the final pruned tree is the goal.
+
+The `heart` data is not available in the `ISLR2` package, so I downloaded the CSV:
+
+```{r}
+heart <- read_csv("data/Heart.csv", show_col_types = FALSE) %>%
+  # Drop the row number column
+  select(-`...1`) %>%
+  janitor::clean_names() %>%
+  # It is not clear what they do with the missing values in the text,
+  #  I'll drop drop the observations for now
+  drop_na() %>%
+  # In order to use categorical variables with `tree::tree()`, need to convert
+  #  character to factor
+  mutate(across(where(is.character), factor))
+glimpse(heart)
+```
+
+```{r figure8.6a, fig.height=6, fig.width=10}
+set.seed(993)
+heart_splits <- initial_split(heart, prop = 0.5)
+heart_train <- training(heart_splits)
+heart_test <- testing(heart_splits)
+
+heart_resamples <- vfold_cv(heart_train, v = 5)
+
+heart_train_tree <- tree(ahd ~ ., data = heart_train)
+
+plot(heart_train_tree)
+text(heart_train_tree)
+```
+
+This resulted in a 
+`r sum(heart_train_tree$frame$var == "<leaf>")` size tree, a little smaller than that in the text.
+
+To reproduce the plot of error versus tree size, I'll re-use a lot of the code from section \@ref(regression-trees):
+
+
+```{r figure8.6b}
+# Fit the CV splits
+heart_resamples_tree <-
+  map_dfr(heart_resamples$splits, analysis, .id = "split") %>%
+  group_by(split) %>%
+  nest() %>%
+  mutate(
+    tree_mod = map(data, ~ tree(ahd ~ ., data = .x))
+  )
+
+# Prune the tree fit to the training data
+heart_tree_pruned <- 
+  tibble(n_terminal = 1:15) %>%
+  mutate(
+    train_tree_pruned = map(n_terminal,
+                            ~ prune.tree(heart_train_tree, best = .x)),
+    # Need to use logistic regression for single node tree models
+    train_tree_pruned = ifelse(
+      n_terminal == 1,
+      list(glm(ahd ~ 1, data = heart_train, family = binomial)),
+      train_tree_pruned
+    )
+  )
+
+# Prune the tree from the CV splits
+heart_resamples_tree_pruned <- heart_resamples_tree %>%
+  crossing(n_terminal = 1:15) %>%
+  mutate(
+    tree_pruned = map2(tree_mod, n_terminal,
+                       ~ prune.tree(.x, best = .y)),
+    # As above, replace the single node trees with glm
+    tree_pruned = ifelse(
+      n_terminal == 1,
+      map(data, ~ glm(ahd ~ 1, data = .x, family = binomial)),
+      tree_pruned
+    )
+  )
+
+# A helper function to calculate classification error from tree or glm models
+calc_class_error <- function(mod, data) {
+  if (class(mod)[1] == "tree") {
+    preds <- predict(mod, type = "class", newdata = data)
+  } else {
+    preds <- predict(mod, type = "response", newdata = data)
+    preds <- ifelse(preds > 0.5, "Yes", "No") %>%
+      factor(levels = c("No", "Yes"))
+    
+  }
+  1 - mean(preds == data$ahd)
+}
+
+# Calculate error on the training and testing sets
+heart_tree_pruned_error <- heart_tree_pruned %>%
+  mutate(
+    train_error = map_dbl(
+      train_tree_pruned,
+      ~ calc_class_error(.x, heart_train)
+    ),
+    test_error = map_dbl(
+      train_tree_pruned,
+      ~ calc_class_error(.x, heart_test)
+    )
+  )
+# And the CV assessment data
+heart_resamples_tree_pruned_error <- heart_resamples_tree_pruned %>%
+  select(split, n_terminal, tree_pruned) %>%
+  left_join(
+    map_dfr(heart_resamples$splits, assessment, .id = "split") %>%
+      group_by(split) %>%
+      nest() %>%
+      rename(assessment_data = data),
+    by = "split"
+  ) %>%
+  mutate(
+    cv_error = map2_dbl(
+      tree_pruned, assessment_data,
+      ~ calc_class_error(.x, .y)
+    )
+  ) %>%
+  group_by(n_terminal) %>%
+  summarise(cv_error = mean(cv_error), .groups = "drop")
+
+heart_tree_pruned_error %>%
+  select(-train_tree_pruned) %>%
+  left_join(heart_resamples_tree_pruned_error, by = "n_terminal") %>%
+  pivot_longer(cols = c(train_error, test_error, cv_error),
+               names_to = "data_set") %>%
+  mutate(
+    data_set = factor(data_set,
+                      levels = c("train_error", "cv_error", "test_error"),
+                      labels = c("Training", "Cross-validation", "Test"))
+  ) %>%
+  ggplot(aes(x = n_terminal, y = value, color = data_set)) +
+  geom_point(size = 3) +
+  geom_line(size = 1) +
+  scale_y_continuous("Error", breaks = seq(0, 0.6, 0.1)) +
+  expand_limits(y = c(0, 0.6)) +
+  scale_x_continuous("Tree size", breaks = c(5, 10, 15)) +
+  scale_color_manual(NULL, values = c("black", "darkorange", "darkgreen")) +
+  theme(legend.position = c(0.7, 0.8))
+```
+
+The best model by CV error here has `r filter(heart_resamples_tree_pruned_error, cv_error == min(cv_error))$n_terminal` terminal nodes.
+Visualize the pruned tree:
+
+```{r figure8.6c}
+heart_best_model_cv <- heart_resamples_tree_pruned_error %>%
+  filter(cv_error == min(cv_error)) %>%
+  pull(n_terminal)
+heart_best_model <- heart_tree_pruned %>%
+  filter(n_terminal == heart_best_model_cv) %>%
+  pull(train_tree_pruned)
+
+plot(heart_best_model[[1]])
+text(heart_best_model[[1]])
+```
+
+### Trees Versus Linear Models
+
+Regression and classification trees have a very different flavor from the more classical approaches for regression and classification like linear regression.>
+
+>
+Which model is better? It depends on the problem at hand. If the relationship between the features and the response is well approximated by
+a linear model as in (8.8), then an approach such as linear regression will
+likely work well, and will outperform a method such as a regression tree
+that does not exploit this linear structure. If instead there is a highly non-linear and complex relationship between the features and the response as
+indicated by model (8.9), then decision trees may outperform classical approaches. An illustrative example is displayed in Figure 8.7. The relative
+performances of tree-based and classical approaches can be assessed by estimating the test error, using either cross-validation or the validation set
+approach (Chapter 5).
+>
+Of course, other considerations beyond simply test error may come into
+play in selecting a statistical learning method; for instance, in certain settings, prediction using a tree may be preferred for the sake of interpretability and visualization.
+
+### Advantages and Disadvantages of Trees
+
+Advantages:
+
+* Trees are very easy to explain.
+* Decision trees more closely mirror human decision-making.
+* Trees can be displayed graphically, and can be easily interpreted.
+* Trees can easily handle qualitative predictors without the need to create dummy variables.
+
+Disadvantages:
+
+* Trees generally do not have the same level of predictive accuracy as some of the other regression and classification approaches.
+* Trees can be very non-robust, i.e. a small change in the data can cause a large change in the final estimated tree.
+
+However, by aggregating many decision trees, using methods like *bagging*, *random forests*, and *boosting*, the predictive performance of trees can be substantially improved.
+
+## 8.2 Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees
 
 ### delete
 
