@@ -598,7 +598,90 @@ Disadvantages:
 
 However, by aggregating many decision trees, using methods like *bagging*, *random forests*, and *boosting*, the predictive performance of trees can be substantially improved.
 
-## 8.2 Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees
+## Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees
+
+>
+An ensemble method is an approach that combines many simple “building block”
+models in order to obtain a single and potentially very powerful
+model. These simple building block models are sometimes known as weak
+learners, since they may lead to mediocre predictions on their own.
+We will now discuss bagging, random forests, boosting, and Bayesian
+additive regression trees. These are ensemble methods for which the simple
+building block is a regression or a classification tree.
+
+### Bagging
+
+The bootstrap was introduced in Chapter 5 to estimate standard deviations of a quantity of interest.
+Here, we see that it may be used to improve statistical learning methods such as decision trees.
+
+The decision tree method suffers from high variance, in that it is highly dependent on the split of the training data.
+*Bootstrap aggregation* or *bagging* is a general-purpose procedure for reducing the variance of a statistical learning method.
+
+Recall that a set of $n$ observations each with variance $\sigma^2$ has variance $\sigma^2/n$.
+In other words, averaging a set of observations reduces variance.
+That is the idea behind bagging: take many ($B$) training sets from the population, build a separate prediction model ($\hat{f}^b (x)$) for each set, and average the resulting predictions:
+
+$$
+\hat{f}_{\text{avg}}(x) = \frac{1}{B} \sum_{b=1}^B \hat{f}^b (x).
+$$
+
+Of course, we generally do not have access to multiple training sets, so we instead bootstrap the training data to obtain models $\hat{f}^{*b}(x)$ and take the average:
+
+$$
+\hat{f}_{\text{bag}}(x) = \frac{1}{B} \sum_{b=1}^B \hat{f}^{*b} (x).
+$$
+
+In the context of decision trees, this involves constructing $B$ regression of classification trees.
+These trees are grown deep and not pruned, so each tree has high variance and low bias.
+By averaging the trees, we reduce the variance.
+
+For re-creating the example in Figure 8.8, I will use the `tidymodels` framework.
+
+After some time reading the `parnsip` documentation, I found out [from  Emil Hvitfeldt 's ISLR labs code](https://emilhvitfeldt.github.io/ISLR-tidymodels-labs/tree-based-methods.html#bagging-and-random-forests) that a bagging model is the same as a random forest model with `mtry` equal to the number of predictors.
+I also set two variables in the `ranger` engine: `importance = TRUE` to retain the information required to compute variable importance later, and `oob.error = TRUE` to keep the out-of-bag error:
+
+```{r}
+# The `.cols()` helper is new to me. Within the context of a parsnip
+#  specification, it returns the number of predictor columns. There are some
+#  other functions, like `.obs()` for rows
+bagging_spec <- rand_forest(mtry = .cols(), trees = tune()) %>%
+  set_engine("ranger", importance = "permutation") %>%
+  set_mode("classification")
+
+# From 1 to 300 trees
+trees_grid <- grid_regular(trees(range = c(1, 300)), levels = 300)
+```
+
+
+```{r}
+heart_validation_split <- validation_split(heart, prop = 0.7)
+heart_recipe <- recipe(ahd ~ ., data = heart)
+
+heart_bagging_workflow <- workflow() %>%
+  add_model(bagging_spec) %>%
+  add_recipe(heart_recipe)
+
+heart_bagging_tune <- tune_grid(
+  heart_bagging_workflow,
+  resamples = heart_validation_split, grid = trees_grid
+)
+```
+
+```{r}
+autoplot(heart_bagging_tune)
+```
+
+
+
+```{r}
+heart_bagging_fit <- fit(heart_bagging_workflow, data = heart_train)
+test <- extract_fit_engine(heart_bagging_fit)
+test$prediction.error
+```
+```{r}
+heart_splits
+```
+
 
 ### delete
 
