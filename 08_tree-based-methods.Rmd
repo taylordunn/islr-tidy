@@ -635,16 +635,16 @@ In the context of decision trees, this involves constructing $B$ regression or c
 These trees are grown deep and not pruned, so each tree has high variance and low bias.
 By averaging the trees, we reduce the variance.
 
-For re-creating the example in Figure 8.8, I will use the `tidymodels` framework.
+For re-creating the example in Figure 8.8, I'll use the `tidymodels` framework.
 
-After some time reading the `parnsip` documentation, I found out [from  Emil Hvitfeldt 's ISLR labs code](https://emilhvitfeldt.github.io/ISLR-tidymodels-labs/tree-based-methods.html#bagging-and-random-forests) that a bagging model is the same as a random forest model with `mtry` equal to the number of predictors.
-I also set two variables in the `ranger` engine: `importance = TRUE` to retain the information required to compute variable importance later, and `oob.error = TRUE` to keep the out-of-bag error:
+After some time reading the `parnsip` documentation, I found out [from  Emil Hvitfeldt 's ISLR labs code](https://emilhvitfeldt.github.io/ISLR-tidymodels-labs/tree-based-methods.html#bagging-and-random-forests) that a bagging model is the same as a random forest model with `mtry` equal to the number of predictors:
 
 ```{r}
 # The `.cols()` helper is new to me. Within the context of a parsnip
 #  specification, it returns the number of predictor columns. There are some
 #  other functions, like `.obs()` for rows
 bagging_spec <- rand_forest(mtry = .cols(), trees = tune()) %>%
+  # Setting `importance = TRUE` for variable importance analysis later
   set_engine("ranger", importance = "permutation") %>%
   set_mode("classification")
 
