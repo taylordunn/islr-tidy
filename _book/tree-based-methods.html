@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>8 Tree-Based Methods | An Introduction to Statistical Learning with the tidyverse and tidymodels</title>
+  <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="8 Tree-Based Methods | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  <meta name="github-repo" content="taylordunn/islr-tidy" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="8 Tree-Based Methods | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
+  
+  <meta name="twitter:description" content="Working through ISLR with the tidyverse and tidymodels" />
+  
+
+<meta name="author" content="Taylor Dunn" />
+
+
+<meta name="date" content="2022-08-19" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="moving-beyond-linearity.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Who, what, and why?</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#an-overview-of-statistical-learning"><i class="fa fa-check"></i>An Overview of Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#wage-data"><i class="fa fa-check"></i>Wage Data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#a-brief-history-of-statistical-learning"><i class="fa fa-check"></i>A Brief History of Statistical Learning</a></li>
+<li class="chapter" data-level="" data-path="introduction.html"><a href="introduction.html#this-book"><i class="fa fa-check"></i>This Book</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="statistical-learning.html"><a href="statistical-learning.html"><i class="fa fa-check"></i><b>2</b> Statistical Learning</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#what-is-statistical-learning"><i class="fa fa-check"></i><b>2.1</b> What Is Statistical Learning?</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="statistical-learning.html"><a href="statistical-learning.html#why-estimate-f"><i class="fa fa-check"></i><b>2.1.1</b> Why Estimate <span class="math inline">\(f\)</span>?</a></li>
+<li class="chapter" data-level="2.1.2" data-path="statistical-learning.html"><a href="statistical-learning.html#how-do-we-estimate-f"><i class="fa fa-check"></i><b>2.1.2</b> How Do We Estimate f?</a></li>
+<li class="chapter" data-level="2.1.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-trade-off-between-prediction-accuracy-and-model-interpretability"><i class="fa fa-check"></i><b>2.1.3</b> The Trade-Off Between Prediction Accuracy and Model Interpretability</a></li>
+<li class="chapter" data-level="2.1.4" data-path="statistical-learning.html"><a href="statistical-learning.html#supervised-versus-unsupervised-learning"><i class="fa fa-check"></i><b>2.1.4</b> Supervised Versus Unsupervised Learning</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#assessing-model-accuracy"><i class="fa fa-check"></i><b>2.2</b> Assessing Model Accuracy</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="statistical-learning.html"><a href="statistical-learning.html#measuring-the-quality-of-fit"><i class="fa fa-check"></i><b>2.2.1</b> Measuring the Quality of Fit</a></li>
+<li class="chapter" data-level="2.2.2" data-path="statistical-learning.html"><a href="statistical-learning.html#the-bias-variance-trade-off"><i class="fa fa-check"></i><b>2.2.2</b> The Bias-Variance Trade-Off</a></li>
+<li class="chapter" data-level="2.2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#the-classification-setting"><i class="fa fa-check"></i><b>2.2.3</b> The Classification Setting</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="statistical-learning.html"><a href="statistical-learning.html#lab-introduction-to-r"><i class="fa fa-check"></i><b>2.3</b> Lab: Introduction to R</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="linear-regression.html"><a href="linear-regression.html"><i class="fa fa-check"></i><b>3</b> Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression"><i class="fa fa-check"></i><b>3.1</b> Simple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-coefficients"><i class="fa fa-check"></i><b>3.1.1</b> Estimating the Coefficients</a></li>
+<li class="chapter" data-level="3.1.2" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-coefficient-estimates"><i class="fa fa-check"></i><b>3.1.2</b> Assessing the Accuracy of the Coefficient Estimates</a></li>
+<li class="chapter" data-level="3.1.3" data-path="linear-regression.html"><a href="linear-regression.html#assessing-the-accuracy-of-the-model"><i class="fa fa-check"></i><b>3.1.3</b> Assessing the Accuracy of the Model</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression"><i class="fa fa-check"></i><b>3.2</b> Multiple Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="linear-regression.html"><a href="linear-regression.html#estimating-the-regression-coefficients"><i class="fa fa-check"></i><b>3.2.1</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="3.2.2" data-path="linear-regression.html"><a href="linear-regression.html#some-important-questions"><i class="fa fa-check"></i><b>3.2.2</b> Some Important Questions</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="linear-regression.html"><a href="linear-regression.html#other-considerations-in-the-regression-model"><i class="fa fa-check"></i><b>3.3</b> Other Considerations in the Regression Model</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors"><i class="fa fa-check"></i><b>3.3.1</b> Qualitative Predictors</a></li>
+<li class="chapter" data-level="3.3.2" data-path="linear-regression.html"><a href="linear-regression.html#extensions-of-the-linear-model"><i class="fa fa-check"></i><b>3.3.2</b> Extensions of the Linear Model</a></li>
+<li class="chapter" data-level="3.3.3" data-path="linear-regression.html"><a href="linear-regression.html#potential-problems"><i class="fa fa-check"></i><b>3.3.3</b> Potential Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="linear-regression.html"><a href="linear-regression.html#the-marketing-plan"><i class="fa fa-check"></i><b>3.4</b> The Marketing Plan</a></li>
+<li class="chapter" data-level="3.5" data-path="linear-regression.html"><a href="linear-regression.html#comparison-of-linear-regression-with-k-nearest-neighbors"><i class="fa fa-check"></i><b>3.5</b> Comparison of Linear Regression with <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="3.6" data-path="linear-regression.html"><a href="linear-regression.html#lab-linear-regression"><i class="fa fa-check"></i><b>3.6</b> Lab: Linear Regression</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="linear-regression.html"><a href="linear-regression.html#libraries"><i class="fa fa-check"></i><b>3.6.1</b> Libraries</a></li>
+<li class="chapter" data-level="3.6.2" data-path="linear-regression.html"><a href="linear-regression.html#simple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.2</b> Simple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.3" data-path="linear-regression.html"><a href="linear-regression.html#multiple-linear-regression-1"><i class="fa fa-check"></i><b>3.6.3</b> Multiple Linear Regression</a></li>
+<li class="chapter" data-level="3.6.4" data-path="linear-regression.html"><a href="linear-regression.html#interaction-terms"><i class="fa fa-check"></i><b>3.6.4</b> Interaction Terms</a></li>
+<li class="chapter" data-level="3.6.5" data-path="linear-regression.html"><a href="linear-regression.html#non-linear-transformations-of-the-predictors"><i class="fa fa-check"></i><b>3.6.5</b> Non-linear Transformations of the Predictors</a></li>
+<li class="chapter" data-level="3.6.6" data-path="linear-regression.html"><a href="linear-regression.html#qualitative-predictors-1"><i class="fa fa-check"></i><b>3.6.6</b> Qualitative Predictors</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="linear-regression.html"><a href="linear-regression.html#exercises"><i class="fa fa-check"></i><b>3.7</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#applied"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="linear-regression.html"><a href="linear-regression.html#reproducibility"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification.html"><a href="classification.html"><i class="fa fa-check"></i><b>4</b> Classification</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="classification.html"><a href="classification.html#an-overview-of-classification"><i class="fa fa-check"></i><b>4.1</b> An Overview of Classification</a></li>
+<li class="chapter" data-level="4.2" data-path="classification.html"><a href="classification.html#why-not-linear-regression"><i class="fa fa-check"></i><b>4.2</b> Why Not Linear Regression?</a></li>
+<li class="chapter" data-level="4.3" data-path="classification.html"><a href="classification.html#logistic-regression"><i class="fa fa-check"></i><b>4.3</b> Logistic Regression</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="classification.html"><a href="classification.html#the-logistic-model"><i class="fa fa-check"></i><b>4.3.1</b> The Logistic Model</a></li>
+<li class="chapter" data-level="4.3.2" data-path="classification.html"><a href="classification.html#estimating-the-regression-coefficients-1"><i class="fa fa-check"></i><b>4.3.2</b> Estimating the Regression Coefficients</a></li>
+<li class="chapter" data-level="4.3.3" data-path="classification.html"><a href="classification.html#making-predictions"><i class="fa fa-check"></i><b>4.3.3</b> Making Predictions</a></li>
+<li class="chapter" data-level="4.3.4" data-path="classification.html"><a href="classification.html#multiple-logistic-regression"><i class="fa fa-check"></i><b>4.3.4</b> Multiple Logistic Regression</a></li>
+<li class="chapter" data-level="4.3.5" data-path="classification.html"><a href="classification.html#multinomial-logistic-regression"><i class="fa fa-check"></i><b>4.3.5</b> Multinomial Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="classification.html"><a href="classification.html#generative-models-for-classification"><i class="fa fa-check"></i><b>4.4</b> Generative Models for Classification</a>
+<ul>
+<li class="chapter" data-level="4.4.1" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1"><i class="fa fa-check"></i><b>4.4.1</b> Linear Discriminant Analysis for <span class="math inline">\(p = 1\)</span></a></li>
+<li class="chapter" data-level="4.4.2" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis-for-p-1-1"><i class="fa fa-check"></i><b>4.4.2</b> Linear Discriminant Analysis for <span class="math inline">\(p &gt; 1\)</span></a></li>
+<li class="chapter" data-level="4.4.3" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis"><i class="fa fa-check"></i><b>4.4.3</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.4.4" data-path="classification.html"><a href="classification.html#naive-bayes"><i class="fa fa-check"></i><b>4.4.4</b> Naive Bayes</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="classification.html"><a href="classification.html#a-comparison-of-classification-methods"><i class="fa fa-check"></i><b>4.5</b> A Comparison of Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="classification.html"><a href="classification.html#an-analytical-comparison"><i class="fa fa-check"></i><b>4.5.1</b> An Analytical Comparison</a></li>
+<li class="chapter" data-level="4.5.2" data-path="classification.html"><a href="classification.html#an-empirical-comparison"><i class="fa fa-check"></i><b>4.5.2</b> An Empirical Comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="classification.html"><a href="classification.html#generalized-linear-models"><i class="fa fa-check"></i><b>4.6</b> Generalized Linear Models</a>
+<ul>
+<li class="chapter" data-level="4.6.1" data-path="classification.html"><a href="classification.html#linear-regression-on-the-bikeshare-data"><i class="fa fa-check"></i><b>4.6.1</b> Linear Regression on the Bikeshare Data</a></li>
+<li class="chapter" data-level="4.6.2" data-path="classification.html"><a href="classification.html#poisson-regression-on-bikeshare-data"><i class="fa fa-check"></i><b>4.6.2</b> Poisson Regression on Bikeshare Data</a></li>
+<li class="chapter" data-level="4.6.3" data-path="classification.html"><a href="classification.html#generalized-linear-models-in-greater-generality"><i class="fa fa-check"></i><b>4.6.3</b> Generalized Linear Models in Greater Generality</a></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="classification.html"><a href="classification.html#lab-classification-methods"><i class="fa fa-check"></i><b>4.7</b> Lab: Classification Methods</a>
+<ul>
+<li class="chapter" data-level="4.7.1" data-path="classification.html"><a href="classification.html#the-stock-market-data"><i class="fa fa-check"></i><b>4.7.1</b> The Stock Market Data</a></li>
+<li class="chapter" data-level="4.7.2" data-path="classification.html"><a href="classification.html#logistic-regression-1"><i class="fa fa-check"></i><b>4.7.2</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.7.3" data-path="classification.html"><a href="classification.html#linear-discriminant-analysis"><i class="fa fa-check"></i><b>4.7.3</b> Linear Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.7.4" data-path="classification.html"><a href="classification.html#quadratic-discriminant-analysis-1"><i class="fa fa-check"></i><b>4.7.4</b> Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="4.7.5" data-path="classification.html"><a href="classification.html#naive-bayes-1"><i class="fa fa-check"></i><b>4.7.5</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.7.6" data-path="classification.html"><a href="classification.html#k-nearest-neighbors-1"><i class="fa fa-check"></i><b>4.7.6</b> <span class="math inline">\(K\)</span>-Nearest Neighbors</a></li>
+<li class="chapter" data-level="4.7.7" data-path="classification.html"><a href="classification.html#poisson-regression"><i class="fa fa-check"></i><b>4.7.7</b> Poisson Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="4.8" data-path="classification.html"><a href="classification.html#exercises-1"><i class="fa fa-check"></i><b>4.8</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#applied-1"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="classification.html"><a href="classification.html#reproducibility-1"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="resampling-methods.html"><a href="resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross Validation</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="resampling-methods.html"><a href="resampling-methods.html#validation-set"><i class="fa fa-check"></i><b>5.1.1</b> The Validation Set Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="resampling-methods.html"><a href="resampling-methods.html#loocv"><i class="fa fa-check"></i><b>5.1.2</b> Leave-One-Out Cross Validation</a></li>
+<li class="chapter" data-level="5.1.3" data-path="resampling-methods.html"><a href="resampling-methods.html#kfoldcv"><i class="fa fa-check"></i><b>5.1.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bias-variance-trade-off-for-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Bias-Variance Trade-Off for <span class="math inline">\(k\)</span>-Fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="resampling-methods.html"><a href="resampling-methods.html#cross-validation-on-classification-problems"><i class="fa fa-check"></i><b>5.1.5</b> Cross-Validation on Classification Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap-lab"><i class="fa fa-check"></i><b>5.2</b> The Bootstrap</a></li>
+<li class="chapter" data-level="5.3" data-path="resampling-methods.html"><a href="resampling-methods.html#lab-cross-validation-and-the-bootstrap"><i class="fa fa-check"></i><b>5.3</b> Lab: Cross-Validation and the Bootstrap</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="resampling-methods.html"><a href="resampling-methods.html#the-validation-set-approach"><i class="fa fa-check"></i><b>5.3.1</b> The Validation Set Approach</a></li>
+<li class="chapter" data-level="5.3.2" data-path="resampling-methods.html"><a href="resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3.2</b> Leave-One-Out Cross-Validation</a></li>
+<li class="chapter" data-level="5.3.3" data-path="resampling-methods.html"><a href="resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.3.3</b> <span class="math inline">\(k\)</span>-fold Cross-Validation</a></li>
+<li class="chapter" data-level="5.3.4" data-path="resampling-methods.html"><a href="resampling-methods.html#bootstrap"><i class="fa fa-check"></i><b>5.3.4</b> The Bootstrap</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="resampling-methods.html"><a href="resampling-methods.html#exercises-2"><i class="fa fa-check"></i><b>5.4</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#applied-2"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="resampling-methods.html"><a href="resampling-methods.html#reproducibility-2"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Linear Model Selection and Regularization</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#subset-selection"><i class="fa fa-check"></i><b>6.1</b> Subset Selection</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#best-subset-selection"><i class="fa fa-check"></i><b>6.1.1</b> Best Subset Selection</a></li>
+<li class="chapter" data-level="6.1.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#stepwise-selection"><i class="fa fa-check"></i><b>6.1.2</b> Stepwise Selection</a></li>
+<li class="chapter" data-level="6.1.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#choosing-the-optimal-model"><i class="fa fa-check"></i><b>6.1.3</b> Choosing the Optimal Model</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#shrinkage-methods"><i class="fa fa-check"></i><b>6.2</b> Shrinkage Methods</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression"><i class="fa fa-check"></i><b>6.2.1</b> Ridge Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#the-lasso"><i class="fa fa-check"></i><b>6.2.2</b> The Lasso</a></li>
+<li class="chapter" data-level="6.2.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#selecting-the-tuning-parameter"><i class="fa fa-check"></i><b>6.2.3</b> Selecting the Tuning Parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#dimension-reduction-methods"><i class="fa fa-check"></i><b>6.3</b> Dimension Reduction Methods</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#principal-components-regression"><i class="fa fa-check"></i><b>6.3.1</b> Principal Components Regression</a></li>
+<li class="chapter" data-level="6.3.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#partial-least-squares"><i class="fa fa-check"></i><b>6.3.2</b> Partial Least Squares</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#considerations-in-high-dimensions"><i class="fa fa-check"></i><b>6.4</b> Considerations in High Dimensions</a>
+<ul>
+<li class="chapter" data-level="6.4.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#high-dimensional-data"><i class="fa fa-check"></i><b>6.4.1</b> High-Dimensional Data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#what-goes-wrong-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.2</b> What Goes Wrong in High Dimensions?</a></li>
+<li class="chapter" data-level="6.4.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#regression-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.3</b> Regression in High Dimensions</a></li>
+<li class="chapter" data-level="6.4.4" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#interpreting-results-in-high-dimensions"><i class="fa fa-check"></i><b>6.4.4</b> Interpreting Results in High Dimensions</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#lab-linear-models-and-regularization-methods"><i class="fa fa-check"></i><b>6.5</b> Lab: Linear Models and Regularization Methods</a>
+<ul>
+<li class="chapter" data-level="6.5.1" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#subset-selection-methods"><i class="fa fa-check"></i><b>6.5.1</b> Subset Selection Methods</a></li>
+<li class="chapter" data-level="6.5.2" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#ridge-regression-and-the-lasso"><i class="fa fa-check"></i><b>6.5.2</b> Ridge Regression and the Lasso</a></li>
+<li class="chapter" data-level="6.5.3" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#pcr-and-pls-regression"><i class="fa fa-check"></i><b>6.5.3</b> PCR and PLS Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="6.6" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#exercises-3"><i class="fa fa-check"></i><b>6.6</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#applied-3"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="linear-model-selection-and-regularization.html"><a href="linear-model-selection-and-regularization.html#reproducibility-3"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Moving Beyond Linearity</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#polynomial-regression"><i class="fa fa-check"></i><b>7.1</b> Polynomial Regression</a></li>
+<li class="chapter" data-level="7.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#step-functions"><i class="fa fa-check"></i><b>7.2</b> Step Functions</a></li>
+<li class="chapter" data-level="7.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#basis-functions"><i class="fa fa-check"></i><b>7.3</b> Basis Functions</a></li>
+<li class="chapter" data-level="7.4" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#regression-splines"><i class="fa fa-check"></i><b>7.4</b> Regression Splines</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#piecewise-polynomials"><i class="fa fa-check"></i><b>7.4.1</b> Piecewise Polynomials</a></li>
+<li class="chapter" data-level="7.4.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#constraints-and-splines"><i class="fa fa-check"></i><b>7.4.2</b> Constraints and Splines</a></li>
+<li class="chapter" data-level="7.4.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#spline-basis"><i class="fa fa-check"></i><b>7.4.3</b> The Spline Basis Representation</a></li>
+<li class="chapter" data-level="7.4.4" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#choosing-knots"><i class="fa fa-check"></i><b>7.4.4</b> Choosing the Number and Locations of the Knots</a></li>
+<li class="chapter" data-level="7.4.5" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#comparison-polynomial"><i class="fa fa-check"></i><b>7.4.5</b> Comparison to Polynomial Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.5</b> Smoothing Splines</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#an-overview-of-smoothing-splines"><i class="fa fa-check"></i><b>7.5.1</b> An Overview of Smoothing Splines</a></li>
+<li class="chapter" data-level="7.5.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#smoothing-parameter"><i class="fa fa-check"></i><b>7.5.2</b> Choosing the Smoothing Parameter <span class="math inline">\(\lambda\)</span></a></li>
+</ul></li>
+<li class="chapter" data-level="7.6" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#local-regression"><i class="fa fa-check"></i><b>7.6</b> Local Regression</a></li>
+<li class="chapter" data-level="7.7" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#generalized-additive-models"><i class="fa fa-check"></i><b>7.7</b> Generalized Additive Models</a>
+<ul>
+<li class="chapter" data-level="7.7.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#gam-regression"><i class="fa fa-check"></i><b>7.7.1</b> GAMs for Regression Problems</a></li>
+<li class="chapter" data-level="7.7.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#gam-classification"><i class="fa fa-check"></i><b>7.7.2</b> GAMs for Classification Problems</a></li>
+</ul></li>
+<li class="chapter" data-level="7.8" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#lab-non-linear-modeling"><i class="fa fa-check"></i><b>7.8</b> Lab: Non-linear Modeling</a>
+<ul>
+<li class="chapter" data-level="7.8.1" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#polynomial-regression-and-step-functions"><i class="fa fa-check"></i><b>7.8.1</b> Polynomial Regression and Step Functions</a></li>
+<li class="chapter" data-level="7.8.2" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#splines"><i class="fa fa-check"></i><b>7.8.2</b> Splines</a></li>
+<li class="chapter" data-level="7.8.3" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#gams-lab"><i class="fa fa-check"></i><b>7.8.3</b> GAMs</a></li>
+</ul></li>
+<li class="chapter" data-level="7.9" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#exercises-4"><i class="fa fa-check"></i><b>7.9</b> Exercises</a>
+<ul>
+<li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#applied-4"><i class="fa fa-check"></i>Applied</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#reproducibility-4"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>8</b> Tree-Based Methods</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#the-basics-of-decision-trees"><i class="fa fa-check"></i><b>8.1</b> The Basics of Decision Trees</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#regression-trees"><i class="fa fa-check"></i><b>8.1.1</b> Regression Trees</a></li>
+<li class="chapter" data-level="8.1.2" data-path="tree-based-methods.html"><a href="tree-based-methods.html#classification-trees"><i class="fa fa-check"></i><b>8.1.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="8.1.3" data-path="tree-based-methods.html"><a href="tree-based-methods.html#trees-versus-linear-models"><i class="fa fa-check"></i><b>8.1.3</b> Trees Versus Linear Models</a></li>
+<li class="chapter" data-level="8.1.4" data-path="tree-based-methods.html"><a href="tree-based-methods.html#advantages-and-disadvantages-of-trees"><i class="fa fa-check"></i><b>8.1.4</b> Advantages and Disadvantages of Trees</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="tree-based-methods.html"><a href="tree-based-methods.html#bagging-random-forests-boosting-and-bayesian-additive-regression-trees"><i class="fa fa-check"></i><b>8.2</b> Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#bagging"><i class="fa fa-check"></i><b>8.2.1</b> Bagging</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="tree-based-methods.html"><a href="tree-based-methods.html#reproducibility-5"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Statistical Learning with the tidyverse and tidymodels</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="tree-based-methods" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">8</span> Tree-Based Methods<a href="tree-based-methods.html#tree-based-methods" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Load the usual packages:</p>
+<div class="sourceCode" id="cb827"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb827-1"><a href="tree-based-methods.html#cb827-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb827-2"><a href="tree-based-methods.html#cb827-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb827-3"><a href="tree-based-methods.html#cb827-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb827-4"><a href="tree-based-methods.html#cb827-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb827-5"><a href="tree-based-methods.html#cb827-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb827-6"><a href="tree-based-methods.html#cb827-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb827-7"><a href="tree-based-methods.html#cb827-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb827-8"><a href="tree-based-methods.html#cb827-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load my R package and set the ggplot theme</span></span>
+<span id="cb827-9"><a href="tree-based-methods.html#cb827-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunnr)</span>
+<span id="cb827-10"><a href="tree-based-methods.html#cb827-10" aria-hidden="true" tabindex="-1"></a>extrafont<span class="sc">::</span><span class="fu">loadfonts</span>(<span class="at">device =</span> <span class="st">&quot;win&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb827-11"><a href="tree-based-methods.html#cb827-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_td_minimal</span>())</span>
+<span id="cb827-12"><a href="tree-based-methods.html#cb827-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set_geom_fonts</span>()</span>
+<span id="cb827-13"><a href="tree-based-methods.html#cb827-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set_palette</span>()</span></code></pre></div>
+<p>Tree-based methods involve <em>stratifying</em> or <em>segmenting</em> the predictor space into a number of simple regions.
+Predictions are typically the mean or mode of the response value for training observations in a region.
+Since the set of splitting rules can be summarized in a tree, these types of approaches are known as <em>decision tree</em> methods.</p>
+<blockquote>
+<p>Tree-based methods are simple and useful for interpretation. However,
+they typically are not competitive with the best supervised learning aproaches, such as those seen in Chapters 6 and 7, in terms of prediction
+accuracy. Hence in this chapter we also introduce bagging, random forests,
+boosting, and Bayesian additive regression trees. Each of these approaches
+involves producing multiple trees which are then combined to yield a single
+consensus prediction. We will see that combining a large number of trees
+can often result in dramatic improvements in prediction accuracy, at the
+expense of some loss in interpretation.</p>
+</blockquote>
+<div id="the-basics-of-decision-trees" class="section level2 hasAnchor" number="8.1">
+<h2><span class="header-section-number">8.1</span> The Basics of Decision Trees<a href="tree-based-methods.html#the-basics-of-decision-trees" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="regression-trees" class="section level3 hasAnchor" number="8.1.1">
+<h3><span class="header-section-number">8.1.1</span> Regression Trees<a href="tree-based-methods.html#regression-trees" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="predicting-baseball-players-salaries-using-regression-trees" class="section level4 unnumbered hasAnchor">
+<h4>Predicting Baseball Players’ Salaries Using Regression Trees<a href="tree-based-methods.html#predicting-baseball-players-salaries-using-regression-trees" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>To motivate <em>regression trees</em>, we use an example of predicting a baseball player’s <code>salary</code> based on <code>years</code> (number of years played in the major leagues), and <code>hits</code> (number of hits made in the previous year).</p>
+<div class="sourceCode" id="cb828"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb828-1"><a href="tree-based-methods.html#cb828-1" aria-hidden="true" tabindex="-1"></a>hitters <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Hitters <span class="sc">%&gt;%</span> janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb828-2"><a href="tree-based-methods.html#cb828-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb828-3"><a href="tree-based-methods.html#cb828-3" aria-hidden="true" tabindex="-1"></a><span class="co"># As per the text, we remove missing `salary` values and log-transform it</span></span>
+<span id="cb828-4"><a href="tree-based-methods.html#cb828-4" aria-hidden="true" tabindex="-1"></a>hitters <span class="ot">&lt;-</span> hitters <span class="sc">%&gt;%</span></span>
+<span id="cb828-5"><a href="tree-based-methods.html#cb828-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(salary)) <span class="sc">%&gt;%</span></span>
+<span id="cb828-6"><a href="tree-based-methods.html#cb828-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">salary =</span> <span class="fu">log</span>(salary))</span>
+<span id="cb828-7"><a href="tree-based-methods.html#cb828-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb828-8"><a href="tree-based-methods.html#cb828-8" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hitters)</span></code></pre></div>
+<pre><code>## Rows: 263
+## Columns: 20
+## $ at_bat     &lt;int&gt; 315, 479, 496, 321, 594, 185, 298, 323, 401, 574, 202, 418,…
+## $ hits       &lt;int&gt; 81, 130, 141, 87, 169, 37, 73, 81, 92, 159, 53, 113, 60, 43…
+## $ hm_run     &lt;int&gt; 7, 18, 20, 10, 4, 1, 0, 6, 17, 21, 4, 13, 0, 7, 20, 2, 8, 1…
+## $ runs       &lt;int&gt; 24, 66, 65, 39, 74, 23, 24, 26, 49, 107, 31, 48, 30, 29, 89…
+## $ rbi        &lt;int&gt; 38, 72, 78, 42, 51, 8, 24, 32, 66, 75, 26, 61, 11, 27, 75, …
+## $ walks      &lt;int&gt; 39, 76, 37, 30, 35, 21, 7, 8, 65, 59, 27, 47, 22, 30, 73, 1…
+## $ years      &lt;int&gt; 14, 3, 11, 2, 11, 2, 3, 2, 13, 10, 9, 4, 6, 13, 15, 5, 8, 1…
+## $ c_at_bat   &lt;int&gt; 3449, 1624, 5628, 396, 4408, 214, 509, 341, 5206, 4631, 187…
+## $ c_hits     &lt;int&gt; 835, 457, 1575, 101, 1133, 42, 108, 86, 1332, 1300, 467, 39…
+## $ c_hm_run   &lt;int&gt; 69, 63, 225, 12, 19, 1, 0, 6, 253, 90, 15, 41, 4, 36, 177, …
+## $ c_runs     &lt;int&gt; 321, 224, 828, 48, 501, 30, 41, 32, 784, 702, 192, 205, 309…
+## $ crbi       &lt;int&gt; 414, 266, 838, 46, 336, 9, 37, 34, 890, 504, 186, 204, 103,…
+## $ c_walks    &lt;int&gt; 375, 263, 354, 33, 194, 24, 12, 8, 866, 488, 161, 203, 207,…
+## $ league     &lt;fct&gt; N, A, N, N, A, N, A, N, A, A, N, N, A, N, N, A, N, N, A, N,…
+## $ division   &lt;fct&gt; W, W, E, E, W, E, W, W, E, E, W, E, E, E, W, W, W, E, W, W,…
+## $ put_outs   &lt;int&gt; 632, 880, 200, 805, 282, 76, 121, 143, 0, 238, 304, 211, 12…
+## $ assists    &lt;int&gt; 43, 82, 11, 40, 421, 127, 283, 290, 0, 445, 45, 11, 151, 45…
+## $ errors     &lt;int&gt; 10, 14, 3, 4, 25, 7, 9, 19, 0, 22, 11, 7, 6, 8, 10, 16, 2, …
+## $ salary     &lt;dbl&gt; 6.163315, 6.173786, 6.214608, 4.516339, 6.620073, 4.248495,…
+## $ new_league &lt;fct&gt; N, A, N, N, A, A, A, N, A, A, N, N, A, N, N, A, N, N, N, N,…</code></pre>
+<p>I’ll start with the <code>trees</code> library for this example:</p>
+<div class="sourceCode" id="cb830"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb830-1"><a href="tree-based-methods.html#cb830-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tree)</span>
+<span id="cb830-2"><a href="tree-based-methods.html#cb830-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb830-3"><a href="tree-based-methods.html#cb830-3" aria-hidden="true" tabindex="-1"></a>hitters_tree <span class="ot">&lt;-</span> <span class="fu">tree</span>(salary <span class="sc">~</span> years <span class="sc">+</span> hits, <span class="at">data =</span> hitters,</span>
+<span id="cb830-4"><a href="tree-based-methods.html#cb830-4" aria-hidden="true" tabindex="-1"></a>                     <span class="co"># In order to limit the tree to just two partitions,</span></span>
+<span id="cb830-5"><a href="tree-based-methods.html#cb830-5" aria-hidden="true" tabindex="-1"></a>                     <span class="co">#  need to set the `control` option</span></span>
+<span id="cb830-6"><a href="tree-based-methods.html#cb830-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">control =</span> <span class="fu">tree.control</span>(<span class="fu">nrow</span>(hitters), <span class="at">minsize =</span> <span class="dv">100</span>))</span></code></pre></div>
+<p>Use the built-in <code>plot()</code> to visualize the tree in Figure 8.1:</p>
+<div class="sourceCode" id="cb831"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb831-1"><a href="tree-based-methods.html#cb831-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hitters_tree)</span>
+<span id="cb831-2"><a href="tree-based-methods.html#cb831-2" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(hitters_tree)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.1-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>To visualize the regions, there is no <code>broom::tidy()</code> method for <code>tree</code> objects, but I can get the cuts from the <code>frame$splits</code> object:</p>
+<div class="sourceCode" id="cb832"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb832-1"><a href="tree-based-methods.html#cb832-1" aria-hidden="true" tabindex="-1"></a>hitters_tree<span class="sc">$</span>frame<span class="sc">$</span>splits</span></code></pre></div>
+<pre><code>##      cutleft  cutright
+## [1,] &quot;&lt;4.5&quot;   &quot;&gt;4.5&quot;  
+## [2,] &quot;&quot;       &quot;&quot;      
+## [3,] &quot;&lt;117.5&quot; &quot;&gt;117.5&quot;
+## [4,] &quot;&quot;       &quot;&quot;      
+## [5,] &quot;&quot;       &quot;&quot;</code></pre>
+<div class="sourceCode" id="cb834"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb834-1"><a href="tree-based-methods.html#cb834-1" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> hitters_tree<span class="sc">$</span>frame<span class="sc">$</span>splits <span class="sc">%&gt;%</span></span>
+<span id="cb834-2"><a href="tree-based-methods.html#cb834-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb834-3"><a href="tree-based-methods.html#cb834-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cutleft <span class="sc">!=</span> <span class="st">&quot;&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb834-4"><a href="tree-based-methods.html#cb834-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">val =</span> readr<span class="sc">::</span><span class="fu">parse_number</span>(cutleft)) <span class="sc">%&gt;%</span></span>
+<span id="cb834-5"><a href="tree-based-methods.html#cb834-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(val)</span>
+<span id="cb834-6"><a href="tree-based-methods.html#cb834-6" aria-hidden="true" tabindex="-1"></a>splits</span></code></pre></div>
+<pre><code>## [1]   4.5 117.5</code></pre>
+<div class="sourceCode" id="cb836"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb836-1"><a href="tree-based-methods.html#cb836-1" aria-hidden="true" tabindex="-1"></a>hitters <span class="sc">%&gt;%</span></span>
+<span id="cb836-2"><a href="tree-based-methods.html#cb836-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> years, <span class="at">y =</span> hits)) <span class="sc">+</span></span>
+<span id="cb836-3"><a href="tree-based-methods.html#cb836-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">color =</span> td_colors<span class="sc">$</span>nice<span class="sc">$</span>soft_orange) <span class="sc">+</span></span>
+<span id="cb836-4"><a href="tree-based-methods.html#cb836-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> splits[<span class="dv">1</span>], <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">&quot;forestgreen&quot;</span>) <span class="sc">+</span></span>
+<span id="cb836-5"><a href="tree-based-methods.html#cb836-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> splits[<span class="dv">1</span>], <span class="at">xend =</span> <span class="dv">25</span>, <span class="at">y =</span> splits[<span class="dv">2</span>], <span class="at">yend =</span> splits[<span class="dv">2</span>]),</span>
+<span id="cb836-6"><a href="tree-based-methods.html#cb836-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">size =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">&quot;forestgreen&quot;</span>) <span class="sc">+</span></span>
+<span id="cb836-7"><a href="tree-based-methods.html#cb836-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">10</span>, <span class="at">y =</span> <span class="dv">50</span>, <span class="at">label =</span> <span class="st">&quot;R[2]&quot;</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb836-8"><a href="tree-based-methods.html#cb836-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">10</span>, <span class="at">y =</span> <span class="dv">200</span>, <span class="at">label =</span> <span class="st">&quot;R[3]&quot;</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb836-9"><a href="tree-based-methods.html#cb836-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">2</span>, <span class="at">y =</span> <span class="dv">118</span>, <span class="at">label =</span> <span class="st">&quot;R[1]&quot;</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">parse =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb836-10"><a href="tree-based-methods.html#cb836-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">240</span>)) <span class="sc">+</span></span>
+<span id="cb836-11"><a href="tree-based-methods.html#cb836-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">4.5</span>, <span class="dv">24</span>)) <span class="sc">+</span></span>
+<span id="cb836-12"><a href="tree-based-methods.html#cb836-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">117.5</span>, <span class="dv">238</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.2-1.png" width="576" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>Overall, the tree stratifies
+or segments the players into three regions of predictor space: players who
+have played for four or fewer years, players who have played for five or more
+years and who made fewer than 118 hits last year, and players who have
+played for five or more years and who made at least 118 hits last year.</p>
+</blockquote>
+<p>The regions <span class="math inline">\(R_1\)</span>, <span class="math inline">\(R_2\)</span>, and <span class="math inline">\(R_3\)</span> are known as <em>terminal nodes</em> or <em>leaves</em> of the tree.
+The splits along the way are referred to as <em>internal nodes</em> – the connections between nodes are called <em>branches</em>.</p>
+<p>A key advantage of a simple decision tree like this is its ease of interpretation:</p>
+<blockquote>
+<p>We might interpret the regression tree displayed in Figure 8.1 as follows:
+<code>Years</code> is the most important factor in determining <code>Salary</code>, and players with
+less experience earn lower salaries than more experienced players. Given
+that a player is less experienced, the number of hits that he made in the
+previous year seems to play little role in his salary. But among players who
+have been in the major leagues for five or more years, the number of hits
+made in the previous year does affect salary, and players who made more
+hits last year tend to have higher salaries.</p>
+</blockquote>
+</div>
+<div id="prediction-via-stratification-of-the-feature-space" class="section level4 unnumbered hasAnchor">
+<h4>Prediction via Stratification of the Feature Space<a href="tree-based-methods.html#prediction-via-stratification-of-the-feature-space" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Roughly speaking, there are two steps in building a regression tree:</p>
+<ol style="list-style-type: decimal">
+<li>Divide the predictor space into <span class="math inline">\(J\)</span> distinct non-overlapping regions <span class="math inline">\(R_1, \dots, R_J\)</span>.</li>
+<li>For every observation that falls into the region <span class="math inline">\(R_j\)</span>, we make the same prediction: the mean of the respone values of the training observations.</li>
+</ol>
+<p>In theory, the regions could be any shape but we choose <em>boxes</em> for simplicity.
+The goal of step 1 is the finx the boxes that minimize the RSS</p>
+<p><span class="math display">\[
+\sum_{j=1}^J \sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2.
+\]</span></p>
+<blockquote>
+<p>Unfortunately, it is computationally infeasible to consider every
+possible partition of the feature space into <span class="math inline">\(J\)</span> boxes. For this reason, we take
+a <em>top-down, greedy</em> approach that is known as <em>recursive binary splitting</em>. The
+approach is <em>top-down</em> because it begins at the top of the tree (at which point
+all observations belong to a single region) and then successively splits the
+predictor space; each split is indicated via two new branches further down
+on the tree. It is <em>greedy</em> because at each step of the tree-building process,
+the best split is made at that particular step, rather than looking ahead
+and picking a split that will lead to a better tree in some future step.</p>
+</blockquote>
+<p>The first split is defined as a pair of half planes:</p>
+<p><span class="math display">\[
+R_1 (j,s) = \{X | X_j &lt; s \} \text{ and } R_2 (j,s) = \{ X | X_j \geq s \},
+\]</span></p>
+<p>and we seek the values <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span> that minimize</p>
+<p><span class="math display">\[
+\sum_{i: x_i \in R_1 (j,s)} (y_i - \hat{y}_{R_1})^2 +
+\sum_{i: x_i \in R_2 (j,s)} (y_i - \hat{y}_{R_2})^2.
+\]</span></p>
+<p>Finding the values <span class="math inline">\(j\)</span> and <span class="math inline">\(s\)</span> to minimize the above RSS can be done quite quickly, especially when the number of features <span class="math inline">\(p\)</span> is not too large.</p>
+<p>The process is repeated – looking for the best predictor and best cutpoint in order to split the data further and minimize the RSS within the regions – except instead of splitting the entire predictor space, we split one of the previously identified regions.
+This results in three regions, which we again look to split.
+This continues until a stopping criterion is reached; for instance, we may continue until no region contains more than five observations.</p>
+</div>
+<div id="tree-pruning" class="section level4 unnumbered hasAnchor">
+<h4>Tree Pruning<a href="tree-based-methods.html#tree-pruning" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>The above process is likely to overfit the data, leading to poor test set performance.
+This is because the resulting tree might be too complex.
+A smaller tree with fewer splits/regions might lead to lower variance and better interpretation at the cost of higher bias.
+One way to control this is to only choose splits that exceed some high threshold of RSS reduction.
+This way is short-sighted however, because a seemingly worthless split early on might be followed by a great split.</p>
+<blockquote>
+<p>Therefore, a better strategy is to grow a very large tree <span class="math inline">\(T_0\)</span>, and then
+<em>prune</em> it back in order to obtain a <em>subtree</em>. How do we determine the best
+way to prune the tree? Intuitively, our goal is to select a subtree that
+leads to the lowest test error rate. Given a subtree, we can estimate its
+test error using cross-validation or the validation set approach. However,
+estimating the cross-validation error for every possible subtree would be too
+cumbersome, since there is an extremely large number of possible subtrees.
+Instead, we need a way to select a small set of subtrees for consideration.</p>
+<p><em>Cost complexity pruning</em> — also known as <em>weakest link pruning</em> — gives us cost
+a way to do just this. Rather than considering every possible subtree, we
+consider a sequence of trees indexed by a nonnegative tuning parameter <span class="math inline">\(\alpha\)</span>.
+For each value of α there corresponds a subtree <span class="math inline">\(T \subset T0\)</span> such that</p>
+</blockquote>
+<p><span class="math display">\[
+\sum^{|T|}_{m=1} \sum_{x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha |T|
+\]</span></p>
+<blockquote>
+<p>is as small as possible. Here <span class="math inline">\(|T|\)</span> indicates the number of terminal nodes of the tree <span class="math inline">\(T\)</span>, <span class="math inline">\(R_m\)</span> is the rectangle (i.e. the subset of predictor space)
+corresponding to the <span class="math inline">\(m\)</span>th terminal node, and <span class="math inline">\(\hat{y}_{R_m}\)</span>
+is the predicted response associated with <span class="math inline">\(R_m\)</span> – that is, the mean of the
+training observations in <span class="math inline">\(R_m\)</span>. The tuning parameter <span class="math inline">\(\alpha\)</span> controls a trade-off between the subtree’s complexity and its fit to the training data.
+When <span class="math inline">\(\alpha = 0\)</span>, then the subtree <span class="math inline">\(T\)</span> will simply equal <span class="math inline">\(T_0\)</span>, because then (8.4) just measures the training error.
+However, as <span class="math inline">\(\alpha\)</span> increases, there is a price to pay for having a tree with many terminal nodes, and so the quantity (8.4)
+will tend to be minimized for a smaller subtree. Equation 8.4 is reminiscent of the lasso (6.7) from Chapter 6,
+in which a similar formulation was used in order to control the complexity of a linear model.</p>
+</blockquote>
+<p>As <span class="math inline">\(\alpha\)</span> is increased from zero, branches get prunced in a nested and predictable way, so obtaining the full sequence of subtrees as a function of <span class="math inline">\(\alpha\)</span> is easy.
+The value of <span class="math inline">\(\alpha\)</span> can then be selected using cross-validation or a validation set, which we then apply to the full data set to obtain the subtree.</p>
+<p>The example with the <code>hitters</code> data first involves splitting the data into half training and half testing:</p>
+<div class="sourceCode" id="cb837"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb837-1"><a href="tree-based-methods.html#cb837-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="sc">-</span><span class="dv">203</span>)</span>
+<span id="cb837-2"><a href="tree-based-methods.html#cb837-2" aria-hidden="true" tabindex="-1"></a>hitters_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(hitters,</span>
+<span id="cb837-3"><a href="tree-based-methods.html#cb837-3" aria-hidden="true" tabindex="-1"></a>                               <span class="co"># Bumped up the prop to get 132 training observations</span></span>
+<span id="cb837-4"><a href="tree-based-methods.html#cb837-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">prop =</span> <span class="fl">0.505</span>)</span>
+<span id="cb837-5"><a href="tree-based-methods.html#cb837-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb837-6"><a href="tree-based-methods.html#cb837-6" aria-hidden="true" tabindex="-1"></a>hitters_train <span class="ot">&lt;-</span> <span class="fu">training</span>(hitters_split)</span>
+<span id="cb837-7"><a href="tree-based-methods.html#cb837-7" aria-hidden="true" tabindex="-1"></a>hitters_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(hitters_split)</span>
+<span id="cb837-8"><a href="tree-based-methods.html#cb837-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb837-9"><a href="tree-based-methods.html#cb837-9" aria-hidden="true" tabindex="-1"></a>hitters_resamples <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(hitters_train, <span class="at">v =</span> <span class="dv">6</span>)</span></code></pre></div>
+<p>Then fitting a decision tree with nine of the features, which aren’t specified so instead I’ll fit using the six features in Figure 8.4</p>
+<div class="sourceCode" id="cb838"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb838-1"><a href="tree-based-methods.html#cb838-1" aria-hidden="true" tabindex="-1"></a>hitters_train_tree <span class="ot">&lt;-</span> <span class="fu">tree</span>(</span>
+<span id="cb838-2"><a href="tree-based-methods.html#cb838-2" aria-hidden="true" tabindex="-1"></a>  salary <span class="sc">~</span> years <span class="sc">+</span> hits <span class="sc">+</span> rbi <span class="sc">+</span> put_outs <span class="sc">+</span> walks <span class="sc">+</span> runs,</span>
+<span id="cb838-3"><a href="tree-based-methods.html#cb838-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> hitters_train,</span>
+<span id="cb838-4"><a href="tree-based-methods.html#cb838-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb838-5"><a href="tree-based-methods.html#cb838-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hitters_train_tree)</span>
+<span id="cb838-6"><a href="tree-based-methods.html#cb838-6" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(hitters_train_tree, <span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This isn’t exactly the same tree as that in the text, as expected with a different random splitting and feature selection.
+I’ll do the same with each CV split:</p>
+<div class="sourceCode" id="cb839"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb839-1"><a href="tree-based-methods.html#cb839-1" aria-hidden="true" tabindex="-1"></a>hitters_resamples_tree <span class="ot">&lt;-</span></span>
+<span id="cb839-2"><a href="tree-based-methods.html#cb839-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compile all of the analysis data sets from the six splits</span></span>
+<span id="cb839-3"><a href="tree-based-methods.html#cb839-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(hitters_resamples<span class="sc">$</span>splits, analysis, <span class="at">.id =</span> <span class="st">&quot;split&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb839-4"><a href="tree-based-methods.html#cb839-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># For each split...</span></span>
+<span id="cb839-5"><a href="tree-based-methods.html#cb839-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(split) <span class="sc">%&gt;%</span></span>
+<span id="cb839-6"><a href="tree-based-methods.html#cb839-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb839-7"><a href="tree-based-methods.html#cb839-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb839-8"><a href="tree-based-methods.html#cb839-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... fit a tree to the analysis set</span></span>
+<span id="cb839-9"><a href="tree-based-methods.html#cb839-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree_mod =</span> <span class="fu">map</span>(</span>
+<span id="cb839-10"><a href="tree-based-methods.html#cb839-10" aria-hidden="true" tabindex="-1"></a>      data,</span>
+<span id="cb839-11"><a href="tree-based-methods.html#cb839-11" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">tree</span>(</span>
+<span id="cb839-12"><a href="tree-based-methods.html#cb839-12" aria-hidden="true" tabindex="-1"></a>        salary <span class="sc">~</span> years <span class="sc">+</span> hits <span class="sc">+</span> rbi <span class="sc">+</span> put_outs <span class="sc">+</span> walks <span class="sc">+</span> runs,</span>
+<span id="cb839-13"><a href="tree-based-methods.html#cb839-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> .x,</span>
+<span id="cb839-14"><a href="tree-based-methods.html#cb839-14" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb839-15"><a href="tree-based-methods.html#cb839-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb839-16"><a href="tree-based-methods.html#cb839-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Next, we prune the large tree above from 3 terminal nodes down to 1.
+For this, I’ll vary the <code>best</code> parameter in the <code>prune.tree()</code> function:</p>
+<div class="sourceCode" id="cb840"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb840-1"><a href="tree-based-methods.html#cb840-1" aria-hidden="true" tabindex="-1"></a>hitters_tree_pruned <span class="ot">&lt;-</span> </span>
+<span id="cb840-2"><a href="tree-based-methods.html#cb840-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">n_terminal =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb840-3"><a href="tree-based-methods.html#cb840-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb840-4"><a href="tree-based-methods.html#cb840-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">train_tree_pruned =</span> <span class="fu">map</span>(n_terminal,</span>
+<span id="cb840-5"><a href="tree-based-methods.html#cb840-5" aria-hidden="true" tabindex="-1"></a>                            <span class="sc">~</span> <span class="fu">prune.tree</span>(hitters_train_tree, <span class="at">best =</span> .x)),</span>
+<span id="cb840-6"><a href="tree-based-methods.html#cb840-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb840-7"><a href="tree-based-methods.html#cb840-7" aria-hidden="true" tabindex="-1"></a>hitters_tree_pruned</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 2
+##    n_terminal train_tree_pruned
+##         &lt;int&gt; &lt;list&gt;           
+##  1          1 &lt;singlend&gt;       
+##  2          2 &lt;tree&gt;           
+##  3          3 &lt;tree&gt;           
+##  4          4 &lt;tree&gt;           
+##  5          5 &lt;tree&gt;           
+##  6          6 &lt;tree&gt;           
+##  7          7 &lt;tree&gt;           
+##  8          8 &lt;tree&gt;           
+##  9          9 &lt;tree&gt;           
+## 10         10 &lt;tree&gt;</code></pre>
+<p>Note that, for <code>n_terminal</code> = 1, the object is <code>singlenode</code>, not <code>tree</code>.
+This makes sense – a single node can’t really be called a tree – but unfortunately it means that I can’t use the <code>predict()</code> function to calculate MSE later on.
+Mathematically, a single node is just a prediction of the mean of the training set, so I will replace <code>n_terminal</code> = 1 with a <code>lm</code> model with just an intercept:</p>
+<div class="sourceCode" id="cb842"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb842-1"><a href="tree-based-methods.html#cb842-1" aria-hidden="true" tabindex="-1"></a>hitters_tree_pruned <span class="ot">&lt;-</span> hitters_tree_pruned <span class="sc">%&gt;%</span></span>
+<span id="cb842-2"><a href="tree-based-methods.html#cb842-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb842-3"><a href="tree-based-methods.html#cb842-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">train_tree_pruned =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb842-4"><a href="tree-based-methods.html#cb842-4" aria-hidden="true" tabindex="-1"></a>      n_terminal <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb842-5"><a href="tree-based-methods.html#cb842-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="fu">lm</span>(salary <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> hitters_train)),</span>
+<span id="cb842-6"><a href="tree-based-methods.html#cb842-6" aria-hidden="true" tabindex="-1"></a>      train_tree_pruned</span>
+<span id="cb842-7"><a href="tree-based-methods.html#cb842-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb842-8"><a href="tree-based-methods.html#cb842-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Do the same for each CV split:</p>
+<div class="sourceCode" id="cb843"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb843-1"><a href="tree-based-methods.html#cb843-1" aria-hidden="true" tabindex="-1"></a>hitters_resamples_tree_pruned <span class="ot">&lt;-</span> hitters_resamples_tree <span class="sc">%&gt;%</span></span>
+<span id="cb843-2"><a href="tree-based-methods.html#cb843-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">crossing</span>(<span class="at">n_terminal =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb843-3"><a href="tree-based-methods.html#cb843-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb843-4"><a href="tree-based-methods.html#cb843-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree_pruned =</span> <span class="fu">map2</span>(tree_mod, n_terminal,</span>
+<span id="cb843-5"><a href="tree-based-methods.html#cb843-5" aria-hidden="true" tabindex="-1"></a>                       <span class="sc">~</span> <span class="fu">prune.tree</span>(.x, <span class="at">best =</span> .y)),</span>
+<span id="cb843-6"><a href="tree-based-methods.html#cb843-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># As above, replace the single node trees with lm</span></span>
+<span id="cb843-7"><a href="tree-based-methods.html#cb843-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree_pruned =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb843-8"><a href="tree-based-methods.html#cb843-8" aria-hidden="true" tabindex="-1"></a>      n_terminal <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb843-9"><a href="tree-based-methods.html#cb843-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map</span>(data, <span class="sc">~</span> <span class="fu">lm</span>(salary <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> .x)),</span>
+<span id="cb843-10"><a href="tree-based-methods.html#cb843-10" aria-hidden="true" tabindex="-1"></a>      tree_pruned</span>
+<span id="cb843-11"><a href="tree-based-methods.html#cb843-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb843-12"><a href="tree-based-methods.html#cb843-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size</code></pre>
+<p>Note the warnings.
+This tells me that some of the models fit to the CV splits had 10 or fewer terminal nodes already, and so no pruning was performed.</p>
+<p>Finally, I’ll compute the MSE for the different data sets.
+The training and testing sets:</p>
+<div class="sourceCode" id="cb845"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb845-1"><a href="tree-based-methods.html#cb845-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple helper function to compute mean squared error</span></span>
+<span id="cb845-2"><a href="tree-based-methods.html#cb845-2" aria-hidden="true" tabindex="-1"></a>calc_mse <span class="ot">&lt;-</span> <span class="cf">function</span>(mod, data) {</span>
+<span id="cb845-3"><a href="tree-based-methods.html#cb845-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>((<span class="fu">predict</span>(mod, <span class="at">newdata =</span> data) <span class="sc">-</span> data<span class="sc">$</span>salary)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb845-4"><a href="tree-based-methods.html#cb845-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb845-5"><a href="tree-based-methods.html#cb845-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb845-6"><a href="tree-based-methods.html#cb845-6" aria-hidden="true" tabindex="-1"></a>hitters_tree_pruned_mse <span class="ot">&lt;-</span> hitters_tree_pruned <span class="sc">%&gt;%</span></span>
+<span id="cb845-7"><a href="tree-based-methods.html#cb845-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb845-8"><a href="tree-based-methods.html#cb845-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">train_mse =</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb845-9"><a href="tree-based-methods.html#cb845-9" aria-hidden="true" tabindex="-1"></a>      train_tree_pruned,</span>
+<span id="cb845-10"><a href="tree-based-methods.html#cb845-10" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">calc_mse</span>(.x, hitters_train)</span>
+<span id="cb845-11"><a href="tree-based-methods.html#cb845-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb845-12"><a href="tree-based-methods.html#cb845-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">test_mse =</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb845-13"><a href="tree-based-methods.html#cb845-13" aria-hidden="true" tabindex="-1"></a>      train_tree_pruned,</span>
+<span id="cb845-14"><a href="tree-based-methods.html#cb845-14" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">calc_mse</span>(.x, hitters_test)</span>
+<span id="cb845-15"><a href="tree-based-methods.html#cb845-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb845-16"><a href="tree-based-methods.html#cb845-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb845-17"><a href="tree-based-methods.html#cb845-17" aria-hidden="true" tabindex="-1"></a>hitters_tree_pruned_mse</span></code></pre></div>
+<pre><code>## # A tibble: 10 × 4
+##    n_terminal train_tree_pruned train_mse test_mse
+##         &lt;int&gt; &lt;list&gt;                &lt;dbl&gt;    &lt;dbl&gt;
+##  1          1 &lt;lm&gt;                  0.671    0.906
+##  2          2 &lt;tree&gt;                0.400    0.487
+##  3          3 &lt;tree&gt;                0.329    0.377
+##  4          4 &lt;tree&gt;                0.280    0.443
+##  5          5 &lt;tree&gt;                0.280    0.443
+##  6          6 &lt;tree&gt;                0.264    0.433
+##  7          7 &lt;tree&gt;                0.252    0.401
+##  8          8 &lt;tree&gt;                0.233    0.393
+##  9          9 &lt;tree&gt;                0.233    0.393
+## 10         10 &lt;tree&gt;                0.225    0.385</code></pre>
+<p>And the CV splits:</p>
+<div class="sourceCode" id="cb847"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb847-1"><a href="tree-based-methods.html#cb847-1" aria-hidden="true" tabindex="-1"></a>hitters_resamples_tree_pruned_mse <span class="ot">&lt;-</span> hitters_resamples_tree_pruned <span class="sc">%&gt;%</span></span>
+<span id="cb847-2"><a href="tree-based-methods.html#cb847-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(split, n_terminal, tree_pruned) <span class="sc">%&gt;%</span></span>
+<span id="cb847-3"><a href="tree-based-methods.html#cb847-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb847-4"><a href="tree-based-methods.html#cb847-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(hitters_resamples<span class="sc">$</span>splits, assessment, <span class="at">.id =</span> <span class="st">&quot;split&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb847-5"><a href="tree-based-methods.html#cb847-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(split) <span class="sc">%&gt;%</span></span>
+<span id="cb847-6"><a href="tree-based-methods.html#cb847-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb847-7"><a href="tree-based-methods.html#cb847-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">assessment_data =</span> data),</span>
+<span id="cb847-8"><a href="tree-based-methods.html#cb847-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">&quot;split&quot;</span></span>
+<span id="cb847-9"><a href="tree-based-methods.html#cb847-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb847-10"><a href="tree-based-methods.html#cb847-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb847-11"><a href="tree-based-methods.html#cb847-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">cv_mse =</span> <span class="fu">map2_dbl</span>(</span>
+<span id="cb847-12"><a href="tree-based-methods.html#cb847-12" aria-hidden="true" tabindex="-1"></a>      tree_pruned, assessment_data,</span>
+<span id="cb847-13"><a href="tree-based-methods.html#cb847-13" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">calc_mse</span>(.x, .y)</span>
+<span id="cb847-14"><a href="tree-based-methods.html#cb847-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb847-15"><a href="tree-based-methods.html#cb847-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb847-16"><a href="tree-based-methods.html#cb847-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(n_terminal) <span class="sc">%&gt;%</span></span>
+<span id="cb847-17"><a href="tree-based-methods.html#cb847-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cv_mse =</span> <span class="fu">mean</span>(cv_mse), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span></code></pre></div>
+<p>Finally, put it all together as in Figure 8.5 (without standard error bars):</p>
+<div class="sourceCode" id="cb848"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb848-1"><a href="tree-based-methods.html#cb848-1" aria-hidden="true" tabindex="-1"></a>hitters_tree_pruned_mse <span class="sc">%&gt;%</span></span>
+<span id="cb848-2"><a href="tree-based-methods.html#cb848-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>train_tree_pruned) <span class="sc">%&gt;%</span></span>
+<span id="cb848-3"><a href="tree-based-methods.html#cb848-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(hitters_resamples_tree_pruned_mse, <span class="at">by =</span> <span class="st">&quot;n_terminal&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb848-4"><a href="tree-based-methods.html#cb848-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(train_mse, test_mse, cv_mse), <span class="at">names_to =</span> <span class="st">&quot;data_set&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb848-5"><a href="tree-based-methods.html#cb848-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb848-6"><a href="tree-based-methods.html#cb848-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_set =</span> <span class="fu">factor</span>(data_set,</span>
+<span id="cb848-7"><a href="tree-based-methods.html#cb848-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;train_mse&quot;</span>, <span class="st">&quot;cv_mse&quot;</span>, <span class="st">&quot;test_mse&quot;</span>),</span>
+<span id="cb848-8"><a href="tree-based-methods.html#cb848-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Training&quot;</span>, <span class="st">&quot;Cross-validation&quot;</span>, <span class="st">&quot;Test&quot;</span>))</span>
+<span id="cb848-9"><a href="tree-based-methods.html#cb848-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb848-10"><a href="tree-based-methods.html#cb848-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n_terminal, <span class="at">y =</span> value, <span class="at">color =</span> data_set)) <span class="sc">+</span></span>
+<span id="cb848-11"><a href="tree-based-methods.html#cb848-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb848-12"><a href="tree-based-methods.html#cb848-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb848-13"><a href="tree-based-methods.html#cb848-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">&quot;Mean squared error&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">1.0</span>, <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb848-14"><a href="tree-based-methods.html#cb848-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1.0</span>)) <span class="sc">+</span></span>
+<span id="cb848-15"><a href="tree-based-methods.html#cb848-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Tree size&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb848-16"><a href="tree-based-methods.html#cb848-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="cn">NULL</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;darkgreen&quot;</span>, <span class="st">&quot;darkorange&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb848-17"><a href="tree-based-methods.html#cb848-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.8</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.5-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>As in the text, the minimum test and CV MSE correspond to the decision trees with three terminal nodes.</p>
+</div>
+</div>
+<div id="classification-trees" class="section level3 hasAnchor" number="8.1.2">
+<h3><span class="header-section-number">8.1.2</span> Classification Trees<a href="tree-based-methods.html#classification-trees" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A classification tree is used for a qualitative response.
+An observation is predicted to belong to the <em>most commonly occurring class</em> of training observations in its region.
+Often, we are not only interested in the predicted class for the terminal nodes, but also the <em>class proportions</em> among the training observations.</p>
+<p>Just as in the regression setting, we use recursive binary splitting to grow a classification tree.
+Instead of RSS, the natural alternative is the <em>classification error rate</em>.
+For a given region, this is simply the fraction of training observations in that region that do not belong to the most common class:</p>
+<p><span class="math display">\[
+E = 1 - \underset{k}{\text{max}} (\hat{p}_{mk})
+\]</span></p>
+<p>where <span class="math inline">\(\hat{p}_{mk}\)</span> represents the proportion of training observations in the <span class="math inline">\(m\)</span>th region that are from the <span class="math inline">\(k\)</span>th class.</p>
+<p>It turns out the classification error is not sufficiently sensitive for tree-growing.
+In practice, two other measures are preferable.</p>
+<p>The <em>Gini index</em> is defined as:</p>
+<p><span class="math display">\[
+G = \sum_{k=1}^K \hat{p}_{mk} (1 - \hat{p}_{mk}).
+\]</span></p>
+<p>It measures total variance across all <span class="math inline">\(K\)</span> classes, taking on a small value if all <span class="math inline">\(\hat{p}_{mk}\)</span>’s are close to 0 or 1.
+For this reason, the Gini index is referred to as a measure of node <em>purity</em>, in that a small value indicates that a node contains predominantly observations from a single class.</p>
+<p>An alternative is the <em>entropy</em>:</p>
+<p><span class="math display">\[
+D = - \sum_{k=1}^K \hat{p}_{mk} \log \hat{p}_{mk}.
+\]</span></p>
+<p>Like the Gini index, the entropy will take on a small value (<span class="math inline">\(\geq 0\)</span>) for pure nodes.</p>
+<p>A tree is typically pruned by evaluating split quality with Gini index or entropy, through the classification error rate is preferable if prediction accuracy of the final pruned tree is the goal.</p>
+<p>The <code>heart</code> data is not available in the <code>ISLR2</code> package, so I downloaded the CSV:</p>
+<div class="sourceCode" id="cb849"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb849-1"><a href="tree-based-methods.html#cb849-1" aria-hidden="true" tabindex="-1"></a>heart <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/Heart.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb849-2"><a href="tree-based-methods.html#cb849-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Drop the row number column</span></span>
+<span id="cb849-3"><a href="tree-based-methods.html#cb849-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">...1</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb849-4"><a href="tree-based-methods.html#cb849-4" aria-hidden="true" tabindex="-1"></a>  janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb849-5"><a href="tree-based-methods.html#cb849-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># It is not clear what they do with the missing values in the text,</span></span>
+<span id="cb849-6"><a href="tree-based-methods.html#cb849-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  I&#39;ll drop drop the observations for now</span></span>
+<span id="cb849-7"><a href="tree-based-methods.html#cb849-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb849-8"><a href="tree-based-methods.html#cb849-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># In order to use categorical variables with `tree::tree()`, need to convert</span></span>
+<span id="cb849-9"><a href="tree-based-methods.html#cb849-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#  character to factor</span></span>
+<span id="cb849-10"><a href="tree-based-methods.html#cb849-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), factor))</span></code></pre></div>
+<pre><code>## New names:
+## • `` -&gt; `...1`</code></pre>
+<div class="sourceCode" id="cb851"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb851-1"><a href="tree-based-methods.html#cb851-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(heart)</span></code></pre></div>
+<pre><code>## Rows: 297
+## Columns: 14
+## $ age        &lt;dbl&gt; 63, 67, 67, 37, 41, 56, 62, 57, 63, 53, 57, 56, 56, 44, 52,…
+## $ sex        &lt;dbl&gt; 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1,…
+## $ chest_pain &lt;fct&gt; typical, asymptomatic, asymptomatic, nonanginal, nontypical…
+## $ rest_bp    &lt;dbl&gt; 145, 160, 120, 130, 130, 120, 140, 120, 130, 140, 140, 140,…
+## $ chol       &lt;dbl&gt; 233, 286, 229, 250, 204, 236, 268, 354, 254, 203, 192, 294,…
+## $ fbs        &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0,…
+## $ rest_ecg   &lt;dbl&gt; 2, 2, 2, 0, 2, 0, 2, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0,…
+## $ max_hr     &lt;dbl&gt; 150, 108, 129, 187, 172, 178, 160, 163, 147, 155, 148, 153,…
+## $ ex_ang     &lt;dbl&gt; 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,…
+## $ oldpeak    &lt;dbl&gt; 2.3, 1.5, 2.6, 3.5, 1.4, 0.8, 3.6, 0.6, 1.4, 3.1, 0.4, 1.3,…
+## $ slope      &lt;dbl&gt; 3, 2, 2, 3, 1, 1, 3, 1, 2, 3, 2, 2, 2, 1, 1, 1, 3, 1, 1, 1,…
+## $ ca         &lt;dbl&gt; 0, 3, 2, 0, 0, 0, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,…
+## $ thal       &lt;fct&gt; fixed, normal, reversable, normal, normal, normal, normal, …
+## $ ahd        &lt;fct&gt; No, Yes, Yes, No, No, No, Yes, No, Yes, Yes, No, No, Yes, N…</code></pre>
+<div class="sourceCode" id="cb853"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb853-1"><a href="tree-based-methods.html#cb853-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">993</span>)</span>
+<span id="cb853-2"><a href="tree-based-methods.html#cb853-2" aria-hidden="true" tabindex="-1"></a>heart_splits <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(heart, <span class="at">prop =</span> <span class="fl">0.5</span>)</span>
+<span id="cb853-3"><a href="tree-based-methods.html#cb853-3" aria-hidden="true" tabindex="-1"></a>heart_train <span class="ot">&lt;-</span> <span class="fu">training</span>(heart_splits)</span>
+<span id="cb853-4"><a href="tree-based-methods.html#cb853-4" aria-hidden="true" tabindex="-1"></a>heart_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(heart_splits)</span>
+<span id="cb853-5"><a href="tree-based-methods.html#cb853-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb853-6"><a href="tree-based-methods.html#cb853-6" aria-hidden="true" tabindex="-1"></a>heart_resamples <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(heart_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb853-7"><a href="tree-based-methods.html#cb853-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb853-8"><a href="tree-based-methods.html#cb853-8" aria-hidden="true" tabindex="-1"></a>heart_train_tree <span class="ot">&lt;-</span> <span class="fu">tree</span>(ahd <span class="sc">~</span> ., <span class="at">data =</span> heart_train)</span>
+<span id="cb853-9"><a href="tree-based-methods.html#cb853-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb853-10"><a href="tree-based-methods.html#cb853-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(heart_train_tree)</span>
+<span id="cb853-11"><a href="tree-based-methods.html#cb853-11" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(heart_train_tree)</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.6a-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>This resulted in a
+16 size tree, a little smaller than that in the text.</p>
+<p>To reproduce the plot of error versus tree size, I’ll re-use a lot of the code from section <a href="tree-based-methods.html#regression-trees">8.1.1</a>:</p>
+<div class="sourceCode" id="cb854"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb854-1"><a href="tree-based-methods.html#cb854-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the CV splits</span></span>
+<span id="cb854-2"><a href="tree-based-methods.html#cb854-2" aria-hidden="true" tabindex="-1"></a>heart_resamples_tree <span class="ot">&lt;-</span></span>
+<span id="cb854-3"><a href="tree-based-methods.html#cb854-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(heart_resamples<span class="sc">$</span>splits, analysis, <span class="at">.id =</span> <span class="st">&quot;split&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb854-4"><a href="tree-based-methods.html#cb854-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(split) <span class="sc">%&gt;%</span></span>
+<span id="cb854-5"><a href="tree-based-methods.html#cb854-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb854-6"><a href="tree-based-methods.html#cb854-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb854-7"><a href="tree-based-methods.html#cb854-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree_mod =</span> <span class="fu">map</span>(data, <span class="sc">~</span> <span class="fu">tree</span>(ahd <span class="sc">~</span> ., <span class="at">data =</span> .x))</span>
+<span id="cb854-8"><a href="tree-based-methods.html#cb854-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb854-9"><a href="tree-based-methods.html#cb854-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-10"><a href="tree-based-methods.html#cb854-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Prune the tree fit to the training data</span></span>
+<span id="cb854-11"><a href="tree-based-methods.html#cb854-11" aria-hidden="true" tabindex="-1"></a>heart_tree_pruned <span class="ot">&lt;-</span> </span>
+<span id="cb854-12"><a href="tree-based-methods.html#cb854-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">n_terminal =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb854-13"><a href="tree-based-methods.html#cb854-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb854-14"><a href="tree-based-methods.html#cb854-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">train_tree_pruned =</span> <span class="fu">map</span>(n_terminal,</span>
+<span id="cb854-15"><a href="tree-based-methods.html#cb854-15" aria-hidden="true" tabindex="-1"></a>                            <span class="sc">~</span> <span class="fu">prune.tree</span>(heart_train_tree, <span class="at">best =</span> .x)),</span>
+<span id="cb854-16"><a href="tree-based-methods.html#cb854-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Need to use logistic regression for single node tree models</span></span>
+<span id="cb854-17"><a href="tree-based-methods.html#cb854-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">train_tree_pruned =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb854-18"><a href="tree-based-methods.html#cb854-18" aria-hidden="true" tabindex="-1"></a>      n_terminal <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb854-19"><a href="tree-based-methods.html#cb854-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(<span class="fu">glm</span>(ahd <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> heart_train, <span class="at">family =</span> binomial)),</span>
+<span id="cb854-20"><a href="tree-based-methods.html#cb854-20" aria-hidden="true" tabindex="-1"></a>      train_tree_pruned</span>
+<span id="cb854-21"><a href="tree-based-methods.html#cb854-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb854-22"><a href="tree-based-methods.html#cb854-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb854-23"><a href="tree-based-methods.html#cb854-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb854-24"><a href="tree-based-methods.html#cb854-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Prune the tree from the CV splits</span></span>
+<span id="cb854-25"><a href="tree-based-methods.html#cb854-25" aria-hidden="true" tabindex="-1"></a>heart_resamples_tree_pruned <span class="ot">&lt;-</span> heart_resamples_tree <span class="sc">%&gt;%</span></span>
+<span id="cb854-26"><a href="tree-based-methods.html#cb854-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">crossing</span>(<span class="at">n_terminal =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb854-27"><a href="tree-based-methods.html#cb854-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb854-28"><a href="tree-based-methods.html#cb854-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree_pruned =</span> <span class="fu">map2</span>(tree_mod, n_terminal,</span>
+<span id="cb854-29"><a href="tree-based-methods.html#cb854-29" aria-hidden="true" tabindex="-1"></a>                       <span class="sc">~</span> <span class="fu">prune.tree</span>(.x, <span class="at">best =</span> .y)),</span>
+<span id="cb854-30"><a href="tree-based-methods.html#cb854-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># As above, replace the single node trees with glm</span></span>
+<span id="cb854-31"><a href="tree-based-methods.html#cb854-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">tree_pruned =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb854-32"><a href="tree-based-methods.html#cb854-32" aria-hidden="true" tabindex="-1"></a>      n_terminal <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb854-33"><a href="tree-based-methods.html#cb854-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map</span>(data, <span class="sc">~</span> <span class="fu">glm</span>(ahd <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> .x, <span class="at">family =</span> binomial)),</span>
+<span id="cb854-34"><a href="tree-based-methods.html#cb854-34" aria-hidden="true" tabindex="-1"></a>      tree_pruned</span>
+<span id="cb854-35"><a href="tree-based-methods.html#cb854-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb854-36"><a href="tree-based-methods.html#cb854-36" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size
+
+## Warning in prune.tree(.x, best = .y): best is bigger than tree size</code></pre>
+<div class="sourceCode" id="cb856"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb856-1"><a href="tree-based-methods.html#cb856-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A helper function to calculate classification error from tree or glm models</span></span>
+<span id="cb856-2"><a href="tree-based-methods.html#cb856-2" aria-hidden="true" tabindex="-1"></a>calc_class_error <span class="ot">&lt;-</span> <span class="cf">function</span>(mod, data) {</span>
+<span id="cb856-3"><a href="tree-based-methods.html#cb856-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">class</span>(mod)[<span class="dv">1</span>] <span class="sc">==</span> <span class="st">&quot;tree&quot;</span>) {</span>
+<span id="cb856-4"><a href="tree-based-methods.html#cb856-4" aria-hidden="true" tabindex="-1"></a>    preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(mod, <span class="at">type =</span> <span class="st">&quot;class&quot;</span>, <span class="at">newdata =</span> data)</span>
+<span id="cb856-5"><a href="tree-based-methods.html#cb856-5" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb856-6"><a href="tree-based-methods.html#cb856-6" aria-hidden="true" tabindex="-1"></a>    preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(mod, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>, <span class="at">newdata =</span> data)</span>
+<span id="cb856-7"><a href="tree-based-methods.html#cb856-7" aria-hidden="true" tabindex="-1"></a>    preds <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(preds <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb856-8"><a href="tree-based-methods.html#cb856-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;No&quot;</span>, <span class="st">&quot;Yes&quot;</span>))</span>
+<span id="cb856-9"><a href="tree-based-methods.html#cb856-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb856-10"><a href="tree-based-methods.html#cb856-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb856-11"><a href="tree-based-methods.html#cb856-11" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span> <span class="sc">-</span> <span class="fu">mean</span>(preds <span class="sc">==</span> data<span class="sc">$</span>ahd)</span>
+<span id="cb856-12"><a href="tree-based-methods.html#cb856-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb856-13"><a href="tree-based-methods.html#cb856-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb856-14"><a href="tree-based-methods.html#cb856-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate error on the training and testing sets</span></span>
+<span id="cb856-15"><a href="tree-based-methods.html#cb856-15" aria-hidden="true" tabindex="-1"></a>heart_tree_pruned_error <span class="ot">&lt;-</span> heart_tree_pruned <span class="sc">%&gt;%</span></span>
+<span id="cb856-16"><a href="tree-based-methods.html#cb856-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb856-17"><a href="tree-based-methods.html#cb856-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">train_error =</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb856-18"><a href="tree-based-methods.html#cb856-18" aria-hidden="true" tabindex="-1"></a>      train_tree_pruned,</span>
+<span id="cb856-19"><a href="tree-based-methods.html#cb856-19" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">calc_class_error</span>(.x, heart_train)</span>
+<span id="cb856-20"><a href="tree-based-methods.html#cb856-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb856-21"><a href="tree-based-methods.html#cb856-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">test_error =</span> <span class="fu">map_dbl</span>(</span>
+<span id="cb856-22"><a href="tree-based-methods.html#cb856-22" aria-hidden="true" tabindex="-1"></a>      train_tree_pruned,</span>
+<span id="cb856-23"><a href="tree-based-methods.html#cb856-23" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">calc_class_error</span>(.x, heart_test)</span>
+<span id="cb856-24"><a href="tree-based-methods.html#cb856-24" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb856-25"><a href="tree-based-methods.html#cb856-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb856-26"><a href="tree-based-methods.html#cb856-26" aria-hidden="true" tabindex="-1"></a><span class="co"># And the CV assessment data</span></span>
+<span id="cb856-27"><a href="tree-based-methods.html#cb856-27" aria-hidden="true" tabindex="-1"></a>heart_resamples_tree_pruned_error <span class="ot">&lt;-</span> heart_resamples_tree_pruned <span class="sc">%&gt;%</span></span>
+<span id="cb856-28"><a href="tree-based-methods.html#cb856-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(split, n_terminal, tree_pruned) <span class="sc">%&gt;%</span></span>
+<span id="cb856-29"><a href="tree-based-methods.html#cb856-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb856-30"><a href="tree-based-methods.html#cb856-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(heart_resamples<span class="sc">$</span>splits, assessment, <span class="at">.id =</span> <span class="st">&quot;split&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb856-31"><a href="tree-based-methods.html#cb856-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(split) <span class="sc">%&gt;%</span></span>
+<span id="cb856-32"><a href="tree-based-methods.html#cb856-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">nest</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb856-33"><a href="tree-based-methods.html#cb856-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">assessment_data =</span> data),</span>
+<span id="cb856-34"><a href="tree-based-methods.html#cb856-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">&quot;split&quot;</span></span>
+<span id="cb856-35"><a href="tree-based-methods.html#cb856-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb856-36"><a href="tree-based-methods.html#cb856-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb856-37"><a href="tree-based-methods.html#cb856-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">cv_error =</span> <span class="fu">map2_dbl</span>(</span>
+<span id="cb856-38"><a href="tree-based-methods.html#cb856-38" aria-hidden="true" tabindex="-1"></a>      tree_pruned, assessment_data,</span>
+<span id="cb856-39"><a href="tree-based-methods.html#cb856-39" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">calc_class_error</span>(.x, .y)</span>
+<span id="cb856-40"><a href="tree-based-methods.html#cb856-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb856-41"><a href="tree-based-methods.html#cb856-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb856-42"><a href="tree-based-methods.html#cb856-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(n_terminal) <span class="sc">%&gt;%</span></span>
+<span id="cb856-43"><a href="tree-based-methods.html#cb856-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">cv_error =</span> <span class="fu">mean</span>(cv_error), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span>
+<span id="cb856-44"><a href="tree-based-methods.html#cb856-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb856-45"><a href="tree-based-methods.html#cb856-45" aria-hidden="true" tabindex="-1"></a>heart_tree_pruned_error <span class="sc">%&gt;%</span></span>
+<span id="cb856-46"><a href="tree-based-methods.html#cb856-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>train_tree_pruned) <span class="sc">%&gt;%</span></span>
+<span id="cb856-47"><a href="tree-based-methods.html#cb856-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(heart_resamples_tree_pruned_error, <span class="at">by =</span> <span class="st">&quot;n_terminal&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb856-48"><a href="tree-based-methods.html#cb856-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(train_error, test_error, cv_error),</span>
+<span id="cb856-49"><a href="tree-based-methods.html#cb856-49" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;data_set&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb856-50"><a href="tree-based-methods.html#cb856-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb856-51"><a href="tree-based-methods.html#cb856-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">data_set =</span> <span class="fu">factor</span>(data_set,</span>
+<span id="cb856-52"><a href="tree-based-methods.html#cb856-52" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;train_error&quot;</span>, <span class="st">&quot;cv_error&quot;</span>, <span class="st">&quot;test_error&quot;</span>),</span>
+<span id="cb856-53"><a href="tree-based-methods.html#cb856-53" aria-hidden="true" tabindex="-1"></a>                      <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Training&quot;</span>, <span class="st">&quot;Cross-validation&quot;</span>, <span class="st">&quot;Test&quot;</span>))</span>
+<span id="cb856-54"><a href="tree-based-methods.html#cb856-54" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb856-55"><a href="tree-based-methods.html#cb856-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n_terminal, <span class="at">y =</span> value, <span class="at">color =</span> data_set)) <span class="sc">+</span></span>
+<span id="cb856-56"><a href="tree-based-methods.html#cb856-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb856-57"><a href="tree-based-methods.html#cb856-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb856-58"><a href="tree-based-methods.html#cb856-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="st">&quot;Error&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.6</span>, <span class="fl">0.1</span>)) <span class="sc">+</span></span>
+<span id="cb856-59"><a href="tree-based-methods.html#cb856-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.6</span>)) <span class="sc">+</span></span>
+<span id="cb856-60"><a href="tree-based-methods.html#cb856-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="st">&quot;Tree size&quot;</span>, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">15</span>)) <span class="sc">+</span></span>
+<span id="cb856-61"><a href="tree-based-methods.html#cb856-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="cn">NULL</span>, <span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;darkorange&quot;</span>, <span class="st">&quot;darkgreen&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb856-62"><a href="tree-based-methods.html#cb856-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.8</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.6b-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p>The best model by CV error here has 7, 8 terminal nodes.
+Visualize the pruned tree:</p>
+<div class="sourceCode" id="cb857"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb857-1"><a href="tree-based-methods.html#cb857-1" aria-hidden="true" tabindex="-1"></a>heart_best_model_cv <span class="ot">&lt;-</span> heart_resamples_tree_pruned_error <span class="sc">%&gt;%</span></span>
+<span id="cb857-2"><a href="tree-based-methods.html#cb857-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cv_error <span class="sc">==</span> <span class="fu">min</span>(cv_error)) <span class="sc">%&gt;%</span></span>
+<span id="cb857-3"><a href="tree-based-methods.html#cb857-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(n_terminal)</span>
+<span id="cb857-4"><a href="tree-based-methods.html#cb857-4" aria-hidden="true" tabindex="-1"></a>heart_best_model <span class="ot">&lt;-</span> heart_tree_pruned <span class="sc">%&gt;%</span></span>
+<span id="cb857-5"><a href="tree-based-methods.html#cb857-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_terminal <span class="sc">==</span> heart_best_model_cv) <span class="sc">%&gt;%</span></span>
+<span id="cb857-6"><a href="tree-based-methods.html#cb857-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(train_tree_pruned)</span></code></pre></div>
+<pre><code>## Warning in n_terminal == heart_best_model_cv: longer object length is not a
+## multiple of shorter object length</code></pre>
+<div class="sourceCode" id="cb859"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb859-1"><a href="tree-based-methods.html#cb859-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(heart_best_model[[<span class="dv">1</span>]])</span>
+<span id="cb859-2"><a href="tree-based-methods.html#cb859-2" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(heart_best_model[[<span class="dv">1</span>]])</span></code></pre></div>
+<p><img src="_main_files/figure-html/figure8.6c-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+<div id="trees-versus-linear-models" class="section level3 hasAnchor" number="8.1.3">
+<h3><span class="header-section-number">8.1.3</span> Trees Versus Linear Models<a href="tree-based-methods.html#trees-versus-linear-models" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Regression and classification trees have a very different flavor from the more classical approaches for regression and classification like linear regression.&gt;</p>
+<blockquote>
+<p>Which model is better? It depends on the problem at hand. If the relationship between the features and the response is well approximated by
+a linear model as in (8.8), then an approach such as linear regression will
+likely work well, and will outperform a method such as a regression tree
+that does not exploit this linear structure. If instead there is a highly non-linear and complex relationship between the features and the response as
+indicated by model (8.9), then decision trees may outperform classical approaches. An illustrative example is displayed in Figure 8.7. The relative
+performances of tree-based and classical approaches can be assessed by estimating the test error, using either cross-validation or the validation set
+approach (Chapter 5).</p>
+<p>Of course, other considerations beyond simply test error may come into
+play in selecting a statistical learning method; for instance, in certain settings, prediction using a tree may be preferred for the sake of interpretability and visualization.</p>
+</blockquote>
+</div>
+<div id="advantages-and-disadvantages-of-trees" class="section level3 hasAnchor" number="8.1.4">
+<h3><span class="header-section-number">8.1.4</span> Advantages and Disadvantages of Trees<a href="tree-based-methods.html#advantages-and-disadvantages-of-trees" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Advantages:</p>
+<ul>
+<li>Trees are very easy to explain.</li>
+<li>Decision trees more closely mirror human decision-making.</li>
+<li>Trees can be displayed graphically, and can be easily interpreted.</li>
+<li>Trees can easily handle qualitative predictors without the need to create dummy variables.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul>
+<li>Trees generally do not have the same level of predictive accuracy as some of the other regression and classification approaches.</li>
+<li>Trees can be very non-robust, i.e. a small change in the data can cause a large change in the final estimated tree.</li>
+</ul>
+<p>However, by aggregating many decision trees, using methods like <em>bagging</em>, <em>random forests</em>, and <em>boosting</em>, the predictive performance of trees can be substantially improved.</p>
+</div>
+</div>
+<div id="bagging-random-forests-boosting-and-bayesian-additive-regression-trees" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees<a href="tree-based-methods.html#bagging-random-forests-boosting-and-bayesian-additive-regression-trees" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<blockquote>
+<p>An ensemble method is an approach that combines many simple “building block”
+models in order to obtain a single and potentially very powerful
+model. These simple building block models are sometimes known as weak
+learners, since they may lead to mediocre predictions on their own.
+We will now discuss bagging, random forests, boosting, and Bayesian
+additive regression trees. These are ensemble methods for which the simple
+building block is a regression or a classification tree.</p>
+</blockquote>
+<div id="bagging" class="section level3 hasAnchor" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Bagging<a href="tree-based-methods.html#bagging" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The bootstrap was introduced in Chapter 5 to estimate standard deviations of a quantity of interest.
+Here, we see that it may be used to improve statistical learning methods such as decision trees.</p>
+<p>The decision tree method suffers from high variance, in that it is highly dependent on the split of the training data.
+<em>Bootstrap aggregation</em> or <em>bagging</em> is a general-purpose procedure for reducing the variance of a statistical learning method.</p>
+<p>Recall that a set of <span class="math inline">\(n\)</span> observations each with variance <span class="math inline">\(\sigma^2\)</span> has variance <span class="math inline">\(\sigma^2/n\)</span>.
+In other words, averaging a set of observations reduces variance.
+That is the idea behind bagging: take many (<span class="math inline">\(B\)</span>) training sets from the population, build a separate prediction model (<span class="math inline">\(\hat{f}^b (x)\)</span>) for each set, and average the resulting predictions:</p>
+<p><span class="math display">\[
+\hat{f}_{\text{avg}}(x) = \frac{1}{B} \sum_{b=1}^B \hat{f}^b (x).
+\]</span></p>
+<p>Of course, we generally do not have access to multiple training sets, so we instead bootstrap the training data to obtain models <span class="math inline">\(\hat{f}^{*b}(x)\)</span> and take the average:</p>
+<p><span class="math display">\[
+\hat{f}_{\text{bag}}(x) = \frac{1}{B} \sum_{b=1}^B \hat{f}^{*b} (x).
+\]</span></p>
+<p>In the context of decision trees, this involves constructing <span class="math inline">\(B\)</span> regression of classification trees.
+These trees are grown deep and not pruned, so each tree has high variance and low bias.
+By averaging the trees, we reduce the variance.</p>
+<p>For re-creating the example in Figure 8.8, I will use the <code>tidymodels</code> framework.</p>
+<p>After some time reading the <code>parnsip</code> documentation, I found out <a href="https://emilhvitfeldt.github.io/ISLR-tidymodels-labs/tree-based-methods.html#bagging-and-random-forests">from Emil Hvitfeldt ’s ISLR labs code</a> that a bagging model is the same as a random forest model with <code>mtry</code> equal to the number of predictors.
+I also set two variables in the <code>ranger</code> engine: <code>importance = TRUE</code> to retain the information required to compute variable importance later, and <code>oob.error = TRUE</code> to keep the out-of-bag error:</p>
+<div class="sourceCode" id="cb860"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb860-1"><a href="tree-based-methods.html#cb860-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The `.cols()` helper is new to me. Within the context of a parsnip</span></span>
+<span id="cb860-2"><a href="tree-based-methods.html#cb860-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  specification, it returns the number of predictor columns. There are some</span></span>
+<span id="cb860-3"><a href="tree-based-methods.html#cb860-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  other functions, like `.obs()` for rows</span></span>
+<span id="cb860-4"><a href="tree-based-methods.html#cb860-4" aria-hidden="true" tabindex="-1"></a>bagging_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mtry =</span> <span class="fu">.cols</span>(), <span class="at">trees =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb860-5"><a href="tree-based-methods.html#cb860-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>, <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb860-6"><a href="tree-based-methods.html#cb860-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
+<span id="cb860-7"><a href="tree-based-methods.html#cb860-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb860-8"><a href="tree-based-methods.html#cb860-8" aria-hidden="true" tabindex="-1"></a><span class="co"># From 1 to 300 trees</span></span>
+<span id="cb860-9"><a href="tree-based-methods.html#cb860-9" aria-hidden="true" tabindex="-1"></a>trees_grid <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">trees</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">300</span>)), <span class="at">levels =</span> <span class="dv">300</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb861"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb861-1"><a href="tree-based-methods.html#cb861-1" aria-hidden="true" tabindex="-1"></a>heart_validation_split <span class="ot">&lt;-</span> <span class="fu">validation_split</span>(heart, <span class="at">prop =</span> <span class="fl">0.7</span>)</span>
+<span id="cb861-2"><a href="tree-based-methods.html#cb861-2" aria-hidden="true" tabindex="-1"></a>heart_recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(ahd <span class="sc">~</span> ., <span class="at">data =</span> heart)</span>
+<span id="cb861-3"><a href="tree-based-methods.html#cb861-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb861-4"><a href="tree-based-methods.html#cb861-4" aria-hidden="true" tabindex="-1"></a>heart_bagging_workflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb861-5"><a href="tree-based-methods.html#cb861-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(bagging_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb861-6"><a href="tree-based-methods.html#cb861-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(heart_recipe)</span>
+<span id="cb861-7"><a href="tree-based-methods.html#cb861-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb861-8"><a href="tree-based-methods.html#cb861-8" aria-hidden="true" tabindex="-1"></a>heart_bagging_tune <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb861-9"><a href="tree-based-methods.html#cb861-9" aria-hidden="true" tabindex="-1"></a>  heart_bagging_workflow,</span>
+<span id="cb861-10"><a href="tree-based-methods.html#cb861-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> heart_validation_split, <span class="at">grid =</span> trees_grid</span>
+<span id="cb861-11"><a href="tree-based-methods.html#cb861-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb862"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb862-1"><a href="tree-based-methods.html#cb862-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(heart_bagging_tune)</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-482-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="reproducibility-5" class="section level2 unnumbered hasAnchor">
+<h2>Reproducibility<a href="tree-based-methods.html#reproducibility-5" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb863"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb863-1"><a href="tree-based-methods.html#cb863-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;2022-08-19 15:23:12 AST&quot;</code></pre>
+<div class="sourceCode" id="cb865"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb865-1"><a href="tree-based-methods.html#cb865-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
+<span id="cb865-2"><a href="tree-based-methods.html#cb865-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
+<span id="cb865-3"><a href="tree-based-methods.html#cb865-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
+<span id="cb865-4"><a href="tree-based-methods.html#cb865-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb865-5"><a href="tree-based-methods.html#cb865-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
+## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
+## Head:     [939e2a2] 2022-07-06: Started the bagging section</code></pre>
+<div class="sourceCode" id="cb867"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb867-1"><a href="tree-based-methods.html#cb867-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
+<pre><code>## ─ Session info ───────────────────────────────────────────────────────────────
+##  setting  value
+##  version  R version 4.2.1 (2022-06-23 ucrt)
+##  os       Windows 10 x64 (build 19044)
+##  system   x86_64, mingw32
+##  ui       RTerm
+##  language (EN)
+##  collate  English_Canada.utf8
+##  ctype    English_Canada.utf8
+##  tz       America/Curacao
+##  date     2022-08-19
+##  pandoc   2.18 @ C:/Program Files/RStudio/bin/quarto/bin/tools/ (via rmarkdown)
+## 
+## ─ Packages ───────────────────────────────────────────────────────────────────
+##  package        * version    date (UTC) lib source
+##  abind            1.4-5      2016-07-21 [1] CRAN (R 4.2.0)
+##  assertthat       0.2.1      2019-03-21 [1] CRAN (R 4.2.1)
+##  backports        1.4.1      2021-12-13 [1] CRAN (R 4.2.0)
+##  base64enc        0.1-3      2015-07-28 [1] CRAN (R 4.2.0)
+##  bayestestR       0.12.1     2022-05-02 [1] CRAN (R 4.2.1)
+##  BiocParallel     1.30.3     2022-06-07 [1] Bioconductor
+##  bit              4.0.4      2020-08-04 [1] CRAN (R 4.2.1)
+##  bit64            4.0.5      2020-08-30 [1] CRAN (R 4.2.1)
+##  bookdown         0.27       2022-06-14 [1] CRAN (R 4.2.1)
+##  boot             1.3-28     2021-05-03 [2] CRAN (R 4.2.1)
+##  broom          * 1.0.0      2022-07-01 [1] CRAN (R 4.2.1)
+##  bslib            0.4.0      2022-07-16 [1] CRAN (R 4.2.1)
+##  cachem           1.0.6      2021-08-19 [1] CRAN (R 4.2.1)
+##  car              3.1-0      2022-06-15 [1] CRAN (R 4.2.1)
+##  carData          3.0-5      2022-01-06 [1] CRAN (R 4.2.1)
+##  cellranger       1.1.0      2016-07-27 [1] CRAN (R 4.2.1)
+##  checkmate        2.1.0      2022-04-21 [1] CRAN (R 4.2.1)
+##  class            7.3-20     2022-01-16 [2] CRAN (R 4.2.1)
+##  cli              3.3.0      2022-04-25 [1] CRAN (R 4.2.1)
+##  codetools        0.2-18     2020-11-04 [2] CRAN (R 4.2.1)
+##  colorspace       2.0-3      2022-02-21 [1] CRAN (R 4.2.1)
+##  combinat         0.0-8      2012-10-29 [1] CRAN (R 4.2.0)
+##  conflicted       1.1.0      2021-11-26 [1] CRAN (R 4.2.1)
+##  corpcor          1.6.10     2021-09-16 [1] CRAN (R 4.2.0)
+##  corrr          * 0.4.4      2022-08-16 [1] CRAN (R 4.2.1)
+##  crayon           1.5.1      2022-03-26 [1] CRAN (R 4.2.1)
+##  datawizard       0.4.1      2022-05-16 [1] CRAN (R 4.2.1)
+##  DBI              1.1.3      2022-06-18 [1] CRAN (R 4.2.1)
+##  dbplyr           2.2.1      2022-06-27 [1] CRAN (R 4.2.1)
+##  dials          * 1.0.0      2022-06-14 [1] CRAN (R 4.2.1)
+##  DiceDesign       1.9        2021-02-13 [1] CRAN (R 4.2.1)
+##  digest           0.6.29     2021-12-01 [1] CRAN (R 4.2.1)
+##  discrim        * 1.0.0      2022-06-23 [1] CRAN (R 4.2.1)
+##  distill          1.4        2022-05-12 [1] CRAN (R 4.2.1)
+##  distributional   0.3.0      2022-01-05 [1] CRAN (R 4.2.1)
+##  doParallel     * 1.0.17     2022-02-07 [1] CRAN (R 4.2.1)
+##  downlit          0.4.2      2022-07-05 [1] CRAN (R 4.2.1)
+##  dplyr          * 1.0.9      2022-04-28 [1] CRAN (R 4.2.1)
+##  dunnr          * 0.2.6      2022-08-07 [1] Github (taylordunn/dunnr@e2a8213)
+##  ellipse          0.4.3      2022-05-31 [1] CRAN (R 4.2.1)
+##  ellipsis         0.3.2      2021-04-29 [1] CRAN (R 4.2.1)
+##  equatiomatic     0.3.1      2022-01-30 [1] CRAN (R 4.2.1)
+##  evaluate         0.15       2022-02-18 [1] CRAN (R 4.2.1)
+##  extrafont        0.18       2022-04-12 [1] CRAN (R 4.2.0)
+##  extrafontdb      1.0        2012-06-11 [1] CRAN (R 4.2.0)
+##  fansi            1.0.3      2022-03-24 [1] CRAN (R 4.2.1)
+##  farver           2.1.1      2022-07-06 [1] CRAN (R 4.2.1)
+##  fastmap          1.1.0      2021-01-25 [1] CRAN (R 4.2.1)
+##  forcats        * 0.5.1      2021-01-27 [1] CRAN (R 4.2.1)
+##  foreach        * 1.5.2      2022-02-02 [1] CRAN (R 4.2.1)
+##  fs               1.5.2      2021-12-08 [1] CRAN (R 4.2.1)
+##  furrr            0.3.0      2022-05-04 [1] CRAN (R 4.2.1)
+##  future           1.27.0     2022-07-22 [1] CRAN (R 4.2.1)
+##  future.apply     1.9.0      2022-04-25 [1] CRAN (R 4.2.1)
+##  gargle           1.2.0      2021-07-02 [1] CRAN (R 4.2.1)
+##  generics         0.1.3      2022-07-05 [1] CRAN (R 4.2.1)
+##  GGally           2.1.2      2021-06-21 [1] CRAN (R 4.2.1)
+##  ggdist         * 3.2.0      2022-07-19 [1] CRAN (R 4.2.1)
+##  ggplot2        * 3.3.6      2022-05-03 [1] CRAN (R 4.2.1)
+##  ggrepel          0.9.1      2021-01-15 [1] CRAN (R 4.2.1)
+##  git2r            0.30.1     2022-03-16 [1] CRAN (R 4.2.1)
+##  glmnet         * 4.1-4      2022-04-15 [1] CRAN (R 4.2.1)
+##  globals          0.15.1     2022-06-24 [1] CRAN (R 4.2.1)
+##  glue             1.6.2      2022-02-24 [1] CRAN (R 4.2.1)
+##  googledrive      2.0.0      2021-07-08 [1] CRAN (R 4.2.1)
+##  googlesheets4    1.0.0      2021-07-21 [1] CRAN (R 4.2.1)
+##  gower            1.0.0      2022-02-03 [1] CRAN (R 4.2.0)
+##  GPfit            1.0-8      2019-02-08 [1] CRAN (R 4.2.1)
+##  gridExtra        2.3        2017-09-09 [1] CRAN (R 4.2.1)
+##  gt             * 0.6.0      2022-05-24 [1] CRAN (R 4.2.1)
+##  gtable           0.3.0      2019-03-25 [1] CRAN (R 4.2.1)
+##  hardhat          1.2.0      2022-06-30 [1] CRAN (R 4.2.1)
+##  haven            2.5.0      2022-04-15 [1] CRAN (R 4.2.1)
+##  here           * 1.0.1      2020-12-13 [1] CRAN (R 4.2.1)
+##  highr            0.9        2021-04-16 [1] CRAN (R 4.2.1)
+##  hms              1.1.1      2021-09-26 [1] CRAN (R 4.2.1)
+##  htmltools        0.5.2      2021-08-25 [1] CRAN (R 4.2.1)
+##  httpuv           1.6.5      2022-01-05 [1] CRAN (R 4.2.1)
+##  httr             1.4.3      2022-05-04 [1] CRAN (R 4.2.1)
+##  igraph           1.3.4      2022-07-19 [1] CRAN (R 4.2.1)
+##  infer          * 1.0.2      2022-06-10 [1] CRAN (R 4.2.1)
+##  insight          0.18.0     2022-07-05 [1] CRAN (R 4.2.1)
+##  ipred            0.9-13     2022-06-02 [1] CRAN (R 4.2.1)
+##  ISLR2          * 1.3-1      2022-01-10 [1] CRAN (R 4.2.1)
+##  iterators      * 1.0.14     2022-02-05 [1] CRAN (R 4.2.1)
+##  janitor          2.1.0      2021-01-05 [1] CRAN (R 4.2.1)
+##  jquerylib        0.1.4      2021-04-26 [1] CRAN (R 4.2.1)
+##  jsonlite         1.8.0      2022-02-22 [1] CRAN (R 4.2.1)
+##  kknn             1.3.1      2016-03-26 [1] CRAN (R 4.2.1)
+##  klaR             1.7-1      2022-06-27 [1] CRAN (R 4.2.1)
+##  knitr            1.39       2022-04-26 [1] CRAN (R 4.2.1)
+##  labeling         0.4.2      2020-10-20 [1] CRAN (R 4.2.0)
+##  labelled         2.9.1      2022-05-05 [1] CRAN (R 4.2.1)
+##  later            1.3.0      2021-08-18 [1] CRAN (R 4.2.1)
+##  lattice          0.20-45    2021-09-22 [2] CRAN (R 4.2.1)
+##  lava             1.6.10     2021-09-02 [1] CRAN (R 4.2.1)
+##  leaps          * 3.1        2020-01-16 [1] CRAN (R 4.2.1)
+##  lhs              1.1.5      2022-03-22 [1] CRAN (R 4.2.1)
+##  lifecycle        1.0.1      2021-09-24 [1] CRAN (R 4.2.1)
+##  listenv          0.8.0      2019-12-05 [1] CRAN (R 4.2.1)
+##  lubridate        1.8.0      2021-10-07 [1] CRAN (R 4.2.1)
+##  magrittr         2.0.3      2022-03-30 [1] CRAN (R 4.2.1)
+##  MASS             7.3-57     2022-04-22 [2] CRAN (R 4.2.1)
+##  Matrix         * 1.4-1      2022-03-23 [2] CRAN (R 4.2.1)
+##  matrixStats      0.62.0     2022-04-19 [1] CRAN (R 4.2.1)
+##  memoise          2.0.1      2021-11-26 [1] CRAN (R 4.2.1)
+##  MetBrewer        0.2.0      2022-03-21 [1] CRAN (R 4.2.1)
+##  mgcv           * 1.8-40     2022-03-29 [2] CRAN (R 4.2.1)
+##  mime             0.12       2021-09-28 [1] CRAN (R 4.2.0)
+##  miniUI           0.1.1.1    2018-05-18 [1] CRAN (R 4.2.1)
+##  mixOmics         6.20.0     2022-04-26 [1] Bioconductor (R 4.2.0)
+##  modeldata      * 1.0.0      2022-07-01 [1] CRAN (R 4.2.1)
+##  modelr           0.1.8      2020-05-19 [1] CRAN (R 4.2.1)
+##  munsell          0.5.0      2018-06-12 [1] CRAN (R 4.2.1)
+##  mvtnorm        * 1.1-3      2021-10-08 [1] CRAN (R 4.2.0)
+##  nlme           * 3.1-157    2022-03-25 [2] CRAN (R 4.2.1)
+##  nnet             7.3-17     2022-01-16 [2] CRAN (R 4.2.1)
+##  parallelly       1.32.1     2022-07-21 [1] CRAN (R 4.2.1)
+##  parsnip        * 1.0.0      2022-06-16 [1] CRAN (R 4.2.1)
+##  patchwork      * 1.1.1      2020-12-17 [1] CRAN (R 4.2.1)
+##  performance      0.9.1      2022-06-20 [1] CRAN (R 4.2.1)
+##  pillar           1.8.0      2022-07-18 [1] CRAN (R 4.2.1)
+##  pkgconfig        2.0.3      2019-09-22 [1] CRAN (R 4.2.1)
+##  pls            * 2.8-1      2022-07-16 [1] CRAN (R 4.2.1)
+##  plyr             1.8.7      2022-03-24 [1] CRAN (R 4.2.1)
+##  poissonreg     * 1.0.0      2022-06-15 [1] CRAN (R 4.2.1)
+##  prodlim          2019.11.13 2019-11-17 [1] CRAN (R 4.2.1)
+##  promises         1.2.0.1    2021-02-11 [1] CRAN (R 4.2.1)
+##  purrr          * 0.3.4      2020-04-17 [1] CRAN (R 4.2.1)
+##  questionr        0.7.7      2022-01-31 [1] CRAN (R 4.2.1)
+##  R6               2.5.1      2021-08-19 [1] CRAN (R 4.2.1)
+##  ranger           0.14.1     2022-06-18 [1] CRAN (R 4.2.1)
+##  rARPACK          0.11-0     2016-03-10 [1] CRAN (R 4.2.1)
+##  RColorBrewer     1.1-3      2022-04-03 [1] CRAN (R 4.2.0)
+##  Rcpp             1.0.9      2022-07-08 [1] CRAN (R 4.2.1)
+##  readr          * 2.1.2      2022-01-30 [1] CRAN (R 4.2.1)
+##  readxl           1.4.0      2022-03-28 [1] CRAN (R 4.2.1)
+##  recipes        * 1.0.1      2022-07-07 [1] CRAN (R 4.2.1)
+##  repr             1.1.4      2022-01-04 [1] CRAN (R 4.2.1)
+##  reprex           2.0.1      2021-08-05 [1] CRAN (R 4.2.1)
+##  reshape          0.8.9      2022-04-12 [1] CRAN (R 4.2.1)
+##  reshape2         1.4.4      2020-04-09 [1] CRAN (R 4.2.1)
+##  rlang            1.0.4      2022-07-12 [1] CRAN (R 4.2.1)
+##  rmarkdown        2.14       2022-04-25 [1] CRAN (R 4.2.1)
+##  rpart            4.1.16     2022-01-24 [2] CRAN (R 4.2.1)
+##  rprojroot        2.0.3      2022-04-02 [1] CRAN (R 4.2.1)
+##  rsample        * 1.1.0      2022-08-08 [1] CRAN (R 4.2.1)
+##  RSpectra         0.16-1     2022-04-24 [1] CRAN (R 4.2.1)
+##  rstudioapi       0.13       2020-11-12 [1] CRAN (R 4.2.1)
+##  Rttf2pt1         1.3.8      2020-01-10 [1] CRAN (R 4.2.1)
+##  rvest            1.0.2      2021-10-16 [1] CRAN (R 4.2.1)
+##  sass             0.4.2      2022-07-16 [1] CRAN (R 4.2.1)
+##  scales         * 1.2.0      2022-04-13 [1] CRAN (R 4.2.1)
+##  see              0.7.1      2022-06-20 [1] CRAN (R 4.2.1)
+##  sessioninfo      1.2.2      2021-12-06 [1] CRAN (R 4.2.1)
+##  shape            1.4.6      2021-05-19 [1] CRAN (R 4.2.0)
+##  shiny            1.7.2      2022-07-19 [1] CRAN (R 4.2.1)
+##  skimr            2.1.4      2022-04-15 [1] CRAN (R 4.2.1)
+##  snakecase        0.11.0     2019-05-25 [1] CRAN (R 4.2.1)
+##  stringi          1.7.8      2022-07-11 [1] CRAN (R 4.2.1)
+##  stringr        * 1.4.0      2019-02-10 [1] CRAN (R 4.2.1)
+##  survival         3.3-1      2022-03-03 [2] CRAN (R 4.2.1)
+##  tibble         * 3.1.8      2022-07-22 [1] CRAN (R 4.2.1)
+##  tictoc         * 1.0.1      2021-04-19 [1] CRAN (R 4.2.0)
+##  tidymodels     * 1.0.0      2022-07-13 [1] CRAN (R 4.2.1)
+##  tidyr          * 1.2.0      2022-02-01 [1] CRAN (R 4.2.1)
+##  tidyselect       1.1.2      2022-02-21 [1] CRAN (R 4.2.1)
+##  tidyverse      * 1.3.2      2022-07-18 [1] CRAN (R 4.2.1)
+##  timeDate         4021.104   2022-07-19 [1] CRAN (R 4.2.1)
+##  tree           * 1.0-42     2022-05-29 [1] CRAN (R 4.2.1)
+##  tune           * 1.0.0      2022-07-07 [1] CRAN (R 4.2.1)
+##  tzdb             0.3.0      2022-03-28 [1] CRAN (R 4.2.1)
+##  usethis          2.1.6      2022-05-25 [1] CRAN (R 4.2.1)
+##  utf8             1.2.2      2021-07-24 [1] CRAN (R 4.2.1)
+##  vctrs            0.4.1      2022-04-13 [1] CRAN (R 4.2.1)
+##  viridisLite      0.4.0      2021-04-13 [1] CRAN (R 4.2.1)
+##  vroom            1.5.7      2021-11-30 [1] CRAN (R 4.2.1)
+##  withr            2.5.0      2022-03-03 [1] CRAN (R 4.2.1)
+##  workflows      * 1.0.0      2022-07-05 [1] CRAN (R 4.2.1)
+##  workflowsets   * 1.0.0      2022-07-12 [1] CRAN (R 4.2.1)
+##  xfun             0.31       2022-05-10 [1] CRAN (R 4.2.1)
+##  xml2             1.3.3      2021-11-30 [1] CRAN (R 4.2.1)
+##  xtable           1.8-4      2019-04-21 [1] CRAN (R 4.2.1)
+##  yaml             2.3.5      2022-02-21 [1] CRAN (R 4.2.0)
+##  yardstick      * 1.0.0      2022-06-06 [1] CRAN (R 4.2.1)
+## 
+##  [1] C:/Users/tdunn/AppData/Local/R/win-library/4.2
+##  [2] C:/Program Files/R/R-4.2.1/library
+## 
+## ──────────────────────────────────────────────────────────────────────────────</code></pre>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2009. <em><span class="nocase">The Elements of Statistical Learning</span></em>. Springer Series in Statistics. New York, NY: Springer New York. <a href="https://doi.org/10.1007/978-0-387-84858-7">https://doi.org/10.1007/978-0-387-84858-7</a>.
+</div>
+<div class="csl-entry">
+Smith, Gary. 2018. <span>“<span class="nocase">Step away from stepwise</span>.”</span> <em>Journal of Big Data</em> 5 (1): 32. <a href="https://doi.org/10.1186/s40537-018-0143-6">https://doi.org/10.1186/s40537-018-0143-6</a>.
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="moving-beyond-linearity.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>An Introduction to Statistical Learning with the tidyverse and tidymodels</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
 
   <meta property="og:title" content="An Introduction to Statistical Learning with the tidyverse and tidymodels" />
   <meta property="og:type" content="book" />
-  
   
   <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="github-repo" content="taylordunn/islr-tidy" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-06-14" />
+<meta name="date" content="2022-08-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 
 <link rel="next" href="introduction.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
 
@@ -364,6 +363,21 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#reproducibility-4"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>8</b> Tree-Based Methods</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#the-basics-of-decision-trees"><i class="fa fa-check"></i><b>8.1</b> The Basics of Decision Trees</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#regression-trees"><i class="fa fa-check"></i><b>8.1.1</b> Regression Trees</a></li>
+<li class="chapter" data-level="8.1.2" data-path="tree-based-methods.html"><a href="tree-based-methods.html#classification-trees"><i class="fa fa-check"></i><b>8.1.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="8.1.3" data-path="tree-based-methods.html"><a href="tree-based-methods.html#trees-versus-linear-models"><i class="fa fa-check"></i><b>8.1.3</b> Trees Versus Linear Models</a></li>
+<li class="chapter" data-level="8.1.4" data-path="tree-based-methods.html"><a href="tree-based-methods.html#advantages-and-disadvantages-of-trees"><i class="fa fa-check"></i><b>8.1.4</b> Advantages and Disadvantages of Trees</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="tree-based-methods.html"><a href="tree-based-methods.html#bagging-random-forests-boosting-and-bayesian-additive-regression-trees"><i class="fa fa-check"></i><b>8.2</b> Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#bagging"><i class="fa fa-check"></i><b>8.2.1</b> Bagging</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="tree-based-methods.html"><a href="tree-based-methods.html#reproducibility-5"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -384,18 +398,21 @@ div.csl-indent {
 <div id="header">
 <h1 class="title">An Introduction to Statistical Learning with the tidyverse and tidymodels</h1>
 <p class="author"><em>Taylor Dunn</em></p>
-<p class="date"><em>2022-06-14</em></p>
+<p class="date"><em>2022-08-19</em></p>
 </div>
-<div id="who-what-and-why" class="section level1 unnumbered">
-<h1>Who, what, and why?</h1>
+<div id="who-what-and-why" class="section level1 unnumbered hasAnchor">
+<h1>Who, what, and why?<a href="index.html#who-what-and-why" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>I am a data scientist and statistician who is (mostly) self-taught from textbooks and generous people sharing their work online.
-Inspired by projects like <a href="https://bookdown.org/content/3890/">Solomon Kurz’s recoding of Statistical Rethinking</a>, I decided to publicly document my notes and code as I work through <a href="https://www.statlearning.com/">An Introduction to Statistical Learning, 2nd edition</a> by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani.</p>
+Inspired by projects like <a href="https://bookdown.org/content/3890/">Solomon Kurz’s recoding of Statistical Rethinking</a> and <a href="https://emilhvitfeldt.github.io/ISLR-tidymodels-labs/index.html">Emil Hvitfeldt’s ISLR tidymodels labs</a>, I decided to publicly document my notes and code as I work through <a href="https://www.statlearning.com/">An Introduction to Statistical Learning, 2nd edition</a> by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani.</p>
 <p>I prefer to work with the <a href="https://www.tidyverse.org/"><code>tidyverse</code></a> collection of R packages, and so will be using those to wrangle and visualize the data.
 Along the way, I’ll be teaching myself the <a href="https://www.tidymodels.org/"><code>tidymodels</code> framework</a> for machine learning.
 In general, my plan for each chapter/concept is to start with the original modeling package, then move towards the <code>tidymodels</code> approach in the labs and exercises.
 For example, I’ll first perform logistic regression with <code>glm()</code>, then use <code>parsnip::logistic_reg()</code> by the end of the chapter.
 I think this will help me better appreciate the unified interface provided with <code>tidymodels</code>, and maybe help me better understand what is going on under the hood.</p>
 <p>I won’t be doing every exercise or section. My main goal for this project is to improve my statistical programming, so I will focus on the applied exercises rather than the conceptual.</p>
+<p>The source code can be found <a href="https://github.com/taylordunn/islr-tidy">here</a>.
+Feel free to leave <a href="https://github.com/taylordunn/islr-tidy/issues">an issue</a> if you find a mistake or have a suggestion.
+I can also be reached on <a href="https://twitter.com/TDunn12">Twitter</a>.</p>
 <p>As of 2022-06-13, I’ve completed Chapters 1 through 7.</p>
 
 </div>

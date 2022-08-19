@@ -16,7 +16,7 @@ description: "Working through ISLR with the tidyverse and tidymodels"
 # Who, what, and why? {-}
 
 I am a data scientist and statistician who is (mostly) self-taught from textbooks and generous people sharing their work online.
-Inspired by projects like [Solomon Kurz's recoding of Statistical Rethinking](https://bookdown.org/content/3890/), I decided to publicly document my notes and code as I work through [An Introduction to Statistical Learning, 2nd edition](https://www.statlearning.com/) by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani.
+Inspired by projects like [Solomon Kurz's recoding of Statistical Rethinking](https://bookdown.org/content/3890/) and [Emil Hvitfeldt's ISLR tidymodels labs](https://emilhvitfeldt.github.io/ISLR-tidymodels-labs/index.html), I decided to publicly document my notes and code as I work through [An Introduction to Statistical Learning, 2nd edition](https://www.statlearning.com/) by Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani.
 
 I prefer to work with the [`tidyverse`](https://www.tidyverse.org/) collection of R packages, and so will be using those to wrangle and visualize the data.
 Along the way, I'll be teaching myself the [`tidymodels` framework](https://www.tidymodels.org/) for machine learning.
@@ -25,5 +25,9 @@ For example, I'll first perform logistic regression with `glm()`, then use `pars
 I think this will help me better appreciate the unified interface provided with `tidymodels`, and maybe help me better understand what is going on under the hood.
 
 I won't be doing every exercise or section. My main goal for this project is to improve my statistical programming, so I will focus on the applied exercises rather than the conceptual.
+
+The source code can be found [here](https://github.com/taylordunn/islr-tidy).
+Feel free to leave [an issue](https://github.com/taylordunn/islr-tidy/issues) if you find a mistake or have a suggestion.
+I can also be reached on [Twitter](https://twitter.com/TDunn12).
 
 As of 2022-06-13, I've completed Chapters 1 through 7.

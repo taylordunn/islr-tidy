@@ -237,8 +237,9 @@ for (forward_step in 1:4) {
   
   # Find the next predictor by RSS
   new_predictor <- MASS::addterm(balance_model, scope = balance_full) %>%
-    broom::tidy() %>%
-    filter(rss == min(rss)) %>%
+    #broom::tidy() %>%
+    as_tibble(rownames = "term") %>%
+    filter(RSS == min(RSS)) %>%
     pull(term)
   
   balance_preds <- append(balance_preds,

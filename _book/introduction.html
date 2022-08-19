@@ -6,11 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>1 Introduction | An Introduction to Statistical Learning with the tidyverse and tidymodels</title>
   <meta name="description" content="Working through ISLR with the tidyverse and tidymodels" />
-  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.27 and GitBook 2.6.7" />
 
   <meta property="og:title" content="1 Introduction | An Introduction to Statistical Learning with the tidyverse and tidymodels" />
   <meta property="og:type" content="book" />
-  
   
   <meta property="og:description" content="Working through ISLR with the tidyverse and tidymodels" />
   <meta name="github-repo" content="taylordunn/islr-tidy" />
@@ -24,7 +23,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-06-14" />
+<meta name="date" content="2022-08-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +32,6 @@
   
 <link rel="prev" href="index.html"/>
 <link rel="next" href="statistical-learning.html"/>
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -51,8 +49,9 @@
 
 
 
-<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
-<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 <link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
 <script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
 
@@ -364,6 +363,21 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="" data-path="moving-beyond-linearity.html"><a href="moving-beyond-linearity.html#reproducibility-4"><i class="fa fa-check"></i>Reproducibility</a></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>8</b> Tree-Based Methods</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#the-basics-of-decision-trees"><i class="fa fa-check"></i><b>8.1</b> The Basics of Decision Trees</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#regression-trees"><i class="fa fa-check"></i><b>8.1.1</b> Regression Trees</a></li>
+<li class="chapter" data-level="8.1.2" data-path="tree-based-methods.html"><a href="tree-based-methods.html#classification-trees"><i class="fa fa-check"></i><b>8.1.2</b> Classification Trees</a></li>
+<li class="chapter" data-level="8.1.3" data-path="tree-based-methods.html"><a href="tree-based-methods.html#trees-versus-linear-models"><i class="fa fa-check"></i><b>8.1.3</b> Trees Versus Linear Models</a></li>
+<li class="chapter" data-level="8.1.4" data-path="tree-based-methods.html"><a href="tree-based-methods.html#advantages-and-disadvantages-of-trees"><i class="fa fa-check"></i><b>8.1.4</b> Advantages and Disadvantages of Trees</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="tree-based-methods.html"><a href="tree-based-methods.html#bagging-random-forests-boosting-and-bayesian-additive-regression-trees"><i class="fa fa-check"></i><b>8.2</b> Bagging, Random Forests, Boosting, and Bayesian Additive Regression Trees</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="tree-based-methods.html"><a href="tree-based-methods.html#bagging"><i class="fa fa-check"></i><b>8.2.1</b> Bagging</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="tree-based-methods.html"><a href="tree-based-methods.html#reproducibility-5"><i class="fa fa-check"></i>Reproducibility</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -381,18 +395,18 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="introduction" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Introduction</h1>
-<div id="an-overview-of-statistical-learning" class="section level2 unnumbered">
-<h2>An Overview of Statistical Learning</h2>
+<div id="introduction" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> Introduction<a href="introduction.html#introduction" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="an-overview-of-statistical-learning" class="section level2 unnumbered hasAnchor">
+<h2>An Overview of Statistical Learning<a href="introduction.html#an-overview-of-statistical-learning" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <blockquote>
 <p>Broadly speaking, supervised statistical learning involves building a statistical model for predicting, or estimating, an output based on one or more inputs.</p>
 </blockquote>
 <blockquote>
 <p>With unsupervised statistical learning, there are inputs but no supervising output; nevertheless we can learn relationships and structure from such data.</p>
 </blockquote>
-<div id="wage-data" class="section level3 unnumbered">
-<h3>Wage Data</h3>
+<div id="wage-data" class="section level3 unnumbered hasAnchor">
+<h3>Wage Data<a href="introduction.html#wage-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Load the <code>Wage</code> data set via the <code>ISLR2</code> package:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="introduction.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR2)</span>
 <span id="cb1-2"><a href="introduction.html#cb1-2" aria-hidden="true" tabindex="-1"></a>wage <span class="ot">&lt;-</span> ISLR2<span class="sc">::</span>Wage</span>
@@ -439,11 +453,11 @@ div.csl-indent {
 <p><img src="_main_files/figure-html/figure1.1-1.png" width="672" /></p>
 </div>
 </div>
-<div id="a-brief-history-of-statistical-learning" class="section level2 unnumbered">
-<h2>A Brief History of Statistical Learning</h2>
+<div id="a-brief-history-of-statistical-learning" class="section level2 unnumbered hasAnchor">
+<h2>A Brief History of Statistical Learning<a href="introduction.html#a-brief-history-of-statistical-learning" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 </div>
-<div id="this-book" class="section level2 unnumbered">
-<h2>This Book</h2>
+<div id="this-book" class="section level2 unnumbered hasAnchor">
+<h2>This Book<a href="introduction.html#this-book" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <blockquote>
 <p>The Elements of Statistical Learning (ESL) by Hastie, Tibshirani, and
 Friedman was first published in 2001. Since that time, it has become an

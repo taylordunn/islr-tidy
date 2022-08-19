@@ -123,3 +123,11 @@ polynomial-regression-and-step-functions
 splines
 gams-lab
 exercises-4
+tree-based-methods
+the-basics-of-decision-trees
+regression-trees
+classification-trees
+trees-versus-linear-models
+advantages-and-disadvantages-of-trees
+bagging-random-forests-boosting-and-bayesian-additive-regression-trees
+bagging

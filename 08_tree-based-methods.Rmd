@@ -135,7 +135,7 @@ Roughly speaking, there are two steps in building a regression tree:
 2. For every observation that falls into the region $R_j$, we make the same prediction: the mean of the respone values of the training observations.
 
 In theory, the regions could be any shape but we choose *boxes* for simplicity.
-The goal of step 1 is the finx the boxes that minimize the RSS
+The goal of step 1 is to find the boxes that minimize the RSS:
 
 $$
 \sum_{j=1}^J \sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2.
@@ -208,7 +208,7 @@ However, as $\alpha$ increases, there is a price to pay for having a tree with m
 will tend to be minimized for a smaller subtree. Equation 8.4 is reminiscent of the lasso (6.7) from Chapter 6,
 in which a similar formulation was used in order to control the complexity of a linear model.
 
-As $\alpha$ is increased from zero, branches get prunced in a nested and predictable way, so obtaining the full sequence of subtrees as a function of $\alpha$ is easy.
+As $\alpha$ is increased from zero, branches get pruned in a nested and predictable way, so obtaining the full sequence of subtrees as a function of $\alpha$ is easy.
 The value of $\alpha$ can then be selected using cross-validation or a validation set, which we then apply to the full data set to obtain the subtree.
 
 The example with the `hitters` data first involves splitting the data into half training and half testing:
@@ -271,7 +271,7 @@ hitters_tree_pruned <-
 hitters_tree_pruned
 ```
 
-Note that, for `n_terminal` = 1, the object is `singlenode`, not `tree`.
+Note that, for `n_terminal` = 1, the object is `singlend`, not `tree`.
 This makes sense -- a single node can't really be called a tree -- but unfortunately it means that I can't use the `predict()` function to calculate MSE later on.
 Mathematically, a single node is just a prediction of the mean of the training set, so I will replace `n_terminal` = 1 with a `lm` model with just an intercept:
 
@@ -415,7 +415,7 @@ A tree is typically pruned by evaluating split quality with Gini index or entrop
 
 The `heart` data is not available in the `ISLR2` package, so I downloaded the CSV:
 
-```{r}
+```{r message=FALSE}
 heart <- read_csv("data/Heart.csv", show_col_types = FALSE) %>%
   # Drop the row number column
   select(-`...1`) %>%
@@ -449,7 +449,7 @@ This resulted in a
 To reproduce the plot of error versus tree size, I'll re-use a lot of the code from section \@ref(regression-trees):
 
 
-```{r figure8.6b}
+```{r figure8.6b, warning=FALSE}
 # Fit the CV splits
 heart_resamples_tree <-
   map_dfr(heart_resamples$splits, analysis, .id = "split") %>%
@@ -551,7 +551,7 @@ heart_tree_pruned_error %>%
   theme(legend.position = c(0.7, 0.8))
 ```
 
-The best model by CV error here has `r filter(heart_resamples_tree_pruned_error, cv_error == min(cv_error))$n_terminal` terminal nodes.
+The best model by CV error here has `r paste(filter(heart_resamples_tree_pruned_error, cv_error == min(cv_error))$n_terminal, sep = " or ")` terminal nodes.
 Visualize the pruned tree:
 
 ```{r figure8.6c}
@@ -568,7 +568,7 @@ text(heart_best_model[[1]])
 
 ### Trees Versus Linear Models
 
-Regression and classification trees have a very different flavor from the more classical approaches for regression and classification like linear regression.>
+Regression and classification trees have a very different flavor from the more classical approaches for regression and classification like linear regression.
 
 >
 Which model is better? It depends on the problem at hand. If the relationship between the features and the response is well approximated by
@@ -611,7 +611,7 @@ building block is a regression or a classification tree.
 
 ### Bagging
 
-The bootstrap was introduced in Chapter 5 to estimate standard deviations of a quantity of interest.
+The bootstrap was introduced in Chapter 5 to estimate standard deviations of quantities of interest.
 Here, we see that it may be used to improve statistical learning methods such as decision trees.
 
 The decision tree method suffers from high variance, in that it is highly dependent on the split of the training data.
@@ -631,7 +631,7 @@ $$
 \hat{f}_{\text{bag}}(x) = \frac{1}{B} \sum_{b=1}^B \hat{f}^{*b} (x).
 $$
 
-In the context of decision trees, this involves constructing $B$ regression of classification trees.
+In the context of decision trees, this involves constructing $B$ regression or classification trees.
 These trees are grown deep and not pruned, so each tree has high variance and low bias.
 By averaging the trees, we reduce the variance.
 
@@ -672,66 +672,6 @@ autoplot(heart_bagging_tune)
 ```
 
 
-
-```{r}
-heart_bagging_fit <- fit(heart_bagging_workflow, data = heart_train)
-test <- extract_fit_engine(heart_bagging_fit)
-test$prediction.error
-```
-```{r}
-heart_splits
-```
-
-
-### delete
-
-For the next example, I'll now switch to the `tidymodels` framework, with `decision_tree()`, the `rpart` engine, and the tunable `cost_complexity` parameter:
-
-```{r}
-decision_tree_spec <- decision_tree(cost_complexity = tune()) %>%
-  set_mode("regression") %>%
-  set_engine("rpart")
-
-hitters_workflow <- workflow() %>%
-  add_recipe(hitters_recipe) %>%
-  add_model(decision_tree_spec)
-
-cost_complexity_grid <-
-  grid_regular(cost_complexity(range = c(-2, 0)), levels = 10)
-
-get_rpart_mod <- function(x) {
-  extract_fit_engine(x)
-}
-
-hitters_tune <- tune_grid(
-  hitters_workflow, resamples = hitters_resamples,
-  grid = cost_complexity_grid, metrics = metric_set(rmse),
-  control = control_grid(extract = get_rpart_mod)
-)
-```
-
-The number of terminal nodes can be retrieved from the `rpart` model objects like this:
-
-```{r}
-rpart_mod <- hitters_tune$.extracts[[1]]$.extracts[[1]]
-sum(rpart_mod$frame$var == "<leaf>")
-```
-
-This specific model has 5 terminal nodes.
-Apply this to each model in the tuning results:
-
-```{r}
-hitters_tune %>%
-  unnest(.extracts) %>%
-  #select(id, cost_complexity, .extracts, .config) %>%
-  mutate(n_terminal = map_int(.extracts,
-                          ~ sum(.x$frame$var == "<leaf>"))) %>%
-  ggplot(aes(x = cost_complexity, y = n_terminal, color = id)) +
-  geom_point() +
-  geom_line() +
-  scale_y_continuous(breaks = 1:10) +
-  scale_x_log10()
-```
 
 ## Reproducibility {-}
 
