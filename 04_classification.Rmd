@@ -1753,7 +1753,7 @@ knn_spec1 <-
 knn_spec3 <-
   nearest_neighbor(mode = "classification", engine = "kknn", neighbors = 3)
 knn_spec5 <-
-  nearest_neighbor(mode = "classification", engine = "kknn", neighbors = 3)
+  nearest_neighbor(mode = "classification", engine = "kknn", neighbors = 5)
 ```
 
 We put the model and recipe together into three separate `workflow`s:
