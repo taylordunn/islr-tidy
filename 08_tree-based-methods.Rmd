@@ -74,7 +74,7 @@ plot(hitters_tree)
 text(hitters_tree)
 ```
 
-To visualize the regions, there is no `broom::tidy()` method for `tree` objects, but I can get the cuts from the `frame$splits` object:
+To work with the regions, there is no `broom::tidy()` method for `tree` objects, but I can get the cuts from the `frame$splits` object:
 
 ```{r}
 hitters_tree$frame$splits
@@ -132,7 +132,7 @@ hits last year tend to have higher salaries.
 Roughly speaking, there are two steps in building a regression tree:
 
 1. Divide the predictor space into $J$ distinct non-overlapping regions $R_1, \dots, R_J$.
-2. For every observation that falls into the region $R_j$, we make the same prediction: the mean of the respone values of the training observations.
+2. For every observation that falls into the region $R_j$, we make the same prediction: the mean of the response values of the training observations.
 
 In theory, the regions could be any shape but we choose *boxes* for simplicity.
 The goal of step 1 is to find the boxes that minimize the RSS:
@@ -192,7 +192,7 @@ Instead, we need a way to select a small set of subtrees for consideration.
 *Cost complexity pruning* — also known as *weakest link pruning* — gives us cost
 a way to do just this. Rather than considering every possible subtree, we
 consider a sequence of trees indexed by a nonnegative tuning parameter $\alpha$.
-For each value of α there corresponds a subtree $T \subset T0$ such that
+For each value of $\alpha$ there corresponds a subtree $T \subset T0$ such that
 
 $$
 \sum^{|T|}_{m=1} \sum_{x_i \in R_m} (y_i - \hat{y}_{R_m})^2 + \alpha |T|
@@ -551,13 +551,14 @@ heart_tree_pruned_error %>%
   theme(legend.position = c(0.7, 0.8))
 ```
 
-The best model by CV error here has `r paste(filter(heart_resamples_tree_pruned_error, cv_error == min(cv_error))$n_terminal, sep = " or ")` terminal nodes.
-Visualize the pruned tree:
+The best model by CV error here has `r paste0(filter(heart_resamples_tree_pruned_error, cv_error == min(cv_error))$n_terminal, collapse = " or ")` terminal nodes.
+Visualize the pruned tree with 
+`r min(filter(heart_resamples_tree_pruned_error, cv_error == min(cv_error))$n_terminal)` terminal nodes:
 
 ```{r figure8.6c}
 heart_best_model_cv <- heart_resamples_tree_pruned_error %>%
   filter(cv_error == min(cv_error)) %>%
-  pull(n_terminal)
+  pull(n_terminal) %>% min()
 heart_best_model <- heart_tree_pruned %>%
   filter(n_terminal == heart_best_model_cv) %>%
   pull(train_tree_pruned)
