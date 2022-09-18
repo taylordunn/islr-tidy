@@ -1103,6 +1103,107 @@ But here is my summary of the six scenarios:
     * QDA performed a bit worse than naive Bayes due to small sample size, and difficulty estimating correlations between predictors.
     * KNN's performance also suffered due to very small sample size.
     
+    
+```{r}
+make_blobs <- function(
+    n_samples = 100, n_features = 2, centers = 2, 
+    cluster_std = 1.0, center_box = c(-10, 10), 
+    shuffle = TRUE
+) {
+  if (is.matrix(centers)) {
+    if (ncol(centers) != n_features) {
+      stop("Dimensionality of centers must equal number of features")
+    }
+  } else {
+    centers <- runif(n  =  n_features * centers,
+                     min = center_box[1], max = center_box[2])
+    centers <- matrix(centers, ncol = n_features)
+  }
+  
+  if (length(cluster_std) != 1 & length(cluster_std) != nrow(centers)) {
+    stop("cluster_std must be 1 or the same length as the number of clusters")
+  }
+  
+  categories <- sample(nrow(centers), size = n_samples, replace = TRUE)
+  
+  starting_points <- matrix(
+    rnorm(n = n_samples * n_features), 
+    ncol = n_features
+  )
+  
+  if (length(cluster_std) == 1) {
+    points <- starting_points * cluster_std
+  } else {
+    points <- starting_points * cluster_std[categories]
+  }
+  
+  points <- points + centers[categories, ]
+  
+  list(
+    samples = points,  labels = categories
+  )
+}
+
+blobs <- make_blobs(centers = matrix(c(1, -1, 1, -1), ncol = 2))
+d <- as_tibble(blobs$samples) %>%
+  setNames(c("x1", "x2")) %>%
+  bind_cols(y = factor(blobs$labels))
+d %>%
+  ggplot(aes(x1, x2, color = y)) +
+  geom_point()
+```
+
+```{r}
+n_obs <- 1e3
+mu_1 <- 3
+mu_2 <- -30
+
+sigma <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)
+x <- MASS::mvrnorm(n = n_obs, mu = c(mu_1 , mu_2), Sigma = sigma)
+colnames(x) <- c("x1", "x2")
+x <- as_tibble(x)
+# Classification log-odds
+beta_0 <- 0
+beta_1 <- 1
+beta_2 <- 1
+log_odds <- beta_0 + beta_1 * x$x1 + beta_2 * x$x2
+y_prob <- 1 / (1 + exp(-log_odds))
+
+d <- x %>%
+  mutate(
+    y = rbinom(n = n_obs, size = 1, prob = y_prob) %>%
+      factor(levels = c(0, 1))
+  )
+d %>%
+  ggplot(aes(x = x1, y = x2, color = y)) +
+  geom_point()
+```
+
+>
+In each of the six scenarios, there were p = 2 quantitative predictors.
+The scenarios were as follows:
+>
+Scenario 1: There were 20 training observations in each of two classes. The
+observations within each class were uncorrelated random normal variables
+with a different mean in each class. The left-hand panel of Figure 4.11 shows
+that LDA performed well in this setting, as one would expect since this is
+the model assumed by LDA. Logistic regression also performed quite well,
+since it assumes a linear decision boundary. KNN performed poorly because
+it paid a price in terms of variance that was not offset by a reduction in bias.
+QDA also performed worse than LDA, since it fit a more flexible classifier
+than necessary. The performance of naive Bayes was slightly better than
+QDA, because the naive Bayes assumption of independent predictors is
+correct.
+
+>
+Scenario 2: Details are as in Scenario 1, except that within each class, the
+two predictors had a correlation of −0.5. The center panel of Figure 4.11
+indicates that the performance of most methods is similar to the previous scenario. The notable exception is naive Bayes, which performs very
+poorly here, since the naive Bayes assumption of independent predictors is
+violated.
+
+
+
 >These six examples illustrate that no one method will dominate the others in every situation. When the true decision boundaries are linear, then
 the LDA and logistic regression approaches will tend to perform well. When
 the boundaries are moderately non-linear, QDA or naive Bayes may give
