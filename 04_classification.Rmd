@@ -1092,7 +1092,7 @@ important: we don’t get a table of coefficients as in Table 4.3.
 
 Without additional simulation details, I can't exactly re-produce the results of this section, but I'll attempt it for scenarios 1, 2 and 3 (the linear examples).
 
-There is a function called `make_blobs()` in the scikit-learn package ([documentation here](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html) that I've used before to simulate clustered data.
+There is a function called `make_blobs()` in the scikit-learn package ([documentation here](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html)) that I've used before to simulate clustered data.
 From a quick Google search, I found [this R package `clusteringdatasets`](https://github.com/elbamos/clusteringdatasets/) which translates the function in R.
 I adapted the [source code](https://github.com/elbamos/clusteringdatasets/blob/master/R/sklearn.R) to simulate the two-class linear scenarios:
 
@@ -1134,7 +1134,7 @@ make_blobs <- function(
 
 Here is some sample data simulated for the first three scenarios:
 
-```{r fig.height=4, fig.width=7}
+```{r fig.height=3, fig.width=7}
 set.seed(22)
 
 tribble(
@@ -1155,7 +1155,7 @@ tribble(
   dunnr::add_facet_borders()
 ```
 
-Simulate 100 testing data sets for each of these scenarios:
+Simulate 100 training data sets for each of these scenarios:
 
 ```{r sim-linear-train, cache=TRUE}
 sim_linear_train <- tribble(
@@ -1176,7 +1176,7 @@ sim_linear_train <- tribble(
   ungroup()
 ```
 
-The text doesn't specify how many training samples are tested, just that it is a "large test set."
+The text doesn't specify how many testing samples are used, just that it is a "large test set."
 I'll use 1000:
 
 ```{r sim-linear-test, cache=TRUE}
@@ -1193,7 +1193,8 @@ sim_linear_test <- sim_linear_train %>%
   ungroup()
 ```
 
-Now load `tidymodels` and define the different models to be evaluated:
+Fitting many models to many data sets is made easy with `tidymodels`, but the code below will be explained more thoroughly later in this book.
+First, load `tidymodels` and define the different models to be evaluated:
 
 ```{r message=FALSE, warning=FALSE}
 library(tidymodels)
@@ -1205,7 +1206,11 @@ models <- tribble(
   "KNN-CV", nearest_neighbor(mode = "classification", neighbors = tune()),
   "LDA", discrim_linear(),
   "Logistic", logistic_reg(),
-  "NBayes", naive_Bayes(),
+  "NBayes", naive_Bayes(engine = "klaR") %>%
+    # The klaR engine has an argument usekernel that is always TRUE
+    # We have to set it to FALSE to not use KDE, and instead use Gaussian
+    #  distributions, as in the text
+    set_args(usekernel = FALSE),
   "QDA", discrim_quad()
 )
 ```
@@ -1259,7 +1264,7 @@ toc()
 
 Plot error rate for each model and scenario as in Figure 4.11:
 
-```{r fig4.11}
+```{r fig4.11, fig.width=8, fig.height=4}
 sim_linear_res %>%
   mutate(model_label = fct_inorder(model_label),
          model_fill = fct_collapse(model_label,
@@ -1275,17 +1280,17 @@ sim_linear_res %>%
 Pretty close.
 
 * Scenario 1: uncorrelated normal variables.
-    * LDA, logistic regression performed well due to linear decision boundary.
+    * LDA and logistic regression performed well due to linear decision boundary.
     * KNN performed poorly.
     * QDA worse than LDA because it was more flexible than necessary.
-    * Naive Bayes should be better than QDA because of independent predictors (as in the text) but that is not the case in my simulations.
+    * Naive Bayes should be better than QDA because of independent predictors but they are pretty equivalent here.
 * Scenario 2: correlated normal variables.
     * Similar to scenario 1, except naive Bayes performed much worse due to correlated predictors.
 * Scenario 3: correlated $t$-distributed predictors (more extreme points than normal).
     * In the text, logistic regression performs slightly better than LDA, but here they are essentially identical.
     
 I'm not sure of an easy way to adapt this approach to the non-linear scenarios 4, 5 and 6.
-If anyone has ideas, please share them [on this issue](https://github.com/taylordunn/islr-tidy/issues/1).
+If anyone reading this has ideas, please share them [on this issue](https://github.com/taylordunn/islr-tidy/issues/1).
 Here is a summary of the results presented in Figure 4.12:
     
 * Scenario 4: normal variables with different correlations per class.
@@ -2139,7 +2144,8 @@ As before with the `smarket` data set, there is increasing `Volume` with `Year`:
 
 ```{r}
 weekly %>%
-  ggplot(aes(x = factor(Year), y = Volume)) +
+  mutate(Year = factor(Year) %>% fct_relabel(~ substr(.x, 3, 4))) %>%
+  ggplot(aes(x = Year, y = Volume)) +
   geom_jitter(width = 0.3, color = td_colors$nice$day9_yellow) +
   geom_boxplot(alpha = 0.3, outlier.shape = NA, width = 0.2)
 ```

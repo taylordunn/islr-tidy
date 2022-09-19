@@ -23,7 +23,7 @@
 <meta name="author" content="Taylor Dunn" />
 
 
-<meta name="date" content="2022-09-18" />
+<meta name="date" content="2022-09-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -4923,7 +4923,7 @@ important: we don’t get a table of coefficients as in Table 4.3.</li>
 <div id="an-empirical-comparison" class="section level3 hasAnchor" number="4.5.2">
 <h3><span class="header-section-number">4.5.2</span> An Empirical Comparison<a href="classification.html#an-empirical-comparison" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Without additional simulation details, I can’t exactly re-produce the results of this section, but I’ll attempt it for scenarios 1, 2 and 3 (the linear examples).</p>
-<p>There is a function called <code>make_blobs()</code> in the scikit-learn package (<a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html">documentation here</a> that I’ve used before to simulate clustered data.
+<p>There is a function called <code>make_blobs()</code> in the scikit-learn package (<a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html">documentation here</a>) that I’ve used before to simulate clustered data.
 From a quick Google search, I found <a href="https://github.com/elbamos/clusteringdatasets/">this R package <code>clusteringdatasets</code></a> which translates the function in R.
 I adapted the <a href="https://github.com/elbamos/clusteringdatasets/blob/master/R/sklearn.R">source code</a> to simulate the two-class linear scenarios:</p>
 <div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb222-1"><a href="classification.html#cb222-1" aria-hidden="true" tabindex="-1"></a>make_blobs <span class="ot">&lt;-</span> <span class="cf">function</span>(</span>
@@ -4979,7 +4979,7 @@ I adapted the <a href="https://github.com/elbamos/clusteringdatasets/blob/master
 <span id="cb223-17"><a href="classification.html#cb223-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> scenario) <span class="sc">+</span></span>
 <span id="cb223-18"><a href="classification.html#cb223-18" aria-hidden="true" tabindex="-1"></a>  dunnr<span class="sc">::</span><span class="fu">add_facet_borders</span>()</span></code></pre></div>
 <p><img src="_main_files/figure-html/unnamed-chunk-119-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Simulate 100 testing data sets for each of these scenarios:</p>
+<p>Simulate 100 training data sets for each of these scenarios:</p>
 <div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="classification.html#cb224-1" aria-hidden="true" tabindex="-1"></a>sim_linear_train <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
 <span id="cb224-2"><a href="classification.html#cb224-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span> scenario, <span class="sc">~</span> n_samples, <span class="sc">~</span> corr, <span class="sc">~</span> dist,</span>
 <span id="cb224-3"><a href="classification.html#cb224-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Scenario 1&quot;</span>, <span class="dv">40</span>, <span class="fl">0.0</span>, <span class="st">&quot;norm&quot;</span>,</span>
@@ -4996,7 +4996,7 @@ I adapted the <a href="https://github.com/elbamos/clusteringdatasets/blob/master
 <span id="cb224-14"><a href="classification.html#cb224-14" aria-hidden="true" tabindex="-1"></a>    ))</span>
 <span id="cb224-15"><a href="classification.html#cb224-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb224-16"><a href="classification.html#cb224-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
-<p>The text doesn’t specify how many training samples are tested, just that it is a “large test set.”
+<p>The text doesn’t specify how many testing samples are used, just that it is a “large test set.”
 I’ll use 1000:</p>
 <div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb225-1"><a href="classification.html#cb225-1" aria-hidden="true" tabindex="-1"></a>sim_linear_test <span class="ot">&lt;-</span> sim_linear_train <span class="sc">%&gt;%</span></span>
 <span id="cb225-2"><a href="classification.html#cb225-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(scenario, corr, dist) <span class="sc">%&gt;%</span></span>
@@ -5009,7 +5009,8 @@ I’ll use 1000:</p>
 <span id="cb225-9"><a href="classification.html#cb225-9" aria-hidden="true" tabindex="-1"></a>    ))</span>
 <span id="cb225-10"><a href="classification.html#cb225-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb225-11"><a href="classification.html#cb225-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code></pre></div>
-<p>Now load <code>tidymodels</code> and define the different models to be evaluated:</p>
+<p>Fitting many models to many data sets is made easy with <code>tidymodels</code>, but the code below will be explained more thoroughly later in this book.
+First, load <code>tidymodels</code> and define the different models to be evaluated:</p>
 <div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="classification.html#cb226-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb226-2"><a href="classification.html#cb226-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(discrim) <span class="co"># this needs to be loaded separately for `discrim_*()`</span></span>
 <span id="cb226-3"><a href="classification.html#cb226-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -5019,9 +5020,13 @@ I’ll use 1000:</p>
 <span id="cb226-7"><a href="classification.html#cb226-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;KNN-CV&quot;</span>, <span class="fu">nearest_neighbor</span>(<span class="at">mode =</span> <span class="st">&quot;classification&quot;</span>, <span class="at">neighbors =</span> <span class="fu">tune</span>()),</span>
 <span id="cb226-8"><a href="classification.html#cb226-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;LDA&quot;</span>, <span class="fu">discrim_linear</span>(),</span>
 <span id="cb226-9"><a href="classification.html#cb226-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;Logistic&quot;</span>, <span class="fu">logistic_reg</span>(),</span>
-<span id="cb226-10"><a href="classification.html#cb226-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;NBayes&quot;</span>, <span class="fu">naive_Bayes</span>(),</span>
-<span id="cb226-11"><a href="classification.html#cb226-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;QDA&quot;</span>, <span class="fu">discrim_quad</span>()</span>
-<span id="cb226-12"><a href="classification.html#cb226-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb226-10"><a href="classification.html#cb226-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;NBayes&quot;</span>, <span class="fu">naive_Bayes</span>(<span class="at">engine =</span> <span class="st">&quot;klaR&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb226-11"><a href="classification.html#cb226-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The klaR engine has an argument usekernel that is always TRUE</span></span>
+<span id="cb226-12"><a href="classification.html#cb226-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We have to set it to FALSE to not use KDE, and instead use Gaussian</span></span>
+<span id="cb226-13"><a href="classification.html#cb226-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">#  distributions, as in the text</span></span>
+<span id="cb226-14"><a href="classification.html#cb226-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_args</span>(<span class="at">usekernel =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb226-15"><a href="classification.html#cb226-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;QDA&quot;</span>, <span class="fu">discrim_quad</span>()</span>
+<span id="cb226-16"><a href="classification.html#cb226-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>For each model and each of the 100 training sets, fit the model and evaluate on the testing set:</p>
 <div class="sourceCode" id="cb227"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb227-1"><a href="classification.html#cb227-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A helper function for fitting on a training set and getting accuracy from</span></span>
 <span id="cb227-2"><a href="classification.html#cb227-2" aria-hidden="true" tabindex="-1"></a><span class="co">#  a testing set</span></span>
@@ -5062,7 +5067,7 @@ I’ll use 1000:</p>
 <span id="cb228-11"><a href="classification.html#cb228-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">test_error =</span> <span class="dv">1</span> <span class="sc">-</span> test_accuracy</span>
 <span id="cb228-12"><a href="classification.html#cb228-12" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb228-13"><a href="classification.html#cb228-13" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
-<pre><code>## 1955.31 sec elapsed</code></pre>
+<pre><code>## 1808.57 sec elapsed</code></pre>
 <p>Plot error rate for each model and scenario as in Figure 4.11:</p>
 <div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb230-1"><a href="classification.html#cb230-1" aria-hidden="true" tabindex="-1"></a>sim_linear_res <span class="sc">%&gt;%</span></span>
 <span id="cb230-2"><a href="classification.html#cb230-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">model_label =</span> <span class="fu">fct_inorder</span>(model_label),</span>
@@ -5074,15 +5079,15 @@ I’ll use 1000:</p>
 <span id="cb230-8"><a href="classification.html#cb230-8" aria-hidden="true" tabindex="-1"></a>  dunnr<span class="sc">::</span><span class="fu">add_facet_borders</span>() <span class="sc">+</span></span>
 <span id="cb230-9"><a href="classification.html#cb230-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>)) <span class="sc">+</span></span>
 <span id="cb230-10"><a href="classification.html#cb230-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">&quot;test error&quot;</span>)</span></code></pre></div>
-<p><img src="_main_files/figure-html/fig4.11-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="_main_files/figure-html/fig4.11-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>Pretty close.</p>
 <ul>
 <li>Scenario 1: uncorrelated normal variables.
 <ul>
-<li>LDA, logistic regression performed well due to linear decision boundary.</li>
+<li>LDA and logistic regression performed well due to linear decision boundary.</li>
 <li>KNN performed poorly.</li>
 <li>QDA worse than LDA because it was more flexible than necessary.</li>
-<li>Naive Bayes should be better than QDA because of independent predictors (as in the text) but that is not the case in my simulations.</li>
+<li>Naive Bayes should be better than QDA because of independent predictors but they are pretty equivalent here.</li>
 </ul></li>
 <li>Scenario 2: correlated normal variables.
 <ul>
@@ -5094,7 +5099,7 @@ I’ll use 1000:</p>
 </ul></li>
 </ul>
 <p>I’m not sure of an easy way to adapt this approach to the non-linear scenarios 4, 5 and 6.
-If anyone has ideas, please share them <a href="https://github.com/taylordunn/islr-tidy/issues/1">on this issue</a>.
+If anyone reading this has ideas, please share them <a href="https://github.com/taylordunn/islr-tidy/issues/1">on this issue</a>.
 Here is a summary of the results presented in Figure 4.12:</p>
 <ul>
 <li>Scenario 4: normal variables with different correlations per class.
@@ -11935,7 +11940,7 @@ Split the data:</p>
 Reproducibility receipt
 </summary>
 <div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="classification.html#cb345-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.time</span>()</span></code></pre></div>
-<pre><code>## [1] &quot;2022-09-18 23:29:25 AST&quot;</code></pre>
+<pre><code>## [1] &quot;2022-09-19 10:28:39 AST&quot;</code></pre>
 <div class="sourceCode" id="cb347"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb347-1"><a href="classification.html#cb347-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="st">&quot;git2r&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) {</span>
 <span id="cb347-2"><a href="classification.html#cb347-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (git2r<span class="sc">::</span><span class="fu">in_repository</span>()) {</span>
 <span id="cb347-3"><a href="classification.html#cb347-3" aria-hidden="true" tabindex="-1"></a>    git2r<span class="sc">::</span><span class="fu">repository</span>()</span>
@@ -11943,7 +11948,7 @@ Reproducibility receipt
 <span id="cb347-5"><a href="classification.html#cb347-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <pre><code>## Local:    main C:/Users/tdunn/Documents/learning/islr-tidy
 ## Remote:   main @ origin (https://github.com/taylordunn/islr-tidy)
-## Head:     [20e7bfa] 2022-09-18: Trying out some simulation</code></pre>
+## Head:     [b60974c] 2022-09-19: Working on the empirical examples in Chapter 4 (issue #1)</code></pre>
 <div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="classification.html#cb349-1" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>()</span></code></pre></div>
 <pre><code>## ─ Session info ───────────────────────────────────────────────────────────────
 ##  setting  value
@@ -11955,7 +11960,7 @@ Reproducibility receipt
 ##  collate  English_Canada.utf8
 ##  ctype    English_Canada.utf8
 ##  tz       America/Curacao
-##  date     2022-09-18
+##  date     2022-09-19
 ##  pandoc   2.18 @ C:/Program Files/RStudio/bin/quarto/bin/tools/ (via rmarkdown)
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────
