@@ -1,0 +1,8 @@
+# These options will ignore HTML and Javascript files (from bookdown),
+#  and count Rmd and R when determining the primary language of this project
+# Read more here: https://github.com/github/linguist/blob/master/docs/overrides.md
+# And here: https://github.com/github/linguist/issues/4119
+
+*.html linguist-detectable=false
+*.js linguist-detectable=false
+*.[Rr]md linguist-language=R
