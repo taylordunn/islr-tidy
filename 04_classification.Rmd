@@ -1,6 +1,7 @@
 ```{r echo=FALSE}
 knitr::opts_chunk$set(fig.retina = 2.5, fig.align = "center",
-                      fig.width = 6, fig.height = 3)
+                      fig.width = 6, fig.height = 3,
+                      cache.path = "cache/")
 ```
 
 # Classification
@@ -26,6 +27,8 @@ library(tidyverse)
 library(broom)
 library(gt)
 library(patchwork) # for composing plots
+library(tictoc) # for timing code execution
+
 # Load my R package and set the ggplot theme
 library(dunnr)
 extrafont::loadfonts(device = "win", quiet = TRUE)
@@ -662,6 +665,14 @@ lda_default_balance_student <-
   MASS::lda(default ~ balance + student, data = default)
 lda_default_balance_student
 ```
+
+```{r}
+# The MASS package has a `select` function that overwrite `dplyr`,
+#  fix that before it becomes a problem
+select <- dplyr::select
+```
+
+
 The resulting training error rate:
 
 ```{r}
@@ -1079,21 +1090,206 @@ important: we don’t get a table of coefficients as in Table 4.3.
 
 ### An Empirical Comparison
 
-As I don't have access to the data, or the methodological details to simulate it, I won't reproduce the results of this section.
-But here is my summary of the six scenarios:
+Without additional simulation details, I can't exactly re-produce the results of this section, but I'll attempt it for scenarios 1, 2 and 3 (the linear examples).
+
+There is a function called `make_blobs()` in the scikit-learn package ([documentation here](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_blobs.html) that I've used before to simulate clustered data.
+From a quick Google search, I found [this R package `clusteringdatasets`](https://github.com/elbamos/clusteringdatasets/) which translates the function in R.
+I adapted the [source code](https://github.com/elbamos/clusteringdatasets/blob/master/R/sklearn.R) to simulate the two-class linear scenarios:
+
+```{r}
+make_blobs <- function(
+  n_samples = 40, n_features = 2,
+  # By default, class 1 is centered at (0, 0) and class 2 at (1, 1)
+  cluster_centers = matrix(c(0, 0, 1, 1), nrow = 2, byrow = TRUE),
+  # By default, the two features are uncorrelated with variance = 1
+  cluster_covar = matrix(c(1, 0, 0, 1), nrow = 2),
+  dist = c("norm", "t"), t_df = 5
+) {
+  if (ncol(cluster_centers) != n_features) {
+    stop("Dimensionality of centers must equal number of features")
+  }
+  if ((nrow(cluster_covar) != n_features) |
+      (ncol(cluster_covar) != n_features)) {
+    stop("Dimensionality of covariance matrix must match number of features")
+  }
+  dist <- match.arg(dist)
+  
+  # Equally divides each of `n_samples` into the different categories according
+  #  to the number of provided classes
+  categories <- rep(1:nrow(cluster_centers), length.out = n_samples)
+  
+  if (dist == "norm") {
+    points <- MASS::mvrnorm(n = n_samples, mu = c(0, 0), Sigma = cluster_covar)
+  } else if (dist == "t") {
+    points <- mvtnorm::rmvt(n = n_samples, delta = c(0, 0), df = t_df,
+                            sigma = cluster_covar)
+  }
+  points <- points + cluster_centers[categories, ]
+  
+  colnames(points) <- c("x", "y")
+  as_tibble(points) %>%
+    bind_cols(category = factor(categories))
+}
+```
+
+Here is some sample data simulated for the first three scenarios:
+
+```{r fig.height=4, fig.width=7}
+set.seed(22)
+
+tribble(
+  ~ scenario, ~ data,
+  "Scenario 1", make_blobs(n_samples = 40),
+  "Scenario 2", make_blobs(n_samples = 40,
+                           cluster_covar = matrix(c(1, -0.5, -0.5, 1),
+                                                  nrow = 2)),
+  "Scenario 3", make_blobs(n_samples = 100,
+                           cluster_covar = matrix(c(1, -0.5, -0.5, 1),
+                                                  nrow = 2),
+                           dist = "t")
+) %>%
+  unnest(data) %>%
+  ggplot(aes(x, y, color = category, shape = category)) +
+  geom_point(size = 3) +
+  facet_wrap(~ scenario) +
+  dunnr::add_facet_borders()
+```
+
+Simulate 100 testing data sets for each of these scenarios:
+
+```{r sim-linear-train, cache=TRUE}
+sim_linear_train <- tribble(
+  ~ scenario, ~ n_samples, ~ corr, ~ dist,
+  "Scenario 1", 40, 0.0, "norm",
+  "Scenario 2", 40, -0.5, "norm",
+  "Scenario 3", 40, -0.5, "t"
+) %>%
+  crossing(sim = 1:100) %>%
+  rowwise() %>%
+  mutate(
+    train_data = list(make_blobs(
+      n_samples = n_samples,
+      cluster_covar = matrix(c(1, corr, corr, 1), nrow = 2),
+      dist = dist
+    ))
+  ) %>%
+  ungroup()
+```
+
+The text doesn't specify how many training samples are tested, just that it is a "large test set."
+I'll use 1000:
+
+```{r sim-linear-test, cache=TRUE}
+sim_linear_test <- sim_linear_train %>%
+  distinct(scenario, corr, dist) %>%
+  rowwise() %>%
+  mutate(
+    test_data = list(make_blobs(
+      n_samples = 1000,
+      cluster_covar = matrix(c(1, corr, corr, 1), nrow = 2),
+      dist = dist
+    ))
+  ) %>%
+  ungroup()
+```
+
+Now load `tidymodels` and define the different models to be evaluated:
+
+```{r message=FALSE, warning=FALSE}
+library(tidymodels)
+library(discrim) # this needs to be loaded separately for `discrim_*()`
+
+models <- tribble(
+  ~ model_label, ~ model,
+  "KNN-1", nearest_neighbor(mode = "classification", neighbors = 1),
+  "KNN-CV", nearest_neighbor(mode = "classification", neighbors = tune()),
+  "LDA", discrim_linear(),
+  "Logistic", logistic_reg(),
+  "NBayes", naive_Bayes(),
+  "QDA", discrim_quad()
+)
+```
+
+For each model and each of the 100 training sets, fit the model and evaluate on the testing set:
+
+```{r}
+# A helper function for fitting on a training set and getting accuracy from
+#  a testing set
+calc_test_accuracy <- function(model_label, train_data, test_data, model) {
+  wf <- workflow() %>%
+    add_recipe(recipe(category ~ x + y, data = train_data)) %>%
+    add_model(model)
+    
+  if (model_label == "KNN-CV") {
+    # 5 fold cross-validation
+    train_data_folds <- vfold_cv(train_data, v = 5)
+    tune_res <- wf %>%
+      tune_grid(
+        resamples = train_data_folds,
+        # Try 1 to 10 neighbors
+        grid = tibble(neighbors = 1:10)
+      )
+    # Overwrite the workflow with the best `neighbors` value by CV accuracy
+    wf <- finalize_workflow(wf, select_best(tune_res, "accuracy")) 
+  }
+  
+  wf %>%
+    fit(data = train_data) %>%
+    augment(test_data) %>%
+    accuracy(truth = category, estimate = .pred_class) %>%
+    pull(.estimate)
+}
+```
+
+```{r sim-linear-res, cache=TRUE, warning=FALSE, message=FALSE}
+tic()
+sim_linear_res <-  sim_linear_train %>%
+  left_join(sim_linear_test %>% dplyr::select(scenario, test_data),
+            by = "scenario") %>%
+  crossing(models) %>%
+  mutate(
+    test_accuracy = pmap_dbl(
+      list(model_label, train_data, test_data, model),
+      calc_test_accuracy
+    ),
+    test_error = 1 - test_accuracy
+  )
+toc()
+```
+
+Plot error rate for each model and scenario as in Figure 4.11:
+
+```{r fig4.11}
+sim_linear_res %>%
+  mutate(model_label = fct_inorder(model_label),
+         model_fill = fct_collapse(model_label,
+                                   KNN = c("KNN-1", "KNN-CV"))) %>%
+  ggplot(aes(x = model_label, y = test_error)) +
+  geom_boxplot(aes(fill = model_fill), show.legend = FALSE) +
+  facet_wrap(~ scenario, nrow = 1, scales = "free_y") +
+  dunnr::add_facet_borders() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(x = NULL, y = "test error")
+```
+
+Pretty close.
 
 * Scenario 1: uncorrelated normal variables.
     * LDA, logistic regression performed well due to linear decision boundary.
     * KNN performed poorly.
     * QDA worse than LDA because it was more flexible than necessary.
-    * Naive Bayes better than QDA because of independent predictors.
+    * Naive Bayes should be better than QDA because of independent predictors (as in the text) but that is not the case in my simulations.
 * Scenario 2: correlated normal variables.
     * Similar to scenario 1, except naive Bayes performed much worse due to correlated predictors.
 * Scenario 3: correlated $t$-distributed predictors (more extreme points than normal).
-    * Logistic regression best (linear decision boundary).
-    * LDA a bit worse because non-normal variables.
+    * In the text, logistic regression performs slightly better than LDA, but here they are essentially identical.
+    
+I'm not sure of an easy way to adapt this approach to the non-linear scenarios 4, 5 and 6.
+If anyone has ideas, please share them [on this issue](https://github.com/taylordunn/islr-tidy/issues/1).
+Here is a summary of the results presented in Figure 4.12:
+    
 * Scenario 4: normal variables with different correlations per class.
-    * The QDA assumption was correct, and therefore greatly outperformed other.
+    * The QDA assumption was correct, and therefore greatly outperformed others.
 * Scenario 5: uncorrelated normal variables, but responses samples from the logistic function applied to a complicated non-linear function of the predictors.
     * The KNN-CV method gave the best results, followed by the more flexible QDA and naive Bayes.
     * KNN with $K = 1$ was the worst.
@@ -1103,106 +1299,7 @@ But here is my summary of the six scenarios:
     * QDA performed a bit worse than naive Bayes due to small sample size, and difficulty estimating correlations between predictors.
     * KNN's performance also suffered due to very small sample size.
     
-    
-```{r}
-make_blobs <- function(
-    n_samples = 100, n_features = 2, centers = 2, 
-    cluster_std = 1.0, center_box = c(-10, 10), 
-    shuffle = TRUE
-) {
-  if (is.matrix(centers)) {
-    if (ncol(centers) != n_features) {
-      stop("Dimensionality of centers must equal number of features")
-    }
-  } else {
-    centers <- runif(n  =  n_features * centers,
-                     min = center_box[1], max = center_box[2])
-    centers <- matrix(centers, ncol = n_features)
-  }
-  
-  if (length(cluster_std) != 1 & length(cluster_std) != nrow(centers)) {
-    stop("cluster_std must be 1 or the same length as the number of clusters")
-  }
-  
-  categories <- sample(nrow(centers), size = n_samples, replace = TRUE)
-  
-  starting_points <- matrix(
-    rnorm(n = n_samples * n_features), 
-    ncol = n_features
-  )
-  
-  if (length(cluster_std) == 1) {
-    points <- starting_points * cluster_std
-  } else {
-    points <- starting_points * cluster_std[categories]
-  }
-  
-  points <- points + centers[categories, ]
-  
-  list(
-    samples = points,  labels = categories
-  )
-}
-
-blobs <- make_blobs(centers = matrix(c(1, -1, 1, -1), ncol = 2))
-d <- as_tibble(blobs$samples) %>%
-  setNames(c("x1", "x2")) %>%
-  bind_cols(y = factor(blobs$labels))
-d %>%
-  ggplot(aes(x1, x2, color = y)) +
-  geom_point()
-```
-
-```{r}
-n_obs <- 1e3
-mu_1 <- 3
-mu_2 <- -30
-
-sigma <- matrix(c(1, 0, 0, 1), nrow = 2, ncol = 2)
-x <- MASS::mvrnorm(n = n_obs, mu = c(mu_1 , mu_2), Sigma = sigma)
-colnames(x) <- c("x1", "x2")
-x <- as_tibble(x)
-# Classification log-odds
-beta_0 <- 0
-beta_1 <- 1
-beta_2 <- 1
-log_odds <- beta_0 + beta_1 * x$x1 + beta_2 * x$x2
-y_prob <- 1 / (1 + exp(-log_odds))
-
-d <- x %>%
-  mutate(
-    y = rbinom(n = n_obs, size = 1, prob = y_prob) %>%
-      factor(levels = c(0, 1))
-  )
-d %>%
-  ggplot(aes(x = x1, y = x2, color = y)) +
-  geom_point()
-```
-
->
-In each of the six scenarios, there were p = 2 quantitative predictors.
-The scenarios were as follows:
->
-Scenario 1: There were 20 training observations in each of two classes. The
-observations within each class were uncorrelated random normal variables
-with a different mean in each class. The left-hand panel of Figure 4.11 shows
-that LDA performed well in this setting, as one would expect since this is
-the model assumed by LDA. Logistic regression also performed quite well,
-since it assumes a linear decision boundary. KNN performed poorly because
-it paid a price in terms of variance that was not offset by a reduction in bias.
-QDA also performed worse than LDA, since it fit a more flexible classifier
-than necessary. The performance of naive Bayes was slightly better than
-QDA, because the naive Bayes assumption of independent predictors is
-correct.
-
->
-Scenario 2: Details are as in Scenario 1, except that within each class, the
-two predictors had a correlation of −0.5. The center panel of Figure 4.11
-indicates that the performance of most methods is similar to the previous scenario. The notable exception is naive Bayes, which performs very
-poorly here, since the naive Bayes assumption of independent predictors is
-violated.
-
-
+The main takeaway from these empirical examples:
 
 >These six examples illustrate that no one method will dominate the others in every situation. When the true decision boundaries are linear, then
 the LDA and logistic regression approaches will tend to perform well. When
@@ -1213,7 +1310,7 @@ smoothness for a non-parametric approach must be chosen carefully. In the
 next chapter we examine a number of approaches for choosing the correct
 level of smoothness and, in general, for selecting the best overall method.
 
->Finally, recall from Chapter 3 that in the regression setting we can accommodate a non-linear relationship between the predictors and
+>Finally, recall from Chapter 3 that in the regression setting we can accommodate a non-linear relationship between the predictors and
 by performing regression using transformations of the predictors. A similar
 approach could be taken in the classification setting. For instance, we could
 create a more flexible version of logistic regression by including $X^2$, $X^3$,
@@ -1565,9 +1662,7 @@ smarket %>%
 
 Use `tidymodels` to fit the model and produce the confusion matrix:
 
-```{r message=FALSE}
-library(tidymodels)
-
+```{r}
 glm_direction_fit <-
   # Note that these options are the defaults
   #  (and mode can only be "classification" for logistic)
